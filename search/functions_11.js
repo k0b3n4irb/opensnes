@@ -16,12 +16,14 @@ var searchData=
   ['textprintu16_13',['textPrintU16',['../text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4',1,'text.h']]],
   ['textputchar_14',['textPutChar',['../text_8h.html#acd3f984c3d3308883e2729a50db16413',1,'text.h']]],
   ['textsetpos_15',['textSetPos',['../text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0',1,'text.h']]],
-  ['tile_5fwalkable_16',['tile_walkable',['../games_2rpg_2main_8c.html#a06d38282ed9fc56c163446c899d7ae7b',1,'main.c']]],
-  ['tileblitglyph2bpp_17',['tileBlitGlyph2bpp',['../tile_8h.html#aa9eef28679b52dd479bff3449a952524',1,'tile.h']]],
-  ['tileencode2bpp_18',['tileEncode2bpp',['../tile_8h.html#a6e39973c09828171e1ae29697dee107f',1,'tile.h']]],
-  ['tileencode4bpp_19',['tileEncode4bpp',['../tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a',1,'tile.h']]],
-  ['tileencode8bpp_20',['tileEncode8bpp',['../tile_8h.html#a96935756d4d5aaeaa40b7732c3cf5888',1,'tile.h']]],
-  ['title_5fdraw_21',['title_draw',['../basics_2scene__stack_2main_8c.html#ae025e4d879d35c5de20fa352e4b64b31',1,'main.c']]],
-  ['title_5finit_22',['title_init',['../basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845',1,'main.c']]],
-  ['title_5fupdate_23',['title_update',['../basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2',1,'main.c']]]
+  ['tileblitglyph2bpp_16',['tileBlitGlyph2bpp',['../tile_8h.html#aa9eef28679b52dd479bff3449a952524',1,'tile.h']]],
+  ['tileencode2bpp_17',['tileEncode2bpp',['../tile_8h.html#a6e39973c09828171e1ae29697dee107f',1,'tile.h']]],
+  ['tileencode4bpp_18',['tileEncode4bpp',['../tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a',1,'tile.h']]],
+  ['tileencode8bpp_19',['tileEncode8bpp',['../tile_8h.html#a96935756d4d5aaeaa40b7732c3cf5888',1,'tile.h']]],
+  ['title_5fdraw_20',['title_draw',['../basics_2scene__stack_2main_8c.html#ae025e4d879d35c5de20fa352e4b64b31',1,'main.c']]],
+  ['title_5finit_21',['title_init',['../basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845',1,'main.c']]],
+  ['title_5fupdate_22',['title_update',['../basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2',1,'main.c']]],
+  ['to_5fscreen_23',['to_screen',['../mode7_2mode7__racing_2main_8c.html#a04c3c3b43451691f3beda883eef700f2',1,'main.c']]],
+  ['to_5ftitle_24',['to_title',['../games_2rooftop__run_2main_8c.html#a0ac00d8e61111bfee2b8ba90d55606b2',1,'main.c']]],
+  ['turret_5ftile_25',['turret_tile',['../basics_2aim__target_2main_8c.html#aa309f387b198a9b54d0ab3e25d617df0',1,'main.c']]]
 ];

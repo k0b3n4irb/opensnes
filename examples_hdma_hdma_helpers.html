@@ -139,7 +139,7 @@ Effects</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Brightness gradient  </td><td class="markdownTableBodyNone">Fade to black at screen bottom  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Color gradient  </td><td class="markdownTableBodyNone">Sky-like color shift on background color 0  </td></tr>
+<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Color gradient  </td><td class="markdownTableBodyNone">Deep blue to orange on the backdrop (color 0)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">X  </td><td class="markdownTableBodyNone">Iris wipe  </td><td class="markdownTableBodyNone">Circular window reveal/conceal  </td></tr>
 <tr class="markdownTableRowEven">
@@ -152,11 +152,11 @@ Effects</h2>
 <h2 class="doxsection"><a class="anchor" id="architecture-6"></a>
 Architecture</h2>
 <ul>
-<li><b>BG1</b>: Static background image (OpenSNES logo)</li>
-<li><b>HDMA</b>: One channel driven by library helper functions</li>
+<li><b>BG1</b>: the OpenSNES logo, Kit over the wordmark (<span class="tt">res/logo.png</span>, written by <span class="tt">devtools/art_assets/build.py</span>); its sky is colour 0, never drawn, so the colour gradient (B) shows all around him</li>
+<li><b>HDMA</b>: channel 6, kept enabled with an empty table between effects, and channel 5 for the brightness gradient; each helper sets its channel up again when the channel runs something else, and only moves its table when it is called again on its own effect (D-pad)</li>
 <li>Each effect builds a per-scanline HDMA table in RAM</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-6"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-3"></a>
 Modules</h2>
 <p><span class="tt">console sprite dma input background hdma</span></p>
 <h2 class="doxsection"><a class="anchor" id="related-examples"></a>

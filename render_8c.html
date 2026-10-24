@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>examples/games/tetris/render.c File Reference</title>
+<title>examples/games/blocks/render.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -141,7 +141,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a63b80f00c14fea9726ff446d72bf706e" id="r_a63b80f00c14fea9726ff446d72bf706e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a63b80f00c14fea9726ff446d72bf706e">MSG_ROW</a>&#160;&#160;&#160;13</td></tr>
 <tr class="memitem:a6cb9fb4cb945dc633b05ab2e51d19f2e" id="r_a6cb9fb4cb945dc633b05ab2e51d19f2e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6cb9fb4cb945dc633b05ab2e51d19f2e">NEXT_BOX_COL</a>&#160;&#160;&#160;16</td></tr>
 <tr class="memitem:a7c92b0bbf13cad4d4606b341db08293a" id="r_a7c92b0bbf13cad4d4606b341db08293a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7c92b0bbf13cad4d4606b341db08293a">NEXT_BOX_ROW</a>&#160;&#160;&#160;17</td></tr>
-<tr class="memitem:ac051922d6263b9fddb3531561ff2a419" id="r_ac051922d6263b9fddb3531561ff2a419"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac051922d6263b9fddb3531561ff2a419">PAL1</a>&#160;&#160;&#160;0x0400   /* <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 1 (grey gradient) */</td></tr>
+<tr class="memitem:ac051922d6263b9fddb3531561ff2a419" id="r_ac051922d6263b9fddb3531561ff2a419"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac051922d6263b9fddb3531561ff2a419">PAL1</a>&#160;&#160;&#160;0x0400   /* <a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a> 1 (the cabinet) */</td></tr>
 <tr class="memitem:ad6b31fb55544fb3bfc13a9a37ec35209" id="r_ad6b31fb55544fb3bfc13a9a37ec35209"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad6b31fb55544fb3bfc13a9a37ec35209">TILE_BORDER_H</a>&#160;&#160;&#160;9   /* horizontal bar */</td></tr>
 <tr class="memitem:a50692b94ddc8999f401b35d8e1672fff" id="r_a50692b94ddc8999f401b35d8e1672fff"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a50692b94ddc8999f401b35d8e1672fff">TILE_BORDER_V</a>&#160;&#160;&#160;10  /* vertical bar */</td></tr>
 <tr class="memitem:a2c4e3765dc9c8e6275c8d6998055b854" id="r_a2c4e3765dc9c8e6275c8d6998055b854"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a2c4e3765dc9c8e6275c8d6998055b854">TILE_CORNER</a>&#160;&#160;&#160;8   /* corner (base = TL) */</td></tr>
@@ -218,7 +218,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(((r) - 1) * 32 + (<a class="code hl_variable" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a>) + 2)</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_afff0ae4fe505f5b27afed49e21dea41d"><div class="ttname"><a href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></div><div class="ttdeci">static u16 c</div><div class="ttdef"><b>Definition</b> main.c:148</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_afff0ae4fe505f5b27afed49e21dea41d"><div class="ttname"><a href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></div><div class="ttdeci">static u16 c</div><div class="ttdef"><b>Definition</b> main.c:145</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -397,7 +397,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PAL1&#160;&#160;&#160;0x0400   /* <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 1 (grey gradient) */</td>
+          <td class="memname">#define PAL1&#160;&#160;&#160;0x0400   /* <a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a> 1 (the cabinet) */</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1341,7 +1341,7 @@ Variables</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_becf1ea6f4c3aedd00716ce2d1a94e66.html">games</a></li><li class="navelem"><a href="dir_b2aa9713755f0da7ec334d8c56ce38b3.html">tetris</a></li><li class="navelem"><a href="render_8c.html">render.c</a></li>
+    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_becf1ea6f4c3aedd00716ce2d1a94e66.html">games</a></li><li class="navelem"><a href="dir_132bfc441c0d7963bb09bf3e9c51c6a0.html">blocks</a></li><li class="navelem"><a href="render_8c.html">render.c</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

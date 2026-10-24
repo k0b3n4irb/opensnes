@@ -129,6 +129,11 @@ $(function(){initNavTree('mode7_2perspective__rotate_2main_8c.html','',''); });
 <code>#include &quot;res/ground.inc&quot;</code><br />
 <code>#include &quot;res/perspective.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:affd30c52e0d4aa2c62b10a56deeb9bd6" id="r_affd30c52e0d4aa2c62b10a56deeb9bd6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#affd30c52e0d4aa2c62b10a56deeb9bd6">TURN_FRAMES</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memdesc:affd30c52e0d4aa2c62b10a56deeb9bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frames between two rotation steps while L or R is held (7.5 deg per step).  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -138,13 +143,15 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a313857711c86124ca4a23076d196f8e3" id="r_a313857711c86124ca4a23076d196f8e3"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a313857711c86124ca4a23076d196f8e3">angle</a></td></tr>
-<tr class="memdesc:a313857711c86124ca4a23076d196f8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground: 9-tile prefab track (original art).  <br /></td></tr>
+<tr class="memdesc:a313857711c86124ca4a23076d196f8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).  <br /></td></tr>
 <tr class="memitem:a4eec51eb21414f626d3c1aae5ad26934" id="r_a4eec51eb21414f626d3c1aae5ad26934"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4eec51eb21414f626d3c1aae5ad26934">pos_x</a></td></tr>
 <tr class="memdesc:a4eec51eb21414f626d3c1aae5ad26934"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 pivot shadows (krom init: 512, 1152).  <br /></td></tr>
 <tr class="memitem:a47999cdb6b6701ff9f57b3bf80c818ca" id="r_a47999cdb6b6701ff9f57b3bf80c818ca"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a47999cdb6b6701ff9f57b3bf80c818ca">pos_y</a></td></tr>
 <tr class="memitem:a3f6f5bb962f3c4e5eea51bf57824ffce" id="r_a3f6f5bb962f3c4e5eea51bf57824ffce"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3f6f5bb962f3c4e5eea51bf57824ffce">scr_x</a></td></tr>
 <tr class="memdesc:a3f6f5bb962f3c4e5eea51bf57824ffce"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 scroll shadows (krom init: 384, 768).  <br /></td></tr>
 <tr class="memitem:a637db4961a5c2f274b02e908de4716b6" id="r_a637db4961a5c2f274b02e908de4716b6"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a637db4961a5c2f274b02e908de4716b6">scr_y</a></td></tr>
+<tr class="memitem:a01057a7b30426a7e4d0c1d509b58db55" id="r_a01057a7b30426a7e4d0c1d509b58db55"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a01057a7b30426a7e4d0c1d509b58db55">turn_wait</a></td></tr>
+<tr class="memdesc:a01057a7b30426a7e4d0c1d509b58db55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frames left before the next rotation step; 0 = step at once.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Rotating Mode 7 perspective — full matrix driven by 4 HDMA channels. </p>
@@ -157,12 +164,29 @@ Variables</h2></td></tr>
 <li>Mode 7 interleaved VRAM (dmaCopyVramMode7)</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>A kart-style track receding to the horizon. D-pad moves over the plane, L/R rotate the world in 7.5-degree steps, Y/A nudge the pivot on X, X/B nudge it on Y (krom's control map).</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>The city's avenues receding to the horizon. D-pad moves over the plane, L/R rotate the world in 7.5-degree steps (one every 4 frames), Y/A nudge the pivot on X, X/B nudge it on Y (krom's control map).</dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, hdma, input, mode7</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/PeterLemon/SNES">https://github.com/PeterLemon/SNES</a> — original demo &amp; tables </dd>
 <dd>
 tools/opensnes-image — <span class="tt">perspective</span> regenerates the tables from the formula </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="affd30c52e0d4aa2c62b10a56deeb9bd6" name="affd30c52e0d4aa2c62b10a56deeb9bd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affd30c52e0d4aa2c62b10a56deeb9bd6">&#9670;&#160;</a></span>TURN_FRAMES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TURN_FRAMES&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frames between two rotation steps while L or R is held (7.5 deg per step). </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -229,7 +253,7 @@ tools/opensnes-image — <span class="tt">perspective</span> regenerates the tab
 </table>
 </div><div class="memdoc">
 
-<p>Mode 7 ground: 9-tile prefab track (original art). </p>
+<p>Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py). </p>
 <p>Rotation step index, 0..47 </p>
 
 </div>
@@ -323,6 +347,30 @@ tools/opensnes-image — <span class="tt">perspective</span> regenerates the tab
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a01057a7b30426a7e4d0c1d509b58db55" name="a01057a7b30426a7e4d0c1d509b58db55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01057a7b30426a7e4d0c1d509b58db55">&#9670;&#160;</a></span>turn_wait</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> turn_wait</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Frames left before the next rotation step; 0 = step at once. </p>
 
 </div>
 </div>

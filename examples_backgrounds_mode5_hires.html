@@ -127,8 +127,8 @@ $(function(){initNavTree('examples_backgrounds_mode5_hires.html','',''); });
 <div class="caption">
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>InterlaceFont</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Interlace/InterlaceFont</span>). BG Mode 5 renders <b>512 horizontal pixels</b> with 16×8 tiles; SETINI bit 0 adds screen interlace for <b>448 visible lines</b>. This example lands the SDK's SETINI surface (<span class="tt">videoSetInterlace/ObjInterlace/Overscan/PseudoHires</span>, all composing through a write-only-register shadow) with a text page as the canonical hi-res payload — every glyph is 8 px wide, unrepresentable at 256.</p>
-<p>The page is original art (<span class="tt">gen_assets.py</span> renders it and converts to Mode 5's paired-tile format; outputs committed so builds don't need Pillow). The 1-pixel stripe/checker bands are the acid test: at true 512 px they alternate every column — a 256-wide mode would alias them to flat gray.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-10"></a>
+<p>The page is a screen of the Rue basse's terminal, 63 columns of the library's 8x8 font in the city's colours (white, cyan and amber on the glass), drawn and converted to Mode 5's paired-tile format by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">hires_page</span>); the outputs are committed. The 1-pixel stripe/checker bands are the acid test: at true 512 px they alternate every column — a 256-wide mode would alias them to flat gray.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-4"></a>
 SNES Concepts</h2>
 <ul>
 <li>BG Mode 5: 512 px, 16×8 tiles stored as 8×8 character pairs (N, N+1)</li>
@@ -141,8 +141,8 @@ Understanding what you see</h2>
 <p>Mode 5's 512 columns interleave the sub screen (even columns) and main screen (odd columns) — a period CRT blended adjacent columns into smooth strokes, while a modern LCD's crisp pixel grid shows them individually:</p>
 <ul>
 <li><b>Text looks slightly "double-struck"</b> — those are the real alternating columns. Authentic PPU output (hi-res games like Seiken Densetsu 3 show the same fringing in emulators); a CRT melts it into clean strokes.</li>
-<li><b>The white/black 1-px band reads as flat gray</b> — 1-px columns are finer than typical window scaling can resolve. That IS the acid test: at 256 wide this band couldn't exist at all. On a CRT it shimmers.</li>
-<li><b>The cyan/gold band still resolves into visible stripes</b> — its period is 4 px (2 px per color), coarse enough to survive scaling: direct visual proof you are looking at 512 columns.</li>
+<li><b>The white/glass 1-px band reads as flat gray</b> — 1-px columns are finer than typical window scaling can resolve. That IS the acid test: at 256 wide this band couldn't exist at all. On a CRT it shimmers.</li>
+<li><b>The cyan/amber band still resolves into visible stripes</b> — its period is 4 px (2 px per color), coarse enough to survive scaling: direct visual proof you are looking at 512 columns.</li>
 <li><b>The 1-px checkerboard reads as gray</b> — same physics, both axes.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="register-fidelity-vs-the-original-1"></a>
@@ -161,17 +161,28 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">BG12NBA  </td><td class="markdownTableBodyNone">tiles word $8000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr</a></span>) — verified  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="validation-notes-luna-v190"></a>
-Validation notes (luna v1.9.0)</h2>
-<p>luna renders hi-res/interlace CONTENT correctly but captures at 256×224 (≈2×2 downsample of the 512×448 field pair) — native-resolution capture is <a href="https://github.com/k0b3n4irb/luna/issues/115">luna#115</a>. The full 448-line page displays once with no vertical wrap (the 32×64 map fix — a 32-row map only covers 256 hi-res lines in interlace), and the 1-px bands render as the correct blend grays.</p>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-6"></a>
+<h2 class="doxsection"><a class="anchor" id="validation-notes"></a>
+Validation notes</h2>
+<p>The screenshot above is luna's capture at native resolution (<span class="tt">luna run --native-res</span>, 512×448: the field pair, every column), and the visual baseline is taken the same way. The full 448-line page displays once with no vertical wrap (the 32×64 map: a 32-row map only covers 256 hi-res lines in interlace).</p>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-3"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/backgrounds/mode5_hires &amp;&amp; make</div>
-<div class="line"># regenerate the page (needs Pillow + numpy):</div>
-<div class="line">python3 gen_assets.py &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-13"></a>
+<div class="line"># redraw the page (contributors, needs Pillow):</div>
+<div class="line">python3 ../../../devtools/art_assets/build.py &amp;&amp; make</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-7"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span></p>
+<h2 class="doxsection"><a class="anchor" id="assets-1"></a>
+Assets</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What  </th><th class="markdownTableHeadNone">Made by  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/text.pic</span>, <span class="tt">res/text.map</span>, <span class="tt">res/text.pal</span>  </td><td class="markdownTableBodyNone">the page as Mode 5 reads it: 4bpp tile pairs, a 32×64 map, four colours  </td><td class="markdownTableBodyNone"><span class="tt">devtools/art_assets/build.py</span> (<span class="tt">hires_page</span>)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/source.png</span>  </td><td class="markdownTableBodyNone">the page itself, 512×448, for reference  </td><td class="markdownTableBodyNone">the same  </td></tr>
+</table>
+<p>CC0, like the rest of the Néo-Lumen assets (<span class="tt">assets/neo-lumen/README.md</span>).</p>
 <h2 class="doxsection"><a class="anchor" id="further-mode-5-without-interlace-512-x-256"></a>
 Further: Mode 5 without interlace (512 x 256)</h2>
 <p>The plain Mode 5 picture is this program minus <span class="tt"><a class="el" href="video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c" title="Enable/disable screen interlace (SETINI bit 0).">videoSetInterlace()</a></span>: 512 pixels wide at 256 lines, 16x8 tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the right), loaded with <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a></span> at 4 bpp for BG1 and 2 bpp for BG2. The same two traps apply — the layer shows through main AND sub screen, and the VRAM budget doubles (24 KB of interleaved tiles for one screen). </p>

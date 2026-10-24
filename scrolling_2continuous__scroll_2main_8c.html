@@ -123,12 +123,12 @@ $(function(){initNavTree('scrolling_2continuous__scroll_2main_8c.html','',''); }
 </div><!--header-->
 <div class="contents">
 
-<p>Two-layer parallax scrolling with player sprite.  
+<p>A threshold camera over two layers in parallax: Kit runs on the roofs.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;res/BG1.inc&quot;</code><br />
-<code>#include &quot;res/BG2.inc&quot;</code><br />
-<code>#include &quot;res/character.inc&quot;</code><br />
+<code>#include &quot;res/roofs.inc&quot;</code><br />
+<code>#include &quot;res/skyline.inc&quot;</code><br />
+<code>#include &quot;res/kit.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -137,43 +137,98 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a5818610d4897962194420846a6f051b5" id="r_a5818610d4897962194420846a6f051b5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5818610d4897962194420846a6f051b5">FRAME_IDLE</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:a5818610d4897962194420846a6f051b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The frames in res/kit.png, 32x32, four a row: idle 0-3, run 4-11.  <br /></td></tr>
+<tr class="memitem:a45d7d05325b5f4b1ad8c37ebbd25a4b7" id="r_a45d7d05325b5f4b1ad8c37ebbd25a4b7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a45d7d05325b5f4b1ad8c37ebbd25a4b7">FRAME_RUN</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:afe81428a3ef9bd18f766d9f153c56ead" id="r_afe81428a3ef9bd18f766d9f153c56ead"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afe81428a3ef9bd18f766d9f153c56ead">KIT_Y</a>&#160;&#160;&#160;105</td></tr>
+<tr class="memdesc:afe81428a3ef9bd18f766d9f153c56ead"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kit's sprite y: his feet (row 30 of the frame) on the roofs (picture row 144, scrolled by 8).  <br /></td></tr>
 <tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Scroll Configuration</div></td></tr>
-<tr><td colspan="2" class="ititle"><div class="groupText"><p>Constants controlling the auto-scroll behavior </p>
+<tr><td colspan="2" class="ititle"><div class="groupText"><p>Constants controlling the camera </p>
 </div></td></tr>
-<tr class="memitem:addf5d5626d788a05436c14e2a00c1974" id="r_addf5d5626d788a05436c14e2a00c1974"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>&#160;&#160;&#160;512</td></tr>
+<tr class="memitem:addf5d5626d788a05436c14e2a00c1974" id="r_addf5d5626d788a05436c14e2a00c1974"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>&#160;&#160;&#160;256</td></tr>
 <tr class="memitem:a8a90ba51fd761fd07b62073e648827a8" id="r_a8a90ba51fd761fd07b62073e648827a8"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a8a90ba51fd761fd07b62073e648827a8">SCROLL_THRESHOLD_LEFT</a>&#160;&#160;&#160;80</td></tr>
 <tr class="memitem:ae3ddf372515f487a80742c4ac55de93f" id="r_ae3ddf372515f487a80742c4ac55de93f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a>&#160;&#160;&#160;140</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:aa51152e2a08444a8e1a93ba7471b2b75" id="r_aa51152e2a08444a8e1a93ba7471b2b75"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa51152e2a08444a8e1a93ba7471b2b75">frame_tile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> f)</td></tr>
+<tr class="memdesc:aa51152e2a08444a8e1a93ba7471b2b75"><td class="mdescLeft">&#160;</td><td class="mdescRight">The OAM tile number of frame <code class="param">f</code> of the sheet.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; two-layer parallax scrolling with player sprite.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; a threshold camera over two layers in parallax.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a73de383a83473e9a755b640ccca7fd44" id="r_a73de383a83473e9a755b640ccca7fd44"><td class="memItemLeft"><a class="el" href="structGameState.html">GameState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a73de383a83473e9a755b640ccca7fd44">game</a> = {20, 100, 0, 32, 0, 32}</td></tr>
+<tr class="memitem:a28ea7d8ebda8a9d44a83a98b38008c0b" id="r_a28ea7d8ebda8a9d44a83a98b38008c0b"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a28ea7d8ebda8a9d44a83a98b38008c0b">facing_left</a></td></tr>
+<tr class="memdesc:a28ea7d8ebda8a9d44a83a98b38008c0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kit faces left (his frames face right; the sprite is mirrored).  <br /></td></tr>
+<tr class="memitem:a73de383a83473e9a755b640ccca7fd44" id="r_a73de383a83473e9a755b640ccca7fd44"><td class="memItemLeft"><a class="el" href="structGameState.html">GameState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a73de383a83473e9a755b640ccca7fd44">game</a> = {20, 105 , 0, 8, 0, 240}</td></tr>
 <tr class="memdesc:a73de383a83473e9a755b640ccca7fd44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global game state instance with initial values.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Two-layer parallax scrolling with player sprite. </p>
-<p>Demonstrates continuous horizontal scrolling with two independent background layers moving at different speeds (parallax) and a player-controlled sprite. BG1 and BG2 are loaded with separate tile sets and palettes in different VRAM/CGRAM slots to avoid conflicts. The scroll position is updated each frame based on player movement: when the sprite crosses a screen threshold, the background auto-scrolls and the player is pushed back, creating a camera-follow effect common in side-scrolling games. Scroll registers are written via <a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a>, which defers the actual PPU register write to the NMI handler via a dirty-flag mechanism.</p>
+<div class="textblock"><p>A threshold camera over two layers in parallax: Kit runs on the roofs. </p>
+<p>Kit runs along a stretch of roofs 512 px wide (BG1, a 64x32 map) in front of the far towers (BG2). The camera follows him without a map engine: while he is between two thresholds of the screen he moves and the world stays; what he goes past one, the world scrolls instead and he is put back on it, so he keeps his place on screen while the roofs go by. BG2 scrolls at half BG1's speed, which is what makes the towers look far away. Scroll registers are written via <a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a>, which defers the actual PPU register write to the NMI handler via a dirty flag.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Multi-layer parallax scrolling (BG1 + BG2 at independent speeds)</li>
+<li>A 64x32 background map: two 32x32 pages side by side, 512 px of world</li>
 <li>Deferred scroll register writes via NMI dirty flags</li>
 <li>Multiple tile sets and palette slots in VRAM/CGRAM</li>
-<li>Sprite overlay on scrolling backgrounds</li>
-<li>Auto-scroll camera with player threshold tracking</li>
+<li>A 32x32 sprite, animated and mirrored by its attribute's H-flip bit</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>Move the character with D-pad; background scrolls when near screen edges</li>
-<li>BG1 and BG2 scroll together (parallax could use different speeds)</li>
-<li>The sprite animates and moves freely within the scroll boundaries</li>
+<li>Hold RIGHT: Kit runs to x 140 and stays there; the roofs scroll by under him and the towers behind them follow at half the speed</li>
+<li>At the end of the roofs the camera stops and Kit runs on to the edge</li>
+<li>Release: Kit stands and breathes; LEFT runs back</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, input, background, dma</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a5818610d4897962194420846a6f051b5" name="a5818610d4897962194420846a6f051b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5818610d4897962194420846a6f051b5">&#9670;&#160;</a></span>FRAME_IDLE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FRAME_IDLE&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The frames in res/kit.png, 32x32, four a row: idle 0-3, run 4-11. </p>
+
+</div>
+</div>
+<a id="a45d7d05325b5f4b1ad8c37ebbd25a4b7" name="a45d7d05325b5f4b1ad8c37ebbd25a4b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45d7d05325b5f4b1ad8c37ebbd25a4b7">&#9670;&#160;</a></span>FRAME_RUN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FRAME_RUN&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe81428a3ef9bd18f766d9f153c56ead" name="afe81428a3ef9bd18f766d9f153c56ead"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe81428a3ef9bd18f766d9f153c56ead">&#9670;&#160;</a></span>KIT_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define KIT_Y&#160;&#160;&#160;105</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Kit's sprite y: his feet (row 30 of the frame) on the roofs (picture row 144, scrolled by 8). </p>
+
+</div>
+</div>
 <a id="addf5d5626d788a05436c14e2a00c1974" name="addf5d5626d788a05436c14e2a00c1974"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#addf5d5626d788a05436c14e2a00c1974">&#9670;&#160;</a></span>MAX_SCROLL_X</h2>
 
@@ -181,11 +236,11 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_SCROLL_X&#160;&#160;&#160;512</td>
+          <td class="memname">#define MAX_SCROLL_X&#160;&#160;&#160;256</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Maximum horizontal scroll (depends on tilemap size) </p>
+<p>BG1's last scroll: 512 px of roofs minus one 256 px screen </p>
 
 </div>
 </div>
@@ -200,7 +255,7 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>When player X &lt; this, scroll left </p>
+<p>When Kit's x &lt; this, scroll left </p>
 
 </div>
 </div>
@@ -215,11 +270,39 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>When player X &gt; this, scroll right </p>
+<p>When Kit's x &gt; this, scroll right </p>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="aa51152e2a08444a8e1a93ba7471b2b75" name="aa51152e2a08444a8e1a93ba7471b2b75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa51152e2a08444a8e1a93ba7471b2b75">&#9670;&#160;</a></span>frame_tile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> frame_tile </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The OAM tile number of frame <code class="param">f</code> of the sheet. </p>
+<p>A 32x32 frame is 4x4 tiles. VRAM rows of sprite tiles are 16 tiles wide, so a frame row of four is one VRAM row of tiles: frame f starts at column (f % 4) * 4 of tile row (f / 4) * 4. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -235,17 +318,48 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point &ndash; two-layer parallax scrolling with player sprite. </p>
-<p>Loads two independent background layers (BG1 and BG2) with separate tile sets and palette slots, plus a character sprite. Each frame, the D-pad moves the player sprite; when the sprite crosses the scroll threshold, the backgrounds auto-scroll and the sprite is pushed back, creating a camera-follow effect. Scroll registers are deferred to the NMI handler via <a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a>'s dirty-flag mechanism for safe VBlank-only writes.</p>
+<p>Entry point &ndash; a threshold camera over two layers in parallax. </p>
+<p>Loads the roofs (BG1, 64x32), the far towers (BG2, 64x32) and Kit's frames, each in its own VRAM and CGRAM slot. Each frame, the D-pad moves Kit; past a threshold the camera scrolls instead, BG2 at half speed.</p>
 <dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>
 <p>&lt; Current joypad button state (read from hardware)</p>
-<p>&lt; When player X &gt; this, scroll right</p>
-<p>&lt; Maximum horizontal scroll (depends on tilemap size)</p>
-<p>&lt; When player X &lt; this, scroll left</p>
+<p>&lt; Kit's current frame</p>
+<p>&lt; Frames since the animation started</p>
+<p>&lt; How far past a threshold Kit went this frame</p>
+<p>&lt; When Kit's x &gt; this, scroll right</p>
+<p>&lt; BG1's last scroll: 512 px of roofs minus one 256 px screen</p>
+<p>&lt; When Kit's x &gt; this, scroll right</p>
+<p>&lt; BG1's last scroll: 512 px of roofs minus one 256 px screen</p>
+<p>&lt; BG1's last scroll: 512 px of roofs minus one 256 px screen</p>
+<p>&lt; When Kit's x &lt; this, scroll left</p>
+<p>&lt; When Kit's x &lt; this, scroll left</p>
 
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a28ea7d8ebda8a9d44a83a98b38008c0b" name="a28ea7d8ebda8a9d44a83a98b38008c0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28ea7d8ebda8a9d44a83a98b38008c0b">&#9670;&#160;</a></span>facing_left</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> facing_left</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Kit faces left (his frames face right; the sprite is mirrored). </p>
+
+</div>
+</div>
 <a id="a73de383a83473e9a755b640ccca7fd44" name="a73de383a83473e9a755b640ccca7fd44"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a73de383a83473e9a755b640ccca7fd44">&#9670;&#160;</a></span>game</h2>
 
@@ -253,7 +367,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structGameState.html">GameState</a> game = {20, 100, 0, 32, 0, 32}</td>
+          <td class="memname"><a class="el" href="structGameState.html">GameState</a> game = {20, 105 , 0, 8, 0, 240}</td>
         </tr>
       </table>
 </div><div class="memdoc">

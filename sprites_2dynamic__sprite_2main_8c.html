@@ -123,15 +123,32 @@ $(function(){initNavTree('sprites_2dynamic__sprite_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Dynamic sprite engine with per-frame VRAM tile streaming.  
+<p>Dynamic sprite engine: per-frame VRAM tile streaming, single sprites and metasprites.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &quot;res/sprite16_grid.inc&quot;</code><br />
+<code>#include &quot;res/spritehero32.inc&quot;</code><br />
+<code>#include &quot;res/spritehero16.inc&quot;</code><br />
+<code>#include &quot;res/spritehero8.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a0363176ea17cef39555ce2d1d709af68" id="r_a0363176ea17cef39555ce2d1d709af68"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0363176ea17cef39555ce2d1d709af68">animStep</a> (void)</td></tr>
+<tr class="memdesc:a0363176ea17cef39555ce2d1d709af68"><td class="mdescLeft">&#160;</td><td class="mdescRight">One frame of the animated scene: a step every 8 frames, then the draws.  <br /></td></tr>
+<tr class="memitem:a639d8dac137f049df085726a0a72076c" id="r_a639d8dac137f049df085726a0a72076c"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a639d8dac137f049df085726a0a72076c">changeObjSize</a> (void)</td></tr>
+<tr class="memdesc:a639d8dac137f049df085726a0a72076c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinitialize sprite engine and upload all tiles during force blank.  <br /></td></tr>
+<tr class="memitem:ad6eba0f1fac53c1e89b6ad3f444b3f09" id="r_ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">drawSprites</a> (void)</td></tr>
+<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw metasprites for the current OBJSEL configuration.  <br /></td></tr>
+<tr class="memitem:a29eae980c57c4880681566fd51f039b4" id="r_a29eae980c57c4880681566fd51f039b4"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a29eae980c57c4880681566fd51f039b4">drawText</a> (void)</td></tr>
+<tr class="memdesc:a29eae980c57c4880681566fd51f039b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw the configuration menu text.  <br /></td></tr>
+<tr class="memitem:a4fd76d03850c6455605296d1ccdb1741" id="r_a4fd76d03850c6455605296d1ccdb1741"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4fd76d03850c6455605296d1ccdb1741">enterAnimScene</a> (void)</td></tr>
+<tr class="memdesc:a4fd76d03850c6455605296d1ccdb1741"><td class="mdescLeft">&#160;</td><td class="mdescRight">The four animated 16x16 sprites: the engine, the palette, the sprites' state and their first draw; the screen comes on at the end.  <br /></td></tr>
+<tr class="memitem:ad427ee29dc9c8178f93fad579f96e246" id="r_ad427ee29dc9c8178f93fad579f96e246"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad427ee29dc9c8178f93fad579f96e246">enterMetaScene</a> (void)</td></tr>
+<tr class="memdesc:ad427ee29dc9c8178f93fad579f96e246"><td class="mdescLeft">&#160;</td><td class="mdescRight">The metasprite scene: Mode 0, the text menu on BG1, the heroes' palette; <a class="el" href="#a639d8dac137f049df085726a0a72076c" title="Reinitialize sprite engine and upload all tiles during force blank.">changeObjSize()</a> configures the engine and draws them.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: dynamic sprite engine demo with four animated sprites.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: the animated sprites at boot, SELECT to the metasprites and back.  <br /></td></tr>
+<tr class="memitem:a0453578d7fedbd070d6460dea4169ec7" id="r_a0453578d7fedbd070d6460dea4169ec7"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0453578d7fedbd070d6460dea4169ec7">metaStep</a> (void)</td></tr>
+<tr class="memdesc:a0453578d7fedbd070d6460dea4169ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">One frame of the metasprite scene: UP/DOWN pick the size pair.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -145,28 +162,206 @@ Variables</h2></td></tr>
 <tr class="memdesc:aaf47a9315cba731325a26e9eacff5c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation frame index for sprite 3 (0-23, wraps at 24).  <br /></td></tr>
 <tr class="memitem:af743d5de011168f86bbdb716e0afbc47" id="r_af743d5de011168f86bbdb716e0afbc47"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></td></tr>
 <tr class="memdesc:af743d5de011168f86bbdb716e0afbc47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global frame counter for animation timing.  <br /></td></tr>
+<tr class="memitem:ae2ffd37454763f04bc54b520f8e8c323" id="r_ae2ffd37454763f04bc54b520f8e8c323"><td class="memItemLeft">static const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a> []</td></tr>
+<tr class="memdesc:ae2ffd37454763f04bc54b520f8e8c323"><td class="mdescLeft">&#160;</td><td class="mdescRight">16x16 metasprite: Kit 32x48 (2x3 grid of 16x16)  <br /></td></tr>
+<tr class="memitem:a39748e25a7a4234b8d7fe367a6199c94" id="r_a39748e25a7a4234b8d7fe367a6199c94"><td class="memItemLeft">static const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a>&#160;</td><td class="memItemRight"><a class="el" href="#a39748e25a7a4234b8d7fe367a6199c94">hero32_frame0</a> []</td></tr>
+<tr class="memdesc:a39748e25a7a4234b8d7fe367a6199c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">32x32 metasprite: Kit 64x64 (2x2 grid of 32x32, blocks 0-3 of the sheet)  <br /></td></tr>
+<tr class="memitem:abc082b417d7da07574502ec922386fb4" id="r_abc082b417d7da07574502ec922386fb4"><td class="memItemLeft">static const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a>&#160;</td><td class="memItemRight"><a class="el" href="#abc082b417d7da07574502ec922386fb4">hero8_frame0</a> []</td></tr>
+<tr class="memdesc:abc082b417d7da07574502ec922386fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">8x8 metasprite: Kit 16x16 (2x2 grid of 8x8, tiles 0-3 of the sheet)  <br /></td></tr>
+<tr class="memitem:a03ed83511c1f6af6113559d4ca6fe10e" id="r_a03ed83511c1f6af6113559d4ca6fe10e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03ed83511c1f6af6113559d4ca6fe10e">in_meta</a></td></tr>
+<tr class="memdesc:a03ed83511c1f6af6113559d4ca6fe10e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point.  <br /></td></tr>
+<tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
+<tr class="memitem:a588ff5082ccab493c90422d028d31b4d" id="r_a588ff5082ccab493c90422d028d31b4d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a588ff5082ccab493c90422d028d31b4d">selectedItem</a></td></tr>
 <tr class="memitem:ace36248f57cf8494fae6acbe77b274f0" id="r_ace36248f57cf8494fae6acbe77b274f0"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ace36248f57cf8494fae6acbe77b274f0">xpos</a> [4] = {64, 112, 160, 208}</td></tr>
 <tr class="memdesc:ace36248f57cf8494fae6acbe77b274f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ROM source for the 16x16 sprite sheet tile data.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Dynamic sprite engine with per-frame VRAM tile streaming. </p>
+<div class="textblock"><p>Dynamic sprite engine: per-frame VRAM tile streaming, single sprites and metasprites. </p>
 <p>Demonstrates the OpenSNES dynamic sprite engine, which uploads only the currently-needed sprite tiles to VRAM each frame instead of pre-loading the entire sprite sheet. This trades VBlank DMA bandwidth for VRAM space, allowing many unique animation frames without exhausting the 32KB OBJ VRAM region.</p>
 <p>Four 16x16 sprites are animated simultaneously. Each sprite's tile data is streamed from ROM to VRAM via <a class="el" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c" title="Draw a dynamic sprite — engine picks the size routine.">oamDynamicDraw()</a> — the engine queues dirty tiles and the NMI handler auto-flushes the queue every VBlank within the DMA budget.</p>
+<p>SELECT switches to the next step of the same engine: a metasprite — a character made of several OBJ — drawn with <a class="el" href="sprite_8h.html#ae4d4517a682025275d57356f692e2548" title="Draw a dynamic metasprite — engine picks the size routine.">oamMetaDrawDyn()</a>, its sub-sprites' tiles streamed the same way, under the three OBJSEL size pairs (8/16, 8/32, 16/32) chosen with UP/DOWN. SELECT again comes back. (The metasprite scene was the dynamic_metasprite example, ported from PVSnesLib's DynamicEngineMetaSprite.)</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Dynamic VRAM tile streaming to conserve OBJ VRAM space</li>
 <li>Batched VBlank DMA for sprite tile uploads</li>
 <li>Multiple independently-animated sprites sharing a tile pool</li>
 <li>oambuffer[] structure for sprite state management</li>
+<li><a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible).">MetaspriteItem</a> arrays defining a character's sub-sprite layout, and the size class (OBJ_SMALL / OBJ_LARGE) of the OBJSEL pair it is drawn with</li>
+<li>OBJSEL size pairs, switched at run time with <a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit()</a></li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>Four 16x16 sprites displayed in a row, each animating through a 24-frame cycle with an 8-frame delay between advances</li>
 <li>No input required; the animation runs continuously</li>
+<li>SELECT: two hero characters; UP/DOWN switch between the 3 OBJSEL size pairs (the menu cursor "&gt;" shows which); the characters change size</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, sprite_dynamic, sprite_lut, dma, background, input</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, sprite_dynamic, sprite_dynamic_meta, sprite_lut, dma, background, text, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a0363176ea17cef39555ce2d1d709af68" name="a0363176ea17cef39555ce2d1d709af68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0363176ea17cef39555ce2d1d709af68">&#9670;&#160;</a></span>animStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void animStep </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>One frame of the animated scene: a step every 8 frames, then the draws. </p>
+
+</div>
+</div>
+<a id="a639d8dac137f049df085726a0a72076c" name="a639d8dac137f049df085726a0a72076c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a639d8dac137f049df085726a0a72076c">&#9670;&#160;</a></span>changeObjSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void changeObjSize </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reinitialize sprite engine and upload all tiles during force blank. </p>
+<p>Uses force blank for a glitch-free OBJSEL switch. The current configuration can enqueue &gt;7 entries (config 2 hits 10), and the NMI auto-flush hook drains 7 per VBlank, so <span class="tt"><a class="el" href="sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410" title="Block until the dynamic-sprite VRAM tile queue is empty.">oamDynamicDrainQueue</a></span> loops <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> until the queue is empty before we release force blank. NMI suppresses the end-frame "hide stale sprites" path during the drain so the just-queued sprites are not pushed off-screen. </p>
+
+</div>
+</div>
+<a id="ad6eba0f1fac53c1e89b6ad3f444b3f09" name="ad6eba0f1fac53c1e89b6ad3f444b3f09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">&#9670;&#160;</a></span>drawSprites()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void drawSprites </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Draw metasprites for the current OBJSEL configuration. </p>
+
+</div>
+</div>
+<a id="a29eae980c57c4880681566fd51f039b4" name="a29eae980c57c4880681566fd51f039b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29eae980c57c4880681566fd51f039b4">&#9670;&#160;</a></span>drawText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void drawText </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Draw the configuration menu text. </p>
+
+</div>
+</div>
+<a id="a4fd76d03850c6455605296d1ccdb1741" name="a4fd76d03850c6455605296d1ccdb1741"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fd76d03850c6455605296d1ccdb1741">&#9670;&#160;</a></span>enterAnimScene()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void enterAnimScene </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The four animated 16x16 sprites: the engine, the palette, the sprites' state and their first draw; the screen comes on at the end. </p>
+
+</div>
+</div>
+<a id="ad427ee29dc9c8178f93fad579f96e246" name="ad427ee29dc9c8178f93fad579f96e246"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad427ee29dc9c8178f93fad579f96e246">&#9670;&#160;</a></span>enterMetaScene()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void enterMetaScene </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The metasprite scene: Mode 0, the text menu on BG1, the heroes' palette; <a class="el" href="#a639d8dac137f049df085726a0a72076c" title="Reinitialize sprite engine and upload all tiles during force blank.">changeObjSize()</a> configures the engine and draws them. </p>
+<p>VRAM (words): $0000 large tiles, $1000 small tiles (the engine), $3000 the 2bpp font, $3800 BG1's tilemap. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -182,17 +377,35 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point: dynamic sprite engine demo with four animated sprites. </p>
-<p>Initializes the dynamic sprite system, which streams sprite tiles from ROM to VRAM on demand each frame. Four 16x16 sprites are placed in a row, each cycling through 24 animation frames with an 8-frame delay.</p>
-<p>The dynamic sprite pipeline per frame:</p><ol type="1">
-<li><a class="el" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c" title="Draw a dynamic sprite — engine picks the size routine.">oamDynamicDraw()</a> — main thread marks which tiles each sprite needs</li>
-<li>NMI VBlank handler auto-flushes: DMAs queued tiles to VRAM and resets the per-frame tile allocator for next frame</li>
-</ol>
-<p>This approach trades VBlank DMA time for VRAM conservation: instead of pre-loading all 24 frames (24 x 4 tiles x 32 bytes = 3KB per sprite), only the 4 active tiles per sprite are in VRAM at any time.</p>
-<dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
-<p>&lt; Priority 3 = in front of all BGs</p>
-<p>&lt; Force initial tile upload</p>
-<p>&lt; Point to ROM tile source</p>
+<p>Entry point: the animated sprites at boot, SELECT to the metasprites and back. </p>
+<dl class="section return"><dt>Returns</dt><dd>Never returns </dd></dl>
+
+</div>
+</div>
+<a id="a0453578d7fedbd070d6460dea4169ec7" name="a0453578d7fedbd070d6460dea4169ec7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0453578d7fedbd070d6460dea4169ec7">&#9670;&#160;</a></span>metaStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void metaStep </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>One frame of the metasprite scene: UP/DOWN pick the size pair. </p>
 
 </div>
 </div>
@@ -315,6 +528,150 @@ Variables</h2></td></tr>
 
 <p>Global frame counter for animation timing. </p>
 <p>Counts from 0 to 7, advancing sprite animation every 8th frame (8/60 = 133ms). Using a shared counter keeps all four sprites synchronized. </p>
+
+</div>
+</div>
+<a id="ae2ffd37454763f04bc54b520f8e8c323" name="ae2ffd37454763f04bc54b520f8e8c323"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2ffd37454763f04bc54b520f8e8c323">&#9670;&#160;</a></span>hero16_frame0</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> hero16_frame0[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                                          = {</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  0,  0, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 0,  1, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  16, 2, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 16, 3, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  32, 4, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 32, 5, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
+<div class="line">}</div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:580</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:568</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:571</div></div>
+<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:577</div></div>
+</div><!-- fragment -->
+<p>16x16 metasprite: Kit 32x48 (2x3 grid of 16x16) </p>
+
+</div>
+</div>
+<a id="a39748e25a7a4234b8d7fe367a6199c94" name="a39748e25a7a4234b8d7fe367a6199c94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39748e25a7a4234b8d7fe367a6199c94">&#9670;&#160;</a></span>hero32_frame0</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> hero32_frame0[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                                          = {</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  0,  0, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(32, 0,  1, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  32, 2, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(32, 32, 3, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>32x32 metasprite: Kit 64x64 (2x2 grid of 32x32, blocks 0-3 of the sheet) </p>
+
+</div>
+</div>
+<a id="abc082b417d7da07574502ec922386fb4" name="abc082b417d7da07574502ec922386fb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc082b417d7da07574502ec922386fb4">&#9670;&#160;</a></span>hero8_frame0</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> hero8_frame0[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                                         = {</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0, 0, 0, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(8, 0, 1, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0, 8, 2, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(8, 8, 3, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>8x8 metasprite: Kit 16x16 (2x2 grid of 8x8, tiles 0-3 of the sheet) </p>
+
+</div>
+</div>
+<a id="a03ed83511c1f6af6113559d4ca6fe10e" name="a03ed83511c1f6af6113559d4ca6fe10e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03ed83511c1f6af6113559d4ca6fe10e">&#9670;&#160;</a></span>in_meta</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> in_meta</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Entry point. </p>
+<p>1 while the metasprite scene is shown </p>
+
+</div>
+</div>
+<a id="a50a1287c6a673d98dd90c61df91fd33c" name="a50a1287c6a673d98dd90c61df91fd33c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50a1287c6a673d98dd90c61df91fd33c">&#9670;&#160;</a></span>pad0</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a588ff5082ccab493c90422d028d31b4d" name="a588ff5082ccab493c90422d028d31b4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a588ff5082ccab493c90422d028d31b4d">&#9670;&#160;</a></span>selectedItem</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> selectedItem</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

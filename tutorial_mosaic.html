@@ -123,10 +123,10 @@ $(function(){initNavTree('tutorial_mosaic.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
-<img src="mosaic.png" alt=""/>
+<img src="fading_mosaic.png" alt=""/>
 <div class="caption">
 mosaic example</div></div>
-    <p><em><span class="tt">examples/transitions/mosaic</span>: the pixel-block effect mid-transition.</em></p>
+    <p><em><span class="tt">examples/transitions/fading</span>: the pixel-block effect at its largest, 16x16.</em></p>
 <p>This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block filter that progressively enlarges the pixels of selected BG layers. Used canonically for <b>RPG battle transitions</b> (Final Fantasy IV–VI), <b>death sequences</b>, <b>damage flashes</b>, <b>scene transitions</b> ("the
 screen pixelates, then resolves into the new room"), and any retro visual style that wants chunky pixels on demand.</p>
 <p>It assumes you have read the <a href="tutorial_graphics.html">Graphics</a> tutorial. Mosaic is one of the simplest PPU effects on the SNES — under 100 lines of C typically suffices.</p>
@@ -172,7 +172,7 @@ The minimum viable mosaic</h2>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line">    <span class="keywordflow">while</span> (1) <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
@@ -233,7 +233,7 @@ The lib API</h2>
 </table>
 <h2 class="doxsection"><a class="anchor" id="worked-pattern-the-shipped-example"></a>
 Worked pattern (the shipped example)</h2>
-<p><span class="tt">examples/transitions/mosaic</span> cycles through four transitions on button press: brightness fade out, brightness fade in, mosaic fade out, mosaic fade in. The example pairs <b><span class="tt"><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></span></b> (the <span class="tt">INIDISP</span>-based global brightness scale) with mosaic so you can compare the two transition shapes side by side.</p>
+<p><span class="tt">examples/transitions/fading</span> steps through its transitions on button press: brightness fade out and in at three speeds, then mosaic fade out and mosaic fade in. It pairs the brightness fades (<span class="tt"><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a></span> / <span class="tt"><a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a></span>, the <span class="tt">INIDISP</span>-based global brightness scale) with the mosaic so you can compare the two transition shapes side by side.</p>
 <p>The takeaway: brightness goes through black; mosaic goes through chunky pixels. They have very different aesthetics and very different gameplay-readability tradeoffs:</p>
 <ul>
 <li><b>Brightness fade</b> — the player loses <em>all</em> visual information mid-fade. Good for "scene cut" feel; bad if the player needs to keep tracking motion across the transition.</li>
@@ -290,7 +290,7 @@ See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></span> — full API reference.</li>
 <li><span class="tt">lib/source/mosaic.c</span> — implementation (compact, mostly register bookkeeping and the fade loops).</li>
-<li><a href="examples_transitions_mosaic.html"><span class="tt">examples/transitions/mosaic</span></a> — four transitions cycled on button press: brightness fade out/in and mosaic fade out/in.</li>
+<li><a href="examples_transitions_fading.html"><span class="tt">examples/transitions/fading</span></a> — the transitions cycled on button press: brightness fades at three speeds, then mosaic fade out/in.</li>
 <li><a href="tutorial_graphics.html">Graphics tutorial</a> — for the BG layer fundamentals mosaic operates on.</li>
 <li><a href="tutorial_game_states.html">Game States tutorial</a> — for putting transitions into the game loop (state-machine pattern for "fade out → swap
   level → fade in"). </li>

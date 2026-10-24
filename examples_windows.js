@@ -1,25 +1,27 @@
 var examples_windows =
 [
-    [ "Transparent Window -- Color Math + HDMA", "examples_windows_transparent_window.html", [
+    [ "Window -- HDMA Torch Beam: Masking and Lighting", "examples_windows_window.html", [
       [ "The ladder", "examples_windows.html#the-ladder-11", null ],
       [ "The idea in one screen", "examples_windows.html#the-idea-in-one-screen-9", [
-        [ "Controls", "examples_windows_transparent_window.html#controls-37", null ],
-        [ "Build &amp; Run", "examples_windows_transparent_window.html#build--run-52", null ],
-        [ "How It Works", "examples_windows_transparent_window.html#how-it-works-20", [
-          [ "The Technique", "examples_windows_transparent_window.html#the-technique", null ],
-          [ "Window for Color Math (Not for BG Masking)", "examples_windows_transparent_window.html#window-for-color-math-not-for-bg-masking", null ],
-          [ "HDMA Rectangle", "examples_windows_transparent_window.html#hdma-rectangle", null ],
-          [ "Color Math Configuration", "examples_windows_transparent_window.html#color-math-configuration-1", null ]
+        [ "Controls", "examples_windows_window.html#controls-33", null ],
+        [ "Build &amp; Run", "examples_windows_window.html#build--run-36", null ],
+        [ "How It Works", "examples_windows_window.html#how-it-works-16", [
+          [ "SNES Window System", "examples_windows_window.html#snes-window-system", null ],
+          [ "Making Non-Rectangular Shapes with HDMA", "examples_windows_window.html#making-non-rectangular-shapes-with-hdma", null ],
+          [ "The Beam Tables", "examples_windows_window.html#the-beam-tables", null ],
+          [ "Inversion: Show Inside", "examples_windows_window.html#inversion-show-inside", null ],
+          [ "Kit Stays Visible", "examples_windows_window.html#kit-stays-visible", null ],
+          [ "Switching Layers", "examples_windows_window.html#switching-layers", null ]
         ] ],
-        [ "SNES Concepts", "examples_windows_transparent_window.html#snes-concepts-55", [
-          [ "Color Math Window vs BG Window", "examples_windows_transparent_window.html#color-math-window-vs-bg-window", null ],
-          [ "Practical Use", "examples_windows_transparent_window.html#practical-use", null ]
+        [ "SNES Concepts", "examples_windows_window.html#snes-concepts-37", [
+          [ "W12SEL Register ($2123)", "examples_windows_window.html#w12sel-register-2123", null ],
+          [ "Lighting: the Window as the Region of Colour Math (Y)", "examples_windows_window.html#lighting-the-window-as-the-region-of-colour-math-y", null ]
         ] ],
-        [ "Project Structure", "examples_windows_transparent_window.html#project-structure-20", null ],
-        [ "Going Further", "examples_windows_transparent_window.html#going-further-14", null ],
-        [ "Modules Used", "examples_windows_transparent_window.html#modules-used-75", null ]
+        [ "VRAM Layout", "examples_windows_window.html#vram-layout-9", null ],
+        [ "Project Structure", "examples_windows_window.html#project-structure-15", null ],
+        [ "Going Further", "examples_windows_window.html#going-further-12", null ],
+        [ "Modules Used", "examples_windows_window.html#modules-used-54", null ]
       ] ]
     ] ],
-    [ "Window -- HDMA Triangle Masking", "examples_windows_window.html", null ],
     [ "Multi-window HDMA — both windows animated per scanline", "examples_windows_window_multi_hdma.html", null ]
 ];

@@ -123,42 +123,119 @@ $(function(){initNavTree('color_2transparency_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Color addition transparency between two background layers.  
+<p>Two ways to mix two layers: colour addition, and pseudo-hires.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="console_8h_source.html">snes/console.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="video_8h_source.html">snes/video.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="background_8h_source.html">snes/background.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="colormath_8h_source.html">snes/colormath.h</a>&gt;</code><br />
-<code>#include &quot;res/backgrounds.inc&quot;</code><br />
-<code>#include &quot;res/clouds.inc&quot;</code><br />
+<code>#include &quot;res/street.inc&quot;</code><br />
+<code>#include &quot;res/mist.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:afd5d5421b601f997269ed75c5711018a" id="r_afd5d5421b601f997269ed75c5711018a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afd5d5421b601f997269ed75c5711018a">BG1_MAP</a>&#160;&#160;&#160;0x5000</td></tr>
+<tr class="memitem:ab45c835fd8700b654746af54b32784e2" id="r_ab45c835fd8700b654746af54b32784e2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab45c835fd8700b654746af54b32784e2">BG1_TILES</a>&#160;&#160;&#160;0x0000</td></tr>
+<tr class="memdesc:ab45c835fd8700b654746af54b32784e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The street and the mist, converted by the build from res/.  <br /></td></tr>
+<tr class="memitem:a62766fd186dd7488aadc4b71b54b5094" id="r_a62766fd186dd7488aadc4b71b54b5094"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a62766fd186dd7488aadc4b71b54b5094">BG3_MAP</a>&#160;&#160;&#160;0x5400</td></tr>
+<tr class="memitem:a71c9fb62ac5ac4d6da90b7c3888dcafd" id="r_a71c9fb62ac5ac4d6da90b7c3888dcafd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a71c9fb62ac5ac4d6da90b7c3888dcafd">BG3_TILES</a>&#160;&#160;&#160;0x4000</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The landscape and the clouds, converted by the build from res/.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: color math transparency with drifting mist over a street.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:abae2a8f85a22f32d06f8cb7e088d89ef" id="r_abae2a8f85a22f32d06f8cb7e088d89ef"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abae2a8f85a22f32d06f8cb7e088d89ef">ph_on</a></td></tr>
+<tr class="memdesc:abae2a8f85a22f32d06f8cb7e088d89ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 while the layers are mixed by pseudo-hires instead of addition  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Color addition transparency between two background layers. </p>
-<p>Demonstrates the SNES color math unit by blending two background layers. BG1 (main screen) shows a 4bpp landscape, while BG3 (sub screen) holds 2bpp semi-transparent clouds that scroll horizontally. The PPU adds the sub screen pixel colors to the main screen via registers CGWSEL ($2130) and CGADSUB ($2131), producing a translucent overlay effect.</p>
-<p>Mode 1 is used with BG3 priority high so the 2bpp cloud layer renders above BG1. Color addition is applied to BG1 and the backdrop, meaning the cloud colors are numerically added to whatever is underneath.</p>
-<p>Based on PVSnesLib Transparency example by Alekmaul.</p>
+<div class="textblock"><p>Two ways to mix two layers: colour addition, and pseudo-hires. </p>
+<p>Demonstrates the SNES color math unit by blending two background layers. BG1 (main screen) shows a 4bpp rainy street at night, while BG3 (sub screen) holds 2bpp mist that drifts horizontally. The PPU adds the sub screen pixel colors to the main screen via registers CGWSEL ($2130) and CGADSUB ($2131), producing a translucent overlay effect.</p>
+<p>Mode 1 is used with BG3 priority high so the 2bpp mist layer renders above BG1. Color addition is applied to BG1 and the backdrop, meaning the mist colour is numerically added to whatever is underneath.</p>
+<p>Press A for the other way the PPU mixes two layers: pseudo-hires (SETINI bit 3). The colour math is switched off, and the PPU interleaves the sub screen (even columns) with the main screen (odd columns) into a 512-pixel line: a 50 % blend that costs no colour math at all, at the price of the horizontal resolution of each layer. A again goes back to addition.</p>
+<p>This began as the PVSnesLib Transparency example by Alekmaul; the pseudo-hires mode was the pseudo_hires example, merged here. The street and the mist are ours: the street generated, the mist procedural (wisps of a periodic noise, so they wrap at 256 pixels).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Color math: addition mode via CGWSEL/CGADSUB registers</li>
 <li>Main screen vs sub screen layer assignment</li>
 <li>Mode 1 with BG3 priority high for overlay effects</li>
 <li>4bpp (BG1) and 2bpp (BG3) tile formats in the same mode</li>
+<li>Pseudo-hires: SETINI ($2133) bit 3, <a class="el" href="video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73" title="Enable/disable pseudo-hires (SETINI bit 3).">videoSetPseudoHires()</a>; main and sub screens alternate pixel by pixel on a 512-pixel line</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>A landscape background with semi-transparent clouds scrolling over it</li>
-<li>The clouds blend additively, brightening the landscape beneath them</li>
-<li>No input required; clouds scroll automatically</li>
+<li>A rainy street with semi-transparent mist drifting over it</li>
+<li>The mist blends additively, lightening the street beneath it</li>
+<li>The mist drifts by itself</li>
+<li>Press A: the mist is no longer added but interleaved column by column with the street (pseudo-hires); A again: back to addition</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, colormath</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, colormath, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="colormath_8h.html" title="SNES Color Math (Blending/Transparency).">colormath.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="afd5d5421b601f997269ed75c5711018a" name="afd5d5421b601f997269ed75c5711018a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd5d5421b601f997269ed75c5711018a">&#9670;&#160;</a></span>BG1_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BG1_MAP&#160;&#160;&#160;0x5000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab45c835fd8700b654746af54b32784e2" name="ab45c835fd8700b654746af54b32784e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab45c835fd8700b654746af54b32784e2">&#9670;&#160;</a></span>BG1_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BG1_TILES&#160;&#160;&#160;0x0000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The street and the mist, converted by the build from res/. </p>
+<p>A C pointer carries its bank byte, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> take the data wherever the linker placed it.</p>
+<p>VRAM word addresses: the street's 883 tiles fill $0000-$372F </p>
+
+</div>
+</div>
+<a id="a62766fd186dd7488aadc4b71b54b5094" name="a62766fd186dd7488aadc4b71b54b5094"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62766fd186dd7488aadc4b71b54b5094">&#9670;&#160;</a></span>BG3_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BG3_MAP&#160;&#160;&#160;0x5400</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a71c9fb62ac5ac4d6da90b7c3888dcafd" name="a71c9fb62ac5ac4d6da90b7c3888dcafd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71c9fb62ac5ac4d6da90b7c3888dcafd">&#9670;&#160;</a></span>BG3_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BG3_TILES&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -174,16 +251,31 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The landscape and the clouds, converted by the build from res/. </p>
-<p>A C pointer carries its bank byte, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> take the data wherever the linker placed it.</p>
-<p>Entry point: color math transparency with scrolling clouds over a landscape.</p>
+<p>Entry point: color math transparency with drifting mist over a street. </p>
 <p>Sets up Mode 1 with two background layers:</p><ul>
-<li>BG1 (main screen): 4bpp landscape, static</li>
-<li>BG3 (sub screen): 2bpp semi-transparent clouds, scrolling horizontally</li>
+<li>BG1 (main screen): 4bpp street, static</li>
+<li>BG3 (sub screen): 2bpp semi-transparent mist, scrolling horizontally</li>
 </ul>
-<p>The SNES color math unit adds the sub screen pixel colors to the main screen, producing a translucent cloud overlay. BG3 is given priority high so its tiles render above BG1 in Mode 1's layer ordering.</p>
+<p>The SNES color math unit adds the sub screen pixel colors to the main screen, producing a translucent mist overlay. BG3 is given priority high so its tiles render above BG1 in Mode 1's layer ordering.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
-<p>Horizontal scroll offset for the cloud layer (BG3), incremented each frame</p>
+<p>Horizontal scroll offset for the mist layer (BG3), incremented each frame</p>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="abae2a8f85a22f32d06f8cb7e088d89ef" name="abae2a8f85a22f32d06f8cb7e088d89ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abae2a8f85a22f32d06f8cb7e088d89ef">&#9670;&#160;</a></span>ph_on</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ph_on</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>1 while the layers are mixed by pseudo-hires instead of addition </p>
 
 </div>
 </div>

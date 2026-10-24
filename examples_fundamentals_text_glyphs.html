@@ -123,13 +123,13 @@ $(function(){initNavTree('examples_fundamentals_text_glyphs.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>The under-the-hood companion to the Text family. Nine tiles, two colours, one message — hand-coded 2bpp bitplanes written straight into VRAM, no <span class="tt">text</span> module. Read <a href="examples_text_print_string.html"><span class="tt">text/print_string</span></a> for the easy way; read this to see what that module hides. </p>
+<p>The under-the-hood companion to the Text family. Nine tiles, three colours, one message — hand-coded 2bpp bitplanes written straight into VRAM, no <span class="tt">text</span> module. Read <a href="examples_text_print_string.html"><span class="tt">text/print_string</span></a> for the easy way; read this to see what that module hides. </p>
 </blockquote>
 <p><img src="text_glyphs.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="controls-7"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-8"></a>
 Controls</h2>
 <p>No interactive controls. The text is displayed statically.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-17"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-12"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES turns pixels into pictures (tiles, tilemaps, palettes — the holy trinity)</li>
@@ -138,7 +138,7 @@ What You'll Learn</h2>
 <li>The difference between VRAM (video memory) and regular RAM</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-23"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-13"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/fundamentals/text_glyphs</div>
@@ -153,18 +153,18 @@ here, tile #7 there." That's it — that's the entire display system. If you wan
 <p>That's exactly what this example does.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-drawing-letters-in-hex"></a>
 2. Drawing Letters in Hex</h3>
-<p>Each letter is hand-encoded as a 16-byte tile in 2bpp format (2 bits per pixel = 4 possible colors). Every pair of bytes is one row of 8 pixels:</p>
+<p>Each letter is hand-encoded as a 16-byte tile in 2bpp format (2 bits per pixel = 4 possible colors). Every pair of bytes is one row of 8 pixels: the first byte is bitplane 0, the second bitplane 1. The letters are the glyphs of the city's font, the one the <span class="tt">text</span> module uses (<span class="tt">lib/source/text.asm</span>):</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a>[] = {</div>
 <div class="line">    <span class="comment">/* Tile 1: H */</span></div>
-<div class="line">    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x7E, 0x00,</div>
-<div class="line">    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x00, 0x00,</div>
+<div class="line">    0x66, 0x00, 0x66, 0x11, 0x66, 0x11, 0x7E, 0x01,</div>
+<div class="line">    0x66, 0x19, 0x66, 0x11, 0x66, 0x11, 0x00, 0x33,</div>
 <div class="line">    <span class="comment">/* ... */</span></div>
 <div class="line">};</div>
-<div class="ttc" id="afundamentals_2text__glyphs_2main_8c_html_aee6022ef8595e19358ccaafa6967a8f9"><div class="ttname"><a href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a></div><div class="ttdeci">static const u8 font_tiles[]</div><div class="ttdoc">Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each).</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
+<div class="ttc" id="afundamentals_2text__glyphs_2main_8c_html_aee6022ef8595e19358ccaafa6967a8f9"><div class="ttname"><a href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a></div><div class="ttdeci">static const u8 font_tiles[]</div><div class="ttdoc">Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each).</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><p>Take <span class="tt">0x66</span> = binary <span class="tt">01100110</span>. Each <span class="tt">1</span> is a lit pixel, each <span class="tt">0</span> is background. Draw it out and you'll see two vertical bars — the sides of the letter H. The <span class="tt">0x7E</span> row (<span class="tt">01111110</span>) is the crossbar.</p>
+</div><!-- fragment --><p>Take the first byte of each pair, <span class="tt">0x66</span> = binary <span class="tt">01100110</span>. Each <span class="tt">1</span> is a lit pixel, each <span class="tt">0</span> is background. Draw them out and you'll see two vertical bars — the sides of the letter H. The <span class="tt">0x7E</span> row (<span class="tt">01111110</span>) is the crossbar.</p>
 <blockquote class="doxtable">
-<p><b>Why are all the second bytes <span class="tt">0x00</span>?</b> In 2bpp format, byte 1 is bitplane 0 and byte 2 is bitplane 1. We only use color 1 (bitplane 0 = 1, bitplane 1 = 0), so the second byte is always zero. If you set both to <span class="tt">0xFF</span>, you'd get color 3 instead. That's how the SNES packs multiple color choices into minimal memory. </p>
+<p><b>And the second bytes?</b> They are bitplane 1. A pixel's colour is its bitplane 1 bit times two plus its bitplane 0 bit: colour 1 is plane 0 alone, colour 2 plane 1 alone, colour 3 both. Bitplane 0 holds the letter (colour 1, cyan); bitplane 1 holds its shadow (colour 2, pink): the row above moved one pixel right (<span class="tt">&gt;&gt; 1</span>, bit 7 is the leftmost pixel), minus the pixels the letter covers. Row 1 of H: <span class="tt">(0x66 &gt;&gt; 1) &amp; ~0x66</span> = <span class="tt">0x33 &amp; 0x99</span> = <span class="tt">0x11</span>. No pixel has both bits set, so colour 3 never shows. That's how the SNES packs four colours into two bits a pixel. </p>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-setting-up-the-ppu"></a>
 3. Setting Up the PPU</h3>
@@ -172,49 +172,39 @@ here, tile #7 there." That's it — that's the entire display system. If you wan
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a>, 0);</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga92fb484df47302e1f52a162e17546636">REG_BG1SC</a> = 0x04;    <span class="comment">/* Tilemap at VRAM $0400, 32x32 entries */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga44e47bf13266350ebb5120b7618d46d5">REG_BG12NBA</a> = 0x00;  <span class="comment">/* BG1 tile graphics at VRAM $0000 */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0400, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);   <span class="comment">/* BG1SC: tilemap at VRAM $0400, 32x32 entries */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a>(0, 0x0000);                 <span class="comment">/* BG12NBA: BG1 tile graphics at VRAM $0000 */</span></div>
+<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
+<div class="ttc" id="abackground_8h_html_a80e3887b5a1a50ba4985e4270ed6673d"><div class="ttname"><a href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr(u8 bg, u16 vramAddr)</div><div class="ttdoc">Set background tile graphics address.</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga82bccfa80c8aa4ff5aa4e1416e0ade25"><div class="ttname"><a href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a></div><div class="ttdeci">#define BG_MODE0</div><div class="ttdef"><b>Definition</b> video.h:34</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga44e47bf13266350ebb5120b7618d46d5"><div class="ttname"><a href="group__ppu__regs.html#ga44e47bf13266350ebb5120b7618d46d5">REG_BG12NBA</a></div><div class="ttdeci">#define REG_BG12NBA</div><div class="ttdoc">BG1/2 tile data address (W).</div><div class="ttdef"><b>Definition</b> registers.h:82</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga92fb484df47302e1f52a162e17546636"><div class="ttname"><a href="group__ppu__regs.html#ga92fb484df47302e1f52a162e17546636">REG_BG1SC</a></div><div class="ttdeci">#define REG_BG1SC</div><div class="ttdoc">BG1 tilemap address (W).</div><div class="ttdef"><b>Definition</b> registers.h:70</div></div>
+<div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><p>Mode 0 gives you four background layers, each with 4 colors (2bpp). For a simple text display, one layer is plenty. <span class="tt">BG1SC = 0x04</span> tells the PPU "the tilemap for
-BG1 starts at VRAM word address `$0400`", and <span class="tt">BG12NBA = 0x00</span> says "the actual tile
-graphics start at `$0000`."</p>
+</div><!-- fragment --><p>Mode 0 gives you four background layers, each with 4 colors (2bpp). For a simple text display, one layer is plenty. <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr</a></span> writes <span class="tt">BG1SC</span>: "the tilemap for
+BG1 starts at VRAM word address `$0400`"; <span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr</a></span> writes <span class="tt">BG12NBA</span>: "the
+actual tile graphics start at `$0000`."</p>
 <blockquote class="doxtable">
 <p><b>Why two separate addresses?</b> Because tiles and tilemaps are different data. Tiles are the pixel art. The tilemap is the layout — which tile goes where on screen. They can live anywhere in VRAM, and you choose where by setting these registers. This separation is what makes the SNES so flexible: you can reuse the same tiles with different layouts, or swap layouts without reloading tiles. </p>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-uploading-tiles-to-vram"></a>
 4. Uploading Tiles to VRAM</h3>
-<p>VRAM isn't regular memory — you can't just write to it with a pointer. You talk to it through a pair of registers: set the address, then write data byte by byte:</p>
-<div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a> = 0x80;   <span class="comment">/* Auto-increment after writing high byte */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a> = 0x00;  <span class="comment">/* Target: VRAM $0000 */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a> = 0x00;</div>
-<div class="line"> </div>
-<div class="line"><span class="keywordflow">for</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; 144; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> += 2) {</div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a> = <a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>];      <span class="comment">/* Low byte */</span></div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a> = <a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> + 1];  <span class="comment">/* High byte → address increments */</span></div>
-<div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga0579806de7fa683e46ebe36fe5b89c64"><div class="ttname"><a href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a></div><div class="ttdeci">#define REG_VMADDH</div><div class="ttdoc">VRAM address high (W).</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga09d7fb089889aaa434f7c88ebccb5190"><div class="ttname"><a href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a></div><div class="ttdeci">#define REG_VMAIN</div><div class="ttdoc">VRAM address increment mode (W).</div><div class="ttdef"><b>Definition</b> registers.h:112</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga165959d614d718e17d008060049491bc"><div class="ttname"><a href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a></div><div class="ttdeci">#define REG_VMADDL</div><div class="ttdoc">VRAM address low (W).</div><div class="ttdef"><b>Definition</b> registers.h:121</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga1c64488065746dab4b05ad917c276841"><div class="ttname"><a href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a></div><div class="ttdeci">#define REG_VMDATAL</div><div class="ttdoc">VRAM data write low (W).</div><div class="ttdef"><b>Definition</b> registers.h:127</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W).</div><div class="ttdef"><b>Definition</b> registers.h:130</div></div>
-</div><!-- fragment --><p>VRAM is organized in 16-bit words. <span class="tt">VMAIN = 0x80</span> means "auto-increment the address
-after I write the high byte." So you write low, write high, and the address moves forward by one word. 144 bytes = 9 tiles × 16 bytes each = our complete font.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md5-two-colors-four-bytes"></a>
-5. Two Colors, Four Bytes</h3>
-<p>The SNES palette uses 15-bit BGR color (5 bits per channel, little-endian):</p>
-<div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 0;       <span class="comment">/* Start at color 0 */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00;   <span class="comment">/* Color 0 low:  dark blue */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x28;   <span class="comment">/* Color 0 high: dark blue */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0xFF;   <span class="comment">/* Color 1 low:  white */</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x7F;   <span class="comment">/* Color 1 high: white */</span></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W).</div><div class="ttdef"><b>Definition</b> registers.h:154</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W).</div><div class="ttdef"><b>Definition</b> registers.h:157</div></div>
-</div><!-- fragment --><p>Color 0 is the background, color 1 is the text. Four bytes, two colors. That's all we need for a monochrome font.</p>
+<p>VRAM isn't regular memory — you can't just write to it with a pointer. You talk to it through registers: set the address (<span class="tt">VMADDL</span>/<span class="tt">VMADDH</span>), then write data, low byte then high byte (<span class="tt">VMDATAL</span>/<span class="tt">VMDATAH</span>). For a block of bytes, a DMA channel does those writes:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a>, 0x0000, 144);   <span class="comment">/* VRAM $0000, 144 bytes */</span></div>
+<div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+</div><!-- fragment --><p>VRAM is organized in 16-bit words. With <span class="tt">VMAIN = 0x80</span> ("auto-increment the address
+after the high byte", which the library sets), each low/high pair lands in one word and the address moves forward by one. 144 bytes = 9 tiles × 16 bytes each = our complete font. Section 6 does the same writes by hand, for the tilemap.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md5-three-colors-six-bytes"></a>
+5. Three Colors, Six Bytes</h3>
+<p>The SNES palette uses 15-bit BGR color (5 bits per channel, <span class="tt">0bbbbbgggggrrrrr</span>, little-endian):</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#af651334dea15b1ee583e22816ed290e7">bg_palette</a>[] = {</div>
+<div class="line">    0x61, 0x10,  <span class="comment">/* Color 0: the glass, #0a1a22 */</span></div>
+<div class="line">    0x49, 0x73,  <span class="comment">/* Color 1: cyan, #48d0e0 */</span></div>
+<div class="line">    0xB4, 0x30,  <span class="comment">/* Color 2: pink, #a02860 */</span></div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="fundamentals_2text__glyphs_2main_8c.html#af651334dea15b1ee583e22816ed290e7">bg_palette</a>, 0, 6);</div>
+<div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="afundamentals_2text__glyphs_2main_8c_html_af651334dea15b1ee583e22816ed290e7"><div class="ttname"><a href="fundamentals_2text__glyphs_2main_8c.html#af651334dea15b1ee583e22816ed290e7">bg_palette</a></div><div class="ttdeci">static const u8 bg_palette[]</div><div class="ttdoc">Background palette in BGR555 format (3 colors, 6 bytes total).</div><div class="ttdef"><b>Definition</b> main.c:110</div></div>
+</div><!-- fragment --><p>Color 0 is the background, color 1 the letters, color 2 their shadow. Cyan is <span class="tt">#48d0e0</span>: each 8-bit channel loses its three low bits (red 72 → 9, green 208 → 26, blue 224 → 28), and <span class="tt">9 | 26 &lt;&lt; 5 | 28 &lt;&lt; 10</span> = <span class="tt">$7349</span>, stored low byte first.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md6-spelling-the-message"></a>
 6. Spelling the Message</h3>
 <p>The message is encoded as an array of tile indices:</p>
@@ -225,7 +215,7 @@ after I write the high byte." So you write low, write high, and the address move
 <div class="line">    8,               <span class="comment">/* ! */</span></div>
 <div class="line">    0xFF             <span class="comment">/* end marker */</span></div>
 <div class="line">};</div>
-<div class="ttc" id="afundamentals_2text__glyphs_2main_8c_html_ab3001e6fcd80f929ec89a02a0d5ad26e"><div class="ttname"><a href="fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e">message</a></div><div class="ttdeci">static const u8 message[]</div><div class="ttdoc">&quot;HELLO WORLD!&quot; encoded as tile indices into font_tiles[]</div><div class="ttdef"><b>Definition</b> main.c:88</div></div>
+<div class="ttc" id="afundamentals_2text__glyphs_2main_8c_html_ab3001e6fcd80f929ec89a02a0d5ad26e"><div class="ttname"><a href="fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e">message</a></div><div class="ttdeci">static const u8 message[]</div><div class="ttdoc">&quot;HELLO WORLD!&quot; encoded as tile indices into font_tiles[]</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
 </div><!-- fragment --><p>Tile 1 = H, tile 2 = E, tile 3 = L, and so on. To place this at row 14, column 10, we calculate the tilemap address:</p>
 <div class="fragment"><div class="line">addr = 0x05CA;  <span class="comment">/* 0x0400 (tilemap base) + 14×32 + 10 */</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a> = addr &amp; 0xFF;</div>
@@ -239,28 +229,33 @@ after I write the high byte." So you write low, write high, and the address move
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a> = 0;     <span class="comment">/* Attributes: palette 0, no flip */</span></div>
 <div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++;</div>
 <div class="line">}</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:144</div></div>
+<div class="ttc" id="agroup__ppu__regs_html_ga0579806de7fa683e46ebe36fe5b89c64"><div class="ttname"><a href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a></div><div class="ttdeci">#define REG_VMADDH</div><div class="ttdoc">VRAM address high (W).</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
+<div class="ttc" id="agroup__ppu__regs_html_ga165959d614d718e17d008060049491bc"><div class="ttname"><a href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a></div><div class="ttdeci">#define REG_VMADDL</div><div class="ttdoc">VRAM address low (W).</div><div class="ttdef"><b>Definition</b> registers.h:121</div></div>
+<div class="ttc" id="agroup__ppu__regs_html_ga1c64488065746dab4b05ad917c276841"><div class="ttname"><a href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a></div><div class="ttdeci">#define REG_VMDATAL</div><div class="ttdoc">VRAM data write low (W).</div><div class="ttdef"><b>Definition</b> registers.h:127</div></div>
+<div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W).</div><div class="ttdef"><b>Definition</b> registers.h:130</div></div>
 </div><!-- fragment --><p>Each tilemap entry is 2 bytes: the low byte picks the tile, the high byte holds attributes (palette, flip, priority). We set them all to 0 — palette 0, no flipping.</p>
 <blockquote class="doxtable">
 <p><b>What's <span class="tt">0x05CA</span>?</b> The tilemap base is <span class="tt">$0400</span>. Each row is 32 entries wide. Row 14 starts at <span class="tt">$0400 + 14×32 = $0400 + $01C0 = $05C0</span>. Column 10 adds 10 more: <span class="tt">$05CA</span>. That math becomes second nature after a few tilemaps. </p>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md7-lights-on"></a>
 7. Lights On</h3>
-<div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;  <span class="comment">/* Show BG1 on the main screen */</span></div>
-<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();     <span class="comment">/* Turn on the display */</span></div>
+<div class="fragment"><div class="line"><a class="code hl_define" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a>);   <span class="comment">/* TM: show BG1 on the main screen */</span></div>
+<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();              <span class="comment">/* Turn on the display */</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
-<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:443</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
+<div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:133</div></div>
 </div><!-- fragment --><p><span class="tt">TM</span> (screen designation) controls which layers are visible. We enable BG1 only. <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> sets brightness to maximum. The infinite loop with <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> keeps the program alive and synced to 60fps — without it, the CPU would spin wildly and cause timing issues.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="tips--tricks"></a>
 Tips &amp; Tricks</h2>
 <ul>
-<li><b>Screen is black?</b> Check that <span class="tt"><a class="el" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45" title="Main screen designation (W).">REG_TM</a></span> has the right layer enabled. If BG1 isn't in the TM register, the PPU won't draw it, no matter what's in VRAM.</li>
+<li><b>Screen is black?</b> Check that <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen()</a></span> (the <span class="tt">TM</span> register) has the right layer enabled. If BG1 isn't in the TM register, the PPU won't draw it, no matter what's in VRAM.</li>
 <li><b>Tiles look wrong?</b> Count your bytes. 2bpp = 16 bytes per tile. If your array is off by even one byte, every subsequent tile shifts and you get garbage.</li>
 <li><b>Want to understand 2bpp better?</b> Take the <span class="tt">0x66</span> byte and draw it on graph paper. Binary: <span class="tt">01100110</span>. Mark the 1s. Do all 8 rows of the H tile. You'll see the letter form before your eyes.</li>
 <li><b>Why <span class="tt">setMode(BG_MODE0, 0)</span> and not Mode 1?</b> Mode 0 gives 4 layers of 2bpp (4 colors each). Mode 1 gives 2 layers of 4bpp + 1 layer of 2bpp. For monochrome text, Mode 0 is the natural fit — and you get 3 extra layers free if you want them later.</li>
@@ -270,7 +265,7 @@ Tips &amp; Tricks</h2>
 Go Further</h2>
 <ul>
 <li><b>Change the message:</b> Add tiles for your own letters. Each tile is 16 bytes — sketch it on graph paper first, convert to hex, add it to <span class="tt"><a class="el" href="fundamentals_2text__glyphs_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9" title="Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each).">font_tiles</a>[]</span>.</li>
-<li><b>Add color:</b> Set bitplane 1 to non-zero values in your tile data and add more colors to the palette. Color 2 uses bitplane 1 only, color 3 uses both bitplanes.</li>
+<li><b>Use colour 3:</b> set both bitplanes on some pixels (an inner highlight on each letter, say) and add a fourth colour to the palette.</li>
 <li><b>Two lines of text:</b> Write a second message at a different tilemap row. Row N starts at base address + N×32.</li>
 <li><b>Next example:</b> <a href="examples_sprites_simple_sprite.html">Simple Sprite</a> &ndash; display a 32x32 sprite on screen using OAM.</li>
 </ul>
@@ -307,7 +302,7 @@ Why These Modules?</h3>
 <p><b>"But there are no sprites in Hello World!"</b> Correct. The dependency chain is: <span class="tt">console</span> → <span class="tt">sprite</span> → <span class="tt">dma</span>. The NMI handler (in console) always DMAs the OAM buffer (in sprite) to the PPU, and that DMA call lives in the dma module. The build system does NOT auto-resolve these dependencies — if you forget <span class="tt">dma</span>, you get a linker error about an undefined <span class="tt"><a class="el" href="dma_8h.html#a50a418c73f494651a1be98404d753c21" title="Copy OAM data (PVSnesLib compatible).">dmaCopyOam</a></span> symbol and no hint about why. </p>
 </blockquote>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-34"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-24"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference"></a>
@@ -334,13 +329,13 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">TM  </td><td class="markdownTableBodyNone">$212C  </td><td class="markdownTableBodyNone">Enable BG1 on main screen  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="files-5"></a>
+<h2 class="doxsection"><a class="anchor" id="files-4"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What's in it  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Everything — tiles, palette, tilemap, main loop (~136 lines)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Everything — tiles, palette, tilemap, main loop (~180 lines)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma background</span>  </td></tr>
 </table>

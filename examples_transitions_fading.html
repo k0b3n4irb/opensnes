@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Fading Example</title>
+<title>Fade and Mosaic — Screen Transitions</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('examples_transitions_fading.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Fading Example </div></div>
+  <div class="headertitle"><div class="title">Fade and Mosaic — Screen Transitions </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
@@ -130,238 +130,116 @@ Demo</div></div>
 <img src="fading.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <p>Screen brightness transitions for fade in/out effects.</p>
-<h2 class="doxsection"><a class="anchor" id="learning-objectives-3"></a>
+    <p>The two transitions the PPU gives for free: a brightness fade and the mosaic filter. Press any button to step through them: fade out and in at three speeds, then the picture breaking into growing blocks and sharpening again.</p>
+<h2 class="doxsection"><a class="anchor" id="learning-objectives-2"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
-<li>How SNES screen brightness control works</li>
-<li>Creating smooth fade transitions</li>
-<li>Different fade speeds and styles</li>
-<li>Using fades for scene transitions</li>
+<li>How master brightness works, and why brightness 0 is not force blank</li>
+<li>How the mosaic filter groups pixels into blocks, and on which layers</li>
+<li>How the speed of a transition is set, and what it costs (nothing but one register write per step)</li>
+<li>How the two combine into the classic RPG battle transition</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-11"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-36"></a>
+SNES Concepts</h2>
+<ul>
+<li>Master brightness, INIDISP ($2100) bits 0-3; force blank, bit 7</li>
+<li>The mosaic filter, MOSAIC ($2106): block size and per-layer enable</li>
+<li>Frame-paced transitions: one register write per step, timed by VBlank</li>
+<li>Sprites are not mosaicked; backgrounds are</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-9"></a>
 Prerequisites</h2>
 <ul>
-<li>Completed background examples</li>
-<li>Understanding of VBlank timing</li>
+<li>A background on screen (<span class="tt">backgrounds/mode1</span>)</li>
+<li>VBlank timing (<span class="tt">basics/game_skeleton</span>)</li>
 </ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="what-this-example-does-3"></a>
-What This Example Does</h2>
-<p>Demonstrates multiple fade effects:</p><ul>
-<li>Fade from black to full brightness</li>
-<li>Fade from full brightness to black</li>
-<li>Fast and slow fade speeds</li>
-<li>Button-triggered transitions</li>
-</ul>
-<div class="fragment"><div class="line">Frame 1:    ████████████████  (Black)</div>
-<div class="line">Frame 5:    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  (25%)</div>
-<div class="line">Frame 10:   ░░░░░░░░░░░░░░░░  (50%)</div>
-<div class="line">Frame 15:   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  (75%)</div>
-<div class="line">Frame 20:   [Full Image]      (100%)</div>
-</div><!-- fragment --><p><b>Controls:</b></p><ul>
-<li>Any button: Advance to next fade effect</li>
-</ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="code-type-3"></a>
-Code Type</h2>
-<p><b>C with Direct Register Access</b></p>
+<h2 class="doxsection"><a class="anchor" id="controls-32"></a>
+Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Component  </th><th class="markdownTableHeadNone">Type  </th></tr>
+<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Background setup  </td><td class="markdownTableBodyNone">Library functions  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Brightness control  </td><td class="markdownTableBodyNone">Direct register (<span class="tt"><a class="el" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388" title="Display control (W).">REG_INIDISP</a></span>)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Fade timing  </td><td class="markdownTableBodyNone">Frame counting with <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Input detection  </td><td class="markdownTableBodyNone">Direct register access  </td></tr>
+<td class="markdownTableBodyNone">Any button  </td><td class="markdownTableBodyNone">Next transition  </td></tr>
 </table>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="inidisp-register"></a>
-INIDISP Register</h2>
-<p>The INIDISP register ($2100) controls screen brightness:</p>
-<div class="fragment"><div class="line">Bits 0-3: Brightness level (0-15)</div>
-<div class="line">Bit 4:    Force blank (1 = screen off)</div>
-<div class="line">Bits 5-7: Unused</div>
-</div><!-- fragment --><table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Value  </th><th class="markdownTableHeadNone">Effect  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$00  </td><td class="markdownTableBodyNone">Brightness 0 (black, screen on)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$0F  </td><td class="markdownTableBodyNone">Brightness 15 (full)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$80  </td><td class="markdownTableBodyNone">Force blank (screen completely off)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$8F  </td><td class="markdownTableBodyNone">Force blank at full brightness  </td></tr>
-</table>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="basic-fade-implementation"></a>
-Basic Fade Implementation</h2>
-<blockquote class="doxtable">
-<p><b>Already in the lib.</b> <span class="tt"><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut(u8 speed)</a></span> and <span class="tt"><a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn(u8 speed)</a></span> are exposed from <span class="tt"><a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">snes/console.h</a></span> since v0.20.x — same signature, same semantics as the snippets below. The example calls those directly; the algorithm below is kept for pedagogical purposes so you can see how a fade works on the wire. </p>
-</blockquote>
-<h3 class="doxsection"><a class="anchor" id="fade-in-black-to-full"></a>
-Fade In (Black to Full)</h3>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed) {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness;</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">for</span> (brightness = 0; brightness &lt;= 15; brightness++) {</div>
-<div class="line">        <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = brightness;</div>
-<div class="line"> </div>
-<div class="line">        <span class="comment">/* Wait multiple frames for slower fade */</span></div>
-<div class="line">        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; speed; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
-<div class="line">            <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line">}</div>
+<p>The cycle: fade out / in at 1 frame per step, at 3, at 6, then mosaic out, mosaic in, and again.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-15"></a>
+How It Works</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1-brightness-inidisp-2100"></a>
+1. Brightness: INIDISP ($2100)</h3>
+<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(1);   <span class="comment">/* 15 -&gt; 0, one step per frame: a quarter of a second */</span></div>
+<div class="line"><a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(3);    <span class="comment">/* 0 -&gt; 15, one step every 3 frames */</span></div>
 <div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
-<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
-<div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W).</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="fade-out-full-to-black"></a>
-Fade Out (Full to Black)</h3>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed) {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness;</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">for</span> (brightness = 15; brightness &gt; 0; brightness--) {</div>
-<div class="line">        <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = brightness;</div>
-<div class="line"> </div>
-<div class="line">        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; speed; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
-<div class="line">            <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0;  <span class="comment">/* Ensure fully black */</span></div>
-<div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_a6c68f9393684a2b251292a9e93891a02"><div class="ttname"><a href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a></div><div class="ttdeci">void fadeOut(u8 speed)</div><div class="ttdoc">Fade the screen from full brightness (15) down to black (0).</div></div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="fade-speeds"></a>
-Fade Speeds</h2>
-<p>Different speeds for different purposes:</p>
+</div><!-- fragment --><p>Bits 0-3 of INIDISP are the master brightness, 0 (black) to 15 (full); bit 7 is force blank. <span class="tt">fadeOut(speed)</span> and <span class="tt">fadeIn(speed)</span> (<span class="tt"><a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">snes/console.h</a></span>) step the brightness once every <span class="tt">speed</span> frames:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Speed  </th><th class="markdownTableHeadNone">Frames per step  </th><th class="markdownTableHeadNone">Total frames  </th><th class="markdownTableHeadNone">Duration  </th></tr>
+<th class="markdownTableHeadNone">Speed  </th><th class="markdownTableHeadNone">Frames per step  </th><th class="markdownTableHeadNone">Whole fade  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">15  </td><td class="markdownTableBodyNone">0.25 sec  </td></tr>
+<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">15 frames, 0.25 s  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">30  </td><td class="markdownTableBodyNone">0.5 sec  </td></tr>
+<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">45 frames, 0.75 s  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">60  </td><td class="markdownTableBodyNone">1.0 sec  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">120  </td><td class="markdownTableBodyNone">2.0 sec  </td></tr>
+<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">90 frames, 1.5 s  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="quick-flash"></a>
-Quick Flash</h3>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> flash(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x0F;  <span class="comment">/* Full white */</span></div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(1);           <span class="comment">/* Quick restore */</span></div>
-<div class="line">}</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="scene-transition-pattern"></a>
-Scene Transition Pattern</h2>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> changeScene(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <span class="comment">/* Fade out current scene */</span></div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(2);</div>
+<p><b>Brightness 0 is not force blank.</b> The screen is black but the PPU still draws, so VRAM is still closed outside VBlank. To load a new scene, fade out, then <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a></span>, load, <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> and fade in.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md2-mosaic-mosaic-2106"></a>
+2. Mosaic: MOSAIC ($2106)</h3>
+<div class="fragment"><div class="line"><a class="code hl_function" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a>);   <span class="comment">/* which backgrounds the filter applies to */</span></div>
+<div class="line"><a class="code hl_function" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a>(3);             <span class="comment">/* block size 1x1 -&gt; 16x16, 3 frames per size */</span></div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Force blank for safe VRAM updates */</span></div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = <a class="code hl_define" href="group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3">INIDISP_FORCE_BLANK</a>;</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">/* Load new graphics (safe during blank) */</span></div>
-<div class="line">    loadNewBackground();</div>
-<div class="line">    loadNewSprites();</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">/* Fade in new scene */</span></div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(2);</div>
-<div class="line">}</div>
-<div class="ttc" id="agroup__reg__const_html_gab18ce2bcee19d38256a74af702ebe4a3"><div class="ttname"><a href="group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3">INIDISP_FORCE_BLANK</a></div><div class="ttdeci">#define INIDISP_FORCE_BLANK</div><div class="ttdef"><b>Definition</b> registers.h:430</div></div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-50"></a>
+<div class="line"><a class="code hl_function" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e">mosaicFadeIn</a>(3);              <span class="comment">/* 16x16 -&gt; 1x1 */</span></div>
+<div class="line"><a class="code hl_function" href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0">mosaicDisable</a>();              <span class="comment">/* size 0 and no layer: the filter is off */</span></div>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
+<div class="ttc" id="amosaic_8h_html_a660392c09a19dd7c76a4cf326370461e"><div class="ttname"><a href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e">mosaicFadeIn</a></div><div class="ttdeci">void mosaicFadeIn(u8 speed)</div><div class="ttdoc">Animate mosaic fade in (pixelated -&gt; clear).</div></div>
+<div class="ttc" id="amosaic_8h_html_a706149f9c377234abaca910959bddb0d"><div class="ttname"><a href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a></div><div class="ttdeci">void mosaicFadeOut(u8 speed)</div><div class="ttdoc">Animate mosaic fade out (clear -&gt; pixelated).</div></div>
+<div class="ttc" id="amosaic_8h_html_a88e76eb7d8b0e6093e2b0b7ed3cd05a0"><div class="ttname"><a href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0">mosaicDisable</a></div><div class="ttdeci">void mosaicDisable(void)</div><div class="ttdoc">Disable mosaic effect for all backgrounds.</div></div>
+<div class="ttc" id="amosaic_8h_html_ab9d8f44d0140477e5b748ac9773d34df"><div class="ttname"><a href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a></div><div class="ttdeci">void mosaicSetLayers(u8 bgMask)</div><div class="ttdoc">Set the backgrounds the mosaic applies to — REPLACES the previous set.</div></div>
+</div><!-- fragment --><p>Bits 7-4 of MOSAIC are the block size minus one (0 = 1x1, 15 = 16x16), bits 3-0 the background layers it applies to. Each block takes the colour of its top-left pixel: the picture looks like a lower resolution of itself, it is not a blur. Sprites are never affected — only backgrounds — so characters can stay sharp while the scene dissolves behind them.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md3-combining-both"></a>
+3. Combining both</h3>
+<p>The classic battle transition of SNES RPGs:</p>
+<ol type="1">
+<li>mosaic out (the scene turns into blocks),</li>
+<li>fade to black,</li>
+<li>load the new scene in force blank,</li>
+<li>fade in (still blocky),</li>
+<li>mosaic in (the blocks shrink and the new scene appears).</li>
+</ol>
+<h2 class="doxsection"><a class="anchor" id="build--run-35"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/transitions/fading</div>
-</div><!-- fragment --><p>Then open <span class="tt">fading.sfc</span> in your emulator (Mesen2 recommended).</p>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-73"></a>
+</div><!-- fragment --><p>Then open <span class="tt">fading.sfc</span> in luna (<span class="tt">luna-gui fading.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-53"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
-<h2 class="doxsection"><a class="anchor" id="files-12"></a>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">mosaic</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
+<h2 class="doxsection"><a class="anchor" id="files-10"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Fade logic and demo sequence  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">the transitions, one per button press  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>); the build converts and links it, <span class="tt">res/opensnes.inc</span> declares the symbols  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/moonrise.png</span> (+ <span class="tt">.toml</span>)  </td><td class="markdownTableBodyNone">the moon over the skyline, Néo-Lumen art (PixelLab, CC0) with its frame painted out by <span class="tt">devtools/art_assets/build.py</span>; the build converts it (<span class="tt">opensnes-tileset</span>), <span class="tt">res/moonrise.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build configuration (<span class="tt">LIB_MODULES := console sprite dma input background</span>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">vram.spec</span>  </td><td class="markdownTableBodyNone">the VRAM regions of the example (<span class="tt">vram_map.h</span> is generated from it)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">build configuration  </td></tr>
 </table>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="exercises-3"></a>
+<h2 class="doxsection"><a class="anchor" id="exercises-2"></a>
 Exercises</h2>
-<h3 class="doxsection"><a class="anchor" id="exercise-1-smooth-fade"></a>
-Exercise 1: Smooth Fade</h3>
-<p>Create smoother fades using sub-frame timing (though limited by 16 brightness levels): </p><div class="fragment"><div class="line"><span class="comment">/* Use longer waits between steps */</span></div>
-<div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> wait = 0; wait &lt; 8; wait++) {</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">}</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-2-directional-wipe"></a>
-Exercise 2: Directional Wipe</h3>
-<p>Combine with window masking for a wipe effect instead of fade.</p>
-<h3 class="doxsection"><a class="anchor" id="exercise-3-color-fade"></a>
-Exercise 3: Color Fade</h3>
-<p>Use color math to fade to a specific color instead of black: </p><div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(r, g, <a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>);</div>
-<div class="line"><span class="comment">/* Increase color math intensity as brightness drops */</span></div>
-<div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:148</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-4-pulse-effect"></a>
-Exercise 4: Pulse Effect</h3>
-<p>Create a pulsing brightness effect: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pulse_dir = 1;</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness = 8;</div>
-<div class="line"> </div>
-<div class="line">brightness += pulse_dir;</div>
-<div class="line"><span class="keywordflow">if</span> (brightness &gt;= 15 || brightness &lt;= 4) {</div>
-<div class="line">    pulse_dir = -pulse_dir;</div>
-<div class="line">}</div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = brightness;</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="technical-notes-3"></a>
-Technical Notes</h2>
-<h3 class="doxsection"><a class="anchor" id="force-blank-vs-brightness-0"></a>
-Force Blank vs Brightness 0</h3>
-<ul>
-<li><b>Brightness 0</b>: Screen shows black, but PPU still renders</li>
-<li><b>Force Blank</b>: PPU stops rendering, VRAM access is safe</li>
-</ul>
-<p>Use force blank when updating graphics, brightness 0 for visual fades.</p>
-<h3 class="doxsection"><a class="anchor" id="fade-during-gameplay"></a>
-Fade During Gameplay</h3>
-<p>For in-game fades without stopping action:</p><ol type="1">
-<li>Use force blank only briefly for VRAM updates</li>
-<li>Fade brightness while game continues</li>
-<li>Game logic runs normally during fade</li>
+<ol type="1">
+<li><b><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> change</b>: load a second picture and switch to it with the five steps of section 3.</li>
+<li><b>Per-layer mosaic</b>: put a second background on BG2 and mosaic BG1 only.</li>
+<li><b>Colour fade</b>: fade to white instead of black with colour math (<span class="tt">color/transparency</span>).</li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="alternative-palette-fade"></a>
-Alternative: Palette Fade</h3>
-<p>Instead of hardware brightness, modify palette colors: </p><div class="fragment"><div class="line"><span class="comment">/* Fade palette toward black */</span></div>
-<div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; 256; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] * <a class="code hl_variable" href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a>) &gt;&gt; 4;</div>
-<div class="line">}</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 512);</div>
-<div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
-<div class="ttc" id="agames_2rpg_2main_8c_html_a0de00e990f7f0ba3ca89aac35bb35ac2"><div class="ttname"><a href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a></div><div class="ttdeci">static u8 fade_level</div><div class="ttdef"><b>Definition</b> main.c:169</div></div>
-</div><!-- fragment --><p>This allows fading specific layers independently.</p>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="whats-next-7"></a>
+<h2 class="doxsection"><a class="anchor" id="whats-next-5"></a>
 What's Next?</h2>
-<p><b>Mosaic:</b> <a href="examples_transitions_mosaic.html">Mosaic Example</a> - Pixelation transitions</p>
-<p><b>Parallax:</b> <a href="../parallax_scroll/">Parallax Scrolling</a> - Multi-speed scrolling with HDMA </p>
+<ul>
+<li><a href="examples_scrolling_parallax_scroll.html">Parallax scrolling</a> — several layers moving at different speeds</li>
+<li><a href="examples_hdma_hdma_wave.html">HDMA wave</a> — a register changed on every scanline </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

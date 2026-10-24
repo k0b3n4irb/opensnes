@@ -130,57 +130,82 @@ $(function(){initNavTree('basics_2aim__target_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="math_8h_source.html">snes/math.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fixed32_8h_source.html">snes/fixed32.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="gameloop_8h_source.html">snes/gameloop.h</a>&gt;</code><br />
+<code>#include &quot;res/units.inc&quot;</code><br />
+<code>#include &quot;res/roof.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a11d58baaffc49494ab91da16621b6a5c" id="r_a11d58baaffc49494ab91da16621b6a5c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a11d58baaffc49494ab91da16621b6a5c">PLAYER_X</a>&#160;&#160;&#160;124</td></tr>
-<tr class="memdesc:a11d58baaffc49494ab91da16621b6a5c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> position — fixed at screen centre.  <br /></td></tr>
-<tr class="memitem:ae22bdd9c98feb24a0843a4ff0fa6e662" id="r_ae22bdd9c98feb24a0843a4ff0fa6e662"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae22bdd9c98feb24a0843a4ff0fa6e662">PLAYER_Y</a>&#160;&#160;&#160;108</td></tr>
+<tr class="memitem:a37c4c48ff47f0838f64b5a1fb3c803b2" id="r_a37c4c48ff47f0838f64b5a1fb3c803b2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a>&#160;&#160;&#160;16</td></tr>
+<tr class="memdesc:a37c4c48ff47f0838f64b5a1fb3c803b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Half a 32×32 sprite: from its centre to the top-left corner OAM wants.  <br /></td></tr>
+<tr class="memitem:a69f9f237baac2ee247f14425602af76e" id="r_a69f9f237baac2ee247f14425602af76e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a69f9f237baac2ee247f14425602af76e">OBJ_VRAM</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memdesc:a69f9f237baac2ee247f14425602af76e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The sprites' tiles, after the font and the maps.  <br /></td></tr>
+<tr class="memitem:a3bfde2d6bdb39781832cf10bf0e704c6" id="r_a3bfde2d6bdb39781832cf10bf0e704c6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3bfde2d6bdb39781832cf10bf0e704c6">ROOF_MAP</a>&#160;&#160;&#160;0x3C00</td></tr>
+<tr class="memitem:a11723159f1463f1975722dc7e8fea8c9" id="r_a11723159f1463f1975722dc7e8fea8c9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a11723159f1463f1975722dc7e8fea8c9">ROOF_TILES</a>&#160;&#160;&#160;0x1000</td></tr>
+<tr class="memdesc:a11723159f1463f1975722dc7e8fea8c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Where BG2 (the roof) keeps its tiles and its map; the text has $0000 and $3800.  <br /></td></tr>
+<tr class="memitem:a1f65971c5917729eb32169601fc213d2" id="r_a1f65971c5917729eb32169601fc213d2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1f65971c5917729eb32169601fc213d2">TILE_DRONE</a>&#160;&#160;&#160;256</td></tr>
+<tr class="memdesc:a1f65971c5917729eb32169601fc213d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The drones' frames in res/units.png, after the turret's sixteen.  <br /></td></tr>
+<tr class="memitem:a5b840601f08b2e0073b3930e845737c7" id="r_a5b840601f08b2e0073b3930e845737c7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5b840601f08b2e0073b3930e845737c7">TILE_ORBITER</a>&#160;&#160;&#160;260</td></tr>
+<tr class="memitem:af5b79d84b830c8b55efd2016ae60e8a9" id="r_af5b79d84b830c8b55efd2016ae60e8a9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af5b79d84b830c8b55efd2016ae60e8a9">TURRET_X</a>&#160;&#160;&#160;128</td></tr>
+<tr class="memdesc:af5b79d84b830c8b55efd2016ae60e8a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The turret's centre — fixed at the screen centre.  <br /></td></tr>
+<tr class="memitem:abe6ba13cd494a412de59d77ba5f1f07b" id="r_abe6ba13cd494a412de59d77ba5f1f07b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#abe6ba13cd494a412de59d77ba5f1f07b">TURRET_Y</a>&#160;&#160;&#160;112</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memitem:a8a0d3bc95bdfda1fef8948aa09b48dd4" id="r_a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8a0d3bc95bdfda1fef8948aa09b48dd4">on_init</a> (void)</td></tr>
 <tr class="memitem:ae658753de50085894acfe2b69fbd62e5" id="r_ae658753de50085894acfe2b69fbd62e5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae658753de50085894acfe2b69fbd62e5">on_update</a> (void)</td></tr>
+<tr class="memitem:addae8997e51cecc589764e859ce10159" id="r_addae8997e51cecc589764e859ce10159"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#addae8997e51cecc589764e859ce10159">orbit_step</a> (void)</td></tr>
+<tr class="memdesc:addae8997e51cecc589764e859ce10159"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advance the orbiter one frame: centre (128, 96), radius 60 px, one LUT step a frame (an orbit in about 4.3 s at 60 Hz).  <br /></td></tr>
+<tr class="memitem:aa309f387b198a9b54d0ab3e25d617df0" id="r_aa309f387b198a9b54d0ab3e25d617df0"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa309f387b198a9b54d0ab3e25d617df0">turret_tile</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> heading)</td></tr>
+<tr class="memdesc:aa309f387b198a9b54d0ab3e25d617df0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The OAM tile of the turret's frame for <code class="param">heading</code> (0–15).  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a1d95c47f3f34f3a3f50fac7bc7f480b7" id="r_a1d95c47f3f34f3a3f50fac7bc7f480b7"><td class="memItemLeft"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1d95c47f3f34f3a3f50fac7bc7f480b7">g_angle</a></td></tr>
+<tr class="memdesc:a1d95c47f3f34f3a3f50fac7bc7f480b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The orbiter: angle (16.16, its integer part a LUT step), velocity, radius.  <br /></td></tr>
+<tr class="memitem:a4c14d42e9fd66fb7a1610b34c740b8e3" id="r_a4c14d42e9fd66fb7a1610b34c740b8e3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4c14d42e9fd66fb7a1610b34c740b8e3">g_angle8</a></td></tr>
+<tr class="memitem:a9038d2c1d499007c4c6009431ceea551" id="r_a9038d2c1d499007c4c6009431ceea551"><td class="memItemLeft"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9038d2c1d499007c4c6009431ceea551">g_omega</a></td></tr>
+<tr class="memitem:a5bc80b8bc64cd7a22a5945fe79c08a31" id="r_a5bc80b8bc64cd7a22a5945fe79c08a31"><td class="memItemLeft"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5bc80b8bc64cd7a22a5945fe79c08a31">g_radius</a></td></tr>
+<tr class="memitem:a8bf367d9546e852ffe3401c8223928d4" id="r_a8bf367d9546e852ffe3401c8223928d4"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8bf367d9546e852ffe3401c8223928d4">g_sx</a></td></tr>
+<tr class="memdesc:a8bf367d9546e852ffe3401c8223928d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The orbiter's centre on screen and its angle as a LUT index.  <br /></td></tr>
+<tr class="memitem:afa9f1f050b3bf0ad4d35b1ae5033aa02" id="r_afa9f1f050b3bf0ad4d35b1ae5033aa02"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#afa9f1f050b3bf0ad4d35b1ae5033aa02">g_sy</a></td></tr>
 <tr class="memitem:a3f3faf49c8176b2b6058a45340d0661e" id="r_a3f3faf49c8176b2b6058a45340d0661e"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3f3faf49c8176b2b6058a45340d0661e">prev_target_x</a></td></tr>
 <tr class="memdesc:a3f3faf49c8176b2b6058a45340d0661e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Previous target X — for change detection (skip text reformat when nothing moved).  <br /></td></tr>
 <tr class="memitem:a86fa852c94d4355ea5c30d8a0468bba2" id="r_a86fa852c94d4355ea5c30d8a0468bba2"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a86fa852c94d4355ea5c30d8a0468bba2">prev_target_y</a></td></tr>
 <tr class="memdesc:a86fa852c94d4355ea5c30d8a0468bba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Previous target Y — see prev_target_x.  <br /></td></tr>
-<tr class="memitem:ad00b9a7770bb3ca84c9ff3c5504255e1" id="r_ad00b9a7770bb3ca84c9ff3c5504255e1"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a> []</td></tr>
-<tr class="memdesc:ad00b9a7770bb3ca84c9ff3c5504255e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite palette — single palette shared by player and target.  <br /></td></tr>
-<tr class="memitem:a8a93c98a1e1bf824c8c791a3653f4d09" id="r_a8a93c98a1e1bf824c8c791a3653f4d09"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8a93c98a1e1bf824c8c791a3653f4d09">sprite_tiles</a> [64]</td></tr>
-<tr class="memdesc:a8a93c98a1e1bf824c8c791a3653f4d09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Two 8×8 sprite tiles in SNES 4bpp format (64 bytes total).  <br /></td></tr>
 <tr class="memitem:ad096e3b38057e57a43b4849613f1ae1d" id="r_ad096e3b38057e57a43b4849613f1ae1d"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad096e3b38057e57a43b4849613f1ae1d">target_x</a></td></tr>
-<tr class="memdesc:ad096e3b38057e57a43b4849613f1ae1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target X coordinate (movable, 0–247).  <br /></td></tr>
+<tr class="memdesc:ad096e3b38057e57a43b4849613f1ae1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The drone's centre, X (movable, 16–240: the sprite stays on screen).  <br /></td></tr>
 <tr class="memitem:a0f52a34005a9653b7ca22395f9f63a3f" id="r_a0f52a34005a9653b7ca22395f9f63a3f"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0f52a34005a9653b7ca22395f9f63a3f">target_y</a></td></tr>
-<tr class="memdesc:a0f52a34005a9653b7ca22395f9f63a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target Y coordinate (movable, 0–215).  <br /></td></tr>
+<tr class="memdesc:a0f52a34005a9653b7ca22395f9f63a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The drone's centre, Y (movable, 16–208).  <br /></td></tr>
+<tr class="memitem:a43d6e196f172ea34331062165c8c5338" id="r_a43d6e196f172ea34331062165c8c5338"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a43d6e196f172ea34331062165c8c5338">turret_heading</a></td></tr>
+<tr class="memdesc:a43d6e196f172ea34331062165c8c5338"><td class="mdescLeft">&#160;</td><td class="mdescRight">The turret's heading, 0–15 (sixteenths of a turn): its frame.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Aim, distance, and angle showcase for <span class="tt">&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</span>. </p>
 <p>Demonstrates the four math primitives a 2D action game leans on the most: <b><span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a></span></b> (pixel distance), <b><span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span></b> (8-bit angle to a target), and the <b><span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> / <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> LUTs</b> (project a velocity vector along that angle). Everything updates live as the user moves the target with the D-pad — the numbers on screen are real arithmetic, not pre-baked.</p>
-<p>The player ("P") sits at screen center. The target ("X") starts upper-right and follows the D-pad. Each frame the example recomputes dx/dy from the two positions, calls <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> for the pixel distance, calls <span class="tt">atan2_8(dy, dx)</span> for the 8-bit angle, then calls <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> and <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> on that angle to read back the unit direction vector. All five values are printed live in the text panel above the play area.</p>
+<p>A security turret sits on a roof at the screen centre; the drone it aims at starts upper-right and follows the D-pad. Each frame the example recomputes dx/dy from the two positions, calls <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> for the pixel distance, calls <span class="tt">atan2_8(dy, dx)</span> for the 8-bit angle, then calls <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> and <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> on that angle to read back the unit direction vector. All five values are printed live in the text panel. The turret turns to face the drone: it has sixteen frames, one per sixteenth of a turn, and the angle picks one (<span class="tt">(<a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).">angle</a> + 8) &gt;&gt; 4</span>, the nearest heading) — the "rotate a sprite to face X" pattern, with no rotation hardware.</p>
+<p>A second drone orbits the roof on its own: its angle is a 16.16 accumulator (<span class="tt"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></span>) advanced by a 16.16 angular velocity every frame, and its position is <span class="tt">radius * <a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos</a></span> / <span class="tt">radius * <a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span> through <span class="tt"><a class="el" href="fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul</a></span> — the motion half of the fixed-point story (it was the fix32_orbit example).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li><span class="tt">&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</span> square-root and atan2:<ul>
 <li><span class="tt">sqrt16(n)</span> → integer floor of √n, range 0–255</li>
 <li><span class="tt">atan2_8(dy, dx)</span> → 8-bit angle in the same convention as the sin/cos LUT (0 = +X, 64 = +Y, 128 = −X, 192 = −Y)</li>
 </ul>
 </li>
-<li><span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span>/<span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> LUT chaining: feed the <span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> output back into the trig LUT to recover a unit direction vector that points from player to target — the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
-<li>Mode 0 + sprite overlay: BG1 hosts the text via the <span class="tt">text</span> module; the player and target are 8×8 OBJ sprites on the OBJ layer so they don't disturb the text display.</li>
+<li><span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span>/<span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> LUT chaining: feed the <span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> output back into the trig LUT to recover a unit direction vector that points from the turret to the drone — the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
+<li><span class="tt">&lt;<a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">snes/fixed32.h</a>&gt;</span> motion: an angle accumulator and a velocity in 16.16, <span class="tt">fix32Mul(radius, fix32Cos(angle))</span> for the position; the integer part of the accumulator (<span class="tt"><a class="el" href="fixed32_8h.html#a0efbb853debc8c5c8a16c10b87553684" title="Convert fixed32 to integer (floor).">UNFIX32</a></span>) indexes the 256-step LUT</li>
+<li>Mode 0 + sprite overlay: BG1 hosts the text via the <span class="tt">text</span> module, BG2 the roof (2bpp, its own four colours at CGRAM 32), and the turret and the drones are 32×32 OBJ sprites over both.</li>
+<li>A sprite's position is its top-left corner: the example keeps the centres (what the maths should aim between) and draws each 32×32 sprite 16 pixels up and left of its centre.</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>The "P" sprite stays anchored at the screen centre.</li>
-<li>The "X" sprite follows the D-pad. Diagonal input moves diagonally — both axes update on the same frame.</li>
+<li>The turret stays at the screen centre and turns its barrel to the drone, in steps of a sixteenth of a turn.</li>
+<li>The drone follows the D-pad. Diagonal input moves diagonally — both axes update on the same frame.</li>
 <li>As you move the target, the live readout panel updates on every frame:<ul>
-<li><span class="tt">DX</span> / <span class="tt">DY</span> are the signed distances from player to target.</li>
+<li><span class="tt">DX</span> / <span class="tt">DY</span> are the signed distances from the turret to the drone.</li>
 <li><span class="tt">DIST</span> is <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span>, in pixels (0–255).</li>
-<li><span class="tt">ANGLE</span> is the 8-bit angle from the player to the target, printed in hex; the equivalent in degrees follows in parentheses (≈ angle × 360 / 256).</li>
+<li><span class="tt">ANGLE</span> is the 8-bit angle from the turret to the drone, printed in hex; the equivalent in degrees follows in parentheses (≈ angle × 360 / 256).</li>
 <li><span class="tt">COS 8.8</span> / <span class="tt">SIN 8.8</span> are the 8.8 fixed-point components of the unit direction vector. At <span class="tt">ANGLE = 0x40</span> (90°, target is straight south) you see <span class="tt">COS = 0x0000</span>, <span class="tt">SIN = 0x0100</span>.</li>
-<li><span class="tt">COS 16.16</span> / <span class="tt">SIN 16.16</span> are the SAME values lifted to the fix32 type. Look at the bottom hex digits: they're always <span class="tt">00</span> because <span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos</a></span>/<span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span> reuse the 8.8 LUT and shift up. A future 16-bit LUT would fill those bits with real precision — the comparison row makes the 8-bit-LUT precision floor visible at runtime.</li>
+<li><span class="tt">COS 16.16</span> / <span class="tt">SIN 16.16</span> are the SAME values lifted to the fix32 type. <a class="el" href="structLook.html" title="A resident&#39;s look: its 32x32 frame (converted alone) and its OBJ slot.">Look</a> at the bottom hex digits: they're always <span class="tt">00</span> because <span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos</a></span>/<span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span> reuse the 8.8 LUT and shift up. A future 16-bit LUT would fill those bits with real precision — the comparison row makes the 8-bit-LUT precision floor visible at runtime.</li>
 </ul>
 </li>
 </ul>
@@ -189,31 +214,123 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, gameloop, math, <a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">math.h</a>, <a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">fixed32.h</a>, <a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="text_8h.html" title="Text rendering functions for OpenSNES.">text.h</a>, <a class="el" href="gameloop_8h.html" title="Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation.">gameloop.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
-<a id="a11d58baaffc49494ab91da16621b6a5c" name="a11d58baaffc49494ab91da16621b6a5c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11d58baaffc49494ab91da16621b6a5c">&#9670;&#160;</a></span>PLAYER_X</h2>
+<a id="a37c4c48ff47f0838f64b5a1fb3c803b2" name="a37c4c48ff47f0838f64b5a1fb3c803b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37c4c48ff47f0838f64b5a1fb3c803b2">&#9670;&#160;</a></span>HALF</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PLAYER_X&#160;&#160;&#160;124</td>
+          <td class="memname">#define HALF&#160;&#160;&#160;16</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> position — fixed at screen centre. </p>
-<p>Made into a <span class="tt">#define</span> rather than a runtime variable so the compiler folds the constant into the dx/dy expressions and we don't pay a load+sub for a quantity that never changes. </p>
+<p>Half a 32×32 sprite: from its centre to the top-left corner OAM wants. </p>
 
 </div>
 </div>
-<a id="ae22bdd9c98feb24a0843a4ff0fa6e662" name="ae22bdd9c98feb24a0843a4ff0fa6e662"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae22bdd9c98feb24a0843a4ff0fa6e662">&#9670;&#160;</a></span>PLAYER_Y</h2>
+<a id="a69f9f237baac2ee247f14425602af76e" name="a69f9f237baac2ee247f14425602af76e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69f9f237baac2ee247f14425602af76e">&#9670;&#160;</a></span>OBJ_VRAM</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PLAYER_Y&#160;&#160;&#160;108</td>
+          <td class="memname">#define OBJ_VRAM&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The sprites' tiles, after the font and the maps. </p>
+
+</div>
+</div>
+<a id="a3bfde2d6bdb39781832cf10bf0e704c6" name="a3bfde2d6bdb39781832cf10bf0e704c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bfde2d6bdb39781832cf10bf0e704c6">&#9670;&#160;</a></span>ROOF_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ROOF_MAP&#160;&#160;&#160;0x3C00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a11723159f1463f1975722dc7e8fea8c9" name="a11723159f1463f1975722dc7e8fea8c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11723159f1463f1975722dc7e8fea8c9">&#9670;&#160;</a></span>ROOF_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ROOF_TILES&#160;&#160;&#160;0x1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Where BG2 (the roof) keeps its tiles and its map; the text has $0000 and $3800. </p>
+
+</div>
+</div>
+<a id="a1f65971c5917729eb32169601fc213d2" name="a1f65971c5917729eb32169601fc213d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f65971c5917729eb32169601fc213d2">&#9670;&#160;</a></span>TILE_DRONE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILE_DRONE&#160;&#160;&#160;256</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The drones' frames in res/units.png, after the turret's sixteen. </p>
+
+</div>
+</div>
+<a id="a5b840601f08b2e0073b3930e845737c7" name="a5b840601f08b2e0073b3930e845737c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b840601f08b2e0073b3930e845737c7">&#9670;&#160;</a></span>TILE_ORBITER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILE_ORBITER&#160;&#160;&#160;260</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5b79d84b830c8b55efd2016ae60e8a9" name="af5b79d84b830c8b55efd2016ae60e8a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5b79d84b830c8b55efd2016ae60e8a9">&#9670;&#160;</a></span>TURRET_X</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TURRET_X&#160;&#160;&#160;128</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The turret's centre — fixed at the screen centre. </p>
+<p>Made into a <span class="tt">#define</span> rather than a runtime variable so the compiler folds the constant into the dx/dy expressions and we don't pay a load+sub for a quantity that never changes. </p>
+
+</div>
+</div>
+<a id="abe6ba13cd494a412de59d77ba5f1f07b" name="abe6ba13cd494a412de59d77ba5f1f07b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe6ba13cd494a412de59d77ba5f1f07b">&#9670;&#160;</a></span>TURRET_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TURRET_Y&#160;&#160;&#160;112</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -288,7 +405,150 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="addae8997e51cecc589764e859ce10159" name="addae8997e51cecc589764e859ce10159"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addae8997e51cecc589764e859ce10159">&#9670;&#160;</a></span>orbit_step()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void orbit_step </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Advance the orbiter one frame: centre (128, 96), radius 60 px, one LUT step a frame (an orbit in about 4.3 s at 60 Hz). </p>
+
+</div>
+</div>
+<a id="aa309f387b198a9b54d0ab3e25d617df0" name="aa309f387b198a9b54d0ab3e25d617df0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa309f387b198a9b54d0ab3e25d617df0">&#9670;&#160;</a></span>turret_tile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> turret_tile </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>heading</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The OAM tile of the turret's frame for <code class="param">heading</code> (0–15). </p>
+<p>A 32×32 frame is 4×4 tiles and a row of OBJ tiles is 16 wide, so heading h (four a row of the sheet) starts at column (h % 4) * 4 of tile row (h / 4) * 4. </p>
+
+</div>
+</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a1d95c47f3f34f3a3f50fac7bc7f480b7" name="a1d95c47f3f34f3a3f50fac7bc7f480b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d95c47f3f34f3a3f50fac7bc7f480b7">&#9670;&#160;</a></span>g_angle</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a> g_angle</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The orbiter: angle (16.16, its integer part a LUT step), velocity, radius. </p>
+
+</div>
+</div>
+<a id="a4c14d42e9fd66fb7a1610b34c740b8e3" name="a4c14d42e9fd66fb7a1610b34c740b8e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c14d42e9fd66fb7a1610b34c740b8e3">&#9670;&#160;</a></span>g_angle8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> g_angle8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9038d2c1d499007c4c6009431ceea551" name="a9038d2c1d499007c4c6009431ceea551"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9038d2c1d499007c4c6009431ceea551">&#9670;&#160;</a></span>g_omega</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a> g_omega</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5bc80b8bc64cd7a22a5945fe79c08a31" name="a5bc80b8bc64cd7a22a5945fe79c08a31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bc80b8bc64cd7a22a5945fe79c08a31">&#9670;&#160;</a></span>g_radius</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a">fixed32</a> g_radius</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8bf367d9546e852ffe3401c8223928d4" name="a8bf367d9546e852ffe3401c8223928d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bf367d9546e852ffe3401c8223928d4">&#9670;&#160;</a></span>g_sx</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> g_sx</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The orbiter's centre on screen and its angle as a LUT index. </p>
+
+</div>
+</div>
+<a id="afa9f1f050b3bf0ad4d35b1ae5033aa02" name="afa9f1f050b3bf0ad4d35b1ae5033aa02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa9f1f050b3bf0ad4d35b1ae5033aa02">&#9670;&#160;</a></span>g_sy</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> g_sy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3f3faf49c8176b2b6058a45340d0661e" name="a3f3faf49c8176b2b6058a45340d0661e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3f3faf49c8176b2b6058a45340d0661e">&#9670;&#160;</a></span>prev_target_x</h2>
 
@@ -337,77 +597,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad00b9a7770bb3ca84c9ff3c5504255e1" name="ad00b9a7770bb3ca84c9ff3c5504255e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad00b9a7770bb3ca84c9ff3c5504255e1">&#9670;&#160;</a></span>sprite_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                           = {</div>
-<div class="line">    0x00, 0x00,                </div>
-<div class="line">    0x00, 0x00,                </div>
-<div class="line">    0x00, 0x00,                </div>
-<div class="line">    0xFF, 0x7F,                </div>
-<div class="line">}</div>
-</div><!-- fragment -->
-<p>Sprite palette — single palette shared by player and target. </p>
-<p>Both sprites use palette 0; the visual difference between them is entirely the tile shape (diamond vs. X). Keeping the palette minimal trims four bytes off the CGRAM upload and avoids the second <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> call that an earlier draft used.</p>
-<p>BGR555 layout: <span class="tt">[R5G5B5]</span> packed into two bytes, low byte first. Only colour 3 is rendered — the tile bitplanes above always resolve to index 3. </p>
-
-</div>
-</div>
-<a id="a8a93c98a1e1bf824c8c791a3653f4d09" name="a8a93c98a1e1bf824c8c791a3653f4d09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a93c98a1e1bf824c8c791a3653f4d09">&#9670;&#160;</a></span>sprite_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_tiles[64]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                             = {</div>
-<div class="line">    </div>
-<div class="line">    0x18, 0x3C, 0x7E, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,  </div>
-<div class="line">    0x18, 0x3C, 0x7E, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,  </div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">    </div>
-<div class="line">    0xC3, 0x66, 0x3C, 0x18, 0x18, 0x3C, 0x66, 0xC3,  </div>
-<div class="line">    0xC3, 0x66, 0x3C, 0x18, 0x18, 0x3C, 0x66, 0xC3,  </div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">}</div>
-</div><!-- fragment -->
-<p>Two 8×8 sprite tiles in SNES 4bpp format (64 bytes total). </p>
-<p>Tile 0 ("P", player): a filled square edged with a dot — easy to spot at the screen centre.</p>
-<p>Tile 1 ("X", target): a crosshair / plus sign — points at its own centre so the user knows exactly where the target's coordinate is.</p>
-<p>Both tiles use bitplanes 0 and 1; planes 2 and 3 are zero so every drawn pixel is colour index 3 in the chosen palette. </p>
-
-</div>
-</div>
 <a id="ad096e3b38057e57a43b4849613f1ae1d" name="ad096e3b38057e57a43b4849613f1ae1d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad096e3b38057e57a43b4849613f1ae1d">&#9670;&#160;</a></span>target_x</h2>
 
@@ -428,7 +617,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Target X coordinate (movable, 0–247). </p>
+<p>The drone's centre, X (movable, 16–240: the sprite stays on screen). </p>
 
 </div>
 </div>
@@ -452,7 +641,23 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Target Y coordinate (movable, 0–215). </p>
+<p>The drone's centre, Y (movable, 16–208). </p>
+
+</div>
+</div>
+<a id="a43d6e196f172ea34331062165c8c5338" name="a43d6e196f172ea34331062165c8c5338"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43d6e196f172ea34331062165c8c5338">&#9670;&#160;</a></span>turret_heading</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> turret_heading</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The turret's heading, 0–15 (sixteenths of a turn): its frame. </p>
 
 </div>
 </div>

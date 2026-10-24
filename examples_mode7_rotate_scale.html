@@ -123,20 +123,17 @@ $(function(){initNavTree('examples_mode7_rotate_scale.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
-<img src="rotate_scale_demo.gif" alt=""/>
-<div class="caption">
-Demo</div></div>
-    <div class="image">
 <img src="rotate_scale.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-5"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-4"></a>
 What This Example Shows</h2>
 <p>How to use the SNES Mode 7 &ndash; a special background mode that applies an affine transformation (rotation + scaling) to a single 128x128 tile layer. This is the same technique behind F-Zero's ground, Mario Kart's tracks, and Pilotwings' maps.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-7"></a>
+<p>A glider flies over the plane, and the zoom is its altitude: zoom out and the view widens as if it climbed, while its shadow slides further away; zoom in and the shadow closes in. Scale and shadow are the two cues that make a flat Mode 7 plane read as height.</p>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-5"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">backgrounds/mode1</span> first (basic background setup). Mode 7 is fundamentally different from tile-based modes but the initialization flow is similar.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-25"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-22"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -146,16 +143,16 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Rotate counter-clockwise  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">D-PAD Up  </td><td class="markdownTableBodyNone">Zoom out (see more of the plane)  </td></tr>
+<td class="markdownTableBodyNone">D-PAD Up  </td><td class="markdownTableBodyNone">Zoom out (see more of the plane) — the glider climbs, its shadow drifts away  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify)  </td></tr>
+<td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify) — the glider descends, its shadow closes in  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-40"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-26"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/rotate_scale</div>
-</div><!-- fragment --><p>Then open <span class="tt">mode7.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-12"></a>
+</div><!-- fragment --><p>Then open <span class="tt">rotate_scale.sfc</span> in luna (<span class="tt">luna-gui rotate_scale.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-8"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-mode-7-vram-format"></a>
 1. Mode 7 VRAM format</h3>
@@ -178,24 +175,30 @@ How It Works</h2>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></span> sets the rotation center to the screen center (128, 128). Scale <span class="tt">0x0100</span> is 1:1 (one texel per pixel).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-update-the-matrix-every-frame"></a>
 3. Update the matrix every frame</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>++;</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:158</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
-<div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Mode 7 ground: 9-tile prefab track (original art).</div><div class="ttdef"><b>Definition</b> main.c:46</div></div>
+<div class="ttc" id="akit_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">u16 pad0</div><div class="ttdef"><b>Definition</b> kit.c:31</div></div>
+<div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).</div><div class="ttdef"><b>Definition</b> main.c:46</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> recalculates the 2x2 transformation matrix (registers M7A-M7D at $211B-$211E) using the current angle and scale. The angle is 0-255, mapping to 0-360 degrees.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-zoom-control"></a>
 4. Zoom control</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
 <div class="line">    <span class="keywordflow">if</span> (zscale &lt; 0x0780) zscale += 8;</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(zscale, zscale);</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 </div><!-- fragment --><p>After changing the scale, you must call <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> again because the matrix depends on both angle and scale. The scale range is clamped to <span class="tt">0x0008</span>-<span class="tt">0x0780</span> &ndash; values outside this range produce extreme distortion.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-42"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md4-the-rotation-centre-and-the-glider-on-it"></a>
+4. The rotation centre, and the glider on it</h3>
+<p><span class="tt">M7X</span>/<span class="tt">M7Y</span> name the point of the plane the matrix turns around; the scroll (<span class="tt">M7HOFS</span>/<span class="tt">M7VOFS</span>) says where that point lands on screen. <span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></span> sets the centre to (128, 128) and leaves it above the screen, so the example scrolls by (0, 16) to put it on screen line 112, the middle:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310">mode7SetScroll</a>(0, 16);       <span class="comment">/* plane point (128, 128) -&gt; screen (128, 112) */</span></div>
+<div class="ttc" id="amode7_8h_html_a43ff7fa2834e9151b5c1d1bc3837c310"><div class="ttname"><a href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310">mode7SetScroll</a></div><div class="ttdeci">void mode7SetScroll(s16 x, s16 y)</div><div class="ttdoc">Set Mode 7 scroll position.</div></div>
+</div><!-- fragment --><p>The glider is Kit's, a 32x32 sprite drawn there; the plane turns under it. Its shadow is the same picture in an all-dark palette, drawn <span class="tt">zscale &gt;&gt; 5</span> pixels below: 8 at 1:1, up to 60 at the widest view. The glider is OAM entry 0 and the shadow entry 1: between two sprites the lower index is drawn in front, whatever their priority bits, which only rank a sprite against the backgrounds (<a href="https://snes.nesdev.org/wiki/Sprites">SNESdev wiki, Sprites</a>).</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-25"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="affine-transformation"></a>
 Affine Transformation</h3>
@@ -221,32 +224,33 @@ One Layer Only</h3>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md88-fixed-point-scale"></a>
 8.8 Fixed-Point Scale</h3>
 <p><span class="tt">0x0100</span> = 1:1, <span class="tt">0x0200</span> = shrunk twice (shows more area), <span class="tt">0x0080</span> = magnified twice. The integer part is the high byte, the fractional part is the low byte.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-12"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-8"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Input handling, rotation/zoom logic  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Input handling, rotation/zoom logic, the glider and its shadow  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">res/mode7bg.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the Mode 7 picture (<span class="tt">opensnes-tileset</span>, <span class="tt">mode = 7</span>); the build converts and links it, <span class="tt">res/mode7bg.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/mode7bg.png</span>  </td><td class="markdownTableBodyNone">Source image for Mode 7 ground  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/mode7bg.png</span>  </td><td class="markdownTableBodyNone">the city from above, 1024x1024 in 235 tiles, written by <span class="tt">devtools/art_assets/mode7.py</span> (CC0, <span class="tt">assets/neo-lumen/</span>)  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/glider.png</span>, <span class="tt">res/glider.png.toml</span>  </td><td class="markdownTableBodyNone">Kit's glider from above, 32x32 (<span class="tt">opensnes-sprite</span>)  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console dma background sprite input mode7</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-7"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-6"></a>
 Going Further</h2>
 <ul>
-<li><b>Add scrolling</b>: Use <span class="tt">mode7SetPos()</span> to pan across the Mode 7 plane with the D-pad while rotating. This is how F-Zero navigates its tracks.</li>
-<li><b>Add sprites on top</b>: Load sprite tiles and place an OAM sprite over the rotating background. Mode 7 supports full sprite rendering.</li>
+<li><b>Fly forward</b>: move the centre along the heading with <span class="tt"><a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a></span> and the same scroll offset, as <span class="tt">mode7/mode7_racing</span> drives its kart.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">mode7/perspective</span> &ndash; Per-scanline scaling for pseudo-3D (F-Zero style)</li>
-<li><span class="tt">effects/hdma_wave</span> &ndash; HDMA can modify Mode 7 parameters per scanline</li>
+<li><span class="tt">hdma/hdma_wave</span> &ndash; HDMA can modify Mode 7 parameters per scanline</li>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-58"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-40"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

@@ -161,7 +161,7 @@ Variables</h2></td></tr>
 <div class="textblock"><p>Mode 7 perspective with an HDMA split screen (F-Zero style). </p>
 <p>Creates an F-Zero-style pseudo-3D ground plane by combining two BG modes on one screen. HDMA changes registers between scanlines: the top 96 lines show a sky in Mode 1 (BG2), the lines below a Mode 7 ground whose scale changes on every line, so that distant rows are compressed. Four HDMA channels share the work: one writes BGMODE at the split line, one the main screen layers (BG2 for the sky, BG1 for the ground), and two write M7A and M7D on every ground line.</p>
 <p>This is the first step: the two diagonal terms of the matrix give depth without rotation. mode7/perspective_rotate drives all four terms per line and turns the world.</p>
-<p>Based on PVSnesLib's Mode7Perspective (mills32 / alekmaul).</p>
+<p>Based on PVSnesLib's Mode7Perspective (mills32 / alekmaul); the city and its sky are ours (devtools/art_assets/mode7.py writes them).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Mid-frame BG mode switching via HDMA (Mode 1 sky + Mode 7 ground)</li>
 <li>Per-scanline M7A/M7D writes (HDMA repeat mode) for the perspective</li>

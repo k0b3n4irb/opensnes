@@ -123,33 +123,36 @@ $(function(){initNavTree('examples_chips_sa1_starfield.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>128 dots in Lissajous sine patterns computed by the SA-1 coprocessor </p>
+<p>128 neon moths in Lissajous sine patterns computed by the SA-1 coprocessor, a cloud over the city's far skyline in the rain </p>
 </blockquote>
 <p><img src="sa1_starfield.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-10"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-5"></a>
 What You'll Learn</h2>
 <ul>
 <li>SA-1 computing 128 sprite positions per frame using sine harmonics</li>
 <li>I-RAM as a shared buffer: SA-1 writes positions, SNES CPU reads them</li>
-<li>Procedural sprite generation (no graphic assets needed)</li>
+<li>One tiny sprite for all 128 (a 4x3 moth in an 8x8 tile): a cloud this dense bunches up, and a scanline shows at most 32 sprites</li>
 <li>Depth illusion via 4 brightness palettes cycling across sprites</li>
 <li>Synchronization protocol between SA-1 and main CPU</li>
 <li>Running SA-1 code from I-RAM: copy it there, keep it position-independent</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="build--run-14"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-6"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/chips/sa1_starfield</div>
 </div><!-- fragment --><p>Then open <span class="tt">sa1_starfield.sfc</span> in luna (or any SNES emulator).</p>
-<h2 class="doxsection"><a class="anchor" id="what-to-observe-2"></a>
+<h2 class="doxsection"><a class="anchor" id="what-to-observe-1"></a>
 What to Observe</h2>
 <ul>
-<li>128 dots moving in smooth, coordinated flock-like patterns</li>
+<li>128 moths moving in smooth, coordinated flock-like patterns over the skyline</li>
 <li>The pattern resembles a murmuration (starling flock)</li>
 <li>4 brightness levels create a subtle depth effect</li>
 <li>All math computed by the SA-1, from I-RAM: at boot it copies its loop and sine table there, so it does not share the ROM with the main CPU (~10.7 MHz; ~8.5 MHz when built with <span class="tt">make clean &amp;&amp; make SA1_CODE_IN=ROM</span> — see the SA-1 tutorial for the measurement)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-24"></a>
+<h2 class="doxsection"><a class="anchor" id="assets-7"></a>
+Assets</h2>
+<p><span class="tt">res/mote.png</span> (the moth) is drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">MOTE</span>); <span class="tt">res/skyline.png</span> is <span class="tt">backgrounds/city_far.png</span> (PixelLab, CC0, <span class="tt">assets/neo-lumen/README.md</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-13"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

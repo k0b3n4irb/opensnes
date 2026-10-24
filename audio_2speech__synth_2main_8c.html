@@ -123,7 +123,7 @@ $(function(){initNavTree('audio_2speech__synth_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Speech synthesis — the SNES says "OPEN SNES".  
+<p>Speech synthesis — the SNES says "OPEN SNES... DAVEO".  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="apu_8h_source.html">snes/apu.h</a>&gt;</code><br />
@@ -142,8 +142,8 @@ Variables</h2></td></tr>
 <tr class="memitem:a68c6bd9a6b7a4a4c060f3394036226bd" id="r_a68c6bd9a6b7a4a4c060f3394036226bd"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a68c6bd9a6b7a4a4c060f3394036226bd">spc_image_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Speech synthesis — the SNES says "OPEN SNES". </p>
-<p>Port of krom (Peter Lemon)'s SpeechSynth demo (PeterLemon/SNES, SPC700/SpeechSynth). Speech on the SNES = sequencing a PHONEME BANK on one DSP voice: per phoneme, the APU-side program selects the sample (SRCN), shapes it (ADSR: plosives one-shot, vowels sustained), inflects the pitch (prosody) and times the wait — krom's bank spells "PETER LEMON"; our original formant-synthesized bank says "OPEN SNES" on loop.</p>
+<div class="textblock"><p>Speech synthesis — the SNES says "OPEN SNES... DAVEO". </p>
+<p>Port of krom (Peter Lemon)'s SpeechSynth demo (PeterLemon/SNES, SPC700/SpeechSynth). Speech on the SNES = sequencing a PHONEME BANK on one DSP voice: per phoneme, the APU-side program selects the sample (SRCN), shapes it (ADSR: plosives one-shot, vowels sustained), inflects the pitch (prosody) and times the wait — krom's bank spells "PETER LEMON"; our original formant-synthesized bank of ten phonemes says "OPEN SNES", then the name of the examples' city, "DAVEO" (da-ve-o), on loop.</p>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Phoneme-bank speech synthesis on the S-DSP (no CPU streaming)</li>

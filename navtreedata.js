@@ -53,15 +53,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "anim_8h.html",
-"dir_799e5ff613eee8f881f50db81391cba4.html",
-"examples_color.html#the-idea-in-one-screen-2",
-"examples_scrolling_parallax_scroll.html",
-"globals_func_l.html",
-"group__macros.html#ga3acffbd305ee72dcd4593c0d8af64a4f",
-"hud_8c.html#abfe0c0c48c9ee899e46c35374cb86a48",
-"pages.html",
-"sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c",
-"superfx_8h.html#a20b4afdcc076097e24c44fe840dacc0c"
+"dir_7b7ada537a323c558359e7762138078d.html",
+"examples_fundamentals_text_glyphs.html#autotoc_md7-lights-on",
+"examples_transitions.html#the-ladder-10",
+"group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1",
+"group__snesmod__pitch.html#gaa08379e80b0a877625abda4ddb176378",
+"map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3",
+"sa1_8h.html#a7f9738d27db531916a42ad9fb31a9024",
+"structOamWorldBatch.html",
+"tutorial_far_ram.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Controller Input</title>
+<title>Controller Input — Both Pads, the Edges, the Frame Count</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,43 +119,40 @@ $(function(){initNavTree('examples_input_controller.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Controller Input </div></div>
+  <div class="headertitle"><div class="title">Controller Input — Both Pads, the Edges, the Frame Count </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Reads the SNES controller and displays which button is currently held. The simplest possible input example — press a button, see its name on screen.</p>
+<div class="textblock"><p>The pad test of a city terminal. Both controllers are drawn on screen, and every button held lights up on its pad's drawing, several at once; under each pad, the bitmask <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> returns, in hex. Under them: the last button pressed and the last button released on pad 1, and the number of VBlanks since boot. In the test bay at the bottom, each D-pad walks its own avatar: Kit for pad 1, the raccoon for pad 2. The screen the console check uses (rows 2 and 14 of <span class="tt"><a class="el" href="hardware_verification.html">docs/HARDWARE_VERIFICATION.md</a></span>).</p>
 <div class="image">
 <img src="controller.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-22"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-16"></a>
 What You'll Learn</h2>
 <ul>
-<li>How to read controller state with <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a></span> (returns a 16-bit bitmask)</li>
-<li>The SNES button constants: <span class="tt"><a class="el" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a></span></li>
+<li>How to read controller state with <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(pad)</a></span> (a 16-bit bitmask), for pad 1 and pad 2</li>
+<li>The edges: <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(pad)</a></span> (went down this frame) and <span class="tt">padReleased(pad)</span> (came up this frame)</li>
+<li>The SNES button constants, in the order the pad shifts them out: <span class="tt"><a class="el" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></span></li>
 <li>That the NMI handler reads joypads automatically — no manual polling needed</li>
-<li>The difference between <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> (held right now) and <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> (just pressed this frame)</li>
+<li><span class="tt"><a class="el" href="system_8h.html#a393cdd9777ac31290693d930c63d2a83" title="Frame counter incremented every VBlank by the NMI handler.">frame_count</a></span>, the VBlank counter the NMI handler keeps</li>
+<li>Showing a bitmask: one lamp sprite per button, shown while its bit is set</li>
+<li>The <span class="tt">gameloop</span> framework: <span class="tt"><a class="el" href="basics_2aim__target_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4">on_init</a></span> once, <span class="tt"><a class="el" href="basics_2aim__target_2main_8c.html#ae658753de50085894acfe2b69fbd62e5">on_update</a></span> once per VBlank</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="controls-15"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-14"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Display  </th></tr>
+<th class="markdownTableHeadNone">Input  </th><th class="markdownTableHeadNone">Display  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">"A PRESSED"  </td></tr>
+<td class="markdownTableBodyNone">Any buttons on pad 1 / pad 2  </td><td class="markdownTableBodyNone">they light up on that pad's drawing while held (cyan on pad 1, pink on pad 2), and HELD shows their bits  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">"B PRESSED"  </td></tr>
+<td class="markdownTableBodyNone">A press / a release on pad 1  </td><td class="markdownTableBodyNone">PRESSED / RELEASED name the button  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">X / Y  </td><td class="markdownTableBodyNone">"X PRESSED" / "Y PRESSED"  </td></tr>
+<td class="markdownTableBodyNone">The D-pad of pad 1 / pad 2  </td><td class="markdownTableBodyNone">walks Kit / the raccoon in the test bay  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">L / R  </td><td class="markdownTableBodyNone">"L PRESSED" / "R PRESSED"  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">D-pad  </td><td class="markdownTableBodyNone">"UP/DOWN/LEFT/RIGHT PRESSED"  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">START / SELECT  </td><td class="markdownTableBodyNone">"START/SELECT PRESSED"  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">None  </td><td class="markdownTableBodyNone">(blank)  </td></tr>
+<td class="markdownTableBodyNone">L and R together  </td><td class="markdownTableBodyNone">the frame counter goes back to 0, once, on the frame the pair is completed  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-31"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-15"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="how-input-works-on-the-snes"></a>
 How Input Works on the SNES</h3>
@@ -167,16 +164,54 @@ padHeld vs padPressed</h3>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
 <div class="ttc" id="ainput_8h_html_aed650db72d53439d6b554063a88de5cb"><div class="ttname"><a href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></div><div class="ttdeci">#define padPressed(pad)</div><div class="ttdef"><b>Definition</b> input.h:159</div></div>
-</div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></span> for continuous actions (movement, charging). Use <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></span> for one-shot actions (jump, menu select, pause toggle).</p>
+</div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></span> for continuous actions (movement, charging). Use <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></span> for one-shot actions (jump, menu select, pause toggle), and <span class="tt"><a class="el" href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda" title="Get buttons released this frame.">padReleased</a></span> for what happens when a button comes up (release a charged shot, end a long jump early).</p>
+<h3 class="doxsection"><a class="anchor" id="two-pads"></a>
+Two Pads</h3>
+<p><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(1)</a></span>, <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(1)</a></span> and <span class="tt">padReleased(1)</span> read the second pad the same way; each pad has its own state, so releasing pad 2 changes nothing on pad 1.</p>
 <h3 class="doxsection"><a class="anchor" id="button-bitmask"></a>
 Button Bitmask</h3>
 <p>Multiple buttons can be held simultaneously. Test with bitwise AND:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) { <span class="comment">/* A is held */</span> }</div>
-<div class="line"><span class="keywordflow">if</span> ((pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a>) &amp;&amp; (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>)) { <span class="comment">/* both shoulders held */</span> }</div>
+<div class="line"><span class="keywordflow">if</span> ((pad &amp; (<a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a> | <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>)) == (<a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a> | <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>)) { <span class="comment">/* both shoulders held */</span> }</div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga600bb1ce7eb7b6ca4dcbb41546c32ec5"><div class="ttname"><a href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></div><div class="ttdeci">#define KEY_L</div><div class="ttdef"><b>Definition</b> input.h:86</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaa020da9e48a194889ac72f94408b3c25"><div class="ttname"><a href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div><div class="ttdeci">#define KEY_R</div><div class="ttdef"><b>Definition</b> input.h:87</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="a-lamp-per-button"></a>
+A Lamp per Button</h3>
+<p>The pads are part of the background picture. Each button has a lamp: an 8x8 sprite laid over it, shown while its bit is set and hidden otherwise:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (held &amp; <a class="code hl_variable" href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>].mask)</div>
+<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(<span class="keywordtype">id</span>, <a class="code hl_variable" href="input_2controller_2main_8c.html#a1a4057fa45a32deaccd6ffd293368556">pad_x</a>[pad] + <a class="code hl_variable" href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>].x, <a class="code hl_define" href="input_2controller_2main_8c.html#a5fb02b736c0c917dc78a96516bf2aac2">PAD_Y</a> + <a class="code hl_variable" href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>].y,</div>
+<div class="line">           <a class="code hl_define" href="input_2controller_2main_8c.html#ae2e8a5ab10e587c7bbc0f2afb0f7726d">TILE_LAMP</a> + <a class="code hl_variable" href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>].tile, 2 + pad, 3, 0);</div>
+<div class="line"><span class="keywordflow">else</span></div>
+<div class="line">    <a class="code hl_function" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279">oamHide</a>(<span class="keywordtype">id</span>);</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:144</div></div>
+<div class="ttc" id="ainput_2controller_2main_8c_html_a1a4057fa45a32deaccd6ffd293368556"><div class="ttname"><a href="input_2controller_2main_8c.html#a1a4057fa45a32deaccd6ffd293368556">pad_x</a></div><div class="ttdeci">static const u8 pad_x[2]</div><div class="ttdoc">Each pad&#39;s top-left on screen.</div><div class="ttdef"><b>Definition</b> main.c:92</div></div>
+<div class="ttc" id="ainput_2controller_2main_8c_html_a45c8f38b1957952a183a7b3382dc7f4c"><div class="ttname"><a href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a></div><div class="ttdeci">static const Lamp lamps[14]</div><div class="ttdoc">The lamps of one pad; the drawing has a button under each.</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
+<div class="ttc" id="ainput_2controller_2main_8c_html_a5fb02b736c0c917dc78a96516bf2aac2"><div class="ttname"><a href="input_2controller_2main_8c.html#a5fb02b736c0c917dc78a96516bf2aac2">PAD_Y</a></div><div class="ttdeci">#define PAD_Y</div><div class="ttdoc">Both pads&#39; top edge (the shoulders).</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
+<div class="ttc" id="ainput_2controller_2main_8c_html_ae2e8a5ab10e587c7bbc0f2afb0f7726d"><div class="ttname"><a href="input_2controller_2main_8c.html#ae2e8a5ab10e587c7bbc0f2afb0f7726d">TILE_LAMP</a></div><div class="ttdeci">#define TILE_LAMP</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
+<div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
+<div class="ttc" id="asprite_8h_html_ab3ca644deefaf56572cb0cb18e533279"><div class="ttname"><a href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279">oamHide</a></div><div class="ttdeci">void oamHide(u16 id)</div><div class="ttdoc">Park a sprite off screen.</div></div>
+</div><!-- fragment --><p>Both pads use the same four lamp tiles (a disc, a square, a pill, half a shoulder); pad 1 draws them with OBJ palette 2 (cyan), pad 2 with palette 3 (pink). The sprites go through OAM, which the NMI handler sends every VBlank, so lighting a button costs no VRAM or CGRAM write. The avatars are 32x32 and the lamps 8x8: <span class="tt"><a class="el" href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a></span>, with <span class="tt">oamSetSize(id, OBJ_LARGE)</span> on the avatars.</p>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-5"></a>
+VRAM Layout</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Region  </th><th class="markdownTableHeadNone">Content  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$0000  </td><td class="markdownTableBodyNone">the font (<span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span>, BG1)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">$1000  </td><td class="markdownTableBodyNone">BG2 tiles: the terminal and its two pads (2bpp)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$3800  </td><td class="markdownTableBodyNone">BG1 map: the text  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">$3C00  </td><td class="markdownTableBodyNone">BG2 map  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$4000  </td><td class="markdownTableBodyNone">OBJ tiles: Kit and the raccoon in four facings, the four lamps  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="assets-14"></a>
+Assets</h2>
+<p><span class="tt">res/screen.png</span> (the terminal, the two pads, the test bay) and <span class="tt">res/cast.png</span> (the avatars and the lamps) are made by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">pad_screen</span>, <span class="tt">pad_sprites</span>); Kit and the raccoon are Néo-Lumen art (PixelLab, CC0; <span class="tt">assets/neo-lumen/README.md</span>). The lamps' places on a pad are <span class="tt">PAD_LAMPS</span> there and the <span class="tt"><a class="el" href="input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c" title="The lamps of one pad; the drawing has a button under each.">lamps</a>[]</span> table in <span class="tt">main.c</span>. The build converts both from the settings file beside each (<span class="tt">opensnes-tileset</span>, <span class="tt">opensnes-sprite</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-29"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -184,22 +219,23 @@ Modules Used</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">console</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span>, <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>, NMI handler setup  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">OAM buffer (required by NMI handler even with no visible sprites)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">the lamps and the avatars (<span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize</a></span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone">DMA transfers used internally by console init  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone">the terminal's map, sent to VRAM  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone">BG layer configuration  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone">BG2: the terminal's tiles and map  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">text</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit()</a></span>, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span>, <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span> for button name display  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">text</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span>, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span>, <span class="tt"><a class="el" href="text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab" title="Print an unsigned integer in hexadecimal.">textPrintHex()</a></span>, <span class="tt"><a class="el" href="text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4" title="Print an unsigned integer.">textPrintU16()</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span>, <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> for reading controller state  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span>, <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span>, <span class="tt"><a class="el" href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda" title="Get buttons released this frame.">padReleased()</a></span> for both pads  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">gameloop</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun()</a></span>: the init / update shape of the program  </td></tr>
 </table>
-<p>Also linked: <span class="tt">gameloop</span> — the <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun()</a></span> frame loop.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-29"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-18"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/controller</div>
-</div><!-- fragment --><p>Open <span class="tt">controller.sfc</span> in Mesen2 and press buttons. </p>
+</div><!-- fragment --><p>Then open <span class="tt">controller.sfc</span> in luna (<span class="tt">luna-gui controller.sfc</span>) or any emulator, and press buttons on both pads. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

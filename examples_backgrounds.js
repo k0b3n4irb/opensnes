@@ -5,16 +5,12 @@ var examples_backgrounds =
       [ "The idea in one screen", "examples_backgrounds.html#the-idea-in-one-screen-1", [
         [ "Description", "examples_backgrounds_mode0.html#description", null ],
         [ "Architecture", "examples_backgrounds_mode0.html#architecture", null ],
-        [ "Ported from", "examples_backgrounds_mode0.html#ported-from", null ],
+        [ "Origin", "examples_backgrounds_mode0.html#origin", null ],
         [ "Modules", "examples_backgrounds_mode0.html#modules", null ]
       ] ]
     ] ],
     [ "Mode 1 Example", "examples_backgrounds_mode1.html", null ],
-    [ "Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds", "examples_backgrounds_mode1_bg3_priority.html", null ],
-    [ "Mode 1 LZ77", "examples_backgrounds_mode1_lz77.html", null ],
-    [ "mode2 — offset-per-tile: per-column scroll from BG3", "examples_backgrounds_mode2.html", null ],
+    [ "mode2 — offset-per-tile in Mode 2 and Mode 4: per-column scroll from BG3", "examples_backgrounds_mode2.html", null ],
     [ "Mode 3 — 256-Color Background", "examples_backgrounds_mode3.html", null ],
-    [ "mode4 — a 256-colour layer with offset-per-tile", "examples_backgrounds_mode4.html", null ],
-    [ "Hi-res text — BG Mode 5 + interlace (512 × 448)", "examples_backgrounds_mode5_hires.html", null ],
-    [ "mode6 — one hi-res layer with offset-per-tile", "examples_backgrounds_mode6.html", null ]
+    [ "Hi-res text — BG Mode 5 + interlace (512 × 448)", "examples_backgrounds_mode5_hires.html", null ]
 ];

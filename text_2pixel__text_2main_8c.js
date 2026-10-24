@@ -7,6 +7,8 @@ var text_2pixel__text_2main_8c =
     [ "MAP_VRAM", "text_2pixel__text_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c", null ],
     [ "PITCH", "text_2pixel__text_2main_8c.html#acd633835a520a62245ec6cfeb6d00e97", null ],
     [ "ROWS", "text_2pixel__text_2main_8c.html#a3cfd3aa62338d12609f6d65bce97e9cd", null ],
+    [ "TERM_MAP", "text_2pixel__text_2main_8c.html#af08380ecf757575bf9d121eafa35f02f", null ],
+    [ "TERM_TILES", "text_2pixel__text_2main_8c.html#ad94fc85e2e721e173adfdb060012bc95", null ],
     [ "TILES", "text_2pixel__text_2main_8c.html#a24efc2648ce6ac7ab8397cbb8fb4c044", null ],
     [ "build_glyphs", "text_2pixel__text_2main_8c.html#add0572e233d765645baee21852a26f04", null ],
     [ "compose", "text_2pixel__text_2main_8c.html#ac9d33e13996bfa7f9b18e21017588889", null ],

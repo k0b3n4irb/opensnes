@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_basics_collision_demo.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>AABB sprite-vs-sprite and tile-based wall collision in a walled arena. Move the white square with the D-pad. Overlapping a red enemy turns both green. </p>
+<p>AABB sprite-vs-sprite and tile-based wall collision in a warehouse. Walk Kit with the D-pad between the crates. A drone he walks under turns its lights green. </p>
 </blockquote>
 <p><img src="collision_demo.png" alt="" class="inline" title="Screenshot"/>    </p>
 <h2 class="doxsection"><a class="anchor" id="controls-3"></a>
@@ -132,57 +132,58 @@ Controls</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">D-Pad  </td><td class="markdownTableBodyNone">Move player sprite (2 pixels/frame)  </td></tr>
+<td class="markdownTableBodyNone">D-Pad  </td><td class="markdownTableBodyNone">Walk Kit (2 pixels/frame)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-4"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-1"></a>
 What You'll Learn</h2>
 <ul>
 <li>AABB collision via <span class="tt"><a class="el" href="collision_8h.html#a098ddee8de49c9dff2b3a5add5c32260" title="Check rectangle vs rectangle collision (AABB).">collideRect()</a></span> with <span class="tt"><a class="el" href="structRect.html" title="Axis-aligned bounding box (rectangle).">Rect</a></span> struct pointers</li>
-<li>Tile-based wall collision via <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> with a collision map array</li>
+<li>Tile-based wall collision via <span class="tt"><a class="el" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597" title="Check collision with tile using custom tile size.">collideTileEx()</a></span> with a collision map of 16x16 cells</li>
 <li>Per-axis rejection for sliding along walls instead of stopping dead</li>
-<li>Direct <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> buffer writes (avoiding <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>'s 158-byte stack overhead)</li>
-<li>OAM high table management for X high bit and sprite size</li>
-<li>Palette bank swapping for visual collision feedback</li>
+<li>One array for the walls and the picture: the tilemap is built from the collision map</li>
+<li>A hitbox smaller than its sprite, and the sprite drawn from the box</li>
+<li>Palette swapping for visual collision feedback</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-8"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-3"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/collision_demo</div>
-</div><!-- fragment --><p>Then open <span class="tt">collision_demo.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-13"></a>
+</div><!-- fragment --><p>Then open <span class="tt">collision_demo.sfc</span> in luna (<span class="tt">luna-gui collision_demo.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-6"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="aabb-collision-with-rect-pointers"></a>
 AABB Collision with Rect Pointers</h3>
 <p><span class="tt"><a class="el" href="collision_8h.html#a098ddee8de49c9dff2b3a5add5c32260" title="Check rectangle vs rectangle collision (AABB).">collideRect()</a></span> takes two <span class="tt">Rect*</span> pointers and returns non-zero if the rectangles overlap. The <span class="tt"><a class="el" href="structRect.html" title="Axis-aligned bounding box (rectangle).">Rect</a></span> struct holds <span class="tt">x</span>, <span class="tt">y</span>, <span class="tt">width</span>, and <span class="tt">height</span> fields:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.x = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
 <div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.y = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>;</div>
-<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.width = <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a5fac8f2cc29ea5bde30c8fa4a4daa306">PLAYER_SIZE</a>;</div>
-<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.height = <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a5fac8f2cc29ea5bde30c8fa4a4daa306">PLAYER_SIZE</a>;</div>
+<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.width = <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a8597c281cebf93733a4e6ac5cf212c19">BOX_SIZE</a>;</div>
+<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.height = <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a8597c281cebf93733a4e6ac5cf212c19">BOX_SIZE</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="collision_8h.html#a098ddee8de49c9dff2b3a5add5c32260">collideRect</a>(&amp;<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>, &amp;<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a">enemy_box</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>])) {</div>
 <div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444">collision_flags</a> |= (1 &lt;&lt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a09f5942c1c4cbb4530e773cfab273444"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444">collision_flags</a></div><div class="ttdeci">static u8 collision_flags</div><div class="ttdoc">Bitmask tracking which enemies the player is currently overlapping.</div><div class="ttdef"><b>Definition</b> main.c:75</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a5fac8f2cc29ea5bde30c8fa4a4daa306"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a5fac8f2cc29ea5bde30c8fa4a4daa306">PLAYER_SIZE</a></div><div class="ttdeci">#define PLAYER_SIZE</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a6b135eb85318c9cd14e19a4325b765c6"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a></div><div class="ttdeci">static Rect player_box</div><div class="ttdoc">Player bounding box for AABB collision tests via collideRect().</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abd583ad309c983b08f00fe94fb7dd85a"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a">enemy_box</a></div><div class="ttdeci">static Rect enemy_box[4]</div><div class="ttdoc">Bounding boxes for each enemy, rebuilt every frame for collideRect().</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a09f5942c1c4cbb4530e773cfab273444"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444">collision_flags</a></div><div class="ttdeci">static u8 collision_flags</div><div class="ttdoc">Bitmask tracking which drones Kit is currently overlapping.</div><div class="ttdef"><b>Definition</b> main.c:95</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a6b135eb85318c9cd14e19a4325b765c6"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a></div><div class="ttdeci">static Rect player_box</div><div class="ttdoc">Kit&#39;s bounding box for AABB collision tests via collideRect().</div><div class="ttdef"><b>Definition</b> main.c:80</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a8597c281cebf93733a4e6ac5cf212c19"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a8597c281cebf93733a4e6ac5cf212c19">BOX_SIZE</a></div><div class="ttdeci">#define BOX_SIZE</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abd583ad309c983b08f00fe94fb7dd85a"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a">enemy_box</a></div><div class="ttdeci">static Rect enemy_box[4]</div><div class="ttdoc">Bounding boxes for each drone, rebuilt every frame for collideRect().</div><div class="ttdef"><b>Definition</b> main.c:87</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Kit&#39;s hitbox, top-left corner, Y.</div><div class="ttdef"><b>Definition</b> main.c:78</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Kit&#39;s hitbox, top-left corner, in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
 <div class="ttc" id="acollision_8h_html_a098ddee8de49c9dff2b3a5add5c32260"><div class="ttname"><a href="collision_8h.html#a098ddee8de49c9dff2b3a5add5c32260">collideRect</a></div><div class="ttdeci">u8 collideRect(const Rect *a, const Rect *b)</div><div class="ttdoc">Check rectangle vs rectangle collision (AABB).</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
-</div><!-- fragment --><p>The example checks the player against four static enemy sprites each frame, storing results in a bitmask (<span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444" title="Bitmask tracking which enemies the player is currently overlapping.">collision_flags</a></span>). Bit N set means enemy N is overlapping.</p>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:144</div></div>
+</div><!-- fragment --><p>The example checks Kit against four drones each frame, storing results in a bitmask (<span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444" title="Bitmask tracking which drones Kit is currently overlapping.">collision_flags</a></span>). Bit N set means drone N is overlapped. Two boxes that only touch edge to edge do not overlap.</p>
 <h3 class="doxsection"><a class="anchor" id="tile-based-wall-collision"></a>
 Tile-Based Wall Collision</h3>
-<p><span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> takes four parameters: a pixel X coordinate, a pixel Y coordinate, a pointer to the collision map array, and the map width in tiles:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04">collideTile</a>(map_x, map_y, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a>, <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a>)</div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a302ff1b83f64306177e701ff28e81c89"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a></div><div class="ttdeci">static const u8 collision_map[16 *14]</div><div class="ttdoc">Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area).</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_aa037a6d6a4f04d51c7ec1c9ee9054e76"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a></div><div class="ttdeci">#define MAP_WIDTH</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
-<div class="ttc" id="acollision_8h_html_a3d1308f57854050bc7d9b288aefcdc04"><div class="ttname"><a href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04">collideTile</a></div><div class="ttdeci">u8 collideTile(s16 px, s16 py, const u8 *tilemap, u16 mapWidth)</div><div class="ttdoc">Check collision with tile at pixel coordinates.</div></div>
-</div><!-- fragment --><p>It converts the pixel position to a tile index (dividing by 8) and returns the tile value &ndash; 1 for solid, 0 for passable. The example checks all four corners of the player's 8x8 bounding box to detect wall overlap.</p>
+<p><span class="tt"><a class="el" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597" title="Check collision with tile using custom tile size.">collideTileEx()</a></span> takes a pixel position, the collision map, its width in cells and the cell size in pixels (8, 16 or 32; <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> is the 8-pixel case):</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597">collideTileEx</a>(x, y, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a>, <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a>, <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a8b4d4a1fcf419d5a3820c5b4b027ee8b">CELL</a>)</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a302ff1b83f64306177e701ff28e81c89"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a></div><div class="ttdeci">static const u8 collision_map[16 *14]</div><div class="ttdoc">Tile-based collision map (16x14 = 224 bytes, 256x224 pixels).</div><div class="ttdef"><b>Definition</b> main.c:130</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a8b4d4a1fcf419d5a3820c5b4b027ee8b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a8b4d4a1fcf419d5a3820c5b4b027ee8b">CELL</a></div><div class="ttdeci">#define CELL</div><div class="ttdef"><b>Definition</b> main.c:110</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_aa037a6d6a4f04d51c7ec1c9ee9054e76"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a></div><div class="ttdeci">#define MAP_WIDTH</div><div class="ttdef"><b>Definition</b> main.c:108</div></div>
+<div class="ttc" id="acollision_8h_html_a68ea9ae72befca266d053e9e26d71597"><div class="ttname"><a href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597">collideTileEx</a></div><div class="ttdeci">u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize)</div><div class="ttdoc">Check collision with tile using custom tile size.</div></div>
+</div><!-- fragment --><p>It divides the position by the cell size and returns the cell's value, non-zero for solid. The map here is 16x14 cells of 16 pixels, the whole screen, so screen coordinates are map coordinates. The example checks all four corners of Kit's 16x16 box.</p>
 <h3 class="doxsection"><a class="anchor" id="per-axis-sliding"></a>
 Per-Axis Sliding</h3>
-<p>When a diagonal movement would collide, each axis is tested independently. If only the X component collides, the Y movement still applies (and vice versa). This lets the player slide along walls:</p>
+<p>When a diagonal movement would collide, each axis is tested independently. If only the X component collides, the Y movement still applies (and vice versa). This lets Kit slide along walls:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (!<a class="code hl_function" href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a>(new_x, new_y)) {</div>
 <div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = new_x;</div>
 <div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = new_y;</div>
@@ -190,48 +191,57 @@ Per-Axis Sliding</h3>
 <div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a>(new_x, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>)) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = new_x;</div>
 <div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, new_y)) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = new_y;</div>
 <div class="line">}</div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_affd96b773b68b544ff0e952b63d80678"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a></div><div class="ttdeci">static u8 check_wall_collision(s16 new_x, s16 new_y)</div><div class="ttdoc">Test whether a position would overlap a solid wall tile.</div><div class="ttdef"><b>Definition</b> main.c:370</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="direct-oammemory-writes"></a>
-Direct oamMemory[] Writes</h3>
-<p>Instead of calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> (which has a 158-byte stack frame per call), the example writes sprite data directly into the OAM buffer. Each sprite is 4 bytes: X low, Y, tile number, and attribute byte (priority + palette bank):</p>
-<div class="fragment"><div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[0] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
-<div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[1] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>;</div>
-<div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[2] = 0;                                  <span class="comment">/* tile 0 */</span></div>
-<div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[3] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((3 &lt;&lt; 4) | (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> &lt;&lt; 1));    <span class="comment">/* priority 3, palette bank */</span></div>
-<div class="line"> </div>
-<div class="line"><a class="code hl_variable" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a> = 1;  <span class="comment">/* NMI handler DMAs the buffer */</span></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
-<div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
-</div><!-- fragment --><p>When a collision is active, the palette bank switches from 0 (normal colors: white player, red enemies) to 1 (green highlight for both), providing instant visual feedback.</p>
-<h3 class="doxsection"><a class="anchor" id="collision-map-layout"></a>
-Collision Map Layout</h3>
-<p>The arena is a 16x14 tile grid (128x112 pixels) centered on the 256x224 screen. Walls form the border with symmetric internal platforms:</p>
-<div class="fragment"><div class="line">1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1   (top wall)</div>
-<div class="line">1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_affd96b773b68b544ff0e952b63d80678"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a></div><div class="ttdeci">static u8 check_wall_collision(s16 new_x, s16 new_y)</div><div class="ttdoc">Test whether Kit&#39;s box at a position would overlap a solid cell.</div><div class="ttdef"><b>Definition</b> main.c:265</div></div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="one-array-for-the-walls-and-the-picture"></a>
+One Array for the Walls and the Picture</h3>
+<div class="fragment"><div class="line">2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2   (the north wall)</div>
+<div class="line">2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2</div>
 <div class="line">...</div>
-<div class="line">1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1   (platforms)</div>
+<div class="line">2,0,0,1,1,0,0,0,0,0,0,1,1,0,0,2   (crate stacks)</div>
 <div class="line">...</div>
-<div class="line">1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1   (center platform)</div>
+<div class="line">2,0,0,0,0,0,1,1,1,1,0,0,0,0,0,2   (the middle stack)</div>
 <div class="line">...</div>
-<div class="line">1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1   (bottom wall)</div>
-</div><!-- fragment --><p>The same data drives both the visual BG tilemap (drawn once at init) and the runtime collision checks (read every frame).</p>
+<div class="line">2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2   (the south wall)</div>
+</div><!-- fragment --><p>0 is the floor, 1 a crate, 2 a wall plate: both solid, drawn differently. At boot, <span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#a23f6b9cbd596bfa99a55782df78ca396" title="Build BG1&#39;s tilemap from the collision map, in force blank.">build_tilemap()</a></span> turns each cell into the 2x2 tiles of its picture in <span class="tt">res/cells.png</span> (and a floor cell into a drain grate now and then, chosen from its position), one row of 32 map entries at a time, one DMA a row, in force blank. Move a crate in the array and it moves on screen and in the collisions at once.</p>
+<h3 class="doxsection"><a class="anchor" id="a-hitbox-is-not-a-sprite"></a>
+A Hitbox Is Not a Sprite</h3>
+<p>Kit is a 32x32 sprite, but what collides is a 16x16 box at his feet: the sprite is drawn 8 pixels left of the box and 16 above it, so his head may pass in front of a crate he stands below, as in a game seen from above. The drones' boxes are their bodies, 8 pixels into their frames each way.</p>
+<h3 class="doxsection"><a class="anchor" id="palette-feedback-and-drawing-order"></a>
+Palette Feedback and Drawing Order</h3>
+<p>Each drone is drawn on OBJ palette 1 (pink lights) or, while its bit is set, palette 2: the same colours with the lights green. Same tiles, another palette, nothing to upload. The drones take OAM slots 0-3 and Kit slot 4: the lower slot is drawn in front, and the drones fly, so a drone Kit walks under stays visible.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-16"></a>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-1"></a>
+VRAM Layout</h2>
+<p>From <span class="tt">vram.spec</span> (<span class="tt">vram_map.h</span> is generated from it):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Region  </th><th class="markdownTableHeadNone">Content  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$0000  </td><td class="markdownTableBodyNone">OBJ tiles: Kit's 15 frames and the drone's 4, 32x32 (320 tiles)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">$1400  </td><td class="markdownTableBodyNone">BG1 tilemap, 32x32  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$2000  </td><td class="markdownTableBodyNone">BG1 tiles: the four 16x16 cells (16 tiles)  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="assets-3"></a>
+Assets</h2>
+<p><span class="tt">res/cells.png</span> (the floor, a crate, a wall plate, the floor with a drain, converted without reduction so that cell k is tiles 2k, 2k + 1, 8 + 2k, 9 + 2k) and <span class="tt">res/cast.png</span> (Kit's walk from above, then the drone's hover) are made by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">warehouse_cells</span>, <span class="tt">collision_sprites</span>); Kit and the drone are Néo-Lumen art (PixelLab, CC0; <span class="tt">assets/neo-lumen/README.md</span>). The build converts both from the settings file beside each (<span class="tt">opensnes-tileset</span>, <span class="tt">opensnes-sprite</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-9"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">collision</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
-<h2 class="doxsection"><a class="anchor" id="files-3"></a>
+<h2 class="doxsection"><a class="anchor" id="files-2"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Collision logic, sprite management, game loop  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Collision logic, the tilemap built from the map, sprite placement, game loop  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">vram.spec</span>  </td><td class="markdownTableBodyNone">The VRAM regions; <span class="tt">vram_map.h</span> is generated from it  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build config (<span class="tt">LIB_MODULES := console input sprite dma collision background</span>)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="whats-next-4"></a>
+<h2 class="doxsection"><a class="anchor" id="whats-next-3"></a>
 What's Next?</h2>
 <p><b>Game:</b> <a href="examples_games_breakout.html">Breakout</a> - Complete game with collision, sprites, and levels </p>
 </div></div><!-- contents -->

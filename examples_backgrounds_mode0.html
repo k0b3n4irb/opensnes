@@ -129,20 +129,22 @@ $(function(){initNavTree('examples_backgrounds_mode0.html','',''); });
 Screenshot</div></div>
     <h2 class="doxsection"><a class="anchor" id="description"></a>
 Description</h2>
-<p>Mode 0 provides four background layers, each with its own 4-color palette bank. This example shows a Kirby-style parallax scene with all four layers scrolling at different speeds.</p>
+<p>Mode 0 provides four background layers, each with its own 4-color palette bank. This example shows the city at night in four layers, each drawn in four colours (one of them transparent), the three behind the status panel scrolling at different speeds.</p>
 <h2 class="doxsection"><a class="anchor" id="architecture"></a>
 Architecture</h2>
 <ul>
 <li><b>Mode 0</b>: Four BGs, each 2bpp (4 colors per tile)</li>
-<li><b>BG1</b>: Foreground terrain (static)</li>
-<li><b>BG2</b>: Mid-ground elements (scroll speed ×3)</li>
-<li><b>BG3</b>: Far buildings (scroll speed ×2)</li>
-<li><b>BG4</b>: HUD bar (scroll speed ×1)</li>
-<li>Each BG uses a separate palette bank (0-3)</li>
+<li><b>BG0</b>: the status panel at the bottom (still)</li>
+<li><b>BG1</b>: the roofs close by (3 px every 3 frames, the fastest)</li>
+<li><b>BG2</b>: the mid-distance blocks (2 px every 3 frames)</li>
+<li><b>BG3</b>: the far towers (1 px every 3 frames, the slowest)</li>
+<li>Each BG uses a separate palette bank (0-3); the backdrop, colour 0 of the first, is the night sky</li>
+<li>Each scrolling layer is a 128-pixel half and its mirror, so it wraps at 256 pixels</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="ported-from"></a>
-Ported from</h2>
-<p>PVSnesLib "Mode0" example.</p>
+<p>The four pictures (<span class="tt">res/bg0.png</span> to <span class="tt">res/bg3.png</span>) are written by <span class="tt">devtools/art_assets/build.py</span> from the generated city in <span class="tt">assets/neo-lumen/</span> (CC0): each source is cut to its band and mapped to its layer's three colours by brightness.</p>
+<h2 class="doxsection"><a class="anchor" id="origin"></a>
+Origin</h2>
+<p>Began as the PVSnesLib "Mode0" example.</p>
 <h2 class="doxsection"><a class="anchor" id="modules"></a>
 Modules</h2>
 <p><span class="tt">console dma background</span> </p>

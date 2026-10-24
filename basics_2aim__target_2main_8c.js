@@ -1,14 +1,27 @@
 var basics_2aim__target_2main_8c =
 [
-    [ "PLAYER_X", "basics_2aim__target_2main_8c.html#a11d58baaffc49494ab91da16621b6a5c", null ],
-    [ "PLAYER_Y", "basics_2aim__target_2main_8c.html#ae22bdd9c98feb24a0843a4ff0fa6e662", null ],
+    [ "HALF", "basics_2aim__target_2main_8c.html#a37c4c48ff47f0838f64b5a1fb3c803b2", null ],
+    [ "OBJ_VRAM", "basics_2aim__target_2main_8c.html#a69f9f237baac2ee247f14425602af76e", null ],
+    [ "ROOF_MAP", "basics_2aim__target_2main_8c.html#a3bfde2d6bdb39781832cf10bf0e704c6", null ],
+    [ "ROOF_TILES", "basics_2aim__target_2main_8c.html#a11723159f1463f1975722dc7e8fea8c9", null ],
+    [ "TILE_DRONE", "basics_2aim__target_2main_8c.html#a1f65971c5917729eb32169601fc213d2", null ],
+    [ "TILE_ORBITER", "basics_2aim__target_2main_8c.html#a5b840601f08b2e0073b3930e845737c7", null ],
+    [ "TURRET_X", "basics_2aim__target_2main_8c.html#af5b79d84b830c8b55efd2016ae60e8a9", null ],
+    [ "TURRET_Y", "basics_2aim__target_2main_8c.html#abe6ba13cd494a412de59d77ba5f1f07b", null ],
     [ "main", "basics_2aim__target_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "on_init", "basics_2aim__target_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4", null ],
     [ "on_update", "basics_2aim__target_2main_8c.html#ae658753de50085894acfe2b69fbd62e5", null ],
+    [ "orbit_step", "basics_2aim__target_2main_8c.html#addae8997e51cecc589764e859ce10159", null ],
+    [ "turret_tile", "basics_2aim__target_2main_8c.html#aa309f387b198a9b54d0ab3e25d617df0", null ],
+    [ "g_angle", "basics_2aim__target_2main_8c.html#a1d95c47f3f34f3a3f50fac7bc7f480b7", null ],
+    [ "g_angle8", "basics_2aim__target_2main_8c.html#a4c14d42e9fd66fb7a1610b34c740b8e3", null ],
+    [ "g_omega", "basics_2aim__target_2main_8c.html#a9038d2c1d499007c4c6009431ceea551", null ],
+    [ "g_radius", "basics_2aim__target_2main_8c.html#a5bc80b8bc64cd7a22a5945fe79c08a31", null ],
+    [ "g_sx", "basics_2aim__target_2main_8c.html#a8bf367d9546e852ffe3401c8223928d4", null ],
+    [ "g_sy", "basics_2aim__target_2main_8c.html#afa9f1f050b3bf0ad4d35b1ae5033aa02", null ],
     [ "prev_target_x", "basics_2aim__target_2main_8c.html#a3f3faf49c8176b2b6058a45340d0661e", null ],
     [ "prev_target_y", "basics_2aim__target_2main_8c.html#a86fa852c94d4355ea5c30d8a0468bba2", null ],
-    [ "sprite_pal", "basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1", null ],
-    [ "sprite_tiles", "basics_2aim__target_2main_8c.html#a8a93c98a1e1bf824c8c791a3653f4d09", null ],
     [ "target_x", "basics_2aim__target_2main_8c.html#ad096e3b38057e57a43b4849613f1ae1d", null ],
-    [ "target_y", "basics_2aim__target_2main_8c.html#a0f52a34005a9653b7ca22395f9f63a3f", null ]
+    [ "target_y", "basics_2aim__target_2main_8c.html#a0f52a34005a9653b7ca22395f9f63a3f", null ],
+    [ "turret_heading", "basics_2aim__target_2main_8c.html#a43d6e196f172ea34331062165c8c5338", null ]
 ];

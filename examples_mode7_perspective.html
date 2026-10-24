@@ -126,13 +126,13 @@ $(function(){initNavTree('examples_mode7_perspective.html','',''); });
 <img src="perspective.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-4"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-3"></a>
 What This Example Shows</h2>
 <p>How to combine Mode 7 with HDMA to create a <b>perspective ground plane</b> &ndash; the same technique used in F-Zero, Mario Kart, and Pilotwings. The screen is split in two: a static sky on top and a scaled ground that recedes into the distance.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-6"></a>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-4"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">mode7/rotate_scale</span> first (Mode 7 basics), then <span class="tt">hdma/hdma_wave</span> (HDMA tables written per scanline).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-24"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-21"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,12 +140,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD  </td><td class="markdownTableBodyNone">Scroll the ground plane  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-39"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/perspective</div>
 </div><!-- fragment --><p>Then run <span class="tt">perspective.sfc</span> in luna (<span class="tt">opensnes run</span>) or any SNES emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-11"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-7"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-split-screen-with-hdma"></a>
 1. Split-screen with HDMA</h3>
@@ -170,24 +170,24 @@ How It Works</h2>
 <p>Two pre-computed tables in <span class="tt">main.c</span>, <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#a8242f1368aa029cac997299479962347" title="M7A per ground line: 512 / zoom, the zoom growing by 0.025 a line (8.8 fixed point,...">perspective_x</a></span> and <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#a95f81030e6fd70dd6fd7bf1b88cf46d8" title="M7D per ground line: 4096 / zoom, the zoom growing by 0.05 a line (8.8 fixed point,...">perspective_y</a></span>, give each ground scanline its own M7A and M7D.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-scrolling"></a>
 3. Scrolling</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>--;</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>++;</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>--;</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>++;</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>--;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>++;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>--;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>++;</div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"><a class="code hl_function" href="mode7_2perspective_2main_8c.html#aca454876f36e8f32b3ef01f1eb441ecd">setCamera</a>();   <span class="comment">/* mode7SetScroll, mode7SetCenter, bgSetScroll for the sky */</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:158</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:114</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_aca454876f36e8f32b3ef01f1eb441ecd"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#aca454876f36e8f32b3ef01f1eb441ecd">setCamera</a></div><div class="ttdeci">static void setCamera(void)</div><div class="ttdoc">Place the camera: Mode 7 scroll and center, and the sky&#39;s scroll.</div><div class="ttdef"><b>Definition</b> main.c:123</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:113</div></div>
+<div class="ttc" id="akit_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">u16 pad0</div><div class="ttdef"><b>Definition</b> kit.c:31</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:115</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_aca454876f36e8f32b3ef01f1eb441ecd"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#aca454876f36e8f32b3ef01f1eb441ecd">setCamera</a></div><div class="ttdeci">static void setCamera(void)</div><div class="ttdoc">Place the camera: Mode 7 scroll and center, and the sky&#39;s scroll.</div><div class="ttdef"><b>Definition</b> main.c:124</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:114</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll()</a></span> and <span class="tt"><a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a></span> write the registers at once, so they run right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-40"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-23"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="mode-switching-mid-frame"></a>
 Mode Switching Mid-Frame</h3>
@@ -198,7 +198,7 @@ Per-Scanline Scaling</h3>
 <h3 class="doxsection"><a class="anchor" id="hdma-budget"></a>
 HDMA Budget</h3>
 <p>HDMA takes its time from the CPU on every line where a channel is active: about 18 master cycles, plus 8 per active channel and 8 per byte written (anomie's register notes; at most 466 master cycles a line, all eight channels on). Here, on a ground line: 18 + 4 x 8 + 4 bytes x 8 = 82 master cycles of the 1364 a scanline lasts.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-11"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-7"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -208,24 +208,24 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">res/ground.png.toml</span>, <span class="tt">res/sky.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the ground (Mode 7) and the sky (<span class="tt">opensnes-tileset</span>); the build converts and links them  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>  </td><td class="markdownTableBodyNone">Mode 7 ground texture source  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>  </td><td class="markdownTableBodyNone">the city from above, 1024x1024 in 235 tiles (CC0, <span class="tt">assets/neo-lumen/</span>)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">Sky background source  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">the towers over the horizon, 512x256; its 16 colours are the ground's first sixteen, the palette both read (<span class="tt">devtools/art_assets/mode7.py</span> writes the two)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console dma background sprite input mode7 hdma</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-6"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-5"></a>
 Going Further</h2>
 <ul>
 <li><b>Add rotation</b>: <span class="tt">mode7/perspective_rotate</span> drives all four matrix terms per line from precomputed tables, one set per angle.</li>
 <li><b>Add sprites</b>: Place car or character sprites on top of the ground plane. Sprites render normally in Mode 7 and can be scaled/positioned to match the perspective.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">hdma/gradient_colors</span> &ndash; Another HDMA technique (color gradients)</li>
-<li><span class="tt">games/likemario</span> &ndash; Scrolling backgrounds with sprites (different approach)</li>
+<li><span class="tt">games/rooftop_run</span> &ndash; Scrolling backgrounds with sprites (different approach)</li>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-56"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-38"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

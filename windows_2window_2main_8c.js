@@ -1,10 +1,25 @@
 var windows_2window_2main_8c =
 [
+    [ "BEAM_LINES", "windows_2window_2main_8c.html#afd901262d75b5c13b84d33c6acdf5654", null ],
+    [ "BEAM_TOP", "windows_2window_2main_8c.html#a160e4a66b4f0b631407fbb12f21d69a3", null ],
+    [ "BEAM_X", "windows_2window_2main_8c.html#a4b398aa45f2555325932a872c5327e8e", null ],
+    [ "BEAM_Y", "windows_2window_2main_8c.html#a9856ab574278b694b6f69dcc3d3f81a0", null ],
+    [ "KIT_X", "windows_2window_2main_8c.html#ac696baeb52142dcbca7996c0fe04f003", null ],
+    [ "KIT_Y", "windows_2window_2main_8c.html#afe81428a3ef9bd18f766d9f153c56ead", null ],
+    [ "VRAM_BG1_MAP", "windows_2window_2main_8c.html#a062335e0c6d2c2294bf2782b300c7a60", null ],
+    [ "VRAM_BG1_TILES", "windows_2window_2main_8c.html#a75ec3171efbfd345d2b96dcede29ded2", null ],
+    [ "VRAM_BG2_MAP", "windows_2window_2main_8c.html#a887794f9b169e435e406eed5ff0a9c3b", null ],
+    [ "VRAM_BG2_TILES", "windows_2window_2main_8c.html#ab202e5cd47fa03ebeb38e0a3b0c8940b", null ],
+    [ "VRAM_OBJ", "windows_2window_2main_8c.html#a446998f668b17e1e0c368b4667ef7165", null ],
     [ "W12SEL_BG1", "windows_2window_2main_8c.html#adf4a0593a765b51301f1aa85c1262f00", null ],
     [ "W12SEL_BG2", "windows_2window_2main_8c.html#ad3e4f60bae6292b70f00e419a32bf8e0", null ],
     [ "W12SEL_BOTH", "windows_2window_2main_8c.html#a0ed35cd555421addfc69ec44fdf83c30", null ],
+    [ "buildBeam", "windows_2window_2main_8c.html#a4412c69291201775560aaa87325c075d", null ],
     [ "main", "windows_2window_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
+    [ "setup_light", "windows_2window_2main_8c.html#ae5ab3c717097db4a7a44b6e56b768646", null ],
     [ "setup_window", "windows_2window_2main_8c.html#a6d8be50ef64f4849ce6ab1db9ac1ed22", null ],
-    [ "tablelefttriangle", "windows_2window_2main_8c.html#ae8ca7c4d0b07e2c52fa9fd77df638833", null ],
-    [ "tablerighttriangle", "windows_2window_2main_8c.html#a05283269f5b57e738841b4cfe551530c", null ]
+    [ "rain_x", "windows_2window_2main_8c.html#a37f355b3f65ccc98806119121f2081ab", null ],
+    [ "rain_y", "windows_2window_2main_8c.html#af8054ee509ca8d1591b4979a38ab79d6", null ],
+    [ "tablelefttriangle", "windows_2window_2main_8c.html#a7f3eb2dd03d6c14d58a1541b91863822", null ],
+    [ "tablerighttriangle", "windows_2window_2main_8c.html#ac6c1dfac8096665d4a568ac7ce1f9923", null ]
 ];

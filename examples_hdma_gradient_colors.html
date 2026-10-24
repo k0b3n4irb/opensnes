@@ -126,13 +126,13 @@ $(function(){initNavTree('examples_hdma_gradient_colors.html','',''); });
 <img src="gradient_colors.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-1"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows"></a>
 What This Example Shows</h2>
 <p>How to create a smooth color gradient across the screen using <b>HDMA to rewrite CGRAM</b> (the palette) every few scanlines. This technique changes the backdrop color (color 0) as the PPU draws each line, creating sky gradients, underwater effects, or sunset transitions.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-2"></a>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-1"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">effects/hdma_wave</span> first (HDMA basics and table format).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-13"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-12"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -141,13 +141,15 @@ Controls</h2>
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Remove the gradient (flat background)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Re-enable the gradient  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">X  </td><td class="markdownTableBodyNone">The indirect gradient: 32 red bands through a pointer table  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-27"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-16"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/hdma/gradient_colors</div>
-</div><!-- fragment --><p>Then open <span class="tt">gradient_colors.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-4"></a>
+</div><!-- fragment --><p>Then open <span class="tt">gradient_colors.sfc</span> in luna (<span class="tt">luna-gui gradient_colors.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-2"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-hdma-targets-cgadd-2121"></a>
 1. HDMA targets CGADD ($2121)</h3>
@@ -174,19 +176,34 @@ How It Works</h2>
 2. The gradient table</h3>
 <p>Each entry in <span class="tt"><a class="el" href="hdma_2gradient__colors_2main_8c.html#ac02a749aefafdaf51906904af640e33a" title="4bpp tile data for the background layer.">hdmaGradientList</a></span> is:</p>
 <div class="fragment"><div class="line">[line_count] [cgadd_lo=0x00] [cgadd_hi=0x00] [color_lo] [color_hi]</div>
-</div><!-- fragment --><p>The table defines color 0 (backdrop) for groups of scanlines. By stepping through blues, purples, and oranges, it creates a smooth vertical gradient.</p>
+</div><!-- fragment --><p>The table defines color 0 (backdrop) for groups of scanlines: 28 bands of 8 lines, the city's sky at dusk, from the night at the top through indigo, violet and magenta to the amber glow of the streets at the bottom. The picture on BG1 is the OpenSNES logo, Kit over the wordmark; its sky is colour 0, never drawn, so the backdrop shows all around him.</p>
 <p>The table ends with a <span class="tt">0x00</span> byte (zero line count = end of HDMA table).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-toggle-at-runtime"></a>
 3. Toggle at runtime</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) <a class="code hl_function" href="hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f">hdmaDisableAll</a>();</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) <a class="code hl_function" href="hdma_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1">enableGradient</a>();</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:158</div></div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) <a class="code hl_function" href="hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f">hdmaDisableAll</a>();</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) <a class="code hl_function" href="hdma_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1">enableGradient</a>();</div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:74</div></div>
-<div class="ttc" id="ahdma_2gradient__colors_2main_8c_html_a3bb2cc2d1414873f04b4bfb504a9b3f1"><div class="ttname"><a href="hdma_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1">enableGradient</a></div><div class="ttdeci">void enableGradient(void)</div><div class="ttdoc">Enable the HDMA backdrop color gradient effect.</div><div class="ttdef"><b>Definition</b> main.c:75</div></div>
+<div class="ttc" id="ahdma_2gradient__colors_2main_8c_html_a3bb2cc2d1414873f04b4bfb504a9b3f1"><div class="ttname"><a href="hdma_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1">enableGradient</a></div><div class="ttdeci">void enableGradient(void)</div><div class="ttdoc">Enable the HDMA backdrop color gradient effect.</div><div class="ttdef"><b>Definition</b> main.c:137</div></div>
 <div class="ttc" id="ahdma_8h_html_ad5a8e7d96e85c1d7ec49a488d6f3838f"><div class="ttname"><a href="hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f">hdmaDisableAll</a></div><div class="ttdeci">void hdmaDisableAll(void)</div><div class="ttdoc">Disable all HDMA channels.</div></div>
+<div class="ttc" id="akit_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">u16 pad0</div><div class="ttdef"><b>Definition</b> kit.c:31</div></div>
 </div><!-- fragment --><p>HDMA can be enabled/disabled at any time. When disabled, color 0 reverts to whatever was last written to CGRAM.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-29"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md4-the-same-effect-through-indirect-hdma-x"></a>
+4. The same effect through indirect HDMA (X)</h3>
+<div class="image">
+<img src="gradient_colors_indirect.png" alt=""/>
+<div class="caption">
+Indirect</div></div>
+    <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318">hdmaSetupIndirect</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4">HDMA_MODE_2REG_2X</a>, <a class="code hl_define" href="hdma_8h.html#af1addfa1b6fe98e5c4f1ff623f263ba0">HDMA_DEST_CGADD</a>,</div>
+<div class="line">                  <a class="code hl_variable" href="hdma_2gradient__colors_2main_8c.html#a0f089355db851d283a48715859fcb354">itable</a>, (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((<a class="code hl_typedef" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a>)(<span class="keywordtype">void</span> *)<a class="code hl_variable" href="hdma_2gradient__colors_2main_8c.html#abf222233a4cef60952d9e8c6930e473f">band_data</a> &gt;&gt; 16));</div>
+<div class="ttc" id="agroup__types_html_ga10e94b422ef0c20dcdec20d31a1f5049"><div class="ttname"><a href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a></div><div class="ttdeci">unsigned int u32</div><div class="ttdoc">32-bit unsigned integer (0 to 4294967295)</div><div class="ttdef"><b>Definition</b> types.h:90</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+<div class="ttc" id="ahdma_2gradient__colors_2main_8c_html_a0f089355db851d283a48715859fcb354"><div class="ttname"><a href="hdma_2gradient__colors_2main_8c.html#a0f089355db851d283a48715859fcb354">itable</a></div><div class="ttdeci">static u8 itable[32 *3+1]</div><div class="ttdoc">The indirect table: [count][ptr_lo][ptr_hi] per band + terminator.</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
+<div class="ttc" id="ahdma_2gradient__colors_2main_8c_html_abf222233a4cef60952d9e8c6930e473f"><div class="ttname"><a href="hdma_2gradient__colors_2main_8c.html#abf222233a4cef60952d9e8c6930e473f">band_data</a></div><div class="ttdeci">static u8 band_data[32][4]</div><div class="ttdoc">The bands&#39; payloads: [CGADD][CGADD][color_lo][color_hi] each.</div><div class="ttdef"><b>Definition</b> main.c:78</div></div>
+<div class="ttc" id="ahdma_8h_html_a35d67e382ab2f45cb99ec5943d38d318"><div class="ttname"><a href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318">hdmaSetupIndirect</a></div><div class="ttdeci">void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table, u8 dataBank)</div><div class="ttdoc">Configure an INDIRECT HDMA channel (table of pointers to data).</div></div>
+</div><!-- fragment --><p>With DMAP bit 6 set, a table entry is <span class="tt">[count][ptr_lo][ptr_hi]</span>: the PPU fetches the entry's 4-byte payload (<span class="tt">[CGADD][CGADD][color_lo][color_hi]</span>) through the pointer, from the bank in <span class="tt">$43x7</span> — the register plain <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> never writes, and <span class="tt"><a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a></span> does. The payloads live in a WRAM array (<span class="tt"><a class="el" href="hdma_2gradient__colors_2main_8c.html#abf222233a4cef60952d9e8c6930e473f" title="The bands&#39; payloads: [CGADD][CGADD][color_lo][color_hi] each.">band_data</a></span>) the CPU can rewrite at any time without touching the table: the layout of dynamic per-scanline palettes. A count of 7 fetches the payload once and holds it for 7 lines; a repeat count (<span class="tt">$87</span>) would fetch a fresh payload every line, the HiColor pattern.</p>
+<p>The gradient is krom (Peter Lemon)'s "Red Space Indirect HDMA" demo, ported to C: 32 red bands of 7 lines, <span class="tt">$001F</span> at the top fading to black.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-14"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="cgram-color-generator-ram"></a>
 CGRAM (Color Generator RAM)</h3>
@@ -197,7 +214,7 @@ HDMA Mode 3 (2REG_2X)</h3>
 <h3 class="doxsection"><a class="anchor" id="non-repeat-vs-repeat-mode"></a>
 Non-Repeat vs Repeat Mode</h3>
 <p>This gradient uses non-repeat entries (bit 7 = 0 in the count byte). The color is written once, then holds for N scanlines. This works because CGRAM latches its value &ndash; unlike scroll registers (BG1HOFS etc.) which need repeat mode with fresh writes every scanline.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-4"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-2"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -205,18 +222,18 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Gradient setup, enable/disable, input handling  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>); the build converts and links it  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/logo.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>); the build converts and links it  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">the HDMA gradient table (<span class="tt"><a class="el" href="hdma_2gradient__colors_2main_8c.html#ac02a749aefafdaf51906904af640e33a" title="4bpp tile data for the background layer.">hdmaGradientList</a></span>), hand-written  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png</span>  </td><td class="markdownTableBodyNone">Source background image  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/logo.png</span>  </td><td class="markdownTableBodyNone">the OpenSNES logo on a transparent sky, written by <span class="tt">devtools/art_assets/build.py</span> (CC0)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console dma background sprite hdma input math</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-2"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-1"></a>
 Going Further</h2>
 <ul>
-<li><b>Custom gradient</b>: Edit the <span class="tt"><a class="el" href="hdma_2gradient__colors_2main_8c.html#ac02a749aefafdaf51906904af640e33a" title="4bpp tile data for the background layer.">hdmaGradientList</a></span> table in data.asm. Each entry is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try creating a sunset (orange to purple to dark blue).</li>
+<li><b>Custom gradient</b>: Edit the <span class="tt"><a class="el" href="hdma_2gradient__colors_2main_8c.html#ac02a749aefafdaf51906904af640e33a" title="4bpp tile data for the background layer.">hdmaGradientList</a></span> table in data.asm. Each entry is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try a dawn instead (dark blue to pale gold).</li>
 <li><b>Animated gradient</b>: Copy the table to RAM and rotate the color entries each frame. This creates a flowing color effect like underwater caustics.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">effects/transparency</span> &ndash; Color math blending (another way to modify colors)</li>
@@ -224,7 +241,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-42"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-27"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">hdma</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="further-the-9-bit-backdrop-two-channels-one-visual"></a>

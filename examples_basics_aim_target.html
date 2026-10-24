@@ -127,8 +127,9 @@ $(function(){initNavTree('examples_basics_aim_target.html','',''); });
 <div class="caption">
 Screenshot</div></div>
     <p>Live demonstration of the four math primitives a 2D action game leans on the most: <b><span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a></span></b> (pixel distance), <b><span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span></b> (8-bit angle to a target), and the <b><span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> / <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> LUTs</b> (project a velocity vector along that angle). Everything updates live as the user moves the target with the D-pad — the numbers on screen are real arithmetic, not pre-baked.</p>
-<p>The player diamond stays anchored at the screen centre; the X follows the D-pad. Each frame the example recomputes <span class="tt">dx</span>/<span class="tt">dy</span> from the two positions, calls <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> for the pixel distance, calls <span class="tt">atan2_8(dy, dx)</span> for the 8-bit angle, then calls <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> and <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> on that angle to read back the unit direction vector.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-12"></a>
+<p>A security turret sits on a roof at the screen centre; the drone it aims at follows the D-pad. Each frame the example recomputes <span class="tt">dx</span>/<span class="tt">dy</span> from the two centres, calls <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> for the pixel distance, calls <span class="tt">atan2_8(dy, dx)</span> for the 8-bit angle, then calls <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> and <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> on that angle to read back the unit direction vector — and turns the turret to face the drone with the same angle.</p>
+<p>A second drone, its eye cyan, orbits the roof on its own: the motion half of the fixed-point story (it was the <span class="tt">fix32_orbit</span> example).</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-5"></a>
 SNES Concepts</h2>
 <ul>
 <li><span class="tt">&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</span> square-root and atan2:<ul>
@@ -136,24 +137,35 @@ SNES Concepts</h2>
 <li><span class="tt">atan2_8(dy, dx)</span> → 8-bit angle in the same convention as the <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> / <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> LUTs (0 = +X, 64 = +Y, 128 = −X, 192 = −Y)</li>
 </ul>
 </li>
-<li>LUT chaining — feed the <span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> output back into the trig LUT to recover a unit direction vector that points from player to target. This is the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
-<li>Mode 0 + sprite overlay — BG1 hosts the text via the <span class="tt">text</span> module; the player and target are 8×8 OBJ sprites on the OBJ layer so they don't disturb the text display. Sprite tiles are placed at VRAM $4000 to keep $0000 free for the text font.</li>
+<li>LUT chaining — feed the <span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> output back into the trig LUT to recover a unit direction vector that points from the turret to the drone. This is the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
+<li>Facing a target with no rotation hardware — the turret is drawn in sixteen headings, a sixteenth of a turn (16 angle steps) apart, and the angle picks the frame: <span class="tt">(<a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).">angle</a> + 8) &gt;&gt; 4</span>, half a step added so that the NEAREST heading wins, not the one just below.</li>
+<li>Mode 0 + sprite overlay — BG1 hosts the text via the <span class="tt">text</span> module, BG2 the roof (2bpp, its own four colours at CGRAM 32: in Mode 0 each BG has its own palettes), in front-to-back order BG1, BG2. The turret and the drones are 32×32 OBJ sprites over both. Sprite tiles are placed at VRAM $4000 to keep $0000 free for the text font; the sheet holds 264 tiles, so the drones sit in the second OBJ name table (tiles 256, 260).</li>
+<li>A sprite's position is its top-left corner. The example keeps the centres — what the maths aims between — and draws each 32×32 sprite 16 pixels up and left of its centre.</li>
+<li><span class="tt">&lt;<a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">snes/fixed32.h</a>&gt;</span> motion, the orbiter — <b>keep the world in 16.16 and the screen in 8.8</b>:<ul>
+<li>an angle accumulator in 16.16 (<span class="tt"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></span>), advanced each frame by a 16.16 angular velocity (<span class="tt"><a class="el" href="fixed32_8h.html#a57f95a127af818ef04a0248e76c08570" title="Convert integer to fixed32 (shift left 16).">FIX32(1)</a></span>: one LUT step a frame)</li>
+<li>its integer part (<span class="tt"><a class="el" href="fixed32_8h.html#a0efbb853debc8c5c8a16c10b87553684" title="Convert fixed32 to integer (floor).">UNFIX32</a></span>) indexes the 256-step LUT</li>
+<li>the position is <span class="tt">fix32Mul(radius, fix32Cos(angle))</span> and the same with <span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span>, around (128, 96) at 60 px, and only the final screen position is narrowed to integers</li>
+</ul>
+</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="what-to-observe"></a>
 What to Observe</h2>
 <p>The live readout panel updates every frame:</p>
 <ul>
-<li><span class="tt">DX</span> / <span class="tt">DY</span> — signed distances from player to target</li>
+<li><span class="tt">DX</span> / <span class="tt">DY</span> — signed distances from the turret to the drone (the text module prints a <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>: the example writes the sign, then the magnitude)</li>
 <li><span class="tt">DIST</span> — <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> in pixels (0–255)</li>
-<li><span class="tt">ANGLE</span> — 8-bit angle from the player to the target (hex), with the equivalent in degrees in parentheses (≈ angle × 360 / 256)</li>
+<li><span class="tt">ANGLE</span> — 8-bit angle from the turret to the drone (hex), with the equivalent in degrees in parentheses (≈ angle × 360 / 256)</li>
 <li><span class="tt">COS</span> / <span class="tt">SIN</span> — 8.8 fixed-point components of the unit direction vector. Their values match the angle: at <span class="tt">ANGLE = 0x40</span> (90°, target straight south on a SNES screen) you see <span class="tt">COS = 0x0000</span> and <span class="tt">SIN = 0x0100</span>.</li>
 </ul>
-<p>Move the X around with the D-pad and watch the entire panel react in real time.</p>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-7"></a>
+<p>Fly the drone around with the D-pad and watch the entire panel react in real time, the turret's barrel following. The cyan drone circles at one LUT step a frame (an orbit in about 4.3 s at 60 Hz), whether you move or not; it crosses the text, as sprites do over a background.</p>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-4"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make -C examples/basics/aim_target</div>
 </div><!-- fragment --><p>The ROM lands at <span class="tt">examples/basics/aim_target/aim_target.sfc</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-15"></a>
+<h2 class="doxsection"><a class="anchor" id="assets-2"></a>
+Assets</h2>
+<p><span class="tt">res/units.png</span> — the turret's sixteen headings (OBJ palette 0), the security drone (palette 1) and its cyan twin (palette 2); <span class="tt">res/roof.png</span> — the roof, four colours. The turret and the roof are drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">turret</span>, <span class="tt">aim_sprites</span>, <span class="tt">rooftop</span>), the drone is Néo-Lumen art (PixelLab, CC0; <span class="tt">assets/neo-lumen/README.md</span>). The build converts both from the settings file beside each (<span class="tt">opensnes-sprite</span>, <span class="tt">opensnes-tileset</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-8"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">text</span>, <span class="tt">input</span>, <span class="tt">gameloop</span>, <span class="tt">math</span>.</p>
 <p>Also linked: <span class="tt"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></span> — 32-bit fixed point (<span class="tt">fix32*</span>).</p>

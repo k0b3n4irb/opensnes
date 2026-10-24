@@ -126,13 +126,14 @@ $(function(){initNavTree('examples_memory_save_game.html','',''); });
 <img src="save_game.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-3"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-2"></a>
 What This Example Shows</h2>
 <p>How to save and load game data using the SNES cartridge SRAM (Static RAM). The SRAM is battery-backed &ndash; data persists even when the console is powered off. This is how classic SNES games like Zelda and Final Fantasy save progress.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-5"></a>
+<p>The screen is a save terminal of the Rue basse: two slot cards on the terminal's glass. Saving or loading a slot writes its status in its card and puts Kit's icon there; a load prints the values read back.</p>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-3"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">text/print_string</span> first (console setup, text display).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-22"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-19"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,18 +141,18 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Write test data to Slot 1  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Read and display Slot 1  </td></tr>
+<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Read Slot 1 and show it in its card  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">X  </td><td class="markdownTableBodyNone">Write test data to Slot 2  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Y  </td><td class="markdownTableBodyNone">Read and display Slot 2  </td></tr>
+<td class="markdownTableBodyNone">Y  </td><td class="markdownTableBodyNone">Read Slot 2 and show it in its card  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-37"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-23"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/save_game</div>
-</div><!-- fragment --><p>Then open <span class="tt">save_game.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-9"></a>
+</div><!-- fragment --><p>Then open <span class="tt">save_game.sfc</span> in luna or any emulator. luna keeps the battery in a <span class="tt">.srm</span> file when asked (<span class="tt">srm_out</span> / <span class="tt">srm_in</span> in a test manifest: this example's three manifests save, power-cycle and read back).</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-5"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-define-a-save-structure"></a>
 1. Define a save structure</h3>
@@ -161,21 +162,21 @@ How It Works</h2>
 <div class="line">} <a class="code hl_struct" href="structSaveState.html">SaveState</a>;</div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="astructSaveState_html"><div class="ttname"><a href="structSaveState.html">SaveState</a></div><div class="ttdoc">Data structure representing one save slot&#39;s persistent state.</div><div class="ttdef"><b>Definition</b> main.c:49</div></div>
+<div class="ttc" id="astructSaveState_html"><div class="ttname"><a href="structSaveState.html">SaveState</a></div><div class="ttdoc">Data structure representing one save slot&#39;s persistent state.</div><div class="ttdef"><b>Definition</b> main.c:69</div></div>
 </div><!-- fragment --><p>The structure is 8 bytes. In a real game, this would hold player position, inventory, level progress, etc.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-save-to-sram"></a>
 2. Save to SRAM</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="amemory_2save__game_2main_8c_html_a3ef531cbe1242a15cd087b7542356808"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a></div><div class="ttdeci">#define SAVE_SIZE</div><div class="ttdoc">Size in bytes of one save slot (must equal sizeof(SaveState)).</div><div class="ttdef"><b>Definition</b> main.c:68</div></div>
-<div class="ttc" id="amemory_2save__game_2main_8c_html_a86e7f1b7f5ebbab30d693661f380d1b9"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a></div><div class="ttdeci">#define SLOT1</div><div class="ttdoc">SRAM byte offset for save slot 1 (starts at byte 0).</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
-<div class="ttc" id="amemory_2save__game_2main_8c_html_ad1c5ad15a7e11834ff3a4a9acb0cc9dc"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a></div><div class="ttdeci">SaveState vts</div><div class="ttdoc">Write buffer: filled with test data before saving to SRAM.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
+<div class="ttc" id="amemory_2save__game_2main_8c_html_a3ef531cbe1242a15cd087b7542356808"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a></div><div class="ttdeci">#define SAVE_SIZE</div><div class="ttdoc">Size in bytes of one save slot (must equal sizeof(SaveState)).</div><div class="ttdef"><b>Definition</b> main.c:88</div></div>
+<div class="ttc" id="amemory_2save__game_2main_8c_html_a86e7f1b7f5ebbab30d693661f380d1b9"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a></div><div class="ttdeci">#define SLOT1</div><div class="ttdoc">SRAM byte offset for save slot 1 (starts at byte 0).</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
+<div class="ttc" id="amemory_2save__game_2main_8c_html_ad1c5ad15a7e11834ff3a4a9acb0cc9dc"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a></div><div class="ttdeci">SaveState vts</div><div class="ttdoc">Write buffer: filled with test data before saving to SRAM.</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
 <div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a></span> copies <span class="tt"><a class="el" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808" title="Size in bytes of one save slot (must equal sizeof(SaveState)).">SAVE_SIZE</a></span> bytes from RAM to SRAM at the given offset. Multiple save slots use different offsets (Slot 0 at offset 0, Slot 1 at offset 8, etc.).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-load-from-sram"></a>
 3. Load from SRAM</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
-<div class="ttc" id="amemory_2save__game_2main_8c_html_ab3904980c9a71424f906b737d40069b4"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a></div><div class="ttdeci">SaveState vtl</div><div class="ttdoc">Read buffer: populated by sramLoadOffset() when loading from SRAM.</div><div class="ttdef"><b>Definition</b> main.c:59</div></div>
+<div class="ttc" id="amemory_2save__game_2main_8c_html_ab3904980c9a71424f906b737d40069b4"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a></div><div class="ttdeci">SaveState vtl</div><div class="ttdoc">Read buffer: populated by sramLoadOffset() when loading from SRAM.</div><div class="ttdef"><b>Definition</b> main.c:79</div></div>
 <div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset()</a></span> copies bytes back from SRAM into a RAM structure. The loaded values are then displayed as hex on screen using <span class="tt"><a class="el" href="text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab" title="Print an unsigned integer in hexadecimal.">textPrintHex()</a></span>.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-enable-sram-in-the-makefile"></a>
@@ -183,23 +184,15 @@ How It Works</h2>
 <div class="fragment"><div class="line">USE_SRAM = 1</div>
 <div class="line">SRAM_SIZE = 3</div>
 </div><!-- fragment --><p><span class="tt">USE_SRAM</span> sets the ROM header flag telling the emulator (or real hardware) that the cartridge has battery-backed SRAM. <span class="tt">SRAM_SIZE = 3</span> means 8 KB (2^3 = 8 KB).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md5-text-display"></a>
-5. Text display</h3>
-<p>The example uses the text system on BG1 in Mode 0 (2bpp):</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e">textInit</a>(<a class="code hl_define" href="text_8h.html#afdb3005611dd240d7b9850474c575548">TEXT_DEFAULT_TILEMAP_ADDR</a>, <a class="code hl_define" href="text_8h.html#a6aeb037193a9aff1d616ceed3becbdce">TEXT_DEFAULT_FONT_TILE</a>, <a class="code hl_define" href="text_8h.html#a71516b8ec619ca3a786d4d3784ff8839">TEXT_DEFAULT_PALETTE</a>);</div>
-<div class="line"><a class="code hl_function" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a>(0x0000);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a>(0, 0x0000);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x3800, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
-<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
-<div class="ttc" id="abackground_8h_html_a80e3887b5a1a50ba4985e4270ed6673d"><div class="ttname"><a href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr(u8 bg, u16 vramAddr)</div><div class="ttdoc">Set background tile graphics address.</div></div>
-<div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
-<div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
-<div class="ttc" id="atext_8h_html_a6aeb037193a9aff1d616ceed3becbdce"><div class="ttname"><a href="text_8h.html#a6aeb037193a9aff1d616ceed3becbdce">TEXT_DEFAULT_FONT_TILE</a></div><div class="ttdeci">#define TEXT_DEFAULT_FONT_TILE</div><div class="ttdoc">Default first font tile (zero — font occupies tiles 0-95).</div><div class="ttdef"><b>Definition</b> text.h:48</div></div>
-<div class="ttc" id="atext_8h_html_a71516b8ec619ca3a786d4d3784ff8839"><div class="ttname"><a href="text_8h.html#a71516b8ec619ca3a786d4d3784ff8839">TEXT_DEFAULT_PALETTE</a></div><div class="ttdeci">#define TEXT_DEFAULT_PALETTE</div><div class="ttdoc">Default palette slot (palette 0).</div><div class="ttdef"><b>Definition</b> text.h:50</div></div>
-<div class="ttc" id="atext_8h_html_a9a7338f84dc102993e17953ceaaf2a8e"><div class="ttname"><a href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e">textInit</a></div><div class="ttdeci">void textInit(u16 tilemap_addr, u16 font_tile, u8 palette)</div><div class="ttdoc">Initialize the text rendering system.</div></div>
-<div class="ttc" id="atext_8h_html_afdb3005611dd240d7b9850474c575548"><div class="ttname"><a href="text_8h.html#afdb3005611dd240d7b9850474c575548">TEXT_DEFAULT_TILEMAP_ADDR</a></div><div class="ttdeci">#define TEXT_DEFAULT_TILEMAP_ADDR</div><div class="ttdoc">Default tilemap WORD address — 32×32 tilemap at VRAM word $3800.</div><div class="ttdef"><b>Definition</b> text.h:46</div></div>
-</div><!-- fragment --><p>After each save/load operation, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span> updates the on-screen feedback and <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span> sends the updated text buffer to VRAM.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-37"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md5-the-screen-text-on-bg1-the-terminal-on-bg2"></a>
+5. The screen: text on BG1, the terminal on BG2</h3>
+<p><span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span> sets Mode 0 with the text on BG1 (font at VRAM $0000, map at $3800). The terminal is a four-colour picture on BG2; in Mode 0 each BG has its own palettes, BG2's from CGRAM 32, which <span class="tt"><a class="el" href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a></span> selects:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, terminal_tiles, terminal_pal, 0, ..., <a class="code hl_define" href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a>);</div>
+<div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
+<div class="ttc" id="agroup__bg__colors_html_gaf195eec5c93ea5507399f3c85109f3d0"><div class="ttname"><a href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a></div><div class="ttdeci">#define BG_4COLORS0</div><div class="ttdef"><b>Definition</b> background.h:51</div></div>
+<div class="ttc" id="amemory_2save__game_2main_8c_html_ad94fc85e2e721e173adfdb060012bc95"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a></div><div class="ttdeci">#define TERM_TILES</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
+</div><!-- fragment --><p>BG1 is in front of BG2 in Mode 0, so the text sits on the glass. <span class="tt"><a class="el" href="memory_2save__game_2main_8c.html#ae1fc44f0e15cc32485e6942b83a44d9b" title="Write a slot&#39;s status in its card, and show Kit&#39;s icon there.">show_slot()</a></span> writes a slot's status in its card and moves that slot's sprite, Kit's icon, into the card's well. The text module's NMI hook sends what was written at the next VBlank.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-19"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="sram-address-space"></a>
 SRAM Address Space</h3>
@@ -213,17 +206,21 @@ Checksum Validation</h3>
 <h3 class="doxsection"><a class="anchor" id="battery-persistence"></a>
 Battery Persistence</h3>
 <p>On real SNES hardware, a CR2032 lithium battery in the cartridge powers the SRAM when the console is off. Batteries last 15-25 years. In emulators, the SRAM is saved to a <span class="tt">.srm</span> file on disk.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-9"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-5"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Save/load logic, text display, input handling  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Save/load logic, the cards, input handling  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/terminal.png</span>  </td><td class="markdownTableBodyNone">BG2, the terminal (2bpp, four colours)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/icon.png</span>  </td><td class="markdownTableBodyNone">Kit's icon, 32x32  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">USE_SRAM := 1</span>, <span class="tt">LIB_MODULES := console dma text background sprite input</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-4"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-3"></a>
 Going Further</h2>
 <ul>
 <li><b>Add a checksum</b>: Before saving, compute a checksum of the data bytes and store it alongside the save. On load, verify the checksum and display "CORRUPT" if it does not match.</li>
@@ -234,7 +231,10 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-53"></a>
+<h2 class="doxsection"><a class="anchor" id="assets-15"></a>
+Assets</h2>
+<p><span class="tt">res/terminal.png</span> is drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">terminal</span>), <span class="tt">res/icon.png</span> is the Néo-Lumen <span class="tt">logo/kit_icon.png</span> indexed by <span class="tt">save_icon</span> (CC0; <span class="tt">assets/neo-lumen/README.md</span>); the build converts both from the settings file beside each.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-34"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

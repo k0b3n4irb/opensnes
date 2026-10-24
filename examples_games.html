@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Complete Game Examples</title>
+<title>Complete Games</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,45 +119,34 @@ $(function(){initNavTree('examples_games.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Complete Game Examples </div></div>
+  <div class="headertitle"><div class="title">Complete Games </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Full game implementations that combine multiple SNES subsystems: sprites, backgrounds, input, scrolling, collision detection, and game state management. Study these after working through the individual topic examples.</p>
-<h2 class="doxsection"><a class="anchor" id="example-roms-7"></a>
+<div class="textblock"><p>Three games with everything a game has: a title screen, the rules, a score, lives or a stack that fills, a game over and a way back to the start. They combine sprites, backgrounds, input, collision, a HUD, sound and a state machine. Study them after the topic examples and the <a href="examples_demos.html">demos</a>.</p>
+<h2 class="doxsection"><a class="anchor" id="example-roms-8"></a>
 Example ROMs</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Difficulty  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_games_breakout.html">breakout</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Classic Breakout clone with paddle, ball, and destructible blocks  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_games_breakout.html">breakout</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Breakout: paddle, ball, destructible bricks, levels, score and lives  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_games_likemario.html">likemario</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">Side-scrolling platformer with scrolling camera and animation  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_games_blocks.html">blocks</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Falling-blocks puzzle with three BG layers, delayed auto-shift input and SNESMOD music  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_games_mapandobjects.html">mapandobjects</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">Tile map world with interactive objects  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_games_tetris.html">tetris</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Tetris with three BG layers, delayed auto-shift input and SNESMOD music  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_games_shmup_1942.html">shmup_1942</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">A vertical shoot 'em up: scrolling, an enemy pool, bullets and collision  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_games_rpg.html">rpg</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">An RPG template: a Tiled-driven overworld with dialog boxes  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_games_mode7_racing.html">mode7_racing</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">An F-Zero-style racer on the Mode 7 plane  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_games_mode7_flying.html">mode7_flying</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">A Pilotwings-style flight over the Mode 7 plane, with landings  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_games_rooftop_run.html">rooftop_run</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">Kit's Rooftop Run: a scrolling platformer with shards to pick up, machines to stomp, three lives, checkpoints and a beacon to reach  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="what-these-demonstrate"></a>
+<h2 class="doxsection"><a class="anchor" id="what-these-demonstrate-1"></a>
 What These Demonstrate</h2>
 <ul>
-<li>Sprite management across many on-screen objects</li>
-<li>Input handling for responsive controls</li>
-<li>Collision detection (sprite-sprite and sprite-tile)</li>
-<li>Game state machines (title, playing, game over)</li>
+<li>Game state machines (title, playing, paused, game over)</li>
 <li>Score tracking and HUD display</li>
-<li>Scrolling camera systems</li>
+<li>Collision detection (sprite-sprite and sprite-tile)</li>
+<li>Input handling for responsive controls</li>
+<li>Music and sound effects tied to the game's events</li>
 </ul>
 <hr  />
-<p>Start with <b>breakout</b> for a self-contained game loop, then study <b>likemario</b> for scrolling platformer techniques.</p>
-<p><a class="el" href="examples_games_breakout.html" title="Breakout">Breakout</a> <a class="el" href="examples_games_likemario.html" title="LikeMario">LikeMario</a> <a class="el" href="examples_games_mapandobjects.html" title="Map and Objects">Map and Objects</a> <a class="el" href="examples_games_mode7_flying.html" title="mode7_flying — a Pilotwings-style demo">mode7_flying — a Pilotwings-style demo</a> <a class="el" href="examples_games_mode7_racing.html" title="mode7_racing — an F-Zero-style mini game">mode7_racing — an F-Zero-style mini game</a> <a class="el" href="examples_games_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a> <a class="el" href="examples_games_shmup_1942.html" title="shmup_1942">shmup_1942</a> <a class="el" href="examples_games_tetris.html" title="Tetris">Tetris</a> </p>
+<p>Start with <b>breakout</b> for a self-contained game loop, then <b>blocks</b> for three layers, timed input and music, then <b>rooftop_run</b> for a world bigger than the screen.</p>
+<p><a class="el" href="examples_games_blocks.html" title="Blocks">Blocks</a> <a class="el" href="examples_games_breakout.html" title="Breakout">Breakout</a> <a class="el" href="examples_games_rooftop_run.html" title="rooftop_run — Kit&#39;s Rooftop Run">rooftop_run — Kit's Rooftop Run</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

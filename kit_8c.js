@@ -1,0 +1,27 @@
+var kit_8c =
+[
+    [ "FRAME_FALL", "kit_8c.html#a1b2c3e7a3264b6faef83962430d24fe9", null ],
+    [ "FRAME_IDLE", "kit_8c.html#a5818610d4897962194420846a6f051b5", null ],
+    [ "FRAME_RISE", "kit_8c.html#aa9d97311fcae3860e0e167f6f253abd9", null ],
+    [ "FRAME_WALK", "kit_8c.html#a12ca48ac61322f5b09f8b9bbb4b4b900", null ],
+    [ "KIT_ACCEL", "kit_8c.html#a139ac34cf30b83e00df52883a6c73c50", null ],
+    [ "KIT_DRAW_DX", "kit_8c.html#ae6f5f4f1cc7271d5c03413f47aa08d95", null ],
+    [ "KIT_DRAW_DY", "kit_8c.html#a3196d91452642773cdc1b8af18768423", null ],
+    [ "KIT_HIJUMPING", "kit_8c.html#a04c1436120ea4f8bc73486144c61daf1", null ],
+    [ "KIT_JUMPING", "kit_8c.html#a71f5674610c2383cd4c87ae23e3d73f3", null ],
+    [ "KIT_MAXACCEL", "kit_8c.html#a3ee4c7d8497bc7efd504429c8a28b84e", null ],
+    [ "kitfall", "kit_8c.html#a9502272a2fe8681085585e7666b6863f", null ],
+    [ "kitframe", "kit_8c.html#a8e6b8e30d1b24c838fff3a735454c89d", null ],
+    [ "kitinit", "kit_8c.html#a5c716f91b3fa95eac07b975b8f0793a7", null ],
+    [ "kitjump", "kit_8c.html#ae16445bf5aaacf8a63317f4509dcf40b", null ],
+    [ "kitupdate", "kit_8c.html#a59ad24e9ccd096f298f064d4e358b8bc", null ],
+    [ "kitwalk", "kit_8c.html#ab02b490ec28ea4fa42985220cd7d1b8b", null ],
+    [ "flip", "kit_8c.html#ac3ec10c7966221f17621e68908bfa9b4", null ],
+    [ "kitfidx", "kit_8c.html#a49e0db6f68d5c5898a9caebaf4b4012e", null ],
+    [ "kitflp", "kit_8c.html#ac996a8c45dc6adced64c6e7a00068b2a", null ],
+    [ "kitid", "kit_8c.html#a68e6f421448561948aa73b5314a9dbfd", null ],
+    [ "kitx", "kit_8c.html#a51daea947660414b79831754e5410d4e", null ],
+    [ "kity", "kit_8c.html#a9113bbb6a68422fa0332cc1587995ac9", null ],
+    [ "nbobjects", "kit_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ],
+    [ "pad0", "kit_8c.html#a50a1287c6a673d98dd90c61df91fd33c", null ]
+];

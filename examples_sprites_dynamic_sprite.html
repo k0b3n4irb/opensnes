@@ -126,22 +126,30 @@ $(function(){initNavTree('examples_sprites_dynamic_sprite.html','',''); });
 <img src="dynamic_sprite.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-8"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-7"></a>
 What This Example Shows</h2>
 <p>How to use the <b>dynamic sprite system</b> to stream sprite tile data into VRAM every frame. Unlike static sprites (where all frames live in VRAM permanently), dynamic sprites upload only the current animation frame, saving VRAM space when sprites have many frames.</p>
-<p>This demo displays 4 animated 16x16 sprites, each cycling through 24 frames of animation.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-9"></a>
+<p>This demo displays four data shards, 16x16 sprites, each turning through 24 frames of animation. SELECT switches to the next step of the same engine: <b>metasprites</b> — Kit, built from several OBJ at 16x16, 32x48 and 64x64 — streamed the same way under the three OBJSEL size pairs.</p>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-7"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">sprites/simple_sprite</span> first (OAM basics), then <span class="tt">sprites/animated_sprite</span> (frame-based animation).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-31"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-27"></a>
 Controls</h2>
-<p>No interactive controls. Four sprites animate automatically.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-46"></a>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">SELECT  </td><td class="markdownTableBodyNone">Switch between the four animated sprites and the metasprite scene  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">D-PAD Up/Down  </td><td class="markdownTableBodyNone">(metasprite scene) switch the OBJSEL size pair: 8/16, 8/32, 16/32  </td></tr>
+</table>
+<p>At boot the four sprites animate by themselves.</p>
+<h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/dynamic_sprite</div>
-</div><!-- fragment --><p>Then open <span class="tt">dynamic_sprite.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-16"></a>
+</div><!-- fragment --><p>Then open <span class="tt">dynamic_sprite.sfc</span> in luna (<span class="tt">luna-gui dynamic_sprite.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-12"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-initialize-the-dynamic-sprite-engine"></a>
 1. Initialize the dynamic sprite engine</h3>
@@ -189,9 +197,27 @@ How It Works</h2>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a> &gt;= 24) <a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a> = 0;</div>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamframeid = <a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a>;</div>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamrefresh = 1;</div>
-<div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_ae08b048faabcd721ef0a0478c4e7129e"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a></div><div class="ttdeci">static u16 frame0</div><div class="ttdoc">Animation frame index for sprite 0 (0-23, wraps at 24).</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
+<div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_ae08b048faabcd721ef0a0478c4e7129e"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a></div><div class="ttdeci">static u16 frame0</div><div class="ttdoc">Animation frame index for sprite 0 (0-23, wraps at 24).</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 </div><!-- fragment --><p>Every 8 frames, the animation advances. Setting <span class="tt">oamrefresh = 1</span> tells the engine to upload the new frame's tiles to VRAM on the next VBlank.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-47"></a>
+<h2 class="doxsection"><a class="anchor" id="the-metasprite-scene"></a>
+The Metasprite Scene</h2>
+<p>A metasprite is a list of pieces, each an offset, a tile and attributes:</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> <a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a>[] = {</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  0,  0, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 0,  1, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
+<div class="line">    ...</div>
+<div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#ae4d4517a682025275d57356f692e2548">oamMetaDrawDyn</a>(10, 192, 140, <a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a>, spritehero16_tiles, <a class="code hl_define" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a>);</div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:568</div></div>
+<div class="ttc" id="asprite_8h_html_a908b094470fa9632302b14321338ae7a"><div class="ttname"><a href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a></div><div class="ttdeci">#define OBJ_SMALL</div><div class="ttdoc">Sprite size selection.</div><div class="ttdef"><b>Definition</b> sprite.h:102</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:571</div></div>
+<div class="ttc" id="asprite_8h_html_ae4d4517a682025275d57356f692e2548"><div class="ttname"><a href="sprite_8h.html#ae4d4517a682025275d57356f692e2548">oamMetaDrawDyn</a></div><div class="ttdeci">void oamMetaDrawDyn(u16 id, s16 x, s16 y, const MetaspriteItem *meta, const u8 *gfxptr, u8 size_class)</div><div class="ttdoc">Draw a dynamic metasprite — engine picks the size routine.</div></div>
+<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:577</div></div>
+<div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_ae2ffd37454763f04bc54b520f8e8c323"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero16_frame0[]</div><div class="ttdoc">16x16 metasprite: Kit 32x48 (2x3 grid of 16x16)</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
+<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:556</div></div>
+</div><!-- fragment --><p><span class="tt">oamMetaDrawDyn(id, x, y, meta, gfx, size_class)</span> streams each piece's tiles with the dynamic engine; <span class="tt"><a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a" title="Sprite size selection.">OBJ_SMALL</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></span> say which half of the OBJSEL pair the pieces use. Changing the pair (UP/DOWN) re-runs <span class="tt"><a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit()</a></span> with a new <span class="tt">sizeMode</span> under force blank, and <span class="tt"><a class="el" href="sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410" title="Block until the dynamic-sprite VRAM tile queue is empty.">oamDynamicDrainQueue()</a></span> uploads both heroes before the screen comes back on. The menu is text on BG1 (Mode 0, font at VRAM $3000, map at $3800); the engine's tiles stay at $0000 (large) and $1000 (small). The scene was the <span class="tt">dynamic_metasprite</span> example, a port of PVSnesLib's DynamicEngineMetaSprite.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-30"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="vram-budget-during-vblank"></a>
 VRAM Budget During VBlank</h3>
@@ -206,7 +232,7 @@ Static vs Dynamic Sprites</h3>
 <h3 class="doxsection"><a class="anchor" id="force-blank-for-initial-setup"></a>
 Force Blank for Initial Setup</h3>
 <p>This demo uses <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a></span> (which sets <span class="tt"><a class="el" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388" title="Display control (W).">REG_INIDISP</a> = 0x80</span>) during setup to allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank only.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-16"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-12"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -214,26 +240,27 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Dynamic sprite initialization, animation loop  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/sprite16_grid.png.toml</span>, <span class="tt">res/sprite32.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the two sheets (<span class="tt">opensnes-sprite</span>); the build converts them and links the result, <span class="tt">res/sprite16_grid.inc</span> declares the symbols  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the four sheets (<span class="tt">opensnes-sprite</span>, the three Kit sheets with <span class="tt">metasprite</span>); the build converts them and links the result, <span class="tt">res/&lt;name&gt;.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/sprite16_grid.png</span>  </td><td class="markdownTableBodyNone">16x16 sprite sheet source  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/sprite16_grid.png</span>  </td><td class="markdownTableBodyNone">the data shard turning, 24 16x16 frames, 8 a row  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/spritehero8.png</span>, <span class="tt">spritehero16.png</span>, <span class="tt">spritehero32.png</span>  </td><td class="markdownTableBodyNone">Kit at 16x16, 32x48 and 64x64, one frame each, on one palette (the metasprite scene loads one)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-10"></a>
+<p>The shard and Kit are the Néo-Lumen art (PixelLab, CC0), turned and indexed by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">assets/neo-lumen/README.md</span>). | <span class="tt">Makefile</span> | <span class="tt">LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input</span> |</p>
+<h2 class="doxsection"><a class="anchor" id="going-further-9"></a>
 Going Further</h2>
 <ul>
 <li><b>Move sprites with input</b>: Add <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> and update <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[0].oamx/oamy</span> based on D-pad direction.</li>
 <li><b>Mix static and dynamic</b>: Use static sprites for simple objects (bullets, UI elements) and dynamic sprites for complex animated characters.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">games/breakout</span> &ndash; Dynamic sprites in a real game context</li>
-<li><span class="tt">games/likemario</span> &ndash; Dynamic sprites with scrolling backgrounds</li>
+<li><span class="tt">games/rooftop_run</span> &ndash; Dynamic sprites with scrolling backgrounds</li>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-65"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-46"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_dynamic_meta</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">text</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

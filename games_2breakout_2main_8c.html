@@ -126,12 +126,14 @@ $(function(){initNavTree('games_2breakout_2main_8c.html','',''); });
 <p>Breakout game with brick collision, paddle physics, and level cycling.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/tiles.inc&quot;</code><br />
+<code>#include &quot;res/back.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:aebeba782b315ded5acb666f7a67bfa3f" id="r_aebeba782b315ded5acb666f7a67bfa3f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aebeba782b315ded5acb666f7a67bfa3f">ST_BLANK</a>&#160;&#160;&#160;<a class="el" href="#a14a28258a334050c9f6b0c48e8240473">str_blank</a></td></tr>
-<tr class="memitem:aa937ed962efcbcb29961338b1974f6ca" id="r_aa937ed962efcbcb29961338b1974f6ca"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa937ed962efcbcb29961338b1974f6ca">ST_GAMEOVER</a>&#160;&#160;&#160;<a class="el" href="#a42c0f4d95c71415b6f3c3d6edb9cb8dd">str_gameover</a></td></tr>
-<tr class="memitem:a24ac643c11ac0d5b6b136058ce32cf8d" id="r_a24ac643c11ac0d5b6b136058ce32cf8d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a24ac643c11ac0d5b6b136058ce32cf8d">ST_PAUSED</a>&#160;&#160;&#160;<a class="el" href="#a5de7e802254624a668ec2182d5e98bca">str_paused</a></td></tr>
+<tr class="memitem:aa937ed962efcbcb29961338b1974f6ca" id="r_aa937ed962efcbcb29961338b1974f6ca"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa937ed962efcbcb29961338b1974f6ca">ST_GAMEOVER</a>&#160;&#160;&#160;<a class="el" href="games_2blocks_2main_8c.html#a42c0f4d95c71415b6f3c3d6edb9cb8dd">str_gameover</a></td></tr>
+<tr class="memitem:a24ac643c11ac0d5b6b136058ce32cf8d" id="r_a24ac643c11ac0d5b6b136058ce32cf8d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a24ac643c11ac0d5b6b136058ce32cf8d">ST_PAUSED</a>&#160;&#160;&#160;<a class="el" href="games_2blocks_2main_8c.html#a5de7e802254624a668ec2182d5e98bca">str_paused</a></td></tr>
 <tr class="memitem:acfa2f5b2f39afd44db3e650704e8fdb6" id="r_acfa2f5b2f39afd44db3e650704e8fdb6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acfa2f5b2f39afd44db3e650704e8fdb6">ST_READY</a>&#160;&#160;&#160;<a class="el" href="#a01b7ce37c8f5065b0eb8e19e239ed0f6">str_ready</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
@@ -178,18 +180,13 @@ Variables</h2></td></tr>
 <tr class="memitem:a45cc3a09fc11ee9da04087957808bcd3" id="r_a45cc3a09fc11ee9da04087957808bcd3"><td class="memItemLeft"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a45cc3a09fc11ee9da04087957808bcd3">backmap</a> []</td></tr>
 <tr class="memdesc:a45cc3a09fc11ee9da04087957808bcd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG3 tilemap RAM copy (0x400 entries = 2KB), far RAM.  <br /></td></tr>
 <tr class="memitem:a8e72a35ad497f7557aaa20d7d4b3cf1a" id="r_a8e72a35ad497f7557aaa20d7d4b3cf1a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8e72a35ad497f7557aaa20d7d4b3cf1a">backpal</a> []</td></tr>
-<tr class="memdesc:a8e72a35ad497f7557aaa20d7d4b3cf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">7 level color sets for palette cycling (7 x 16 bytes = 112 bytes)  <br /></td></tr>
+<tr class="memdesc:a8e72a35ad497f7557aaa20d7d4b3cf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">7 level colour sets for BG3 (7 x 16 bytes = 112 bytes, data.asm)  <br /></td></tr>
 <tr class="memitem:a527bd59cd1354756e866a8b5ab8764b2" id="r_a527bd59cd1354756e866a8b5ab8764b2"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a527bd59cd1354756e866a8b5ab8764b2">backpal_end</a> []</td></tr>
 <tr class="memitem:a91c63eb9edd62eb732e0452a4b373c2a" id="r_a91c63eb9edd62eb732e0452a4b373c2a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a91c63eb9edd62eb732e0452a4b373c2a">bg1map</a> []</td></tr>
-<tr class="memdesc:a91c63eb9edd62eb732e0452a4b373c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tilemap: playfield border frame and HUD layout (2KB).  <br /></td></tr>
+<tr class="memdesc:a91c63eb9edd62eb732e0452a4b373c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tilemap: the cabinet and the HUD labels (2KB, data.asm).  <br /></td></tr>
 <tr class="memitem:a0992443a26a2872b852f4a74c919e9f9" id="r_a0992443a26a2872b852f4a74c919e9f9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0992443a26a2872b852f4a74c919e9f9">bg1map_end</a> []</td></tr>
 <tr class="memitem:a8e7548ddd361df192f748341942e1088" id="r_a8e7548ddd361df192f748341942e1088"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8e7548ddd361df192f748341942e1088">bg2map</a> []</td></tr>
-<tr class="memdesc:a8e7548ddd361df192f748341942e1088"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG3 tilemap: all 4 background fill patterns concatenated (2KB).  <br /></td></tr>
-<tr class="memitem:a476c963d61296bb47ea0652d90e450e6" id="r_a476c963d61296bb47ea0652d90e450e6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a476c963d61296bb47ea0652d90e450e6">bg2map0</a> []</td></tr>
-<tr class="memdesc:a476c963d61296bb47ea0652d90e450e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Individual BG3 patterns (pointers into bg2map for per-level selection).  <br /></td></tr>
-<tr class="memitem:a85e51eb7496be1227d463b414a074e50" id="r_a85e51eb7496be1227d463b414a074e50"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a85e51eb7496be1227d463b414a074e50">bg2map1</a> []</td></tr>
-<tr class="memitem:a26a1054dd9ca7569f89f3a1731b22f51" id="r_a26a1054dd9ca7569f89f3a1731b22f51"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a26a1054dd9ca7569f89f3a1731b22f51">bg2map2</a> []</td></tr>
-<tr class="memitem:a3d5f47b642d829a5c8a682003a91357a" id="r_a3d5f47b642d829a5c8a682003a91357a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3d5f47b642d829a5c8a682003a91357a">bg2map3</a> []</td></tr>
+<tr class="memdesc:a8e7548ddd361df192f748341942e1088"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG3 tilemap: the circuit board under the playfield (2KB, data.asm).  <br /></td></tr>
 <tr class="memitem:a18118f5b1957084421e701eae53167ef" id="r_a18118f5b1957084421e701eae53167ef"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a18118f5b1957084421e701eae53167ef">bg2map_end</a> []</td></tr>
 <tr class="memitem:a6ac9de1ec5f73d6bf17edf3a7c5905e8" id="r_a6ac9de1ec5f73d6bf17edf3a7c5905e8"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6ac9de1ec5f73d6bf17edf3a7c5905e8">blockcount</a></td></tr>
 <tr class="memitem:a03a4934bef9319bc930389c594beaeda" id="r_a03a4934bef9319bc930389c594beaeda"><td class="memItemLeft"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03a4934bef9319bc930389c594beaeda">blockmap</a> []</td></tr>
@@ -214,9 +211,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
 <tr class="memitem:ab2b1d527fc1671bb06fc9a39bf715f21" id="r_ab2b1d527fc1671bb06fc9a39bf715f21"><td class="memItemLeft"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab2b1d527fc1671bb06fc9a39bf715f21">pal</a> []</td></tr>
 <tr class="memdesc:ab2b1d527fc1671bb06fc9a39bf715f21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette RAM copy (0x100 entries = 512 bytes), far RAM.  <br /></td></tr>
-<tr class="memitem:aa81235770612a39a2668d11264dc308f" id="r_aa81235770612a39a2668d11264dc308f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa81235770612a39a2668d11264dc308f">palette</a> []</td></tr>
-<tr class="memdesc:aa81235770612a39a2668d11264dc308f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full 256-color palette for BG and sprite layers (512 bytes).  <br /></td></tr>
-<tr class="memitem:a3da363538ba291dd89fe3717bcf9b000" id="r_a3da363538ba291dd89fe3717bcf9b000"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3da363538ba291dd89fe3717bcf9b000">palette_end</a> []</td></tr>
 <tr class="memitem:a03956d7bf1f05c56957071e0c5e4dba7" id="r_a03956d7bf1f05c56957071e0c5e4dba7"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></td></tr>
 <tr class="memitem:aa4286d0de16674bb408ebd89c0e74fc5" id="r_aa4286d0de16674bb408ebd89c0e74fc5"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a></td></tr>
 <tr class="memitem:a8e889bed9bbd7b21d9d0d22217333d02" id="r_a8e889bed9bbd7b21d9d0d22217333d02"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8e889bed9bbd7b21d9d0d22217333d02">px</a></td></tr>
@@ -229,12 +223,6 @@ Variables</h2></td></tr>
 <tr class="memdesc:a5de7e802254624a668ec2182d5e98bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">"PAUSED" message string  <br /></td></tr>
 <tr class="memitem:a01b7ce37c8f5065b0eb8e19e239ed0f6" id="r_a01b7ce37c8f5065b0eb8e19e239ed0f6"><td class="memItemLeft">const char&#160;</td><td class="memItemRight"><a class="el" href="#a01b7ce37c8f5065b0eb8e19e239ed0f6">str_ready</a> []</td></tr>
 <tr class="memdesc:a01b7ce37c8f5065b0eb8e19e239ed0f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">"READY" message string (data.asm)  <br /></td></tr>
-<tr class="memitem:a528a98f57a33487a445fc0fdd6b3b71e" id="r_a528a98f57a33487a445fc0fdd6b3b71e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a528a98f57a33487a445fc0fdd6b3b71e">tiles1</a> []</td></tr>
-<tr class="memdesc:a528a98f57a33487a445fc0fdd6b3b71e"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG tiles: border, bricks, and font glyphs (4bpp, ~3840 bytes).  <br /></td></tr>
-<tr class="memitem:a723ffc1e7d730d37788ef8b10473bff6" id="r_a723ffc1e7d730d37788ef8b10473bff6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a723ffc1e7d730d37788ef8b10473bff6">tiles1_end</a> []</td></tr>
-<tr class="memitem:a4e2ff104ea000ee1feab2f58b34bb791" id="r_a4e2ff104ea000ee1feab2f58b34bb791"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a> []</td></tr>
-<tr class="memdesc:a4e2ff104ea000ee1feab2f58b34bb791"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite tiles: ball, paddle, and shadow shapes (4bpp, ~592 bytes).  <br /></td></tr>
-<tr class="memitem:a396ccfe1f03bf101dfd6d307510d6dac" id="r_a396ccfe1f03bf101dfd6d307510d6dac"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a396ccfe1f03bf101dfd6d307510d6dac">tiles2_end</a> []</td></tr>
 <tr class="memitem:ae162ea9295db01996b894786eb967116" id="r_ae162ea9295db01996b894786eb967116"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae162ea9295db01996b894786eb967116">vel_x</a></td></tr>
 <tr class="memdesc:ae162ea9295db01996b894786eb967116"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ball X velocity (-2 to +2 pixels/frame).  <br /></td></tr>
 <tr class="memitem:a0071485059e75f7bbb09abbfab93e477" id="r_a0071485059e75f7bbb09abbfab93e477"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0071485059e75f7bbb09abbfab93e477">vel_y</a></td></tr>
@@ -290,7 +278,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ST_GAMEOVER&#160;&#160;&#160;<a class="el" href="#a42c0f4d95c71415b6f3c3d6edb9cb8dd">str_gameover</a></td>
+          <td class="memname">#define ST_GAMEOVER&#160;&#160;&#160;<a class="el" href="games_2blocks_2main_8c.html#a42c0f4d95c71415b6f3c3d6edb9cb8dd">str_gameover</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -305,7 +293,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ST_PAUSED&#160;&#160;&#160;<a class="el" href="#a5de7e802254624a668ec2182d5e98bca">str_paused</a></td>
+          <td class="memname">#define ST_PAUSED&#160;&#160;&#160;<a class="el" href="games_2blocks_2main_8c.html#a5de7e802254624a668ec2182d5e98bca">str_paused</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -446,8 +434,8 @@ Variables</h2></td></tr>
 <p>Update all sprite positions. </p>
 <p>SPRITE ORGANIZATION: This game uses 10 hardware sprites for the ball and paddle. Sprite 0 is left unused: an old comment reported a corruption there that was never reproduced nor explained; nothing in the SDK reserves it.</p>
 <p>Sprite Assignment: Sprite 1: Ball Sprites 2-5: Paddle (left cap, 2x middle mirrored, right cap) Sprite 6: Ball shadow (offset +3,+3 pixels, lower priority) Sprites 7-10: Paddle shadow (offset +4,+4 pixels, lower priority)</p>
-<p>TILE NUMBERING: Sprite tiles are at VRAM $2000 (secondary name table). To access secondary table, set bit 8 of tile number: tile | 256</p>
-<p>Tile Layout in tiles2: Tile 15: Paddle left cap Tile 16: Paddle middle (used twice, second time H-flipped) Tile 17: Paddle right cap Tile 18: Paddle shadow left Tile 19: Paddle shadow middle Tile 20: Ball Tile 21: Ball shadow</p>
+<p>TILE NUMBERING: OBJSEL's name base is $0000 and its gap 0, so the second name table starts at word $1000 — where BG1's tiles are. The sprites therefore use the BG sheet's tiles 15-21, reached with bit 8 of the tile number (tile | 256, the attribute's low bit).</p>
+<p>Tile Layout in res/tiles.png: Tile 15: Paddle left cap Tile 16: Paddle middle (used twice, second time H-flipped) Tile 17: Paddle right cap Tile 18: Paddle shadow left Tile 19: Paddle shadow middle Tile 20: Ball Tile 21: Ball shadow</p>
 <p>SHADOW TECHNIQUE: Shadows are separate sprites with:</p><ul>
 <li>Same shape but darker color (shadow palette)</li>
 <li>Offset position (+3 or +4 pixels down-right)</li>
@@ -993,7 +981,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>7 level color sets for palette cycling (7 x 16 bytes = 112 bytes) </p>
+<p>7 level colour sets for BG3 (7 x 16 bytes = 112 bytes, data.asm) </p>
 
 </div>
 </div>
@@ -1031,7 +1019,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>BG1 tilemap: playfield border frame and HUD layout (2KB). </p>
+<p>BG1 tilemap: the cabinet and the HUD labels (2KB, data.asm). </p>
 
 </div>
 </div>
@@ -1069,73 +1057,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>BG3 tilemap: all 4 background fill patterns concatenated (2KB). </p>
-
-</div>
-</div>
-<a id="a476c963d61296bb47ea0652d90e450e6" name="a476c963d61296bb47ea0652d90e450e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a476c963d61296bb47ea0652d90e450e6">&#9670;&#160;</a></span>bg2map0</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2map0[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Individual BG3 patterns (pointers into bg2map for per-level selection). </p>
-
-</div>
-</div>
-<a id="a85e51eb7496be1227d463b414a074e50" name="a85e51eb7496be1227d463b414a074e50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a85e51eb7496be1227d463b414a074e50">&#9670;&#160;</a></span>bg2map1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2map1[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a26a1054dd9ca7569f89f3a1731b22f51" name="a26a1054dd9ca7569f89f3a1731b22f51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26a1054dd9ca7569f89f3a1731b22f51">&#9670;&#160;</a></span>bg2map2</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2map2[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3d5f47b642d829a5c8a682003a91357a" name="a3d5f47b642d829a5c8a682003a91357a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d5f47b642d829a5c8a682003a91357a">&#9670;&#160;</a></span>bg2map3</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2map3[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>BG3 tilemap: the circuit board under the playfield (2KB, data.asm). </p>
 
 </div>
 </div>
@@ -1592,44 +1514,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa81235770612a39a2668d11264dc308f" name="aa81235770612a39a2668d11264dc308f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa81235770612a39a2668d11264dc308f">&#9670;&#160;</a></span>palette</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Full 256-color palette for BG and sprite layers (512 bytes). </p>
-
-</div>
-</div>
-<a id="a3da363538ba291dd89fe3717bcf9b000" name="a3da363538ba291dd89fe3717bcf9b000"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3da363538ba291dd89fe3717bcf9b000">&#9670;&#160;</a></span>palette_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a03956d7bf1f05c56957071e0c5e4dba7" name="a03956d7bf1f05c56957071e0c5e4dba7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03956d7bf1f05c56957071e0c5e4dba7">&#9670;&#160;</a></span>pos_x</h2>
 
@@ -1814,82 +1698,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>"READY" message string (data.asm) </p>
-
-</div>
-</div>
-<a id="a528a98f57a33487a445fc0fdd6b3b71e" name="a528a98f57a33487a445fc0fdd6b3b71e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a528a98f57a33487a445fc0fdd6b3b71e">&#9670;&#160;</a></span>tiles1</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles1[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG tiles: border, bricks, and font glyphs (4bpp, ~3840 bytes). </p>
-
-</div>
-</div>
-<a id="a723ffc1e7d730d37788ef8b10473bff6" name="a723ffc1e7d730d37788ef8b10473bff6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a723ffc1e7d730d37788ef8b10473bff6">&#9670;&#160;</a></span>tiles1_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles1_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4e2ff104ea000ee1feab2f58b34bb791" name="a4e2ff104ea000ee1feab2f58b34bb791"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e2ff104ea000ee1feab2f58b34bb791">&#9670;&#160;</a></span>tiles2</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles2[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sprite tiles: ball, paddle, and shadow shapes (4bpp, ~592 bytes). </p>
-
-</div>
-</div>
-<a id="a396ccfe1f03bf101dfd6d307510d6dac" name="a396ccfe1f03bf101dfd6d307510d6dac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a396ccfe1f03bf101dfd6d307510d6dac">&#9670;&#160;</a></span>tiles2_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles2_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

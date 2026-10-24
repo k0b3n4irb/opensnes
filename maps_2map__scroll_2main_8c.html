@@ -127,55 +127,125 @@ $(function(){initNavTree('maps_2map__scroll_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="map_8h_source.html">snes/map.h</a>&gt;</code><br />
-<code>#include &quot;res/tilesMario.inc&quot;</code><br />
-<code>#include &quot;res/mario.inc&quot;</code><br />
-<code>#include &quot;res/tiledMario.inc&quot;</code><br />
+<code>#include &quot;res/roofs.inc&quot;</code><br />
+<code>#include &quot;res/kit.inc&quot;</code><br />
+<code>#include &quot;res/rooftops.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a12ca48ac61322f5b09f8b9bbb4b4b900" id="r_a12ca48ac61322f5b09f8b9bbb4b4b900"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a12ca48ac61322f5b09f8b9bbb4b4b900">FRAME_WALK</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memdesc:a12ca48ac61322f5b09f8b9bbb4b4b900"><td class="mdescLeft">&#160;</td><td class="mdescRight">The roofs' 802 tiles, Kit's 32x32 frames.  <br /></td></tr>
+<tr class="memitem:ae149f3c623db4510b5901377062d11cc" id="r_ae149f3c623db4510b5901377062d11cc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae149f3c623db4510b5901377062d11cc">ROOF_Y</a>&#160;&#160;&#160;(22 * 8)</td></tr>
+<tr class="memdesc:ae149f3c623db4510b5901377062d11cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The roofs' surface: row 22 of the map.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ad19fabc7c07daebf70556da870bcae87" id="r_ad19fabc7c07daebf70556da870bcae87"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad19fabc7c07daebf70556da870bcae87">kit_tile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> f)</td></tr>
+<tr class="memdesc:ad19fabc7c07daebf70556da870bcae87"><td class="mdescLeft">&#160;</td><td class="mdescRight">OAM tile number of frame f of Kit's sheet.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — scrolling map with animated Mario.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — scrolling map with Kit walking on it.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:aa48841d5d53b15359fc2ebe7b1cc0924" id="r_aa48841d5d53b15359fc2ebe7b1cc0924"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa48841d5d53b15359fc2ebe7b1cc0924">flip</a></td></tr>
-<tr class="memdesc:aa48841d5d53b15359fc2ebe7b1cc0924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation toggle (advance every other input frame).  <br /></td></tr>
+<tr class="memdesc:aa48841d5d53b15359fc2ebe7b1cc0924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation counter (one walk frame every 4 frames of movement).  <br /></td></tr>
 <tr class="memitem:a8819ae0e38a6565e016c379e527b426d" id="r_a8819ae0e38a6565e016c379e527b426d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8819ae0e38a6565e016c379e527b426d">flipx</a></td></tr>
 <tr class="memdesc:a8819ae0e38a6565e016c379e527b426d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Horizontal flip flag (1 = facing left).  <br /></td></tr>
 <tr class="memitem:a046e42fc978f81375d5b89664d72d1f4" id="r_a046e42fc978f81375d5b89664d72d1f4"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a046e42fc978f81375d5b89664d72d1f4">frame</a></td></tr>
 <tr class="memdesc:a046e42fc978f81375d5b89664d72d1f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current sprite tile number.  <br /></td></tr>
 <tr class="memitem:affac57a4c6f56d54fc5e576becd0a387" id="r_affac57a4c6f56d54fc5e576becd0a387"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#affac57a4c6f56d54fc5e576becd0a387">frameidx</a></td></tr>
-<tr class="memdesc:affac57a4c6f56d54fc5e576becd0a387"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current animation frame index (0-3).  <br /></td></tr>
-<tr class="memitem:a64765bb84f68eac80cb3db7381300400" id="r_a64765bb84f68eac80cb3db7381300400"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a64765bb84f68eac80cb3db7381300400">sprTiles</a> [4] = {0, 2, 4, 6}</td></tr>
-<tr class="memdesc:a64765bb84f68eac80cb3db7381300400"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tilesMario_tiles graphics  <br /></td></tr>
+<tr class="memdesc:affac57a4c6f56d54fc5e576becd0a387"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current walk frame index (0-7).  <br /></td></tr>
 <tr class="memitem:a4bf69d14b43306f29f9a67bbb2d70ca8" id="r_a4bf69d14b43306f29f9a67bbb2d70ca8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a></td></tr>
-<tr class="memdesc:a4bf69d14b43306f29f9a67bbb2d70ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mario X position in map pixels.  <br /></td></tr>
+<tr class="memdesc:a4bf69d14b43306f29f9a67bbb2d70ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kit X position in map pixels.  <br /></td></tr>
 <tr class="memitem:a65f23786744bb3a1567af452246db6d1" id="r_a65f23786744bb3a1567af452246db6d1"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a65f23786744bb3a1567af452246db6d1">yloc</a></td></tr>
-<tr class="memdesc:a65f23786744bb3a1567af452246db6d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mario Y position in map pixels.  <br /></td></tr>
+<tr class="memdesc:a65f23786744bb3a1567af452246db6d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kit Y position in map pixels (the top of his 32x32 frame).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Scrolling map with animated sprite character. </p>
-<p>A large Tiled map scrolls as a Mario sprite moves left and right. The map engine streams only the visible tiles to VRAM, so the map can be much wider than the screen. The sprite animates between 4 walk frames and flips horizontally based on direction.</p>
+<p>A large Tiled map scrolls as Kit, the fox-kit courier, walks left and right along a row of rooftops at night. The map engine streams only the visible tiles to VRAM, so the map can be much wider than the screen. The sprite cycles through 8 walk frames and flips horizontally based on direction.</p>
 <p>This is the stepping stone between "static background" and "continuous_scroll" — it teaches the map engine basics with a simple player character.</p>
-<p>Ported from PVSnesLib "mapscroll" example by alekmaul.</p>
+<p>This began as the PVSnesLib "mapscroll" example by alekmaul; the map, its tiles and Kit are ours (devtools/art_assets/build.py writes the Tiled map and its tile sheet from assets/neo-lumen/).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Map engine: mapLoad / mapUpdate / mapUpdateCamera / mapVblank</li>
 <li>Camera-follow: sprite position drives the viewport</li>
-<li>Sprite animation: 4-frame walk cycle with horizontal flip</li>
+<li>Sprite animation: 8-frame walk cycle with horizontal flip</li>
 <li>oamSet for simple single-sprite rendering</li>
 <li><a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a> / <a class="el" href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b" title="Camera Y position in pixels.">mapGetCameraY()</a> for screen-relative sprite positioning</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>Press LEFT/RIGHT to move Mario through the level</li>
+<li>Press LEFT/RIGHT to move Kit along the roofs</li>
 <li>The background scrolls to follow the character</li>
-<li>Mario's walk animation cycles every 2 frames of movement</li>
-<li>Mario flips horizontally when changing direction</li>
+<li>Kit's walk advances one frame every 4 frames of movement</li>
+<li>Kit flips horizontally when changing direction</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, background, map</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="map_8h.html" title="Scrolling tilemap engine for Mode 1 backgrounds.">map.h</a>, <a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a12ca48ac61322f5b09f8b9bbb4b4b900" name="a12ca48ac61322f5b09f8b9bbb4b4b900"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12ca48ac61322f5b09f8b9bbb4b4b900">&#9670;&#160;</a></span>FRAME_WALK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FRAME_WALK&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The roofs' 802 tiles, Kit's 32x32 frames. </p>
+<p>The level's tilemap, tile definitions and objects (opensnes-level)</p>
+<p>First walk frame in Kit's sheet (frames 4-11, four 32x32 frames a row) </p>
+
+</div>
+</div>
+<a id="ae149f3c623db4510b5901377062d11cc" name="ae149f3c623db4510b5901377062d11cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae149f3c623db4510b5901377062d11cc">&#9670;&#160;</a></span>ROOF_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ROOF_Y&#160;&#160;&#160;(22 * 8)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The roofs' surface: row 22 of the map. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="ad19fabc7c07daebf70556da870bcae87" name="ad19fabc7c07daebf70556da870bcae87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad19fabc7c07daebf70556da870bcae87">&#9670;&#160;</a></span>kit_tile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> kit_tile </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>OAM tile number of frame f of Kit's sheet. </p>
+<p>The converter lays the sheet's 32x32 blocks out four to a 128-pixel row of OBJ VRAM: block f starts at tile (f % 4) * 4 + (f / 4) * 64. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -191,7 +261,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point — scrolling map with animated Mario. </p>
+<p>Entry point — scrolling map with Kit walking on it. </p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite game loop) </dd></dl>
 
 </div>
@@ -209,7 +279,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Animation toggle (advance every other input frame). </p>
+<p>Animation counter (one walk frame every 4 frames of movement). </p>
 
 </div>
 </div>
@@ -257,38 +327,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Current animation frame index (0-3). </p>
-
-</div>
-</div>
-<a id="a64765bb84f68eac80cb3db7381300400" name="a64765bb84f68eac80cb3db7381300400"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64765bb84f68eac80cb3db7381300400">&#9670;&#160;</a></span>sprTiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprTiles[4] = {0, 2, 4, 6}</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>4bpp tilesMario_tiles graphics </p>
-<p>Tileset palette (3 banks x 16 colors)</p>
-<p>The level's tilemap, tile definitions and objects (opensnes-level)</p>
-<p>Metatile definitions</p>
-<p>Tile collision attributes</p>
-<p>16x16 Mario sprite tiles (4 animation frames)</p>
-<p>Mario sprite palette</p>
-<p>Walk frame tile offsets: each 16x16 sprite = 2 tiles in VRAM </p>
+<p>Current walk frame index (0-7). </p>
 
 </div>
 </div>
@@ -304,7 +343,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Mario X position in map pixels. </p>
+<p>Kit X position in map pixels. </p>
 
 </div>
 </div>
@@ -320,7 +359,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Mario Y position in map pixels. </p>
+<p>Kit Y position in map pixels (the top of his 32x32 frame). </p>
 
 </div>
 </div>

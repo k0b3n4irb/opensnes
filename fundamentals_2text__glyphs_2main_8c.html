@@ -135,7 +135,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:af651334dea15b1ee583e22816ed290e7" id="r_af651334dea15b1ee583e22816ed290e7"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af651334dea15b1ee583e22816ed290e7">bg_palette</a> []</td></tr>
-<tr class="memdesc:af651334dea15b1ee583e22816ed290e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background palette in BGR555 format (2 colors, 4 bytes total).  <br /></td></tr>
+<tr class="memdesc:af651334dea15b1ee583e22816ed290e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background palette in BGR555 format (3 colors, 6 bytes total).  <br /></td></tr>
 <tr class="memitem:aee6022ef8595e19358ccaafa6967a8f9" id="r_aee6022ef8595e19358ccaafa6967a8f9"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aee6022ef8595e19358ccaafa6967a8f9">font_tiles</a> []</td></tr>
 <tr class="memdesc:aee6022ef8595e19358ccaafa6967a8f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each).  <br /></td></tr>
 <tr class="memitem:ab3001e6fcd80f929ec89a02a0d5ad26e" id="r_ab3001e6fcd80f929ec89a02a0d5ad26e"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab3001e6fcd80f929ec89a02a0d5ad26e">message</a> []</td></tr>
@@ -143,19 +143,17 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Fundamentals — how a glyph is drawn: hand-coded 2bpp font tiles. </p>
-<p>The under-the-hood companion to the Text family. Instead of calling the <span class="tt">text</span> module, it writes a hand-coded 2bpp bitmap font straight into VRAM, builds a tilemap row to spell "HELLO WORLD!", and shows it on BG1 in Mode</p><ol type="1">
-<li>Every tile is raw bitplane data in a C array — no assets, no font library — so you see exactly how the SNES PPU turns bytes into pixels. Read <span class="tt">examples/text/print_string</span> first for the easy way; read this to understand what that module hides.</li>
-</ol>
+<p>The under-the-hood companion to the Text family. Instead of calling the <span class="tt">text</span> module, it writes a hand-coded 2bpp bitmap font straight into VRAM, builds a tilemap row to spell "HELLO WORLD!", and shows it on BG1 in Mode 0, in the city's colours: cyan letters with a pink shadow on a terminal's glass. Every tile is raw bitplane data in a C array — no assets, no font library — so you see exactly how the SNES PPU turns bytes into pixels. Read <span class="tt">examples/text/print_string</span> first for the easy way; read this to understand what that module hides.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>2bpp tile format: each 8x8 tile is 16 bytes (two bitplanes interleaved)</li>
+<li>2bpp tile format: each 8x8 tile is 16 bytes (two bitplanes interleaved); plane 0 draws colour 1, plane 1 colour 2</li>
 <li>VRAM tilemap structure: 32x32 entries, each a 16-bit word (tile index + attributes)</li>
-<li>CGRAM palette: two BGR555 colors loaded at palette index 0</li>
+<li>CGRAM palette: three BGR555 colors loaded at palette index 0</li>
 <li>Mode 0: four BG layers, each limited to 4 colors (2bpp)</li>
 <li>DMA transfers for tile data and palette via dmaCopyVram / dmaCopyCGram</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>"HELLO WORLD!" rendered in white text on a dark blue background</li>
+<li>"HELLO WORLD!" in cyan, each letter with a pink shadow one pixel right and down, on the dark glass of a terminal</li>
 <li>The text appears centered at row 14, column 10 of the 32x32 tilemap</li>
 <li>The screen is otherwise blank (tilemap filled with tile 0, the space glyph)</li>
 </ul>
@@ -208,12 +206,13 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">                           = {</div>
-<div class="line">    0x00, 0x28,  </div>
-<div class="line">    0xFF, 0x7F,  </div>
+<div class="line">    0x61, 0x10,  </div>
+<div class="line">    0x49, 0x73,  </div>
+<div class="line">    0xB4, 0x30,  </div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p>Background palette in BGR555 format (2 colors, 4 bytes total). </p>
-<p>SNES CGRAM stores colors as 15-bit BGR555: bbbbbgggggrrrrr in two bytes (little-endian). Color 0 is the background fill, color 1 is the text. Only 2 of the 4 available Mode 0 palette entries are used. </p>
+<p>Background palette in BGR555 format (3 colors, 6 bytes total). </p>
+<p>SNES CGRAM stores colors as 15-bit BGR555: 0bbbbbgggggrrrrr in two bytes (little-endian). Color 0 is the background fill (a terminal's glass), color 1 the letters, color 2 their shadow: the neon of the Rue basse. Color 3 of the 4 Mode 0 palette entries is not used. </p>
 
 </div>
 </div>
@@ -238,7 +237,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each). </p>
-<p>Each 8x8 tile occupies 16 bytes in SNES 2bpp format: two interleaved bitplanes per pixel row. Bitplane 0 selects palette color 1, bitplane 1 selects color 2, and both together select color 3. All bitplane-1 bytes are zero here, so every lit pixel maps to palette color 1 (white).</p>
+<p>Each 8x8 tile occupies 16 bytes in SNES 2bpp format: two interleaved bitplanes per pixel row, plane 0 first. A pixel's colour is its plane 1 bit times two plus its plane 0 bit. Plane 0 holds the letter, the glyph of the city's font (the <span class="tt">text</span> module's, lib/source/text.asm): colour 1, cyan. Plane 1 holds its shadow, the letter moved one pixel right and one down, where the letter is not: colour 2, pink. No pixel has both bits, so colour 3 is never drawn.</p>
 <p>Tile index map: 0=Space, 1=H, 2=E, 3=L, 4=O, 5=W, 6=R, 7=D, 8=! </p>
 
 </div>

@@ -126,34 +126,37 @@ $(function(){initNavTree('examples_chips_superfx_game_skeleton.html','',''); });
 <p>The shape of a Super FX game: the game runs every frame, the GSU renders on its own clock, the NMI puts finished frames on screen. </p>
 </blockquote>
 <p><img src="superfx_game_skeleton.png" alt="" class="inline" title="Screenshot"/>    </p>
-<p>A crosshair follows the D-pad at 60 frames per second, and SNESMOD music plays, while the GSU draws <span class="tt">superfx_3d</span>'s rotating cube at 30. Neither waits for the other: the renderer runs from the GSU's code cache, so the CPU keeps the ROM and its game loop; <span class="tt"><a class="el" href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a></span> double-buffers the frames, and the NMI moves each one to VRAM a piece per VBlank, showing it only once all of it has landed.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-16"></a>
+<p>A square of the city at night, in the rain. Above the projector in its middle, a hologram turns and bobs: a data cube, a pink cube inside it, the struts between them, and the two beams that rise from the projector's rim. The GSU draws it at 30 frames per second while a sight follows the D-pad at 60 and SNESMOD music plays. Neither waits for the other: the renderer runs from the GSU's code cache, so the CPU keeps the ROM and its game loop; <span class="tt"><a class="el" href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a></span> double-buffers the frames, and the NMI moves each one to VRAM a piece per VBlank, showing it only once all of it has landed.</p>
+<h2 class="doxsection"><a class="anchor" id="build--run-8"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/chips/superfx_game_skeleton</div>
 </div><!-- fragment --><p>Then open <span class="tt">superfx_game_skeleton.sfc</span> in luna (or bsnes). Hold the D-pad.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-12"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-7"></a>
 What You'll Learn</h2>
 <ul>
-<li><b>A job that leaves the ROM to the CPU</b>: <span class="tt"><a class="el" href="superfx_8h.html#a943b65ace4311678092e5d4176b014b5" title="Copy a GSU program into the GSU code cache ($3100-$32FF).">gsuCacheLoad()</a></span> + <span class="tt"><a class="el" href="superfx_8h.html#a8745a42974dfd87a72b1adc719729aa7" title="Start the program loaded by gsuCacheLoad() and return at once.">gsuStartCached()</a></span>, with a renderer that has no <span class="tt">CACHE</span>, no <span class="tt">LJMP</span> and no ROM read (<span class="tt">gsu_cube.sfx</span>, <span class="tt">superfx_3d</span>'s renderer minus two <span class="tt">CACHE</span>)</li>
+<li><b>A job that leaves the ROM to the CPU</b>: <span class="tt"><a class="el" href="superfx_8h.html#a943b65ace4311678092e5d4176b014b5" title="Copy a GSU program into the GSU code cache ($3100-$32FF).">gsuCacheLoad()</a></span> + <span class="tt"><a class="el" href="superfx_8h.html#a8745a42974dfd87a72b1adc719729aa7" title="Start the program loaded by gsuCacheLoad() and return at once.">gsuStartCached()</a></span>, with a renderer that has no <span class="tt">CACHE</span>, no <span class="tt">LJMP</span> and no ROM read (<span class="tt">gsu_cube.sfx</span>, derived from <span class="tt">superfx_3d</span>'s renderer without its two <span class="tt">CACHE</span>)</li>
+<li><b>Splitting the work between the CPU and the GSU</b>: the CPU turns the 8 vertices of the outer cube and writes 19 points to Game Pak RAM (the inner cube is the outer one halved, a shift); the GSU joins them, walking an edge table of 34 lines (point, point, colour) the CPU wrote once at boot</li>
+<li><b>Writing cartridge RAM from C</b>: the points go through <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> *</span> pointers to <span class="tt">$70:8000</span>; a plain pointer reads and writes bank <span class="tt">$00</span></li>
+<li><b>A GSU bitmap over a picture</b>: the GSU clears to colour 0, which is transparent, so BG2's square shows wherever the hologram is not</li>
 <li><b>Double-buffered presentation</b>: two framebuffers in Game Pak RAM (<span class="tt">$70:0000</span>, <span class="tt">$70:4000</span>), two char blocks in VRAM (<span class="tt">$0000</span>, <span class="tt">$2000</span> words), BG1's char base swapped only after a whole frame</li>
 <li><b>Game Pak RAM time-sharing</b>: the NMI takes the RAM from the GSU for each transfer (SCMR <span class="tt">RAN = 0</span>) and gives it back; the GSU waits meanwhile</li>
 <li><b>The blank window</b>: a 40 + 40 line letterbox (<span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking</a></span>) lets the NMI move about 11 KB per VBlank, so a 16 KB frame lands in two</li>
-<li><b>The game loop stays at 60 fps</b>: it only starts a job when the last one is done and the previous frame is on screen (<span class="tt"><a class="el" href="superfx_8h.html#a3b031469e2704f59a026f0ab6667a959" title="Is the GSU still running? (SFR GO bit).">gsuBusy()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#a184d51664ef4edc754b9d33b63168f4c" title="1 while a presented frame is still being moved to VRAM">gsuPresentBusy()</a></span>), and never waits on either</li>
+<li><b>The game loop stays at 60 fps</b>: it only starts a job when the last one is done and the previous frame is on screen (<span class="tt"><a class="el" href="superfx_8h.html#a3b031469e2704f59a026f0ab6667a959" title="Is the GSU still running? (SFR GO bit).">gsuBusy()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#a184d51664ef4edc754b9d33b63168f4c" title="1 while a presented frame is still being moved to VRAM">gsuPresentBusy()</a></span>), and never waits on either. The CPU's share of a job must fit in the frame that starts it: filling all 34 edges from C, 170 bytes a job, did not, and the loop fell to 40 frames a second</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="architecture-3"></a>
 Architecture</h2>
 <div class="fragment"><div class="line">every frame (CPU)                   when the GSU is done (CPU)</div>
 <div class="line">─────────────────                   ──────────────────────────</div>
-<div class="line">pad → crosshair → OAM               gsuWait()      RAM back to the CPU</div>
+<div class="line">pad → sight → OAM                   gsuWait()      RAM back to the CPU</div>
 <div class="line">snesmodProcess()</div>
 <div class="line">WaitForVBlank()                     gsuPresent()   queue it, flip gsu_scbr</div>
-<div class="line">                                    rotate, edges → $70:8000</div>
+<div class="line">                                    turn, project → 19 points at $70:8000</div>
 <div class="line">NMI (every VBlank)                  gsuCacheLoad() + gsuStartCached()</div>
 <div class="line">──────────────────</div>
 <div class="line">OAM, then gsu_present_step:         GSU (from its cache)</div>
 <div class="line">  RAN = 0, DMA $70 → VRAM,          ───────────────────</div>
-<div class="line">  RAN back; whole frame landed →    clear the buffer at R8, draw 12 edges,</div>
+<div class="line">  RAN back; whole frame landed →    clear the buffer at R8, draw 34 edges,</div>
 <div class="line">  BG12NBA to the new block          STOP</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="per-example-files-1"></a>
 Per-Example Files</h2>
@@ -161,16 +164,49 @@ Per-Example Files</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Game loop, crosshair, rotation and projection, job pacing  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Game loop, sight, rotation and projection, the edge table, job pacing  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">gsu_cube.sfx</span>  </td><td class="markdownTableBodyNone">Bresenham + PLOT renderer that runs from the code cache  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">gsu_cube.sfx</span>  </td><td class="markdownTableBodyNone">Bresenham + PLOT renderer that runs from the code cache: joins the points through the edge table  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">gsu_loader.asm</span>  </td><td class="markdownTableBodyNone"><span class="tt">.incbin</span> of the renderer, edge upload to Game Pak RAM  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">gsu_loader.asm</span>  </td><td class="markdownTableBodyNone"><span class="tt">.incbin</span> of the renderer  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/square.png</span>  </td><td class="markdownTableBodyNone">the square (BG2): 541 tiles, palette slot 1  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/sight.png</span>  </td><td class="markdownTableBodyNone">the pad's sight, 16x16  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="testing-2"></a>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-3"></a>
+VRAM Layout</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Word address  </th><th class="markdownTableHeadNone">Content  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">$0000</span>, <span class="tt">$2000</span>  </td><td class="markdownTableBodyNone">BG1's two char blocks, the GSU's frames (16 KB each)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">$4000</span>  </td><td class="markdownTableBodyNone">BG2's tiles, the square (to <span class="tt">$61CF</span>)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">$6000</span>  </td><td class="markdownTableBodyNone">the OBJ name base; its first table overlaps the square's tiles and is not used  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">$7000</span>  </td><td class="markdownTableBodyNone">the sight, OBJ tile 256 (the second name table)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">$7800</span>  </td><td class="markdownTableBodyNone">BG1's map, the bitmap's column-major tilemap  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">$7C00</span>  </td><td class="markdownTableBodyNone">BG2's map  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="assets-8"></a>
+Assets</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What  </th><th class="markdownTableHeadNone">Made by  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/square.png</span>  </td><td class="markdownTableBodyNone">the square in the rain, its projector in the middle, 256x144 padded to 256x256  </td><td class="markdownTableBodyNone"><span class="tt">devtools/art_assets/build.py</span> from <span class="tt">assets/neo-lumen/backgrounds/square.png</span> (PixelLab)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/sight.png</span>  </td><td class="markdownTableBodyNone">the sight: four bright corner brackets and a magenta centre, ringed with ink  </td><td class="markdownTableBodyNone"><span class="tt">assets/neo-lumen/ui/sight.png</span> (PixelLab), the ink ring added by <span class="tt">devtools/art_assets/build.py</span>  </td></tr>
+</table>
+<p>CC0, like the rest of the Néo-Lumen assets (<span class="tt">assets/neo-lumen/README.md</span>). The music is <span class="tt">audio/snesmod_music</span>'s module.</p>
+<h2 class="doxsection"><a class="anchor" id="testing"></a>
 Testing</h2>
-<p><span class="tt">testing/manifests/superfx_game_skeleton.toml</span> holds RIGHT for 60 frames and checks the crosshair moved 60 pixels (the game never skipped a frame), about 30 presented frames per second and no bus violation. <span class="tt">testing/vram_dma_blank.py</span> checks every framebuffer byte lands in blank, as whole frames into alternating blocks, with every swap after a whole frame.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-26"></a>
+<p><span class="tt">testing/manifests/superfx_game_skeleton.toml</span> holds RIGHT for 60 frames and checks the sight moved 60 pixels (the game never skipped a frame), about 30 presented frames per second and no bus violation. <span class="tt">testing/vram_dma_blank.py</span> checks every framebuffer byte lands in blank, as whole frames into alternating blocks, with every swap after a whole frame.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-15"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -178,16 +214,18 @@ Modules Used</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">console</span>  </td><td class="markdownTableBodyNone">System initialization, <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">The crosshair (OAM)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">The sight (OAM)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone">Palettes and the crosshair tile  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone">Palettes and the sight's tiles  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone">BG1 mode, map, scroll, char base  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone">BG1 mode, map, scroll, char base; BG2's scroll  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">asset</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span>: the square's tiles, palette and map in one call  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone">The D-pad  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">superfx</span>  </td><td class="markdownTableBodyNone">Cache jobs, presentation, letterbox, bitmap tilemap (added by <span class="tt">USE_SUPERFX</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">superfx</span>  </td><td class="markdownTableBodyNone">Cache jobs, presentation, letterbox, bitmap tilemap (added by <span class="tt">USE_SUPERFX</span>)  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">snesmod</span>  </td><td class="markdownTableBodyNone">The music (<span class="tt">audio/snesmod_music</span>'s module; added by <span class="tt">USE_SNESMOD</span>)  </td></tr>
 </table>
 </div></div><!-- contents -->

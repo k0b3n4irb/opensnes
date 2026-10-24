@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>speech_synth — the SNES says &quot;OPEN SNES&quot;</title>
+<title>speech_synth — the SNES says &quot;OPEN SNES… DAVEO&quot;</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,10 +119,25 @@ $(function(){initNavTree('examples_audio_speech_synth.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">speech_synth — the SNES says "OPEN SNES" </div></div>
+  <div class="headertitle"><div class="title">speech_synth — the SNES says "OPEN SNES… DAVEO" </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Port of krom (Peter Lemon)'s <b>SpeechSynth</b> (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">SPC700/SpeechSynth</span>). Speech on the SNES = sequencing a <b>phoneme bank</b> on one DSP voice: per phoneme, the APU-side program selects the sample (SRCN), shapes it (ADSR: plosives one-shot, vowels/nasals looped and sustained), inflects pitch for prosody, and waits (4 ms timer grain). krom's 32-phoneme bank spells "PETER LEMON"; our original 5-phoneme bank (formant synthesis, <span class="tt">gen_phonemes.py</span>) says <b>"OPEN SNES"</b> on loop.</p>
+<div class="textblock"><p>Port of krom (Peter Lemon)'s <b>SpeechSynth</b> (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">SPC700/SpeechSynth</span>). Speech on the SNES = sequencing a <b>phoneme bank</b> on one DSP voice: per phoneme, the APU-side program selects the sample (SRCN), shapes it (ADSR: plosives one-shot, vowels/nasals looped and sustained), inflects pitch for prosody, and waits (4 ms timer grain). krom's 32-phoneme bank spells "PETER LEMON"; our original 10-phoneme bank (formant synthesis, <span class="tt">gen_phonemes.py</span>) says <b>"OPEN SNES"</b>, then, after a pause, the name of the examples' city, <b>"DAVEO"</b> (said the French way, da-ve-o: three even syllables, the pitch falling on the last), on loop.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Phonemes  </th><th class="markdownTableHeadNone">What they are  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">AU, EA, AA, EE, OO  </td><td class="markdownTableBodyNone">vowels: a glottal pulse train through three formant filters, looped (the open o of "open", its e, the a, the closed e and the closed o of "Daveo")  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">NN  </td><td class="markdownTableBodyNone">the nasal: the same, with one low formant  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">PP, DD  </td><td class="markdownTableBodyNone">plosives, one-shot: a burst; the voiced D starts with a short voice bar  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">SS  </td><td class="markdownTableBodyNone">the fricative, one-shot: high-frequency noise  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">VV  </td><td class="markdownTableBodyNone">the voiced fricative, looped: a low voice with that noise over it  </td></tr>
+</table>
+<p>A phrase entry is SRCN, ADSR1, ADSR2, pitch and a duration in 4 ms ticks; SRCN <span class="tt">$FE</span> is a pause (a wait without a new KON, so the last phoneme decays through the gap) and <span class="tt">$FF</span> ends the phrase.</p>
 <p>ROM mode: <b>LoROM</b> (project default).</p>
 <h2 class="doxsection"><a class="anchor" id="register-fidelity-vs-the-original"></a>
 Register fidelity vs the original</h2>
@@ -155,7 +170,7 @@ The debugging archaeology (all owner-listening-test driven)</h2>
 <h2 class="doxsection"><a class="anchor" id="debug-tooling-that-cracked-it"></a>
 Debug tooling that cracked it</h2>
 <p><span class="tt">luna spc-dump</span> exports the full APU state (64 KB ARAM + all 128 DSP registers) as a playable .spc — diffing two dumps localized every one of the bugs above. See <span class="tt"><a class="el" href="tutorial_audio_samples.html">docs/tutorials/audio_samples.md</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-8"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-4"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">apu</span> </p>
 </div></div><!-- contents -->

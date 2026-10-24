@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>mode2 — offset-per-tile: per-column scroll from BG3</title>
+<title>mode2 — offset-per-tile in Mode 2 and Mode 4: per-column scroll from BG3</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('examples_backgrounds_mode2.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">mode2 — offset-per-tile: per-column scroll from BG3 </div></div>
+  <div class="headertitle"><div class="title">mode2 — offset-per-tile in Mode 2 and Mode 4: per-column scroll from BG3 </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Backgrounds · the offset-per-tile modes (2/4/6).</b></p>
@@ -130,30 +130,70 @@ Why it matters for your game</h2>
 <img src="mode2.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-3"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn"></a>
 What you'll learn</h2>
 <p>The single idea: in Mode 2, <b>BG3 stops being a drawable layer and becomes an offset table.</b> For each column of BG1/BG2, the PPU reads a scroll offset straight out of BG3's tilemap:</p>
 <ul>
 <li>Per screen column <em>N ≥ 1</em> (column 0 can't be offset), the PPU reads BG3 <b>tile-row 0</b> for the horizontal offset word and <b>tile-row 1</b> for the vertical offset word.</li>
 <li><b>Offset word:</b> bit <span class="tt">0x2000</span> = apply to BG1 (<span class="tt">0x4000</span> = BG2); the V value is bits 0–9, the H value bits 3–9 (8-pixel-granular).</li>
 </ul>
-<p>This example puts a stack of horizontal colour bands on BG1 and writes a sine into BG3's V-offset row, so each column samples the bands at a different height — the bands ripple. The phase advances each frame. <b>Modes 4 and 6 reuse this exact data path</b> (mode 4 packs H/V into one word with a select bit — see <a href="examples_backgrounds_mode4.html"><span class="tt">mode4</span></a>), so this one example teaches the whole OPT family.</p>
+<p>This example puts the Rue basse under the rain on BG1 (the 4bpp picture of <a href="examples_backgrounds_mode1.html">mode1</a>) and writes a small sine into BG3's V-offset row, so each column shows the street a few lines higher or lower: the air shimmers like the heat over a steam vent. The phase advances each frame.</p>
+<ul>
+<li><b>A vertical word is the raw scroll value.</b> It replaces the layer's <span class="tt">VOFS</span> for its column entirely (snesdev-wiki, <em>Offset-per-tile</em>: "Vertical
+  entries will replace the BG VOFS value entirely"), so the -1 the lib adds to a vertical scroll (KNOWN_LIMITATIONS, "Vertical scroll is off by one") is not in it. A word of <span class="tt">0x3FF</span> (-1) puts a column where column 0 is; the wave here goes from -1 to 2 lines. <b>Modes 4 and 6 reuse this exact data path</b>, and press <b>B</b> for Mode 4.</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="mode-4-one-row-one-word-per-column-b"></a>
+Mode 4: one row, one word per column (B)</h3>
+<div class="image">
+<img src="mode2_mode4.png" alt=""/>
+<div class="caption">
+Mode 4</div></div>
+    <p>Mode 4 gives you an 8bpp (256-colour) BG1, a 2bpp BG2, and — like Mode 2 — BG3 as the offset table. The difference is the table: Mode 4 reads <b>one row</b> of it, so each column gets one word, either vertical or horizontal:</p>
+<ul>
+<li><b>The Mode 4 offset word:</b> bit 15 = 1 vertical, 0 horizontal; bit 13 = apply to BG1 (bit 14 = BG2); the value in bits 0–9, of which a horizontal offset ignores the low 3 (snesdev-wiki, <em>Offset-per-tile</em>).</li>
+<li><b>One row:</b> BG3 row 0 holds the 32 words; word 0 applies to the second visible column — the leftmost column is never offset.</li>
+<li><b>BG3VOFS picks the row:</b> <span class="tt">bgSetScroll(2, 0, 0)</span> reads row 0. The lib writes BG3's VOFS raw in Modes 2/4/6 (for a displayed layer it writes <span class="tt">y - 1</span>; see KNOWN_LIMITATIONS, "Vertical scroll is off by one").</li>
+</ul>
+<p>Here BG1 is the canal at night in 256 colours (the 8bpp picture of <a href="examples_backgrounds_mode3.html">mode3</a>, with eight mirrored rows added below it for the lines the wave lowers into view), and the same sine goes into the row as vertical words: the columns ripple. Press <b>A</b> and it goes in as horizontal words: the columns slide sideways, 0 to 24 pixels, 8 at a time. <b>B</b> again goes back to Mode 2.</p>
+<p>The two pictures do not fit in VRAM together (28 KB of 4bpp tiles, 50 KB of 8bpp), so a switch reloads the scene in force blank (<span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff</a></span>, the tiles, the map and the palette by DMA, <span class="tt"><a class="el" href="video_8h.html#ad89d023577743a32d3407027e535b0ff" title="Set background mode.">setMode</a></span>, <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn</a></span>): one dark frame. VRAM: the scene's tiles at <span class="tt">$0000</span> (the canal's second part at <span class="tt">$4000</span>), BG1's map at <span class="tt">$7000</span>, the offset table at <span class="tt">$7400</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="what-to-observe--if-it-breaks"></a>
 What to observe / if it breaks</h2>
 <ul>
-<li><b>Correct run:</b> rainbow bands ripple as a travelling wave; each column is at its own vertical offset, all from one 32-entry BG3 table.</li>
-<li><b>Bands stay flat:</b> the offset table never reached VRAM. The classic cause is computing it <em>after</em> <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span> — the upload then runs past VBlank and the PPU drops it. Build the table during active display, DMA it the instant VBlank starts (what this example does).</li>
+<li><b>Correct run:</b> the street shimmers as a travelling wave; each 8-pixel column is at its own vertical offset (look at the noodle sign's edges), all from one 32-entry BG3 table.</li>
+<li><b>The street stays still:</b> the offset table never reached VRAM. The classic cause is computing it <em>after</em> <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span> — the upload then runs past VBlank and the PPU drops it. Build the table during active display, DMA it the instant VBlank starts (what this example does).</li>
 <li><b>Only the leftmost column is wrong:</b> column 0 cannot be offset by OPT — that is hardware, not a bug.</li>
+<li><b>Every column but the first sits one line too high:</b> the words carry the lib's -1 convention twice, or not at all. They are raw values (above).</li>
 <li><b>Whole layer shifts uniformly (no ripple):</b> your offset words are missing the <span class="tt">0x2000</span> enable bit, so the PPU ignores them and uses the base scroll.</li>
 </ul>
-<p>Probe oracle: <span class="tt"><a class="el" href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016" title="Probe oracle: wave phase, advances each frame.">wave_phase</a></span> advances every frame.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-5"></a>
+<p>Probe oracle: <span class="tt"><a class="el" href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016" title="Probe oracle: wave phase, advances each frame.">wave_phase</a></span> advances every frame. The luna manifests <span class="tt">dma_mode2_opt_table.toml</span> (Mode 2: the two rows, word by word, at a given loop iteration) and <span class="tt">backgrounds_mode2_mode4.toml</span> (B, then A: the vertical words, then the horizontal ones) check it.</p>
+<h2 class="doxsection"><a class="anchor" id="controls-2"></a>
+Controls</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Switch between Mode 2 and Mode 4  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">In Mode 4: vertical words ⇄ horizontal words  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="build--run-2"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../testing/bin/luna run -n 3000000 mode2.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-11"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-6"></a>
 Modules used</h2>
-<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">math</span>, <span class="tt">tile</span> (the run-time tile encoder, <span class="tt"><a class="el" href="tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a" title="64 colour indices (0-15) to one 4bpp tile">tileEncode4bpp</a></span>)</p>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">math</span></p>
+<h2 class="doxsection"><a class="anchor" id="assets"></a>
+Assets</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What  </th><th class="markdownTableHeadNone">Made by  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/street.png</span>  </td><td class="markdownTableBodyNone">the rainy street, 16 colours, 4bpp (<span class="tt">res/street.png.toml</span>)  </td><td class="markdownTableBodyNone">mode1's file, copied by <span class="tt">devtools/art_assets/build.py</span>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/canal.png</span>  </td><td class="markdownTableBodyNone">the canal at night, 253 colours, 8bpp, 256x232 (<span class="tt">res/canal.png.toml</span>)  </td><td class="markdownTableBodyNone"><span class="tt">assets/neo-lumen/backgrounds/canal_256.png</span>, its last eight rows mirrored below it (<span class="tt">mode2_canal</span> in <span class="tt">build.py</span>)  </td></tr>
+</table>
+<p>CC0, like the rest of the Néo-Lumen assets (<span class="tt">assets/neo-lumen/README.md</span>).</p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are"></a>
 Where you are</h2>
 <p>← the rest of the family covers the everyday modes (<a href="examples_backgrounds_mode1.html">mode1</a>, <a href="examples_backgrounds_mode0.html">mode0</a>, <a href="examples_backgrounds_mode3.html">mode3</a>, <a href="examples_backgrounds_mode5_hires.html">mode5_hires</a>); this rung is the specialist OPT modes. For per-scanline (rather than per-column) tricks, see the <a href="examples_hdma.html">hdma</a> family. </p>

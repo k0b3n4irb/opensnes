@@ -134,7 +134,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Text — print a string with the built-in font. </p>
-<p>The gentlest possible program that still exercises the whole SNES rhythm (tiles + palette + VRAM + VBlank). <span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span> sets up the hardware <em>and</em> the text engine in one call, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span> writes into an off-screen buffer, and the NMI handler DMAs that buffer to VRAM as a tilemap on the next VBlank — no manual flush needed. One string, on BG1, in Mode 0. This is the first rung of the Text ladder; the under-the-hood version (a glyph as raw 2bpp bitplanes) lives in <span class="tt">examples/fundamentals/text_glyphs</span>.</p>
+<p>The gentlest possible program that still exercises the whole SNES rhythm (tiles + palette + VRAM + VBlank). <span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span> sets up the hardware <em>and</em> the text engine in one call, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span> writes into an off-screen buffer, and the NMI handler DMAs that buffer to VRAM as a tilemap on the next VBlank — no manual flush needed. Two lines on BG1, in Mode 0: the boot screen of a terminal in the Rue basse. This is the first rung of the Text ladder; the under-the-hood version (a glyph as raw 2bpp bitplanes) lives in <span class="tt">examples/fundamentals/text_glyphs</span>.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>The text module in one call: <a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a> -&gt; <a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a> (the NMI auto-flushes)</li>
 <li>Colour 0 is the universal backdrop; <a class="el" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c" title="Set a single CGRAM color.">setColor()</a> writes a 15-bit BGR value</li>
@@ -142,7 +142,7 @@ Functions</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>A dark blue screen with "TEXT MODULE TEST" printed in white</li>
+<li>A terminal's dark glass with "OS: RUE BASSE NET" and "READY" in white</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, text, background, sprite</dd></dl>

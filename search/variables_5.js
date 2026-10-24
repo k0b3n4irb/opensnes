@@ -1,12 +1,19 @@
 var searchData=
 [
   ['echo_5fon_0',['echo_on',['../audio_2soundboard_2main_8c.html#a9313bf26ebffdabd4a82279b0d1e44f8',1,'main.c']]],
-  ['edge_5fbuffer_1',['edge_buffer',['../chips_2superfx__3d_2main_8c.html#a13e8a460af470496c612612de060c050',1,'edge_buffer:&#160;main.c'],['../chips_2superfx__game__skeleton_2main_8c.html#a13e8a460af470496c612612de060c050',1,'edge_buffer:&#160;main.c']]],
-  ['empty_5ftile_2',['empty_tile',['../basics_2collision__demo_2main_8c.html#a16dc96ce6b56ea6c030a6a86de599555',1,'main.c']]],
-  ['enemies_3',['enemies',['../structGameState.html#a592b98be5c4621d0ab1f675140caddc2',1,'GameState']]],
-  ['enemy_5fbox_4',['enemy_box',['../basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a',1,'main.c']]],
-  ['enemy_5ftile_5',['enemy_tile',['../basics_2collision__demo_2main_8c.html#a25335bd710faba5ef21e459eca381dc9',1,'main.c']]],
-  ['enemy_5fx_6',['enemy_x',['../basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297',1,'main.c']]],
-  ['enemy_5fy_7',['enemy_y',['../basics_2collision__demo_2main_8c.html#a49bfa517490e1db79447e8458479040c',1,'main.c']]],
-  ['extbg_5fon_8',['extbg_on',['../mode7_2extbg_2main_8c.html#af2356516c9b2ec14b6ac2d9a2376cf16',1,'main.c']]]
+  ['edge_5fbuffer_1',['edge_buffer',['../chips_2superfx__3d_2main_8c.html#a13e8a460af470496c612612de060c050',1,'main.c']]],
+  ['edges_2',['edges',['../chips_2superfx__game__skeleton_2main_8c.html#a030088215c32847cc28d5bf3e64638ab',1,'main.c']]],
+  ['effect_5fname_3',['effect_name',['../audio_2snesmod__music_2main_8c.html#ad1e66e2a3607bab15e971590552c1bea',1,'main.c']]],
+  ['effect_5fsource_4',['effect_source',['../audio_2snesmod__music_2main_8c.html#ae2068dd80f1297f277316dbf88cd4f6d',1,'main.c']]],
+  ['en_5fdir_5',['en_dir',['../games_2rooftop__run_2main_8c.html#a8595aff71cf593e3cf9772cc9f1aa39a',1,'main.c']]],
+  ['en_5fframe_6',['en_frame',['../games_2rooftop__run_2main_8c.html#a0cf102482be3f8b5cc190407a3c54f1a',1,'main.c']]],
+  ['en_5fstate_7',['en_state',['../games_2rooftop__run_2main_8c.html#a7fe63c222a9775983c15e9a4d60bb743',1,'main.c']]],
+  ['en_5ftimer_8',['en_timer',['../games_2rooftop__run_2main_8c.html#a42c2800f8c43078516282145475fc24f',1,'main.c']]],
+  ['en_5fx_9',['en_x',['../games_2rooftop__run_2main_8c.html#a12e2b66cd6b99afdaa0f7e055cc6ccc6',1,'main.c']]],
+  ['en_5fy_10',['en_y',['../games_2rooftop__run_2main_8c.html#a6ddeba55e638eef794e89d614ae359c1',1,'main.c']]],
+  ['enemies_11',['enemies',['../structGameState.html#a592b98be5c4621d0ab1f675140caddc2',1,'GameState']]],
+  ['enemy_5fbox_12',['enemy_box',['../basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a',1,'main.c']]],
+  ['enemy_5fx_13',['enemy_x',['../basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297',1,'main.c']]],
+  ['enemy_5fy_14',['enemy_y',['../basics_2collision__demo_2main_8c.html#a49bfa517490e1db79447e8458479040c',1,'main.c']]],
+  ['extbg_5fon_15',['extbg_on',['../mode7_2extbg_2main_8c.html#af2356516c9b2ec14b6ac2d9a2376cf16',1,'main.c']]]
 ];

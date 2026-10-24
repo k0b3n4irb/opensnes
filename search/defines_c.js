@@ -1,13 +1,18 @@
 var searchData=
 [
-  ['nbands_0',['NBANDS',['../hdma_2hdma__indirect__gradient_2main_8c.html#a46ee023ac3f5d103e533843238d2e52a',1,'main.c']]],
+  ['nbands_0',['NBANDS',['../hdma_2gradient__colors_2main_8c.html#a46ee023ac3f5d103e533843238d2e52a',1,'main.c']]],
   ['nbirds_1',['NBIRDS',['../chips_2sa1__starfield_2main_8c.html#ae33cce9568cb8d271c2d716d88786445',1,'NBIRDS:&#160;main.c'],['../sprites_2sprite__swarm_2main_8c.html#ae33cce9568cb8d271c2d716d88786445',1,'NBIRDS:&#160;main.c']]],
-  ['ncoins_2',['NCOINS',['../sprites_2world__sprites_2main_8c.html#a3b5b3bfae7fbfb59c398860aac341db5',1,'main.c']]],
-  ['next_5fbox_5fcol_3',['NEXT_BOX_COL',['../render_8c.html#a6cb9fb4cb945dc633b05ab2e51d19f2e',1,'render.c']]],
-  ['next_5fbox_5frow_4',['NEXT_BOX_ROW',['../render_8c.html#a7c92b0bbf13cad4d4606b341db08293a',1,'render.c']]],
-  ['num_5feffects_5',['NUM_EFFECTS',['../audio_2snesmod__sfx_2main_8c.html#adae8021d63052c74619497c15c70595e',1,'main.c']]],
-  ['num_5fenemies_6',['NUM_ENEMIES',['../basics_2collision__demo_2main_8c.html#a7bdeb427cc72fabd831b0ab942f0b9a0',1,'main.c']]],
-  ['num_5fpiece_5ftypes_7',['NUM_PIECE_TYPES',['../piece_8h.html#a91553c0e2fac0272cc71951d9787bf7e',1,'piece.h']]],
-  ['num_5frotations_8',['NUM_ROTATIONS',['../piece_8h.html#ad166377d181c8c40cdb6363f644de7ec',1,'piece.h']]],
-  ['nwalk_9',['NWALK',['../sprites_2world__sprites_2main_8c.html#a699dd5a9b368e82fe6a267bb2476f0e2',1,'main.c']]]
+  ['next_5fbox_5fcol_2',['NEXT_BOX_COL',['../render_8c.html#a6cb9fb4cb945dc633b05ab2e51d19f2e',1,'render.c']]],
+  ['next_5fbox_5frow_3',['NEXT_BOX_ROW',['../render_8c.html#a7c92b0bbf13cad4d4606b341db08293a',1,'render.c']]],
+  ['npc_5fx_4',['NPC_X',['../basics_2panel__hud_2main_8c.html#a49f0a57dacecbd085cf463f03178e50a',1,'main.c']]],
+  ['npc_5fy_5',['NPC_Y',['../basics_2panel__hud_2main_8c.html#aec1e7e50b1c2040e3ae379263a3aadb4',1,'main.c']]],
+  ['nres_6',['NRES',['../sprites_2world__sprites_2main_8c.html#a2cd84acb2e9acce35594edff79ab1404',1,'main.c']]],
+  ['nshards_7',['NSHARDS',['../sprites_2world__sprites_2main_8c.html#a5fddcc754a9eec77ebb3cf19a36b51b3',1,'main.c']]],
+  ['num_5fbeacons_8',['NUM_BEACONS',['../mode7_2dsp1__ground_2main_8c.html#a26c9350f108f504835f0f8d67d085c49',1,'main.c']]],
+  ['num_5fedges_9',['NUM_EDGES',['../chips_2superfx__game__skeleton_2main_8c.html#af3fd05475d9b55d3a1988070b5d26ddb',1,'main.c']]],
+  ['num_5feffects_10',['NUM_EFFECTS',['../audio_2snesmod__music_2main_8c.html#adae8021d63052c74619497c15c70595e',1,'main.c']]],
+  ['num_5fenemies_11',['NUM_ENEMIES',['../basics_2collision__demo_2main_8c.html#a7bdeb427cc72fabd831b0ab942f0b9a0',1,'main.c']]],
+  ['num_5fpiece_5ftypes_12',['NUM_PIECE_TYPES',['../piece_8h.html#a91553c0e2fac0272cc71951d9787bf7e',1,'piece.h']]],
+  ['num_5frotations_13',['NUM_ROTATIONS',['../piece_8h.html#ad166377d181c8c40cdb6363f644de7ec',1,'piece.h']]],
+  ['num_5fturned_14',['NUM_TURNED',['../chips_2superfx__game__skeleton_2main_8c.html#aab7381a787d56df72cd0ef90b2ed2805',1,'main.c']]]
 ];

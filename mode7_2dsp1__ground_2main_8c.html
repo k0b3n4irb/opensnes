@@ -145,10 +145,19 @@ Macros</h2></td></tr>
 <tr class="memitem:a87c100475b01bfbc1e0a970e1d659acc" id="r_a87c100475b01bfbc1e0a970e1d659acc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a87c100475b01bfbc1e0a970e1d659acc">CH_MODE</a>&#160;&#160;&#160;<a class="el" href="hdma_8h.html#aab369ad1c03dc078ac3d1243230bea88">HDMA_CHANNEL_1</a></td></tr>
 <tr class="memdesc:a87c100475b01bfbc1e0a970e1d659acc"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA channels: BGMODE switch, TM switch, M7A/M7B, M7C/M7D. 1-4 like mode7/perspective (0 is the general-DMA channel, 7 the NMI handler's).  <br /></td></tr>
 <tr class="memitem:aab6612b5a05e01b014ad82044c954a50" id="r_aab6612b5a05e01b014ad82044c954a50"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aab6612b5a05e01b014ad82044c954a50">CH_TM</a>&#160;&#160;&#160;<a class="el" href="hdma_8h.html#af72bf48681bd17ceb4c71729392f36b2">HDMA_CHANNEL_2</a></td></tr>
+<tr class="memitem:a92652e65375034ab2e7f640858e82b39" id="r_a92652e65375034ab2e7f640858e82b39"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a92652e65375034ab2e7f640858e82b39">CUBE_HALF</a>&#160;&#160;&#160;20</td></tr>
+<tr class="memitem:ad88f263632ebfb3d110cba60b949c303" id="r_ad88f263632ebfb3d110cba60b949c303"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad88f263632ebfb3d110cba60b949c303">CUBE_X</a>&#160;&#160;&#160;512</td></tr>
+<tr class="memdesc:ad88f263632ebfb3d110cba60b949c303"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cube: world position of its centre and its half-size.  <br /></td></tr>
+<tr class="memitem:a859bbb54f5a8cd2241ae8b438ac31157" id="r_a859bbb54f5a8cd2241ae8b438ac31157"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a859bbb54f5a8cd2241ae8b438ac31157">CUBE_Y</a>&#160;&#160;&#160;352</td></tr>
+<tr class="memitem:a31e411cb25a08a0b48fa96e0d7be6d7b" id="r_a31e411cb25a08a0b48fa96e0d7be6d7b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a31e411cb25a08a0b48fa96e0d7be6d7b">CUBE_Z</a>&#160;&#160;&#160;40</td></tr>
 <tr class="memitem:a4c4aad939d02eb3cfd1dc491c36d38c8" id="r_a4c4aad939d02eb3cfd1dc491c36d38c8"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a4c4aad939d02eb3cfd1dc491c36d38c8">GROUND_MAX</a>&#160;&#160;&#160;127</td></tr>
 <tr class="memdesc:a4c4aad939d02eb3cfd1dc491c36d38c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Largest HDMA repeat block (7-bit count). The ground uses one.  <br /></td></tr>
 <tr class="memitem:a1f98dd72ca62af59cb4d6417173b66dd" id="r_a1f98dd72ca62af59cb4d6417173b66dd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1f98dd72ca62af59cb4d6417173b66dd">MOVE_STEP</a>&#160;&#160;&#160;4</td></tr>
 <tr class="memdesc:a1f98dd72ca62af59cb4d6417173b66dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forward speed in ground units per frame.  <br /></td></tr>
+<tr class="memitem:a26c9350f108f504835f0f8d67d085c49" id="r_a26c9350f108f504835f0f8d67d085c49"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a26c9350f108f504835f0f8d67d085c49">NUM_BEACONS</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memdesc:a26c9350f108f504835f0f8d67d085c49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprites: 8 cube corners (0-7), then the beacons (8-11).  <br /></td></tr>
+<tr class="memitem:a69f9f237baac2ee247f14425602af76e" id="r_a69f9f237baac2ee247f14425602af76e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a69f9f237baac2ee247f14425602af76e">OBJ_VRAM</a>&#160;&#160;&#160;0x6000</td></tr>
+<tr class="memdesc:a69f9f237baac2ee247f14425602af76e"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of the sprite tile (the Mode 7 ground takes $0000-$3FFF, the sky $4000-$5FFF).  <br /></td></tr>
 <tr class="memitem:a1af2e4d6a9117072899beb157d400c92" id="r_a1af2e4d6a9117072899beb157d400c92"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1af2e4d6a9117072899beb157d400c92">TABLE_HDR</a>&#160;&#160;&#160;6</td></tr>
 <tr class="memdesc:a1af2e4d6a9117072899beb157d400c92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Payload offset in a matrix table: [sky count][4 sky bytes][repeat header].  <br /></td></tr>
 <tr class="memitem:a032503e76d6f69bc67e99e909c8125da" id="r_a032503e76d6f69bc67e99e909c8125da"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a032503e76d6f69bc67e99e909c8125da">TABLE_SIZE</a>&#160;&#160;&#160;(<a class="el" href="#a1af2e4d6a9117072899beb157d400c92">TABLE_HDR</a> + <a class="el" href="#a4c4aad939d02eb3cfd1dc491c36d38c8">GROUND_MAX</a> * 4 + 1)</td></tr>
@@ -161,6 +170,10 @@ Functions</h2></td></tr>
 <tr class="memitem:aa70a5d5ab5df3d622fb1ed40cf526e41" id="r_aa70a5d5ab5df3d622fb1ed40cf526e41"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa70a5d5ab5df3d622fb1ed40cf526e41">cameraUpdate</a> (void)</td></tr>
 <tr class="memdesc:aa70a5d5ab5df3d622fb1ed40cf526e41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Re-run the projection for the current camera and cache what the rest of the frame needs (horizon raster, ground centre).  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
+<tr class="memitem:aaaf2c309435e7b30a97ca7628af7c72c" id="r_aaaf2c309435e7b30a97ca7628af7c72c"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aaaf2c309435e7b30a97ca7628af7c72c">placeObjects</a> (void)</td></tr>
+<tr class="memdesc:aaaf2c309435e7b30a97ca7628af7c72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project the cube's corners and the beacons with the current camera.  <br /></td></tr>
+<tr class="memitem:add4314994326ca9cf00c34ece0c2304d" id="r_add4314994326ca9cf00c34ece0c2304d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#add4314994326ca9cf00c34ece0c2304d">placePoint</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a>)</td></tr>
+<tr class="memdesc:add4314994326ca9cf00c34ece0c2304d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place sprite <code class="param">id</code> at world point (x, y, z), or hide it.  <br /></td></tr>
 <tr class="memitem:aad63c86c9eedc52c2d3179fe8f7294e9" id="r_aad63c86c9eedc52c2d3179fe8f7294e9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aad63c86c9eedc52c2d3179fe8f7294e9">tableInit</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *t, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> lines, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> diag)</td></tr>
 <tr class="memdesc:aad63c86c9eedc52c2d3179fe8f7294e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build one matrix table skeleton: a sky entry holding the identity matrix, then the repeat-block header the DSP-1 payload sits under.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -168,16 +181,29 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a440e70483678702d9edb9695ad0bd075" id="r_a440e70483678702d9edb9695ad0bd075"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a440e70483678702d9edb9695ad0bd075">back</a></td></tr>
 <tr class="memdesc:a440e70483678702d9edb9695ad0bd075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Table set being filled this frame (the other one is on screen).  <br /></td></tr>
+<tr class="memitem:aacfd560406113153b3573e0bc6553e05" id="r_aacfd560406113153b3573e0bc6553e05"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aacfd560406113153b3573e0bc6553e05">beacon</a> [4][2]</td></tr>
+<tr class="memdesc:aacfd560406113153b3573e0bc6553e05"><td class="mdescLeft">&#160;</td><td class="mdescRight">The beacons: four points on the ground around the cube.  <br /></td></tr>
 <tr class="memitem:a3e1556ecea76ea0630efc9c16d61ad57" id="r_a3e1556ecea76ea0630efc9c16d61ad57"><td class="memItemLeft">static <a class="el" href="structDsp1Camera.html">Dsp1Camera</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3e1556ecea76ea0630efc9c16d61ad57">cam</a></td></tr>
 <tr class="memdesc:a3e1556ecea76ea0630efc9c16d61ad57"><td class="mdescLeft">&#160;</td><td class="mdescRight">The camera: position on the ground plane (x, y wrap with the 1024-unit texture), height, lens, heading (aas: 0 looks up the map, -Y; 0x4000 looks to +X) and tilt. The luna manifest reads x, y and aas.  <br /></td></tr>
+<tr class="memitem:a1b49ba06ad8a5160ef98bd665f58077c" id="r_a1b49ba06ad8a5160ef98bd665f58077c"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1b49ba06ad8a5160ef98bd665f58077c">cube</a> [8][3]</td></tr>
+<tr class="memdesc:a1b49ba06ad8a5160ef98bd665f58077c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cube's corners around its centre (model space).  <br /></td></tr>
+<tr class="memitem:acf632c3122027a1ed8d345a45b3850f4" id="r_acf632c3122027a1ed8d345a45b3850f4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#acf632c3122027a1ed8d345a45b3850f4">cube_ay</a></td></tr>
+<tr class="memitem:a8d005c5bc8c42e76c666670208f6bd91" id="r_a8d005c5bc8c42e76c666670208f6bd91"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8d005c5bc8c42e76c666670208f6bd91">cube_az</a></td></tr>
+<tr class="memdesc:a8d005c5bc8c42e76c666670208f6bd91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cube's two rotation angles (16-bit, 2^16 = 360 degrees).  <br /></td></tr>
 <tr class="memitem:a5b9d66cf95a6941f1833f707e0a52150" id="r_a5b9d66cf95a6941f1833f707e0a52150"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5b9d66cf95a6941f1833f707e0a52150">cx</a></td></tr>
 <tr class="memdesc:a5b9d66cf95a6941f1833f707e0a52150"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ground point under the imaginary centre (last dsp1SetCamera).  <br /></td></tr>
 <tr class="memitem:a4650e5b7cc6da46f244b5d66793e69dd" id="r_a4650e5b7cc6da46f244b5d66793e69dd"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4650e5b7cc6da46f244b5d66793e69dd">cy</a></td></tr>
+<tr class="memitem:ac0efed51c1c998c2f468a6f405b232d5" id="r_ac0efed51c1c998c2f468a6f405b232d5"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac0efed51c1c998c2f468a6f405b232d5">dot_pal</a> [64]</td></tr>
+<tr class="memdesc:ac0efed51c1c998c2f468a6f405b232d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">OBJ palettes 0 and 1: colour 1 = neon cyan (the cube), then magenta (the beacons). The ground uses CGRAM 0-15 only, so 128 and up are free.  <br /></td></tr>
+<tr class="memitem:a038c1b5d9597eb67562da8969f062b51" id="r_a038c1b5d9597eb67562da8969f062b51"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a038c1b5d9597eb67562da8969f062b51">dot_tile</a> [32]</td></tr>
+<tr class="memdesc:a038c1b5d9597eb67562da8969f062b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">8x8 4bpp tile, colour 1 everywhere (planes 0/1 interleave per row: plane 0 = even bytes).  <br /></td></tr>
 <tr class="memitem:a12daf4f2dbff3923ffb1c93fdbdb13ab" id="r_a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a12daf4f2dbff3923ffb1c93fdbdb13ab">dsp1_ok</a> = 0</td></tr>
 <tr class="memdesc:a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 when the DSP-1 answered the known-answer probe (luna manifest asserts it).  <br /></td></tr>
 <tr class="memitem:ad1de2fd88fb73178e7f4020e8a38e960" id="r_ad1de2fd88fb73178e7f4020e8a38e960"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad1de2fd88fb73178e7f4020e8a38e960">ground_lines</a></td></tr>
 <tr class="memitem:abedcfba005b8c73773b4b8fbe04fc615" id="r_abedcfba005b8c73773b4b8fbe04fc615"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abedcfba005b8c73773b4b8fbe04fc615">raster_lines</a> = 0</td></tr>
 <tr class="memdesc:abedcfba005b8c73773b4b8fbe04fc615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rasters streamed in the last dsp1Raster call (luna manifest asserts it).  <br /></td></tr>
+<tr class="memitem:af6e5012ca1aee6e020dda83f9186894a" id="r_af6e5012ca1aee6e020dda83f9186894a"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af6e5012ca1aee6e020dda83f9186894a">shown</a></td></tr>
+<tr class="memdesc:af6e5012ca1aee6e020dda83f9186894a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprites on screen after the last placement pass (luna manifest asserts it).  <br /></td></tr>
 <tr class="memitem:a93598385c70398be68e81a304480603d" id="r_a93598385c70398be68e81a304480603d"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a93598385c70398be68e81a304480603d">sky_lines</a></td></tr>
 <tr class="memdesc:a93598385c70398be68e81a304480603d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen line of the first ground raster and the block length.  <br /></td></tr>
 <tr class="memitem:a10a1668cf42f86ae9ff17ac668ff50bc" id="r_a10a1668cf42f86ae9ff17ac668ff50bc"><td class="memItemLeft">static <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a10a1668cf42f86ae9ff17ac668ff50bc">tab_ab</a> [2][(6+127 *4+1)]</td></tr>
@@ -196,21 +222,25 @@ Variables</h2></td></tr>
 <div class="textblock"><p>DSP-1 ground: the Super Mario Kart floor — per-scanline Mode 7 matrices streamed by the coprocessor's Raster command. </p>
 <p>mode7/perspective fakes a receding floor with a precomputed M7A/M7D table; this example asks the DSP-1 for the real thing. Each frame the CPU sends the camera (position, height, heading, tilt) with dsp1SetCamera, then dsp1Raster streams one 2x2 matrix per screen line — A, B, C and D, so the floor rotates with the heading for free — straight into two HDMA payloads. The HDMA channels replay them next frame while the CPU already computes the frame after (double buffering). Above the horizon the same HDMA split as mode7/perspective shows a Mode 3 sky.</p>
 <p>The three numbers dsp1SetCamera hands back beside the matrices are the whole geometry: Vva says on which raster the horizon sits, Cx/Cy say which ground point is under the screen centre (they go to M7X/M7Y), and the Mode 7 scroll registers just pin that centre to the middle of the screen.</p>
+<p>Objects in that world are the other half of the chip: four beacons stand on the esplanade and a wireframe cube (its eight corners) tumbles above it. dsp1Attitude + dsp1Objective rotate the cube's corners, and dsp1Project, with the same camera, turns every world point into a screen position — so the sprites stay glued to the ground as it turns and slides past. (The cube was the chips/dsp1_cube example.)</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>DSP-1 Raster: open-ended command streaming Mode 7 matrices per raster</li>
 <li>Parameter outputs (Vof, Vva, Cx, Cy) driving M7X/M7Y and the HDMA split</li>
 <li>HDMA_MODE_2REG_2X repeat blocks feeding M7A/M7B and M7C/M7D</li>
 <li>Double-buffered HDMA tables swapped with hdmaSetTable in VBlank</li>
 <li>dsp1Triangle as the movement sin/cos</li>
+<li>dsp1Attitude / dsp1Objective: rotating a model's points</li>
+<li>dsp1Project: world point -&gt; screen (H right-positive, V down-positive, relative to the screen centre; measured on luna's firmware), M the scale</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>A textured ground plane receding to a horizon under a sky</li>
 <li>D-pad Left/Right turn the camera: the floor rotates in true perspective and the sky pans with the heading (one turn = the 512-px sky map)</li>
 <li>D-pad Up/Down drive forward/backward along the heading</li>
+<li>Four beacons and a tumbling cube that stay put on the ground while the view turns and moves; past the horizon or behind you they disappear</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, input, mode7, hdma, dsp1</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, input, mode7, hdma, sprite, dsp1</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Needs the DSP-1 firmware in luna (dsp1b.rom) — see the README. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="dsp1_8h.html" title="DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C.">snes/dsp1.h</a>, <a class="el" href="tutorial_dsp1.html">docs/tutorials/dsp1.md</a>, examples/mode7/perspective </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -336,6 +366,64 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a92652e65375034ab2e7f640858e82b39" name="a92652e65375034ab2e7f640858e82b39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92652e65375034ab2e7f640858e82b39">&#9670;&#160;</a></span>CUBE_HALF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CUBE_HALF&#160;&#160;&#160;20</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad88f263632ebfb3d110cba60b949c303" name="ad88f263632ebfb3d110cba60b949c303"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad88f263632ebfb3d110cba60b949c303">&#9670;&#160;</a></span>CUBE_X</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CUBE_X&#160;&#160;&#160;512</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The cube: world position of its centre and its half-size. </p>
+
+</div>
+</div>
+<a id="a859bbb54f5a8cd2241ae8b438ac31157" name="a859bbb54f5a8cd2241ae8b438ac31157"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a859bbb54f5a8cd2241ae8b438ac31157">&#9670;&#160;</a></span>CUBE_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CUBE_Y&#160;&#160;&#160;352</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a31e411cb25a08a0b48fa96e0d7be6d7b" name="a31e411cb25a08a0b48fa96e0d7be6d7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31e411cb25a08a0b48fa96e0d7be6d7b">&#9670;&#160;</a></span>CUBE_Z</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CUBE_Z&#160;&#160;&#160;40</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a4c4aad939d02eb3cfd1dc491c36d38c8" name="a4c4aad939d02eb3cfd1dc491c36d38c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4c4aad939d02eb3cfd1dc491c36d38c8">&#9670;&#160;</a></span>GROUND_MAX</h2>
 
@@ -365,6 +453,38 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Forward speed in ground units per frame. </p>
+
+</div>
+</div>
+<a id="a26c9350f108f504835f0f8d67d085c49" name="a26c9350f108f504835f0f8d67d085c49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26c9350f108f504835f0f8d67d085c49">&#9670;&#160;</a></span>NUM_BEACONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NUM_BEACONS&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sprites: 8 cube corners (0-7), then the beacons (8-11). </p>
+
+</div>
+</div>
+<a id="a69f9f237baac2ee247f14425602af76e" name="a69f9f237baac2ee247f14425602af76e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69f9f237baac2ee247f14425602af76e">&#9670;&#160;</a></span>OBJ_VRAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OBJ_VRAM&#160;&#160;&#160;0x6000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of the sprite tile (the Mode 7 ground takes $0000-$3FFF, the sky $4000-$5FFF). </p>
 
 </div>
 </div>
@@ -461,6 +581,80 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aaaf2c309435e7b30a97ca7628af7c72c" name="aaaf2c309435e7b30a97ca7628af7c72c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaf2c309435e7b30a97ca7628af7c72c">&#9670;&#160;</a></span>placeObjects()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void placeObjects </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Project the cube's corners and the beacons with the current camera. </p>
+
+</div>
+</div>
+<a id="add4314994326ca9cf00c34ece0c2304d" name="add4314994326ca9cf00c34ece0c2304d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add4314994326ca9cf00c34ece0c2304d">&#9670;&#160;</a></span>placePoint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void placePoint </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>pal</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Place sprite <code class="param">id</code> at world point (x, y, z), or hide it. </p>
+<p>dsp1Project gives H and V relative to the screen centre, H to the right and V downward, and M, the scale (here only its sign: a point behind the eye comes back with M &lt;= 0). A point that lands above the horizon line, where the sky is drawn, or off screen, is hidden. </p>
+
+</div>
+</div>
 <a id="aad63c86c9eedc52c2d3179fe8f7294e9" name="aad63c86c9eedc52c2d3179fe8f7294e9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aad63c86c9eedc52c2d3179fe8f7294e9">&#9670;&#160;</a></span>tableInit()</h2>
 
@@ -536,6 +730,33 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aacfd560406113153b3573e0bc6553e05" name="aacfd560406113153b3573e0bc6553e05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacfd560406113153b3573e0bc6553e05">&#9670;&#160;</a></span>beacon</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> beacon[4][2]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
+<div class="line">    {472, 312}, {552, 312}, {472, 392}, {552, 392},</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The beacons: four points on the ground around the cube. </p>
+
+</div>
+</div>
 <a id="a3e1556ecea76ea0630efc9c16d61ad57" name="a3e1556ecea76ea0630efc9c16d61ad57"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3e1556ecea76ea0630efc9c16d61ad57">&#9670;&#160;</a></span>cam</h2>
 
@@ -557,6 +778,82 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The camera: position on the ground plane (x, y wrap with the 1024-unit texture), height, lens, heading (aas: 0 looks up the map, -Y; 0x4000 looks to +X) and tilt. The luna manifest reads x, y and aas. </p>
+
+</div>
+</div>
+<a id="a1b49ba06ad8a5160ef98bd665f58077c" name="a1b49ba06ad8a5160ef98bd665f58077c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b49ba06ad8a5160ef98bd665f58077c">&#9670;&#160;</a></span>cube</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> cube[8][3]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                      = {</div>
+<div class="line">    {- 20 ,- 20 ,- 20 }, { 20 ,- 20 ,- 20 },</div>
+<div class="line">    { 20 , 20 ,- 20 }, {- 20 , 20 ,- 20 },</div>
+<div class="line">    {- 20 ,- 20 , 20 }, { 20 ,- 20 , 20 },</div>
+<div class="line">    { 20 , 20 , 20 }, {- 20 , 20 , 20 },</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The cube's corners around its centre (model space). </p>
+
+</div>
+</div>
+<a id="acf632c3122027a1ed8d345a45b3850f4" name="acf632c3122027a1ed8d345a45b3850f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf632c3122027a1ed8d345a45b3850f4">&#9670;&#160;</a></span>cube_ay</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cube_ay</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8d005c5bc8c42e76c666670208f6bd91" name="a8d005c5bc8c42e76c666670208f6bd91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d005c5bc8c42e76c666670208f6bd91">&#9670;&#160;</a></span>cube_az</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cube_az</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The cube's two rotation angles (16-bit, 2^16 = 360 degrees). </p>
 
 </div>
 </div>
@@ -603,6 +900,65 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac0efed51c1c998c2f468a6f405b232d5" name="ac0efed51c1c998c2f468a6f405b232d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0efed51c1c998c2f468a6f405b232d5">&#9670;&#160;</a></span>dot_pal</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dot_pal[64]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
+<div class="line">    0x00,0x00, 0xE0,0x7F, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,</div>
+<div class="line">    0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,</div>
+<div class="line">    0x00,0x00, 0x1F,0x7C, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,</div>
+<div class="line">    0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>OBJ palettes 0 and 1: colour 1 = neon cyan (the cube), then magenta (the beacons). The ground uses CGRAM 0-15 only, so 128 and up are free. </p>
+
+</div>
+</div>
+<a id="a038c1b5d9597eb67562da8969f062b51" name="a038c1b5d9597eb67562da8969f062b51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a038c1b5d9597eb67562da8969f062b51">&#9670;&#160;</a></span>dot_tile</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dot_tile[32]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                         = {</div>
+<div class="line">    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,</div>
+<div class="line">    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,</div>
+<div class="line">    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>8x8 4bpp tile, colour 1 everywhere (planes 0/1 interleave per row: plane 0 = even bytes). </p>
 
 </div>
 </div>
@@ -657,6 +1013,22 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Rasters streamed in the last dsp1Raster call (luna manifest asserts it). </p>
+
+</div>
+</div>
+<a id="af6e5012ca1aee6e020dda83f9186894a" name="af6e5012ca1aee6e020dda83f9186894a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6e5012ca1aee6e020dda83f9186894a">&#9670;&#160;</a></span>shown</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> shown</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sprites on screen after the last placement pass (luna manifest asserts it). </p>
 
 </div>
 </div>

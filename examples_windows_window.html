@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Window -- HDMA Triangle Masking</title>
+<title>Window -- HDMA Torch Beam: Masking and Lighting</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,65 +119,72 @@ $(function(){initNavTree('examples_windows_window.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Window -- HDMA Triangle Masking </div></div>
+  <div class="headertitle"><div class="title">Window -- HDMA Torch Beam: Masking and Lighting </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
 <img src="window.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <p>A triangle-shaped window mask driven by HDMA, showing how per-scanline window boundary updates create non-rectangular shapes. Press <b>A</b>, <b>X</b>, or <b>B</b> to apply the window to different background layers.</p>
-<p>Ported from PVSnesLib "Window" example.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-38"></a>
+    <p>Kit stands in a dark back alley with a torch. The beam is a window driven by HDMA: its left edge changes every scanline, so the window is a cone that leaves the torch and opens to the right. Press <b>A</b>, <b>X</b> or <b>B</b> and it masks background layers — the alley, the rain in front of it, or both; press <b>Y</b> and it marks where colour math lights the picture instead.</p>
+<div class="image">
+<img src="window_shade.png" alt=""/>
+<div class="caption">
+Lit</div></div>
+    <p>Ported from PVSnesLib's "Window" example; the colour-math mode is its "TransparentWindow" example (by Digifox), adding instead of subtracting.</p>
+<h2 class="doxsection"><a class="anchor" id="controls-33"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>A</b>  </td><td class="markdownTableBodyNone">Window on BG1 only  </td></tr>
+<td class="markdownTableBodyNone"><b>A</b>  </td><td class="markdownTableBodyNone">The beam on BG1 (the alley) only: the rain falls everywhere  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>X</b>  </td><td class="markdownTableBodyNone">Window on BG2 only  </td></tr>
+<td class="markdownTableBodyNone"><b>X</b>  </td><td class="markdownTableBodyNone">The beam on BG2 (the rain) only: the alley is lit, the rain shows where the torch catches it  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>B</b>  </td><td class="markdownTableBodyNone">Window on both BG1 and BG2  </td></tr>
+<td class="markdownTableBodyNone"><b>B</b>  </td><td class="markdownTableBodyNone">The beam on both BG1 and BG2 (the boot state)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>Y</b>  </td><td class="markdownTableBodyNone">Light the beam: nothing is clipped, colour math brightens both BGs inside it  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-53"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-36"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/windows/window</div>
-</div><!-- fragment --><p>Then open <span class="tt">window.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-21"></a>
+</div><!-- fragment --><p>Then open <span class="tt">window.sfc</span> in luna (<span class="tt">luna-gui window.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-16"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="snes-window-system"></a>
 SNES Window System</h3>
-<p>The SNES PPU has two hardware windows &ndash; rectangular regions defined by left and right X coordinates. These windows can mask (hide) portions of any background layer or sprite layer. Window operations cost zero CPU time because they are handled entirely by the PPU.</p>
+<p>The SNES PPU has two hardware windows &ndash; regions defined by a left and a right X coordinate. These windows can mask (hide) portions of any background layer or sprite layer. Window operations cost zero CPU time because they are handled entirely by the PPU.</p>
 <h3 class="doxsection"><a class="anchor" id="making-non-rectangular-shapes-with-hdma"></a>
 Making Non-Rectangular Shapes with HDMA</h3>
-<p>A single window is always a horizontal band. But by changing the left/right boundaries <b>every scanline</b> using HDMA, you can create any shape &ndash; circles, triangles, or custom silhouettes.</p>
+<p>A single window is always a horizontal band. But by changing the left/right boundaries <b>every scanline</b> using HDMA, you can create any shape &ndash; circles, cones, or custom silhouettes.</p>
 <p>This example uses two HDMA channels:</p><ul>
 <li><b>Channel 4</b> writes to WH0 ($2126) &ndash; window 1 left boundary</li>
 <li><b>Channel 5</b> writes to WH1 ($2127) &ndash; window 1 right boundary</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="the-triangle-tables"></a>
-The Triangle Tables</h3>
-<p>The HDMA tables define a diamond/triangle shape centered on screen:</p>
-<div class="fragment"><div class="line">Line  0-59:  WH0=255, WH1=0   -&gt; left &gt; right -&gt; window disabled (no mask)</div>
-<div class="line">Line 60-91:  WH0 shrinks 127-&gt;96, WH1 grows 129-&gt;160 -&gt; triangle expands</div>
-<div class="line">Line 92-123: WH0 grows 96-&gt;127, WH1 shrinks 160-&gt;129 -&gt; triangle contracts</div>
-<div class="line">Line 124+:   WH0=255, WH1=0   -&gt; window disabled again</div>
-</div><!-- fragment --><p>The tables use <b>repeat mode</b> (bit 7 set in the line count) because each scanline needs a different value. Non-repeat mode would write once and hold, which does not work when the shape changes per line.</p>
+<h3 class="doxsection"><a class="anchor" id="the-beam-tables"></a>
+The Beam Tables</h3>
+<p><span class="tt"><a class="el" href="windows_2window_2main_8c.html#a4412c69291201775560aaa87325c075d" title="Compute the two tables of the beam.">buildBeam()</a></span> computes the two tables at boot from the shape they draw. The torch's tip is at (44, 187); the cone widens by one line every three pixels:</p>
+<div class="fragment"><div class="line">Line   0-116:  WH0=255, WH1=0    -&gt; left &gt; right -&gt; no window</div>
+<div class="line">Line 117-223:  WH0 = 44 + 3 x |line - 187| (255 past the screen), WH1 = 255</div>
+</div><!-- fragment --><p>The beam lines use <b>repeat mode</b> (bit 7 set in the line count) because each scanline needs a different value. Non-repeat mode would write once and hold, which does not work when the shape changes per line.</p>
 <h3 class="doxsection"><a class="anchor" id="inversion-show-inside"></a>
 Inversion: Show Inside</h3>
-<p>By default, TMW (main screen window at $212E) hides pixels <b>inside</b> the window. The code sets the <b>invert</b> flag in W12SEL ($2123) so that pixels <b>outside</b> the window are hidden instead &ndash; revealing only the triangle-shaped area.</p>
+<p>By default, TMW (main screen window at $212E) hides pixels <b>inside</b> the window. The code sets the <b>invert</b> flag in W12SEL ($2123) so that pixels <b>outside</b> the window are hidden instead &ndash; revealing only the beam.</p>
+<h3 class="doxsection"><a class="anchor" id="kit-stays-visible"></a>
+Kit Stays Visible</h3>
+<p>Kit is a sprite, and the window is not enabled on sprites (WOBJSEL and TMW's OBJ bit stay 0), so he stands out in the dark whatever the beam masks.</p>
 <h3 class="doxsection"><a class="anchor" id="switching-layers"></a>
 Switching Layers</h3>
 <p>When you press A/X/B, the code:</p><ol type="1">
 <li>Disables HDMA channels</li>
-<li>Resets all window registers via <span class="tt"><a class="el" href="window_8h.html#a950e61e7616f970db1d7dab2a851a8b7" title="Initialize window system.">windowInit()</a></span></li>
+<li>Resets all window registers via <span class="tt"><a class="el" href="window_8h.html#abc5aaec4f8b14ffdaa8aa487492962cb" title="Disable all windows.">windowDisableAll()</a></span></li>
 <li>Enables window 1 on the new <a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer(s)</a> with inversion</li>
 <li>Sets TMW for the new <a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer(s)</a></li>
 <li>Re-enables HDMA</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-56"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-37"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="w12sel-register-2123"></a>
 W12SEL Register ($2123)</h3>
@@ -195,10 +202,46 @@ W12SEL Register ($2123)</h3>
 <td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">BG2 Window 1 Enable  </td></tr>
 </table>
 <p>Setting both the enable and invert bits for a BG makes pixels <b>outside</b> the window invisible, revealing only the windowed region.</p>
-<h3 class="doxsection"><a class="anchor" id="window-shapes-in-commercial-games"></a>
-Window Shapes in Commercial Games</h3>
-<p>This technique was used extensively: spotlight effects in Mega Man X, the title screen reveal in Donkey Kong Country, and dialog box cutouts in RPGs. Any shape that can be described as a left-right boundary pair per scanline can be rendered as a window.</p>
-<h2 class="doxsection"><a class="anchor" id="vram-layout-3"></a>
+<h3 class="doxsection"><a class="anchor" id="lighting-the-window-as-the-region-of-colour-math-y"></a>
+Lighting: the Window as the Region of Colour Math (Y)</h3>
+<p>Pressing Y keeps the same HDMA tables and changes what the window is for:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Register  </th><th class="markdownTableHeadNone">Value  </th><th class="markdownTableHeadNone">Meaning  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">W12SEL / TMW  </td><td class="markdownTableBodyNone"><span class="tt">$00</span> / <span class="tt">$00</span>  </td><td class="markdownTableBodyNone">no layer is clipped  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">WOBJSEL  </td><td class="markdownTableBodyNone"><span class="tt">$20</span>  </td><td class="markdownTableBodyNone">the colour window is window 1, not inverted: the beam  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">CGWSEL  </td><td class="markdownTableBodyNone"><span class="tt">$10</span>  </td><td class="markdownTableBodyNone">colour math only inside the colour window, from the fixed colour  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">CGADSUB  </td><td class="markdownTableBodyNone"><span class="tt">$03</span>  </td><td class="markdownTableBodyNone">add (bit 7 clear), on BG1 and BG2  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">COLDATA  </td><td class="markdownTableBodyNone">6, 5, 2  </td><td class="markdownTableBodyNone">the warm colour added  </td></tr>
+</table>
+<div class="fragment"><div class="line"><a class="code hl_function" href="window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a>(<a class="code hl_define" href="window_8h.html#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177">WINDOW_MATH</a>);       <span class="comment">/* the colour window */</span></div>
+<div class="line"><a class="code hl_function" href="window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c">windowSetMainMask</a>(0);                      <span class="comment">/* nothing clipped */</span></div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#a15da8aea1fb4d880f7547dd3dfe2320c">colorMathSetCondition</a>(<a class="code hl_define" href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3">COLORMATH_INSIDE</a>);</div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a>);</div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);</div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a> | <a class="code hl_define" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a>);</div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(6, 5, 2);</div>
+<div class="ttc" id="acolormath_8h_html_a15da8aea1fb4d880f7547dd3dfe2320c"><div class="ttname"><a href="colormath_8h.html#a15da8aea1fb4d880f7547dd3dfe2320c">colorMathSetCondition</a></div><div class="ttdeci">void colorMathSetCondition(u8 condition)</div><div class="ttdoc">Set when color math is enabled (window control).</div></div>
+<div class="ttc" id="acolormath_8h_html_a4071dbd0a7992b17481aa199e5c8a3c3"><div class="ttname"><a href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3">COLORMATH_INSIDE</a></div><div class="ttdeci">#define COLORMATH_INSIDE</div><div class="ttdoc">Enable inside window only.</div><div class="ttdef"><b>Definition</b> colormath.h:107</div></div>
+<div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens).</div><div class="ttdef"><b>Definition</b> colormath.h:84</div></div>
+<div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
+<div class="ttc" id="acolormath_8h_html_aba2a18b87756e861ed9c66e8766f2579"><div class="ttname"><a href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a></div><div class="ttdeci">#define COLORMATH_SRC_FIXED</div><div class="ttdoc">Use fixed color as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:97</div></div>
+<div class="ttc" id="acolormath_8h_html_ac014d3ff6d4d18a0b5e597560636d38f"><div class="ttname"><a href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a></div><div class="ttdeci">void colorMathSetOp(u8 op)</div><div class="ttdoc">Set color math operation (add or subtract).</div></div>
+<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div></div>
+<div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga4491b560e6f9decf7efa9c0b23906ec2"><div class="ttname"><a href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a></div><div class="ttdeci">#define LAYER_BG2</div><div class="ttdef"><b>Definition</b> video.h:109</div></div>
+<div class="ttc" id="awindow_8h_html_a6ab27f7c632399c2a56dafa591e2e51c"><div class="ttname"><a href="window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c">windowSetMainMask</a></div><div class="ttdeci">void windowSetMainMask(u8 layers)</div><div class="ttdoc">Set main screen window masking.</div></div>
+<div class="ttc" id="awindow_8h_html_acfb87c43c4940497f7e2a21a08008155"><div class="ttname"><a href="window_8h.html#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a></div><div class="ttdeci">#define WINDOW_1</div><div class="ttdoc">Window 1.</div><div class="ttdef"><b>Definition</b> window.h:52</div></div>
+<div class="ttc" id="awindow_8h_html_ae1bc6577dfc89cd5fb01cddeef631017"><div class="ttname"><a href="window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a></div><div class="ttdeci">void windowEnable(u8 window, u8 layers)</div><div class="ttdoc">Enable window for specified layers.</div></div>
+<div class="ttc" id="awindow_8h_html_ae4bd6eff3175f2ca17357d2a2a1b8177"><div class="ttname"><a href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177">WINDOW_MATH</a></div><div class="ttdeci">#define WINDOW_MATH</div><div class="ttdoc">Color math (affects color blending) — the window&#39;s own bit.</div><div class="ttdef"><b>Definition</b> window.h:66</div></div>
+</div><!-- fragment --><p>The masking modes call <span class="tt"><a class="el" href="colormath_8h.html#ae94260b8411da5bb9f06386b65e6d6cb" title="Disable all color math.">colorMathDisable()</a></span> first, so A, X or B after Y clips again with no light left over. The same pattern draws a shadow (subtract instead of add) or the darkened box behind a dialogue.</p>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-9"></a>
 VRAM Layout</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -206,42 +249,49 @@ VRAM Layout</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$0000  </td><td class="markdownTableBodyNone">BG1 tilemap (32x32)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$1000  </td><td class="markdownTableBodyNone">BG2 tilemap (32x32)  </td></tr>
+<td class="markdownTableBodyNone">$0400  </td><td class="markdownTableBodyNone">BG2 tilemap (32x32)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4000  </td><td class="markdownTableBodyNone">BG1 tiles (4bpp, 16 colors)  </td></tr>
+<td class="markdownTableBodyNone">$1000  </td><td class="markdownTableBodyNone">BG1 tiles: the alley, 889 tiles (4bpp)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$6000  </td><td class="markdownTableBodyNone">BG2 tiles (4bpp, 16 colors)  </td></tr>
+<td class="markdownTableBodyNone">$5000  </td><td class="markdownTableBodyNone">BG2 tiles: the rain (4bpp)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$6000  </td><td class="markdownTableBodyNone">Kit (OBJ)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="project-structure-21"></a>
+<p>A BG's tiles start on a $1000-word boundary (BG12NBA keeps the top four bits of the address).</p>
+<h2 class="doxsection"><a class="anchor" id="project-structure-15"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">HDMA triangle tables, window setup, input loop  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">The beam tables, window setup, input loop, the falling rain  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/bg1.png.toml</span>, <span class="tt">res/bg2.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the two pictures (<span class="tt">opensnes-tileset</span>, palette bank 1 for BG2); the build converts and links them, <span class="tt">res/bgN.inc</span> declares the symbols  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/alley.png</span>  </td><td class="markdownTableBodyNone">BG1, the alley (palette slot 0)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/bg1.png</span>  </td><td class="markdownTableBodyNone">Background 1 (palette slot 0)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/rain.png</span>  </td><td class="markdownTableBodyNone">BG2, the rain on nothing (palette slot 1)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/bg2.png</span>  </td><td class="markdownTableBodyNone">Background 2 (palette slot 1)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/kit.png</span>  </td><td class="markdownTableBodyNone">Kit holding his torch, 32x32  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma input background window hdma math</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings (<span class="tt">opensnes-tileset</span>, <span class="tt">opensnes-sprite</span>); the build converts and links them, <span class="tt">res/&lt;name&gt;.inc</span> declares the symbols  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma input background window hdma colormath</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-15"></a>
+<p>The alley and Kit with his torch come from PixelLab, the rain is drawn by <span class="tt">devtools/art_assets/build.py</span> (CC0, <span class="tt">assets/neo-lumen/README.md</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="going-further-12"></a>
 Going Further</h2>
 <ul>
-<li><b>Animated window</b>: Modify the triangle tables each frame to make the shape pulse or rotate. Copy the tables to RAM and adjust the boundary values.</li>
-<li><b>Circle window</b>: Replace the linear expansion/contraction with a circular profile calculated from the equation <span class="tt">x = sqrt(r^2 - y^2)</span>.</li>
+<li><b>A moving beam</b>: rebuild the tables each frame with the tip following a sprite, or sweep the cone by changing its slope.</li>
+<li><b>Circle window</b>: replace the cone with a circular profile calculated from the equation <span class="tt">x = sqrt(r^2 - y^2)</span>.</li>
+<li><b>A rectangle</b>: a static box needs only three non-repeat entries per table (window empty, the edges for the box's height, empty again).</li>
 <li><b>Explore related examples</b>:<ul>
-<li><span class="tt">effects/transparent_window</span> &ndash; Window + color math for semi-transparent overlays</li>
-<li><span class="tt">effects/hdma_wave</span> &ndash; Another HDMA-driven per-scanline effect</li>
+<li><span class="tt">windows/window_multi_hdma</span> &ndash; both windows shaped per scanline</li>
+<li><span class="tt">hdma/hdma_wave</span> &ndash; another HDMA-driven per-scanline effect</li>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-76"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-54"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">window</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">window</span>, <span class="tt">hdma</span>, <span class="tt">colormath</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

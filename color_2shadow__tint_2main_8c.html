@@ -128,33 +128,24 @@ $(function(){initNavTree('color_2shadow__tint_2main_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="colormath_8h_source.html">snes/colormath.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
+<code>#include &quot;res/street.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a8b27d566dea9812fa32fcb98be42e07d" id="r_a8b27d566dea9812fa32fcb98be42e07d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8b27d566dea9812fa32fcb98be42e07d">apply_effect</a> (void)</td></tr>
 <tr class="memdesc:a8b27d566dea9812fa32fcb98be42e07d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply the effect for the current fx_state (call after VBlank).  <br /></td></tr>
-<tr class="memitem:a795bed8133175626818a45174638b1b3" id="r_a795bed8133175626818a45174638b1b3"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a795bed8133175626818a45174638b1b3">build_scene_palette</a> (void)</td></tr>
-<tr class="memdesc:a795bed8133175626818a45174638b1b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill scene_pal[] with a believable slice of a game world.  <br /></td></tr>
-<tr class="memitem:a460156209b333c99c10a754e3b076326" id="r_a460156209b333c99c10a754e3b076326"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a460156209b333c99c10a754e3b076326">build_solid_tile</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> v)</td></tr>
-<tr class="memdesc:a460156209b333c99c10a754e3b076326"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill tilebuf with a solid 4bpp tile of palette index v.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:adf08111f5aa78a7eb0efff8c23f8d70a" id="r_adf08111f5aa78a7eb0efff8c23f8d70a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf08111f5aa78a7eb0efff8c23f8d70a">fx_state</a></td></tr>
-<tr class="memdesc:adf08111f5aa78a7eb0efff8c23f8d70a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset).  <br /></td></tr>
-<tr class="memitem:a68664318b8ea5088673f050ee4ba451c" id="r_a68664318b8ea5088673f050ee4ba451c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a68664318b8ea5088673f050ee4ba451c">rowbuf</a> [32]</td></tr>
-<tr class="memdesc:a68664318b8ea5088673f050ee4ba451c"><td class="mdescLeft">&#160;</td><td class="mdescRight">One tilemap row (32 entries).  <br /></td></tr>
-<tr class="memitem:a92b21d6f159a9c252629a6c18a44e8b0" id="r_a92b21d6f159a9c252629a6c18a44e8b0"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a92b21d6f159a9c252629a6c18a44e8b0">scene_pal</a> [16]</td></tr>
-<tr class="memdesc:a92b21d6f159a9c252629a6c18a44e8b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">16 game-world colours, filled at init (RAM — no ROM const)  <br /></td></tr>
-<tr class="memitem:a4b24fbfead388e007e43fcdc6e13e592" id="r_a4b24fbfead388e007e43fcdc6e13e592"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4b24fbfead388e007e43fcdc6e13e592">tilebuf</a> [32]</td></tr>
-<tr class="memdesc:a4b24fbfead388e007e43fcdc6e13e592"><td class="mdescLeft">&#160;</td><td class="mdescRight">One solid 4bpp tile (two interleaved bitplane pairs, 32 bytes).  <br /></td></tr>
+<tr class="memdesc:adf08111f5aa78a7eb0efff8c23f8d70a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracle: current effect (0 none, 1 blackout, 2 green rain, 3 red alert).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Colour — shadow &amp; tint: recolour a whole scene at once. </p>
 <p>Colour math against a <em>fixed</em> colour is how a game changes mood without touching a single tile or palette entry. Subtract a grey and the scene darkens — dusk, a dungeon, nightfall. Add a colour and the scene takes that cast — the blue of being underwater, the orange of a sunset or lava glow, the red flash of taking a hit. One register pair does it to every pixel of a layer, every frame, for free.</p>
-<p>The scene here is a 4x4 chart of sixteen game-world colours (sky, water, foliage, earth, stone, accents) built procedurally — zero assets — so you can watch the effect land on every hue at once. Press A to cycle:</p>
-<p>none -&gt; shadow (darken) -&gt; underwater tint -&gt; sunset tint -&gt; none</p>
+<p>The scene here is a street of the city at night — apartment blocks and a noodle sign (res/street.png) — so you can watch the effect land on a picture. Press A to cycle:</p>
+<p>none -&gt; blackout (darken) -&gt; green rain (tint) -&gt; red alert (tint) -&gt; none</p>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Colour math with the FIXED-colour source (COLDATA $2132): result is main-screen ± a constant, applied per enabled layer</li>
@@ -162,7 +153,7 @@ Variables</h2></td></tr>
 <li>The effect is a PPU pass over the final image: no VRAM, CGRAM or OAM traffic, so it costs nothing per frame and scales to the whole screen</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>Boot: the plain colour chart. Press A to darken it (shadow), then wash it blue (underwater), then warm it (sunset), then back to plain. Every swatch shifts together. <span class="tt"><a class="el" href="#adf08111f5aa78a7eb0efff8c23f8d70a" title="Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset).">fx_state</a></span> is the probe oracle (0..3).</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>Boot: the plain street. Press A to darken it (a blackout), then wash it green (a toxic rain), then red (the alarm), then back to plain. Every pixel shifts together. <span class="tt"><a class="el" href="#adf08111f5aa78a7eb0efff8c23f8d70a" title="Probe oracle: current effect (0 none, 1 blackout, 2 green rain, 3 red alert).">fx_state</a></span> is the probe oracle (0..3).</dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, colormath, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="colormath_8h.html" title="SNES Color Math (Blending/Transparency).">lib/include/snes/colormath.h</a> — <a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow()</a>, <a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint()</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
@@ -190,62 +181,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Apply the effect for the current fx_state (call after VBlank). </p>
-
-</div>
-</div>
-<a id="a795bed8133175626818a45174638b1b3" name="a795bed8133175626818a45174638b1b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a795bed8133175626818a45174638b1b3">&#9670;&#160;</a></span>build_scene_palette()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void build_scene_palette </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill scene_pal[] with a believable slice of a game world. </p>
-<p>Four rows of four: sky/water, foliage, earth/stone, accents. Vivid enough that both a darken and a colour cast read clearly on every one. </p>
-
-</div>
-</div>
-<a id="a460156209b333c99c10a754e3b076326" name="a460156209b333c99c10a754e3b076326"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a460156209b333c99c10a754e3b076326">&#9670;&#160;</a></span>build_solid_tile()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void build_solid_tile </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>v</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill tilebuf with a solid 4bpp tile of palette index v. </p>
-<p>4bpp planar: rows 0-7 store bitplane pair (0,1) as 16 bytes, then pair (2,3). Each plane byte is $FF or $00 per the matching bit of v. </p>
 
 </div>
 </div>
@@ -279,79 +214,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset). </p>
-
-</div>
-</div>
-<a id="a68664318b8ea5088673f050ee4ba451c" name="a68664318b8ea5088673f050ee4ba451c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68664318b8ea5088673f050ee4ba451c">&#9670;&#160;</a></span>rowbuf</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> rowbuf[32]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>One tilemap row (32 entries). </p>
-
-</div>
-</div>
-<a id="a92b21d6f159a9c252629a6c18a44e8b0" name="a92b21d6f159a9c252629a6c18a44e8b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a92b21d6f159a9c252629a6c18a44e8b0">&#9670;&#160;</a></span>scene_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scene_pal[16]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>16 game-world colours, filled at init (RAM — no ROM const) </p>
-
-</div>
-</div>
-<a id="a4b24fbfead388e007e43fcdc6e13e592" name="a4b24fbfead388e007e43fcdc6e13e592"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b24fbfead388e007e43fcdc6e13e592">&#9670;&#160;</a></span>tilebuf</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilebuf[32]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>One solid 4bpp tile (two interleaved bitplane pairs, 32 bytes). </p>
+<p>Probe oracle: current effect (0 none, 1 blackout, 2 green rain, 3 red alert). </p>
 
 </div>
 </div>

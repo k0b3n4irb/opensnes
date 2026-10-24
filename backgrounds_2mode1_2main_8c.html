@@ -127,8 +127,18 @@ $(function(){initNavTree('backgrounds_2mode1_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="asset_8h_source.html">snes/asset.h</a>&gt;</code><br />
-<code>#include &quot;res/opensnes.inc&quot;</code><br />
+<code>#include &lt;<a class="el" href="lzss_8h_source.html">snes/lzss.h</a>&gt;</code><br />
+<code>#include &quot;res/street.inc&quot;</code><br />
+<code>#include &quot;res/street_lz.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a6f6f629f73ce5b47b350e9ffe6dbe820" id="r_a6f6f629f73ce5b47b350e9ffe6dbe820"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6f6f629f73ce5b47b350e9ffe6dbe820">MAP_ADDR</a>&#160;&#160;&#160;0x7800</td></tr>
+<tr class="memdesc:a6f6f629f73ce5b47b350e9ffe6dbe820"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of the tilemap, after both copies of the tiles.  <br /></td></tr>
+<tr class="memitem:aec6d53e2c8cc80ae281858336d6feca3" id="r_aec6d53e2c8cc80ae281858336d6feca3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec6d53e2c8cc80ae281858336d6feca3">TILES_LZ</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memitem:a832a34876a8d52d1fc8d9d2180b44d9c" id="r_a832a34876a8d52d1fc8d9d2180b44d9c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a832a34876a8d52d1fc8d9d2180b44d9c">TILES_PLAIN</a>&#160;&#160;&#160;0x0000</td></tr>
+<tr class="memdesc:a832a34876a8d52d1fc8d9d2180b44d9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of the plain tiles (bgLoad) and of the decompressed copy.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -136,25 +146,76 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Static 16-color background display in Mode 1 (4bpp). </p>
-<p>Displays a single full-screen tiled background using Mode 1, the most commonly used SNES video mode. Mode 1 provides two 4bpp layers (BG1 and BG2, each up to 16 colors) plus one 2bpp layer (BG3, 4 colors). This example uses only BG1 with a 16-color tileset and tilemap converted from a PNG by the build (opensnes-tileset and the settings file beside it).</p>
-<p>This is a direct port of the PVSnesLib "Mode1" example.</p>
+<p>Displays a single full-screen tiled background using Mode 1, the most commonly used SNES video mode. Mode 1 provides two 4bpp layers (BG1 and BG2, each up to 16 colors) plus one 2bpp layer (BG3, 4 colors). This example uses only BG1: a rainy street at night, 16 colours, converted from a PNG by the build (opensnes-tileset and the settings file beside it).</p>
+<p>The same picture is also linked a second time, LZ77-compressed by the build (<span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> in res/street_lz.png.toml: 28256 bytes of tiles become 18816), and decompressed at boot straight into VRAM by <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a>. A and B point BG1 at one copy or the other: the screen does not change, and that is the lesson — same tiles, two thirds of the ROM. A detailed picture compresses less than a flat one: LZ77 finds repeats, and every tile of a painting is a little different.</p>
+<p>This began as the PVSnesLib "Mode1" and "Mode1LZ77" examples.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Mode 1: BG1/BG2 are 4bpp (16 colors each), BG3 is 2bpp (4 colors)</li>
 <li><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a> for combined tile + palette loading with VRAM address configuration</li>
 <li><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> for tilemap data transfer to a separate VRAM region</li>
-<li>VRAM layout: tilemap at $0000, tiles at $4000 (non-overlapping regions)</li>
+<li>VRAM layout: tiles at $0000, the decompressed copy at $4000, tilemap at $7800 (each region in its own range)</li>
 <li>Force blank (setScreenOff) during VRAM setup to avoid mid-frame writes</li>
+<li>LZ77-compressed tiles: <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> decodes from ROM into VRAM</li>
+<li><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a>: a background's character base is one register, switched at any time</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>A static full-screen image rendered as 8x8 tiles on BG1</li>
+<li>A static full-screen image rendered as 8x8 tiles on BG1: 883 distinct tiles, close to the 1024 a tilemap entry can number</li>
 <li>Only BG1 is enabled; BG2 and BG3 are unused</li>
 <li>The image remains stationary (no scrolling)</li>
+<li>A shows BG1 from the decompressed copy at VRAM $4000, B from the plain one at $0000: the picture is the same pixel for pixel</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, asset</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, asset, lzss, input</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="lzss_8h.html" title="LZSS (LZ77) Decompression for SNES.">lzss.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a6f6f629f73ce5b47b350e9ffe6dbe820" name="a6f6f629f73ce5b47b350e9ffe6dbe820"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f6f629f73ce5b47b350e9ffe6dbe820">&#9670;&#160;</a></span>MAP_ADDR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAP_ADDR&#160;&#160;&#160;0x7800</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of the tilemap, after both copies of the tiles. </p>
+
+</div>
+</div>
+<a id="aec6d53e2c8cc80ae281858336d6feca3" name="aec6d53e2c8cc80ae281858336d6feca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec6d53e2c8cc80ae281858336d6feca3">&#9670;&#160;</a></span>TILES_LZ</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILES_LZ&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a832a34876a8d52d1fc8d9d2180b44d9c" name="a832a34876a8d52d1fc8d9d2180b44d9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a832a34876a8d52d1fc8d9d2180b44d9c">&#9670;&#160;</a></span>TILES_PLAIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILES_PLAIN&#160;&#160;&#160;0x0000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of the plain tiles (bgLoad) and of the decompressed copy. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -172,7 +233,7 @@ Functions</h2></td></tr>
 
 <p>Entry point &ndash; load a 4bpp tileset and display a static Mode 1 image. </p>
 <p>Demonstrates the typed asset bundle: tileset, palette, tilemap, color depth and map size all travel together in a single <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>. A single <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> does the same work as a manual <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr</a></span> + <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet</a></span> + <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> triple, with the color-mode / size pairing locked at declaration time.</p>
-<p>The VRAM layout places the tilemap at $0000 and tile graphics at $4000 to avoid overlap (each tilemap is up to 2KB, tile data can be many KB).</p>
+<p>The picture has 883 distinct tiles (28 KB at 4bpp), and the VRAM holds it twice, so the layout is tight: the plain tiles at $0000, the decompressed copy at $4000 (a character base is a multiple of $1000 words), and the tilemap after both at $7800.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
 
 </div>

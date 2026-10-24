@@ -201,7 +201,7 @@ ROM runs but crashes after a few seconds</h3>
 <p><b>Debug</b>:</p><ol type="1">
 <li>Use luna to see where it crashes (<span class="tt">run_until_pc</span> / <span class="tt">state</span> over MCP — see the <a href="tutorial_debugging.html">debugging tutorial</a>)</li>
 <li>Check the call stack depth</li>
-<li>Look for NULL pointer dereferences</li>
+<li><a class="el" href="structLook.html" title="A resident&#39;s look: its 32x32 frame (converted alone) and its OBJ slot.">Look</a> for NULL pointer dereferences</li>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="sprites-dont-appear"></a>
 Sprites don't appear</h3>
@@ -210,7 +210,7 @@ Sprites don't appear</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// 2. Load sprite graphics to VRAM</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a>(sprite_gfx, sprite_gfx_end - sprite_gfx,</div>
-<div class="line">              <a class="code hl_variable" href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a>, sprite_pal_end - <a class="code hl_variable" href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a>,</div>
+<div class="line">              sprite_pal, sprite_pal_end - sprite_pal,</div>
 <div class="line">              0, 0x0000, <a class="code hl_define" href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// 3. Set sprite properties — oamSet(id, x, y, tile, palette, priority, flags)</span></div>
@@ -222,7 +222,6 @@ Sprites don't appear</h3>
 <div class="line"><span class="comment">// 5. Update OAM (done in VBlank by the library)</span></div>
 <div class="line"><span class="comment">// The NMI handler uploads the OAM shadow when a sprite call changed it</span></div>
 <div class="line"><span class="comment">// (oam_update_flag); a direct write into oamMemory[] is not seen</span></div>
-<div class="ttc" id="abasics_2aim__target_2main_8c_html_ad00b9a7770bb3ca84c9ff3c5504255e1"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a></div><div class="ttdeci">static const u8 sprite_pal[]</div><div class="ttdoc">Sprite palette — single palette shared by player and target.</div><div class="ttdef"><b>Definition</b> main.c:121</div></div>
 <div class="ttc" id="asprite_8h_html_a0ab1cfd8e05842654a0e146b83d62664"><div class="ttname"><a href="sprite_8h.html#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a></div><div class="ttdeci">void oamInit(u16 size, u16 name_base)</div><div class="ttdoc">Initialize the sprite (OAM) system.</div></div>
 <div class="ttc" id="asprite_8h_html_a209aae598e419d8117a9e2813dabc667"><div class="ttname"><a href="sprite_8h.html#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a></div><div class="ttdeci">#define OAM_DEFAULT_SIZE</div><div class="ttdoc">Default sprite size mode — small=8×8 / large=16×16.</div><div class="ttdef"><b>Definition</b> sprite.h:211</div></div>
 <div class="ttc" id="asprite_8h_html_a2ae2a968b390cd097d6362def10c0e11"><div class="ttname"><a href="sprite_8h.html#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a></div><div class="ttdeci">#define OAM_DEFAULT_TILE_BASE</div><div class="ttdoc">Default sprite tile base — 0 = tiles at VRAM word $0000.</div><div class="ttdef"><b>Definition</b> sprite.h:213</div></div>
@@ -289,7 +288,7 @@ Wrong colours / garbled palette</h3>
 </div><!-- fragment --><p> (or the same settings in <span class="tt">res/sprite.png.toml</span>, which the build runs for you).</p>
 <h3 class="doxsection"><a class="anchor" id="colours-shift-when-you-add-a-tile"></a>
 Colours shift when you add a tile</h3>
-<p>The converter derives the whole palette again from the new art. Author a fixed palette and impose it: <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a> = "fixed.pal"</span> in the asset's settings file (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>).</p>
+<p>The converter derives the whole palette again from the new art. Author a fixed palette and impose it: <span class="tt"><a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a> = "fixed.pal"</span> in the asset's settings file (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>).</p>
 <h3 class="doxsection"><a class="anchor" id="tiles-appear-corrupted-or-an-upload-only-partly-lands"></a>
 Tiles appear corrupted, or an upload only partly lands</h3>
 <p><b>Causes</b>:</p><ol type="1">

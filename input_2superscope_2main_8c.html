@@ -130,7 +130,7 @@ $(function(){initNavTree('input_2superscope_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="dma_8h_source.html">snes/dma.h</a>&gt;</code><br />
 <code>#include &quot;res/aim_adjust_target.inc&quot;</code><br />
-<code>#include &quot;res/sprites.inc&quot;</code><br />
+<code>#include &quot;res/marker.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -139,24 +139,24 @@ Macros</h2></td></tr>
 <tr class="memitem:ac3bd49a6808ba1a64a446fdd14cb2a21" id="r_ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac3bd49a6808ba1a64a446fdd14cb2a21">STATE_DETECT</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/.  <br /></td></tr>
 <tr class="memitem:aa74af0876332d1a6258cff9745a1bd53" id="r_aa74af0876332d1a6258cff9745a1bd53"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa74af0876332d1a6258cff9745a1bd53">STATE_READY</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:aa74af0876332d1a6258cff9745a1bd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrated and tracking fire events; placing red dot markers.  <br /></td></tr>
+<tr class="memdesc:aa74af0876332d1a6258cff9745a1bd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrated and tracking fire events; placing impact markers.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aea20b3ca4ff63808811ac25be7f919bc" id="r_aea20b3ca4ff63808811ac25be7f919bc"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aea20b3ca4ff63808811ac25be7f919bc">clearBottom</a> (void)</td></tr>
 <tr class="memdesc:aea20b3ca4ff63808811ac25be7f919bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the bottom 4 rows of the text overlay (rows 24-27).  <br /></td></tr>
 <tr class="memitem:ac07b8b77915794eb44a0c607312d2a5d" id="r_ac07b8b77915794eb44a0c607312d2a5d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ac07b8b77915794eb44a0c607312d2a5d">hideDot</a> (void)</td></tr>
-<tr class="memdesc:ac07b8b77915794eb44a0c607312d2a5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hide the red dot marker sprite by moving it off-screen.  <br /></td></tr>
+<tr class="memdesc:ac07b8b77915794eb44a0c607312d2a5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hide the impact marker sprite by moving it off-screen.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; Super Scope detection, calibration, and fire tracking.  <br /></td></tr>
 <tr class="memitem:a8fac21c510e5bd8768b159adc86309e9" id="r_a8fac21c510e5bd8768b159adc86309e9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8fac21c510e5bd8768b159adc86309e9">showDot</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
-<tr class="memdesc:a8fac21c510e5bd8768b159adc86309e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show the red dot marker at the given screen coordinates.  <br /></td></tr>
+<tr class="memdesc:a8fac21c510e5bd8768b159adc86309e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show the impact marker at the given screen coordinates.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Super Scope light gun detection, calibration, and firing. </p>
 <p>Demonstrates the SNES Super Scope (light gun) peripheral connected to controller port 2. The Super Scope works by detecting the CRT beam position when the trigger is pulled, returning X/Y screen coordinates via the auto-joypad registers. Because the sensor relies on CRT timing, a calibration step is needed to correct for aiming offset.</p>
-<p>The example uses a three-state machine: DETECT waits for the Super Scope to be connected, CALIBRATE asks the player to shoot the screen center so the library can compute the aim offset, and READY tracks fire events and marks the hit position with a red dot sprite.</p>
-<p>Video setup: Mode 0 with BG1 (text overlay) and BG2 (crosshair target background for calibration), plus OBJ sprites for the red dot marker.</p>
+<p>The example uses a three-state machine: DETECT waits for the Super Scope to be connected, CALIBRATE asks the player to shoot the screen center so the library can compute the aim offset, and READY tracks fire events and marks the hit position with an impact marker sprite.</p>
+<p>Video setup: Mode 0 with BG1 (text overlay) and BG2 (the calibration target of the security range), plus an OBJ sprite for the impact marker.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Super Scope peripheral detection and calibration flow</li>
 <li>Light gun coordinate reading (scopeGetX / scopeGetY)</li>
@@ -169,7 +169,7 @@ Functions</h2></td></tr>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>"Connect SuperScope to Port 2" message on startup</li>
 <li>After connection, a crosshair target for calibration</li>
-<li>Shooting places a red dot at the hit position</li>
+<li>Shooting places an impact marker at the hit position</li>
 <li>PAUSE button returns to calibration; CURSOR transitions to play</li>
 </ul>
 </dd></dl>
@@ -207,7 +207,7 @@ Functions</h2></td></tr>
 <p>Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/. </p>
 <p>Aim target tilemap (32x32 BG2 layout), converted by the build from res/</p>
 <p>Aim target palette (BGR555), converted by the build from res/</p>
-<p>Sprite tile data (red dot marker, 4bpp), converted by the build from res/</p>
+<p>Sprite tile data (impact marker, 4bpp), converted by the build from res/</p>
 <p>Sprite palette (BGR555), converted by the build from res/</p>
 <p>Waiting for Super Scope to be connected to port 2 </p>
 
@@ -225,7 +225,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calibrated and tracking fire events; placing red dot markers. </p>
+<p>Calibrated and tracking fire events; placing impact markers. </p>
 
 </div>
 </div>
@@ -281,7 +281,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Hide the red dot marker sprite by moving it off-screen. </p>
+<p>Hide the impact marker sprite by moving it off-screen. </p>
 <p>Y coordinate OAM_Y_OFFSCREEN (224) is below the NTSC visible area, so the SNES PPU will not render this sprite. This is cheaper than disabling the sprite via the OAM high table. </p>
 
 </div>
@@ -305,7 +305,7 @@ Functions</h2></td></tr>
 <p>Implements a three-state machine:</p><ul>
 <li>STATE_DETECT: polls <a class="el" href="group__scope__input.html#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a> / <a class="el" href="group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a" title="Check if Super Scope is connected.">scopeIsConnected()</a> each frame until the Super Scope is detected on controller port 2.</li>
 <li>STATE_CALIBRATE: displays a crosshair target on BG2 and waits for the player to shoot the center. <a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e" title="Calibrate aim from a center-screen shot.">scopeCalibrate()</a> records the aim offset so subsequent coordinate readings are accurate.</li>
-<li>STATE_READY: tracks FIRE events, reads calibrated X/Y via <a class="el" href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c" title="Get calibration-adjusted H position.">scopeGetX()</a> / <a class="el" href="group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1" title="Get calibration-adjusted V position.">scopeGetY()</a>, and places a red dot sprite at the hit position. The PAUSE button returns to calibration for re-aiming.</li>
+<li>STATE_READY: tracks FIRE events, reads calibrated X/Y via <a class="el" href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c" title="Get calibration-adjusted H position.">scopeGetX()</a> / <a class="el" href="group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1" title="Get calibration-adjusted V position.">scopeGetY()</a>, and places an impact marker sprite at the hit position. The PAUSE button returns to calibration for re-aiming.</li>
 </ul>
 <p>The fire_armed flag prevents stale FIRE events from the previous state from triggering immediately on state entry.</p>
 <dl class="section return"><dt>Returns</dt><dd>0 (never reached &ndash; infinite game loop) </dd></dl>
@@ -339,7 +339,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Show the red dot marker at the given screen coordinates. </p>
+<p>Show the impact marker at the given screen coordinates. </p>
 <p>Updates sprite 0's X/Y in the OAM low table and signals the NMI handler to DMA the OAM buffer to the PPU next VBlank.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

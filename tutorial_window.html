@@ -173,7 +173,7 @@ The minimum viable window</h2>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line">    <span class="keywordflow">while</span> (1) <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
@@ -262,11 +262,12 @@ Animated triangle reveal — <span class="tt">examples/windows/window</span></h3
 <li>Press <b>A</b>: apply window to BG1 only.</li>
 <li>Press <b>X</b>: apply window to BG2 only.</li>
 <li>Press <b>B</b>: apply window to both BG1 and BG2.</li>
+<li>Press <b>Y</b>: shade the triangle instead (below).</li>
 </ul>
 <p>Two HDMA channels (4 and 5) write <span class="tt">WH0</span>/<span class="tt">WH1</span> per scanline. The example configures everything through the lib helpers: <span class="tt"><a class="el" href="window_8h.html#abc5aaec4f8b14ffdaa8aa487492962cb" title="Disable all windows.">windowDisableAll()</a></span>, <span class="tt"><a class="el" href="window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017" title="Enable window for specified layers.">windowEnable()</a></span>, <span class="tt"><a class="el" href="window_8h.html#ace412a79a04227a3b380fa54723a749a" title="Set window inversion for layers.">windowSetInvert()</a></span> and <span class="tt"><a class="el" href="window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c" title="Set main screen window masking.">windowSetMainMask()</a></span> for the window, <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> and <span class="tt"><a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask()</a></span> for the two channels.</p>
-<h3 class="doxsection"><a class="anchor" id="window--colour-math--exampleswindowstransparent_window"></a>
-Window + colour math — <span class="tt">examples/windows/transparent_window</span></h3>
-<p>Pairs the window system with the colour-math pipeline to produce a spotlight that <b>blends</b> BG1 onto BG2 (rather than just hiding it). The window covers part of the screen; inside the window, BG1 is half-transparent over BG2; outside, BG1 is fully opaque. The bridge is <span class="tt"><a class="el" href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177" title="Color math (affects color blending) — the window&#39;s own bit.">WINDOW_MATH</a></span> — a layer mask bit that targets the <em>colour-math area</em> rather than a BG/OBJ. See the <a href="tutorial_colormath.html">Colormath tutorial</a> for the blending side; this example is the canonical "you need both" demo.</p>
+<h3 class="doxsection"><a class="anchor" id="window--colour-math--exampleswindowswindow-press-y"></a>
+Window + colour math — <span class="tt">examples/windows/window</span> (press Y)</h3>
+<p>The same window can mark <b>where colour math happens</b> instead of what is hidden. With Y, no layer is clipped (<span class="tt">windowSetMainMask(0)</span>); the colour window (<span class="tt"><a class="el" href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177" title="Color math (affects color blending) — the window&#39;s own bit.">WINDOW_MATH</a></span>, a mask bit that targets the colour-math area rather than a BG/OBJ) is the triangle, and colour math subtracts a fixed grey from BG1 and BG2 inside it only (<span class="tt"><a class="el" href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3" title="Enable inside window only.">COLORMATH_INSIDE</a></span>). The triangle is darkened — the way a game draws a shadow or a dialogue box over the scene. See the <a href="tutorial_colormath.html">Colormath tutorial</a> for the colour-math side.</p>
 <h2 class="doxsection"><a class="anchor" id="gotchas-10"></a>
 Gotchas</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-repeat-vs-non-repeat-on-wh0wh1--pick-by-data-shape-not-by-register"></a>
@@ -306,10 +307,9 @@ See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="window_8h.html" title="SNES Window/Masking System.">lib/include/snes/window.h</a></span> — full API reference.</li>
 <li><span class="tt">lib/source/window.c</span> — implementation (mostly register bookkeeping for the four-axis state).</li>
-<li><a href="examples_windows_window.html"><span class="tt">examples/windows/window</span></a> — animated triangle reveal.</li>
-<li><a href="examples_windows_transparent_window.html"><span class="tt">examples/windows/transparent_window</span></a> — window + colour math (the pair example).</li>
+<li><a href="examples_windows_window.html"><span class="tt">examples/windows/window</span></a> — the triangle window as a mask (A, X, B) and as the region of colour math (Y).</li>
 <li><a href="tutorial_hdma.html">HDMA tutorial</a> — required reading for animated window shapes.</li>
-<li><a href="tutorial_colormath.html">Colormath tutorial</a> — the pair tutorial; covers the blending side of <span class="tt">transparent_window</span>.</li>
+<li><a href="tutorial_colormath.html">Colormath tutorial</a> — the pair tutorial; covers the colour-math side of the Y mode.</li>
 <li><a href="tutorial_graphics.html">Graphics tutorial</a> — companion read for the BG-layer fundamentals the window operates on.</li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="both-windows-per-scanline--exampleswindowswindow_multi_hdma"></a>

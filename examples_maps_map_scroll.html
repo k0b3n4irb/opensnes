@@ -122,12 +122,12 @@ $(function(){initNavTree('examples_maps_map_scroll.html','',''); });
   <div class="headertitle"><div class="title">Map Scroll </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A level drawn in the <a href="https://www.mapeditor.org/">Tiled</a> map editor scrolls as a Mario sprite moves left and right. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen; the level, its tile properties and its tileset are converted by the build from settings files beside them.</p>
+<div class="textblock"><p>A level drawn in the <a href="https://www.mapeditor.org/">Tiled</a> map editor scrolls as Kit, the fox-kit courier, walks left and right along a row of rooftops at night. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen; the level, its tile properties and its tileset are converted by the build from settings files beside them.</p>
 <div class="image">
 <img src="map_scroll.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-26"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-19"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to design a level in Tiled and convert it for the SNES (Tiled → opensnes-level → ROM)</li>
@@ -136,17 +136,17 @@ What You'll Learn</h2>
 <li>How camera-follow works: sprite position drives the viewport</li>
 <li>How to combine a scrolling background with an animated sprite</li>
 <li>The two-phase update pattern: <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span> (CPU) → <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> (DMA)</li>
-<li>Sprite screen positioning relative to camera (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>)</li>
+<li>Sprite screen positioning relative to camera (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Kit X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="controls-19"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-17"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">LEFT  </td><td class="markdownTableBodyNone">Move Mario left (sprite flips, map scrolls)  </td></tr>
+<td class="markdownTableBodyNone">LEFT  </td><td class="markdownTableBodyNone">Move Kit left (sprite flips, map scrolls)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">RIGHT  </td><td class="markdownTableBodyNone">Move Mario right  </td></tr>
+<td class="markdownTableBodyNone">RIGHT  </td><td class="markdownTableBodyNone">Move Kit right  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="the-tiled-workflow"></a>
 The Tiled Workflow</h2>
@@ -158,20 +158,21 @@ The Tiled Workflow</h2>
 <div class="line">└──────┬───────┘        └──────────────┘      │ .m16 .t16 .b16│</div>
 <div class="line">       │                                      └──────────────┘</div>
 <div class="line">       └── Your level data, ready for mapLoad()</div>
-</div><!-- fragment --><p><b>Step 1.</b> Design the level in Tiled (8x8 pixel tiles, any width/height up to 16384 tiles in all). Set per-tile properties: <span class="tt">attribute</span> (collision), <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span> (0-7), <span class="tt">priority</span> (0-1).</p>
+</div><!-- fragment --><p><b>Step 1.</b> Design the level in Tiled (8x8 pixel tiles, any width/height up to 16384 tiles in all). Set per-tile properties: <span class="tt">attribute</span> (collision), <span class="tt"><a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></span> (0-7), <span class="tt">priority</span> (0-1).</p>
 <p><b>Step 2.</b> Export it as <span class="tt">.tmj</span> (JSON).</p>
-<p><b>Step 3.</b> The tileset picture is converted by <span class="tt">opensnes-tileset</span>, from its settings file <span class="tt">res/tilesMario.png.toml</span>: </p><div class="fragment"><div class="line">tool = &quot;opensnes-tileset&quot;</div>
+<p><b>Step 3.</b> The tileset picture is converted by <span class="tt">opensnes-tileset</span>, from its settings file <span class="tt">res/roofs.png.toml</span>: </p><div class="fragment"><div class="line">tool = &quot;opensnes-tileset&quot;</div>
 <div class="line"> </div>
 <div class="line">[convert]</div>
-<div class="line">colors = 48</div>
+<div class="line">colors = 16</div>
 <div class="line"># Outputs: .pic (tiles), .pal (palette), .map (tile optimization table), .inc (the C declarations)</div>
-</div><!-- fragment --><p><b>Step 4.</b> The level is converted by <span class="tt">opensnes-level</span>, after the tileset whose <span class="tt">.map</span> its settings file names (<span class="tt">res/tiledMario.tmj.toml</span>): </p><div class="fragment"><div class="line">tool = &quot;opensnes-level&quot;</div>
+</div><!-- fragment --><p><b>Step 4.</b> The level is converted by <span class="tt">opensnes-level</span>, after the tileset whose <span class="tt">.map</span> its settings file names (<span class="tt">res/rooftops.tmj.toml</span>): </p><div class="fragment"><div class="line">tool = &quot;opensnes-level&quot;</div>
 <div class="line"> </div>
 <div class="line">[convert]</div>
-<div class="line">tileset = &quot;tilesMario.map&quot;</div>
-<div class="line"># Outputs: BG1.m16 (tilemap), tiledMario.t16 (tile defs), tiledMario.b16 (attributes),</div>
-<div class="line">#          tiledMario.o16 (entities), tiledMario.inc (the C declarations)</div>
-</div><!-- fragment --><p><b>Step 5.</b> The build links the converted data (<span class="tt">res/tilesMario.inc</span> and <span class="tt">res/tiledMario.inc</span> declare it); <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> takes it — no <span class="tt">data.asm</span>.</p>
+<div class="line">tileset = &quot;roofs.map&quot;</div>
+<div class="line"># Outputs: BG1.m16 (tilemap), rooftops.t16 (tile defs), rooftops.b16 (attributes),</div>
+<div class="line">#          rooftops.o16 (entities), rooftops.inc (the C declarations)</div>
+</div><!-- fragment --><p><b>Step 5.</b> The build links the converted data (<span class="tt">res/roofs.inc</span> and <span class="tt">res/rooftops.inc</span> declare it); <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> takes it — no <span class="tt">data.asm</span>.</p>
+<p>The level here is one long row of rooftops (2304 pixels, 802 distinct tiles) and Kit is a 32x32 sprite of eight walk frames; both are generated for OpenSNES (CC0, <span class="tt">assets/neo-lumen/</span>), and <span class="tt">devtools/art_assets/build.py</span> writes <span class="tt">res/rooftops.tmj</span> and its tile sheet <span class="tt">res/roofs.png</span> from them. Open the <span class="tt">.tmj</span> in Tiled to edit the level: each tile of the sheet carries its <span class="tt">attribute</span> (<span class="tt">FF00</span> for the roof and the walls under it).</p>
 <h3 class="doxsection"><a class="anchor" id="tile-properties"></a>
 Tile Properties</h3>
 <p>Each tile in the Tiled editor can carry custom properties:</p>
@@ -181,12 +182,12 @@ Tile Properties</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">attribute</span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"FF00"</span>)  </td><td class="markdownTableBodyNone">Collision type: <span class="tt"><a class="el" href="map_8h.html#af873aaa17834669d0f263af08c2912c3" title="Solid tile (blocks movement).">T_SOLID</a></span>, <span class="tt"><a class="el" href="map_8h.html#a7b834046275ade27bcb100e684cdbf2a" title="Ladder tile (object can climb).">T_LADDER</a></span>, <span class="tt"><a class="el" href="map_8h.html#a87a89f657f33f4eab646bb7f6ad21fa3" title="Spike tile (object dies).">T_SPIKE</a></span>, etc.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">Palette bank (bits 10-12 of tilemap entry)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">Palette bank (bits 10-12 of tilemap entry)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">priority</span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">BG priority bit (bit 13 of tilemap entry)  </td></tr>
 </table>
 <p>opensnes-level stores them in the <span class="tt">.b16</span> (attributes) and <span class="tt">.t16</span> (palette and priority) files.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-17"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="map-engine-two-phase-update"></a>
 Map Engine Two-Phase Update</h3>
@@ -197,18 +198,18 @@ Map Engine Two-Phase Update</h3>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="camera-relative-sprite-positioning"></a>
 Camera-Relative Sprite Positioning</h3>
-<p>The sprite's position in the map (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a></span>) is not its screen position. The screen position is <span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>, where <span class="tt"><a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span> is the camera's current offset exported by the map engine.</p>
+<p>The sprite's position in the map (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Kit X position in map pixels.">xloc</a></span>) is not its screen position. The screen position is <span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Kit X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>, where <span class="tt"><a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span> is the camera's current offset exported by the map engine.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a> - <a class="code hl_function" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a>(), <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a> - <a class="code hl_function" href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a>(), <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, 0, 3, flags);</div>
 <div class="ttc" id="amap_8h_html_a6611ce4f68f92827cc67361e07c2c63b"><div class="ttname"><a href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a></div><div class="ttdeci">u16 mapGetCameraY(void)</div><div class="ttdoc">Camera Y position in pixels.</div></div>
 <div class="ttc" id="amap_8h_html_a6b6efef7218d3ace881a6c4acce4aafe"><div class="ttname"><a href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a></div><div class="ttdeci">u16 mapGetCameraX(void)</div><div class="ttdoc">Camera X position in pixels.</div></div>
-<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
-<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a4bf69d14b43306f29f9a67bbb2d70ca8"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a></div><div class="ttdeci">u16 xloc</div><div class="ttdoc">Mario X position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:68</div></div>
-<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a65f23786744bb3a1567af452246db6d1"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a></div><div class="ttdeci">u16 yloc</div><div class="ttdoc">Mario Y position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:71</div></div>
+<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
+<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a4bf69d14b43306f29f9a67bbb2d70ca8"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a></div><div class="ttdeci">u16 xloc</div><div class="ttdoc">Kit X position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
+<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a65f23786744bb3a1567af452246db6d1"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a></div><div class="ttdeci">u16 yloc</div><div class="ttdoc">Kit Y position in map pixels (the top of his 32x32 frame).</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="walk-animation"></a>
 Walk Animation</h3>
 <p>The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. Animation advances every other input frame for natural pacing.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-32"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -216,7 +217,7 @@ Modules Used</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">console</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span>, <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>, NMI handler setup  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">OAM buffer for the Mario sprite  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">sprite</span>  </td><td class="markdownTableBodyNone">OAM buffer for Kit, a 32x32 sprite  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone">DMA transfers for tiles, palette, and map column streaming  </td></tr>
 <tr class="markdownTableRowEven">
@@ -226,7 +227,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">map</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span>, <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> — the streaming map engine  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-34"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-21"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/map_scroll</div>

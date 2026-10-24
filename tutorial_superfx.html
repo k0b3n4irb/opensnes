@@ -219,7 +219,7 @@ SLOT 3</span> on the 65816 side.</p>
 <div class="line">    <span class="keywordflow">while</span> (1) { <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>(); }</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="achips_2superfx__3d_2main_8c_html_a2861225d7574bbcdac86c81668b650c3"><div class="ttname"><a href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a></div><div class="ttdeci">const u8 gsu_program[]</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
@@ -231,7 +231,7 @@ SLOT 3</span> on the 65816 side.</p>
 <div class="ttc" id="asuperfx_8h_html_a54c1329e34940920937be4e71bce9d99"><div class="ttname"><a href="superfx_8h.html#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a></div><div class="ttdeci">void gsuSetProgram(const void *program)</div><div class="ttdoc">Tell the library where the GSU program lives.</div></div>
 <div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Set the GSU default configuration; returns gsuIsPresent().</div><div class="ttdef"><b>Definition</b> superfx.h:170</div></div>
 <div class="ttc" id="asuperfx_8h_html_afa2477b5e4a9d17cf5cf4103cc5ca5a8"><div class="ttname"><a href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a></div><div class="ttdeci">void gsuLaunch(void)</div><div class="ttdoc">Launch GSU program and wait for completion (WRAM-safe).</div></div>
-</div><!-- fragment --><p><span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> copies nothing and disables nothing: the CPU waits in a WRAM loop while the GSU owns the cartridge, and interrupts keep working (<a class="el" href="tutorial_superfx_advanced.html" title="Super FX: Running a Game Around the GSU">Super FX: Running a Game Around the GSU</a> explains how). Adjust <span class="tt"><a class="el" href="superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d" title="CFGR register value written by the launchers ($80 = IRQ mask). CFGR_FAST_MUL (bit 5,...">gsu_cfgr</a></span> (IRQ mask, fast multiply) and <span class="tt"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995" title="SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).">gsu_scmr</a></span> (colour depth, bus grants) before the call when your program needs it — <span class="tt">examples/chips/superfx_hello</span> sets both.</p>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> copies nothing and disables nothing: the CPU waits in a WRAM loop while the GSU owns the cartridge, and interrupts keep working (<a class="el" href="tutorial_superfx_advanced.html" title="Super FX: Running a Game Around the GSU">Super FX: Running a Game Around the GSU</a> explains how). Adjust <span class="tt"><a class="el" href="superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d" title="CFGR register value written by the launchers ($80 = IRQ mask). CFGR_FAST_MUL (bit 5,...">gsu_cfgr</a></span> (IRQ mask, fast multiply) and <span class="tt"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995" title="SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).">gsu_scmr</a></span> (colour depth, bus grants) before the call when your program needs it.</p>
 <h2 class="doxsection"><a class="anchor" id="super-fx-assembly-rules"></a>
 Super FX Assembly Rules</h2>
 <p>Four mandatory rules for all GSU programs:</p>
@@ -317,13 +317,9 @@ Example ROMs</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What it demonstrates  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_chips_superfx_hello.html">superfx_hello</a>  </td><td class="markdownTableBodyNone">Boot, registers, SRAM read/write  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="examples_chips_superfx_3d.html">superfx_3d</a>  </td><td class="markdownTableBodyNone">Rotating wireframe cube, Bresenham line drawing, 3D projection  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_chips_superfx_game_skeleton.html">superfx_game_skeleton</a>  </td><td class="markdownTableBodyNone">A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_chips_superfx_save.html">superfx_save</a>  </td><td class="markdownTableBodyNone">A boot counter kept in the battery-backed Game Pak RAM, through the <span class="tt">sram</span> module  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_chips_superfx_game_skeleton.html">superfx_game_skeleton</a>  </td><td class="markdownTableBodyNone">A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="further-reading-1"></a>
 Further Reading</h2>

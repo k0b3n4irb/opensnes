@@ -1,17 +1,17 @@
 var examples_fundamentals =
 [
     [ "Fundamentals: how a glyph is drawn", "examples_fundamentals_text_glyphs.html", [
-      [ "Example ROMs", "examples_fundamentals.html#example-roms-6", null ],
+      [ "Example ROMs", "examples_fundamentals.html#example-roms-7", null ],
       [ "Why this tier exists", "examples_fundamentals.html#why-this-tier-exists", [
-        [ "Controls", "examples_fundamentals_text_glyphs.html#controls-7", null ],
-        [ "What You'll Learn", "examples_fundamentals_text_glyphs.html#what-youll-learn-17", null ],
-        [ "Build &amp; Run", "examples_fundamentals_text_glyphs.html#build--run-23", null ],
+        [ "Controls", "examples_fundamentals_text_glyphs.html#controls-8", null ],
+        [ "What You'll Learn", "examples_fundamentals_text_glyphs.html#what-youll-learn-12", null ],
+        [ "Build &amp; Run", "examples_fundamentals_text_glyphs.html#build--run-13", null ],
         [ "Walkthrough", "examples_fundamentals_text_glyphs.html#walkthrough-1", [
           [ "1. There Is No printf", "examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf", null ],
           [ "2. Drawing Letters in Hex", "examples_fundamentals_text_glyphs.html#autotoc_md2-drawing-letters-in-hex", null ],
           [ "3. Setting Up the PPU", "examples_fundamentals_text_glyphs.html#autotoc_md3-setting-up-the-ppu", null ],
           [ "4. Uploading Tiles to VRAM", "examples_fundamentals_text_glyphs.html#autotoc_md4-uploading-tiles-to-vram", null ],
-          [ "5. Two Colors, Four Bytes", "examples_fundamentals_text_glyphs.html#autotoc_md5-two-colors-four-bytes", null ],
+          [ "5. Three Colors, Six Bytes", "examples_fundamentals_text_glyphs.html#autotoc_md5-three-colors-six-bytes", null ],
           [ "6. Spelling the Message", "examples_fundamentals_text_glyphs.html#autotoc_md6-spelling-the-message", null ],
           [ "7. Lights On", "examples_fundamentals_text_glyphs.html#autotoc_md7-lights-on", null ]
         ] ],
@@ -22,9 +22,9 @@ var examples_fundamentals =
           [ "The Makefile", "examples_fundamentals_text_glyphs.html#the-makefile", null ],
           [ "Why These Modules?", "examples_fundamentals_text_glyphs.html#why-these-modules", null ]
         ] ],
-        [ "Modules Used", "examples_fundamentals_text_glyphs.html#modules-used-34", null ],
+        [ "Modules Used", "examples_fundamentals_text_glyphs.html#modules-used-24", null ],
         [ "Technical Reference", "examples_fundamentals_text_glyphs.html#technical-reference", null ],
-        [ "Files", "examples_fundamentals_text_glyphs.html#files-5", null ]
+        [ "Files", "examples_fundamentals_text_glyphs.html#files-4", null ]
       ] ]
     ] ]
 ];

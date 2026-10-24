@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Color Addition Transparency</title>
+<title>Color Addition Transparency — and Pseudo-Hires</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,48 +119,65 @@ $(function(){initNavTree('examples_color_transparency.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Color Addition Transparency </div></div>
+  <div class="headertitle"><div class="title">Color Addition Transparency — and Pseudo-Hires </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>Additive blending between two background layers: a static landscape with semi-transparent clouds scrolling over it. No input required. </p>
+<p>Two ways to mix two background layers: additive colour math (the mist lightens the street under it), and pseudo-hires (the mist and the street interleaved column by column, a 50 % blend with no colour math). </p>
 </blockquote>
 <p><img src="transparency_demo.gif" alt="" class="inline" title="Demo"/>    </p>
 <div class="image">
 <img src="transparency.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="controls-6"></a>
+    <h2 class="doxsection"><a class="anchor" id="controls-5"></a>
 Controls</h2>
-<p>No interactive controls. The clouds scroll automatically.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-16"></a>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Switch between colour addition and pseudo-hires  </td></tr>
+</table>
+<p>The mist drifts by itself.</p>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-10"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES color math unit blends layers using CGWSEL and CGADSUB registers</li>
 <li>The difference between main screen and sub screen layer assignment</li>
 <li>How Mode 1 with BG3 priority high creates an overlay layer</li>
 <li>Mixing 4bpp (BG1) and 2bpp (BG3) tile formats in the same mode</li>
-<li>Using an assembly DMA loader for SUPERFREE graphics data with correct bank bytes</li>
+<li>How pseudo-hires (SETINI bit 3) blends the main and sub screens without colour math</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-22"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-11"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/color/transparency</div>
-</div><!-- fragment --><p>Then open <span class="tt">transparency.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-23"></a>
+</div><!-- fragment --><p>Then open <span class="tt">transparency.sfc</span> in luna (<span class="tt">luna-gui transparency.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-10"></a>
 SNES Concepts</h2>
+<h3 class="doxsection"><a class="anchor" id="pseudo-hires-the-other-blend-a"></a>
+Pseudo-Hires: the Other Blend (A)</h3>
+<div class="image">
+<img src="transparency_pseudo_hires.png" alt=""/>
+<div class="caption">
+Pseudo-hires</div></div>
+    <div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(0);      <span class="comment">/* no layer in colour math */</span></div>
+<div class="line"><a class="code hl_function" href="video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73">videoSetPseudoHires</a>(1);     <span class="comment">/* SETINI ($2133) bit 3 */</span></div>
+<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div></div>
+<div class="ttc" id="avideo_8h_html_abe59765794ebd50fc54c7d2d6a9c4d73"><div class="ttname"><a href="video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73">videoSetPseudoHires</a></div><div class="ttdeci">void videoSetPseudoHires(u8 on)</div><div class="ttdoc">Enable/disable pseudo-hires (SETINI bit 3).</div></div>
+</div><!-- fragment --><p>With SETINI bit 3 set, the PPU outputs 512 pixels per line: the sub screen on the even columns, the main screen on the odd ones (snesdev-wiki, <em>PPU registers</em> and <em>Uncommon graphics mode games</em>; anomie's register doc; the wiki's <em>Backgrounds</em> page has the inverse, a known error). A CRT on composite blends each pair, and so does an emulator's 256-pixel view: the mist sits half over the street. The colour math is off here — the sub screen reaches the output only through the interleave — so this blend leaves the colour math free for something else; the price is horizontal detail, and on a sharp RGB display the columns show as stripes rather than a blend. The lib keeps a shadow of the write-only register.</p>
 <h3 class="doxsection"><a class="anchor" id="color-math-main-screen--sub-screen"></a>
 Color Math: Main Screen + Sub Screen</h3>
 <p>The SNES PPU can blend two images together using its color math unit. The "main screen" is the final displayed image. The "sub screen" is a second, hidden rendering of selected layers whose pixel colors are used as the blend source.</p>
 <p>In this example:</p><ul>
-<li><b>Main screen</b>: BG1 (landscape) + BG3 (clouds) &ndash; both visible</li>
-<li><b>Sub screen</b>: BG3 (clouds) &ndash; provides the color values for blending</li>
+<li><b>Main screen</b>: BG1 (street) + BG3 (mist) &ndash; both visible</li>
+<li><b>Sub screen</b>: BG3 (mist) &ndash; provides the color values for blending</li>
 </ul>
-<p>The color math unit takes each main screen pixel and <b>adds</b> the corresponding sub screen pixel color to it. Where clouds overlap the landscape, the cloud colors brighten the landscape beneath them. Where there are no cloud pixels, no addition occurs.</p>
+<p>The color math unit takes each main screen pixel and <b>adds</b> the corresponding sub screen pixel color to it. Where the mist overlaps the street, its colour brightens the street beneath it. Where there are no mist pixels, no addition occurs.</p>
 <h3 class="doxsection"><a class="anchor" id="mode-1-with-bg3-priority-high"></a>
 Mode 1 with BG3 Priority High</h3>
-<p>Mode 1 normally draws BG3 (2bpp) behind BG1 (4bpp). Setting <span class="tt"><a class="el" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></span> promotes BG3's high-priority tiles above all other BG layers, which is essential for the cloud overlay to render on top of the landscape.</p>
+<p>Mode 1 normally draws BG3 (2bpp) behind BG1 (4bpp). Setting <span class="tt"><a class="el" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></span> promotes BG3's high-priority tiles above all other BG layers, which is essential for the mist overlay to render on top of the street.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, <a class="code hl_define" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a>);</div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
 <div class="ttc" id="agroup__bg__priority_html_gaae7e8057f1919684b5f32fd7b7b3f24f"><div class="ttname"><a href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></div><div class="ttdeci">#define BG3_MODE1_PRIORITY_HIGH</div><div class="ttdef"><b>Definition</b> video.h:48</div></div>
@@ -176,13 +193,12 @@ Color Math Configuration</h3>
 <div class="ttc" id="acolormath_8h_html_a68e6232f50f8471623e03b1351662cf4"><div class="ttname"><a href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4">COLORMATH_BACKDROP</a></div><div class="ttdeci">#define COLORMATH_BACKDROP</div><div class="ttdoc">Apply color math to backdrop (color 0) — color math&#39;s own bit.</div><div class="ttdef"><b>Definition</b> colormath.h:71</div></div>
 <div class="ttc" id="acolormath_8h_html_ac014d3ff6d4d18a0b5e597560636d38f"><div class="ttname"><a href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a></div><div class="ttdeci">void colorMathSetOp(u8 op)</div><div class="ttdoc">Set color math operation (add or subtract).</div></div>
 <div class="ttc" id="acolormath_8h_html_aeb012e74893e9b0761ee5dd2f18bd1ef"><div class="ttname"><a href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a></div><div class="ttdeci">void colorMathInit(void)</div><div class="ttdoc">Initialize color math to defaults.</div></div>
-<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div></div>
 <div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
 <div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
-</div><!-- fragment --><p>The <span class="tt"><a class="el" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4" title="Apply color math to backdrop (color 0) — color math&#39;s own bit.">COLORMATH_BACKDROP</a></span> flag ensures clouds also blend over empty areas (CGRAM entry 0).</p>
+</div><!-- fragment --><p>The <span class="tt"><a class="el" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4" title="Apply color math to backdrop (color 0) — color math&#39;s own bit.">COLORMATH_BACKDROP</a></span> flag ensures the mist also blends over empty areas (CGRAM entry 0).</p>
 <h3 class="doxsection"><a class="anchor" id="loading-the-graphics"></a>
 Loading the graphics</h3>
-<p>The tiles, tilemaps and palettes come out of the two settings files beside the pictures (<span class="tt">res/backgrounds.bmp.toml</span>, <span class="tt">res/clouds.bmp.toml</span>): the build converts them with <span class="tt">opensnes-tileset</span> and links the result in the asset banks, and the generated <span class="tt">res/*.inc</span> declare the symbols with their bank carried in the far pointer, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> read them from any bank. All graphics are loaded during forced blank (screen off) since the total data exceeds the ~4KB VBlank DMA budget.</p>
+<p>The tiles, tilemaps and palettes come out of the two settings files beside the pictures (<span class="tt">res/street.png.toml</span>, <span class="tt">res/mist.png.toml</span>): the build converts them with <span class="tt">opensnes-tileset</span> and links the result in the asset banks, and the generated <span class="tt">res/*.inc</span> declare the symbols with their bank carried in the far pointer, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> read them from any bank. All graphics are loaded during forced blank (screen off) since the total data exceeds the ~4KB VBlank DMA budget.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="walkthrough"></a>
 Walkthrough</h2>
@@ -192,14 +208,14 @@ Setup</h3>
 <li><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span> initializes the PPU and NMI handler</li>
 <li>Force blank (<span class="tt"><a class="el" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388" title="Display control (W).">REG_INIDISP</a> = 0x80</span>) allows unlimited VRAM write time</li>
 <li><span class="tt">loadGraphics()</span> DMAs all tile/tilemap/palette data to VRAM and CGRAM</li>
-<li>BG1 tilemap at VRAM <span class="tt">$2000</span>, tiles at <span class="tt">$0000</span> (4bpp landscape)</li>
-<li>BG3 tilemap at VRAM <span class="tt">$2400</span>, tiles at <span class="tt">$1000</span> (2bpp clouds)</li>
+<li>BG1 tilemap at VRAM <span class="tt">$5000</span>, tiles at <span class="tt">$0000</span> (4bpp street: 883 tiles, up to <span class="tt">$372F</span>)</li>
+<li>BG3 tilemap at VRAM <span class="tt">$5400</span>, tiles at <span class="tt">$4000</span> (2bpp mist)</li>
 <li>Main screen, sub screen, and color math are configured</li>
 <li>Screen is turned on</li>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="main-loop"></a>
 Main Loop</h3>
-<p>Each frame, BG3's horizontal scroll is incremented by one pixel. The tilemap wraps naturally, creating seamless looping clouds:</p>
+<p>Each frame, BG3's horizontal scroll is incremented by one pixel. The tilemap wraps naturally, and the mist is drawn to wrap at 256 pixels (every wave of its noise has a whole number of periods across the width), so it loops without a seam:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>++;</div>
 <div class="line">    <a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(2, <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>, 0);  <span class="comment">/* bg index 2 = BG3 (0-indexed) */</span></div>
@@ -207,13 +223,13 @@ Main Loop</h3>
 <div class="line">}</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="ascrolling_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 tile data – repeating shader pattern (4bpp, tiles at VRAM $4000).</div><div class="ttdef"><b>Definition</b> main.c:46</div></div>
+<div class="ttc" id="ascrolling_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 tile data – the rain, a repeating picture (4bpp, tiles at VRAM $4000).</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> defers the actual PPU register write to the NMI handler via a dirty-flag mechanism, ensuring scroll updates happen safely during VBlank.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-33"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-20"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
-<h2 class="doxsection"><a class="anchor" id="files-4"></a>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
+<h2 class="doxsection"><a class="anchor" id="files-3"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -221,15 +237,15 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">PPU setup, color math configuration, scroll loop  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/*.bmp.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the landscape (<span class="tt">opensnes-tileset</span>, palette rearranged into banks, bank 1) and the clouds (2bpp); the build converts and links them  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the street (<span class="tt">opensnes-tileset</span>, 16 colours, palette 1) and the mist (2bpp); the build converts and links them  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build config (no conversion rule: the settings files drive it)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/backgrounds.bmp</span>  </td><td class="markdownTableBodyNone">4bpp landscape source image  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/street.png</span>  </td><td class="markdownTableBodyNone">the rainy street at night, 16 colours; generated for OpenSNES, CC0 (<span class="tt">assets/neo-lumen/</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/clouds.bmp</span>  </td><td class="markdownTableBodyNone">2bpp cloud overlay source image  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/mist.png</span>  </td><td class="markdownTableBodyNone">the mist, 2 colours: procedural wisps, CC0 (<span class="tt">assets/neo-lumen/</span>)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="whats-next-5"></a>
+<h2 class="doxsection"><a class="anchor" id="whats-next-4"></a>
 What's Next?</h2>
 <p><b>Window Masking:</b> <a href="../window/">Window Example</a> - Triangle-shaped HDMA window</p>
 <p><b>HDMA Gradient:</b> <a href="../gradient_colors/">Gradient Colors</a> - Per-scanline color effects </p>

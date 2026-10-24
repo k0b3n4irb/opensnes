@@ -14,7 +14,7 @@ var searchData=
   ['7_20registers_20share_20one_20write_20twice_20latch_11',['🟡 BG1 scroll and the Mode 7 registers share one write-twice latch',['../tutorial_mode7.html#autotoc_md-bg1-scroll-and-the-mode-7-registers-share-one-write-twice-latch',1,'']]],
   ['7_20rotating_20perspective_20—_20the_20full_20matrix_20per_20scanline_12',['Mode 7 rotating perspective — the full matrix, per scanline',['../examples_mode7_perspective_rotate.html',1,'examples_mode7']]],
   ['7_20rotation_20and_20scaling_13',['Mode 7 -- Rotation and Scaling',['../examples_mode7_rotate_scale.html',1,'examples_mode7']]],
-  ['7_20the_20main_20loop_14',['7. The Main Loop',['../examples_games_likemario.html#autotoc_md7-the-main-loop',1,'']]],
+  ['7_20tile_20based_20collision_14',['7. Tile-Based Collision',['../examples_games_rooftop_run.html#autotoc_md7-tile-based-collision',1,'']]],
   ['7_20tutorial_15',['Mode 7 Tutorial',['../tutorial_mode7.html',1,'documentation']]],
   ['7_20unusual_16',['🟠 Mosaic + Mode 7 = unusual',['../tutorial_mosaic.html#autotoc_md-mosaic--mode-7--unusual',1,'']]],
   ['7_20vram_20format_17',['1. Mode 7 VRAM format',['../examples_mode7_rotate_scale.html#autotoc_md1-mode-7-vram-format',1,'']]],

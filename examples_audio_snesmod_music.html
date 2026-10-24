@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>SNESMOD Music Example</title>
+<title>SNESMOD Music and Sound Effects</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,37 +119,31 @@ $(function(){initNavTree('examples_audio_snesmod_music.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">SNESMOD Music Example </div></div>
+  <div class="headertitle"><div class="title">SNESMOD Music and Sound Effects </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Full music playback using SNESMOD, a tracker-based audio engine for the SNES.</p>
+<div class="textblock"><p>Tracker music with transport controls, and sound effects fired over it, with SNESMOD, the tracker engine that runs on the SNES's sound processor.</p>
 <h2 class="doxsection"><a class="anchor" id="learning-objectives"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
-<li>How SNESMOD works (module-based music)</li>
-<li>Loading soundbanks and modules</li>
-<li>Music playback controls (play, stop, pause, fade)</li>
-<li>Volume control</li>
-<li>How the build turns an <span class="tt">.it</span> file into a soundbank (<span class="tt">opensnes-music</span>)</li>
+<li>How SNESMOD works (module-based music on the SPC700)</li>
+<li>Loading a soundbank, a module, and sound effects</li>
+<li>Music playback controls (play, stop, pause, volume, fade)</li>
+<li>Playing an effect over the music, with volume, pan and pitch</li>
+<li>How the module, its echo and the effects share the SPC700's 64 KB</li>
+<li>How the build turns <span class="tt">.it</span> files into a soundbank (<span class="tt">opensnes-music</span>)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="prerequisites"></a>
-Prerequisites</h2>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-2"></a>
+SNES Concepts</h2>
 <ul>
-<li>Basic understanding of SNES audio concepts</li>
-<li>Understanding of BG text rendering</li>
-<li>Basic tracker music concepts (optional)</li>
+<li>The SPC700 is a separate processor with its own 64 KB of RAM; the CPU only sends it commands through four ports</li>
+<li><span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> every frame sends the queued commands</li>
+<li>A sound effect is a sample uploaded into the SPC700's RAM after the module, played on a voice of its own</li>
+<li>The echo buffer takes the top of that RAM: what is left between the module and the echo is all the effects get</li>
 </ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="what-this-example-does"></a>
-What This Example Does</h2>
-<ul>
-<li>Displays a menu showing controls</li>
-<li>Plays an Impulse Tracker module on startup</li>
-<li>Full playback controls via joypad</li>
-<li>Volume adjustment with L/R triggers</li>
-<li>Fade out effect</li>
-</ul>
-<p><b>Controls:</b> </p><table class="markdownTable">
+<h2 class="doxsection"><a class="anchor" id="controls-1"></a>
+Controls</h2>
+<table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
@@ -162,75 +156,44 @@ What This Example Does</h2>
 <td class="markdownTableBodyNone">L/R  </td><td class="markdownTableBodyNone">Volume down/up  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">START  </td><td class="markdownTableBodyNone">Fade out  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">LEFT/RIGHT  </td><td class="markdownTableBodyNone">Choose the effect (jump, powerup, laser, confirm)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">UP/DOWN  </td><td class="markdownTableBodyNone">Its pitch (low, normal, high)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Y  </td><td class="markdownTableBodyNone">Play the effect over the music  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="code-type"></a>
-Code Type</h2>
-<p><b>Mixed C + Library + SNESMOD</b></p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Component  </th><th class="markdownTableHeadNone">Type  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Hardware init  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span>)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Video mode  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="video_8h.html#ad89d023577743a32d3407027e535b0ff" title="Set background mode.">setMode()</a></span>)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Screen enable  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span>)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">VBlank sync  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Audio  </td><td class="markdownTableBodyNone">SNESMOD library  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Font tiles  </td><td class="markdownTableBodyNone">text module (<span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont</a></span>)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Text rendering  </td><td class="markdownTableBodyNone">text module (<span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>, <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush</a></span>)  </td></tr>
-</table>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="snesmod-overview"></a>
-SNESMOD Overview</h2>
-<p>SNESMOD is a tracker-based music playback system:</p>
-<div class="fragment"><div class="line">Impulse Tracker file (.it)</div>
-<div class="line">         |</div>
-<div class="line">         v</div>
+<h2 class="doxsection"><a class="anchor" id="snesmod-workflow"></a>
+SNESMOD Workflow</h2>
+<div class="fragment"><div class="line">Impulse Tracker files (.it)          music/nocturne.it  sfx/neo_lumen_sfx.it</div>
+<div class="line">         |                                     \             /</div>
+<div class="line">         v                                      SOUNDBANK_SRC</div>
 <div class="line">    [opensnes-music bank]</div>
 <div class="line">         |</div>
 <div class="line">         v</div>
-<div class="line">soundbank.asm + soundbank.h</div>
+<div class="line">soundbank.asm + soundbank.h  -&gt;  linked into the ROM</div>
 <div class="line">         |</div>
 <div class="line">         v</div>
-<div class="line">   Linked into ROM</div>
-<div class="line">         |</div>
-<div class="line">         v</div>
-<div class="line">    [SNESMOD driver]</div>
-<div class="line">         |</div>
-<div class="line">         v</div>
-<div class="line">    SPC700 playback</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="key-features"></a>
-Key Features</h3>
-<ul>
-<li>8 simultaneous channels</li>
-<li>Impulse Tracker module support</li>
-<li>Automatic BRR sample compression</li>
-<li>Volume control and fading</li>
-<li>Echo/reverb effects</li>
-<li>~5.5KB driver footprint</li>
-</ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="snesmod-api"></a>
-SNESMOD API</h2>
+<div class="line">    [SNESMOD driver on the SPC700]</div>
+</div><!-- fragment --><p>The soundbank holds two modules. <span class="tt">nocturne</span> is the music. <span class="tt">neo_lumen_sfx</span> has no song: it is a list of four instruments, and every sample of a soundbank can be loaded as an effect. <span class="tt">soundbank.h</span> names each one after its sample (<span class="tt">SFX_JUMP</span>, <span class="tt">SFX_LASER</span>…).</p>
 <h3 class="doxsection"><a class="anchor" id="initialization-1"></a>
 Initialization</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();                    <span class="comment">/* Initialize SPC driver */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a>(SOUNDBANK_BANK);  <span class="comment">/* Set soundbank bank */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a>(MOD_POLLEN8);   <span class="comment">/* Load module by ID */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);                   <span class="comment">/* Start from position 0 */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();                        <span class="comment">/* upload the driver to the SPC700 */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a>(SOUNDBANK_BANK);</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a>(MOD_NOCTURNE);      <span class="comment">/* resets the SPC RAM: load effects AFTER it */</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> jump = <a class="code hl_function" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a>(SFX_JUMP);   <span class="comment">/* keep the slot it returns */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);</div>
 <div class="ttc" id="agroup__snesmod__init_html_ga4ee30188309d91d30e4d147b6292cae3"><div class="ttname"><a href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a></div><div class="ttdeci">void snesmodSetSoundbank(u8 bank)</div><div class="ttdoc">Set the soundbank bank number.</div></div>
 <div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_ga8299a9a929e131b1c7c145fae1a1e2f1"><div class="ttname"><a href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a></div><div class="ttdeci">void snesmodPlay(u8 startPosition)</div><div class="ttdoc">Start module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gae805748fae02839bafc3b2c2e3a82358"><div class="ttname"><a href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a></div><div class="ttdeci">void snesmodLoadModule(u16 moduleId)</div><div class="ttdoc">Load a module from the soundbank.</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asnesmod_8h_html"><div class="ttname"><a href="snesmod_8h.html">snesmod.h</a></div><div class="ttdoc">SNESMOD - Tracker-based Audio Engine.</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="main-loop-critical"></a>
 Main Loop (CRITICAL!)</h3>
@@ -241,71 +204,51 @@ Main Loop (CRITICAL!)</h3>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
-</div><!-- fragment --><p><b>Warning:</b> <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is what sends the commands (play, stop, volume, sound effects) to the SPC700. Without it they wait in a queue of 85 and the newest are dropped once it is full; the music already playing goes on.</p>
-<h3 class="doxsection"><a class="anchor" id="playback-control"></a>
-Playback Control</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);      <span class="comment">/* Play from start */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038">snesmodStop</a>();       <span class="comment">/* Stop playback */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d">snesmodPause</a>();      <span class="comment">/* Pause */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a>();     <span class="comment">/* Resume from pause */</span></div>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is what sends the commands (play, stop, volume, sound effects) to the SPC700. Without it they wait in a queue of 85 and the newest are dropped once it is full; the music already playing goes on.</p>
+<h3 class="doxsection"><a class="anchor" id="playback-and-effects"></a>
+Playback and Effects</h3>
+<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);                  <span class="comment">/* play from the start */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038">snesmodStop</a>();</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d">snesmodPause</a>();  <a class="code hl_function" href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a>();</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(255);     <span class="comment">/* 0-255, 255 at load */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a>(0, 4);         <span class="comment">/* target volume, speed */</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(jump, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a>);   <span class="comment">/* slot, volume, pan, pitch */</span></div>
 <div class="ttc" id="agroup__snesmod__module_html_ga1201b579aa2b8fbb3c62abe17c230038"><div class="ttname"><a href="group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038">snesmodStop</a></div><div class="ttdeci">void snesmodStop(void)</div><div class="ttdoc">Stop module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gab75a9b81acb805e7cfe875b6e093425d"><div class="ttname"><a href="group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d">snesmodPause</a></div><div class="ttdeci">void snesmodPause(void)</div><div class="ttdoc">Pause module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gaf35e6e51f4a13c2183365eb814605bd2"><div class="ttname"><a href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a></div><div class="ttdeci">void snesmodResume(void)</div><div class="ttdoc">Resume module playback.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="volume-control-1"></a>
-Volume Control</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(255);    <span class="comment">/* 0-255, 255 at load */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a>(0, 4);        <span class="comment">/* Target volume, speed */</span></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:340</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga256f12e62b2fae20a93a5ab05a53db5f"><div class="ttname"><a href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a></div><div class="ttdeci">void snesmodSetModuleVolume(u8 volume)</div><div class="ttdoc">Set module volume.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga9681d3b7715b34884cd81e2caf51d477"><div class="ttname"><a href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a></div><div class="ttdeci">void snesmodFadeVolume(u8 targetVolume, u8 speed)</div><div class="ttdoc">Fade module volume.</div></div>
 </div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="creating-music"></a>
-Creating Music</h2>
-<h3 class="doxsection"><a class="anchor" id="using-openmpt-recommended"></a>
-Using OpenMPT (Recommended)</h3>
-<ol type="1">
-<li>Download <a href="https://openmpt.org/">OpenMPT</a> (free for Windows/Wine)</li>
-<li>Create new Impulse Tracker (.it) module</li>
-<li>Follow SNES constraints:<ul>
-<li>Maximum 8 channels</li>
-<li>32kHz sample rate</li>
-<li>Total samples under 58KB</li>
-</ul>
-</li>
-<li>Export as <span class="tt">.it</span> file</li>
-<li>Place in <span class="tt">music/</span> directory</li>
-</ol>
-<h3 class="doxsection"><a class="anchor" id="build-process"></a>
-Build Process</h3>
-<p>When the Makefile sets <span class="tt">SOUNDBANK_SRC</span> (with <span class="tt">USE_SNESMOD := 1</span>), the build:</p><ol type="1">
-<li>Runs <span class="tt">opensnes-music bank</span> on your <span class="tt">.it</span> file(s)</li>
-<li>Writes <span class="tt">soundbank.bnk</span>, <span class="tt">soundbank.asm</span> and <span class="tt">soundbank.h</span></li>
-<li>Links the soundbank into the ROM</li>
-</ol>
-<div class="fragment"><div class="line">SOUNDBANK_SRC := music/mymusic.it</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="generated-files"></a>
-Generated Files</h2>
-<p>After a build:</p>
-<p><b>soundbank.h</b> (excerpt): </p><div class="fragment"><div class="line"><span class="preprocessor">#define MOD_POLLEN8                         0</span></div>
-<div class="line"><span class="preprocessor">#define MOD_POLLEN8_SIZE                    44137</span></div>
-<div class="line"><span class="preprocessor">#define SFX_SAW1                            0</span></div>
-<div class="line">...</div>
-<div class="line">#define SOUNDBANK_BANK 1</div>
-</div><!-- fragment --><p><b>soundbank.asm:</b> the bank is given to the soundbank alone, at its start: </p><div class="fragment"><div class="line">.BANK 1</div>
-<div class="line">.ORG 0</div>
-<div class="line">.SECTION &quot;SOUNDBANK&quot; FORCE ; need dedicated bank(s)</div>
-<div class="line"> </div>
-<div class="line">soundbank:</div>
-<div class="line">.incbin &quot;./soundbank.bnk&quot;</div>
-<div class="line">.ENDS</div>
-</div><!-- fragment --><hr  />
+<h2 class="doxsection"><a class="anchor" id="room-for-the-effects"></a>
+Room for the Effects</h2>
+<p>Effects are copied into the SPC700's RAM right after the module, and the echo buffer sits at the top. <span class="tt">opensnes-music inspect</span> says how much is left:</p>
+<div class="fragment"><div class="line">$ opensnes-music inspect music/nocturne.it</div>
+<div class="line">music/nocturne.it: &quot;Daveo Nocturne&quot;, ... -&gt; 18376 bytes of SPC RAM (30008 free of 48384), 8 BRR sources</div>
+</div><!-- fragment --><p>The nocturne's echo (a delay of 5, 10 KB of buffer) leaves 30 008 bytes. The four effects take 18 460 of them:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Effect  </th><th class="markdownTableHeadNone">Bytes of BRR  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">jump  </td><td class="markdownTableBodyNone">4 150  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">powerup (cut to 0.8 s)  </td><td class="markdownTableBodyNone">7 200  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">laser (cut to 0.5 s)  </td><td class="markdownTableBodyNone">4 500  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">confirm  </td><td class="markdownTableBodyNone">2 610  </td></tr>
+</table>
+<p><b>The driver does not check.</b> An effect loaded past the room is copied over the echo buffer: the echo overwrites the effect and plays its bytes back as noise, with no error anywhere. Count the bytes, or ask <span class="tt">inspect</span>, before adding an effect to a game with echo — a longer echo delay takes 2 KB a step.</p>
+<hr  />
 <h2 class="doxsection"><a class="anchor" id="build--run"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_music</div>
 </div><!-- fragment --><p>Then run <span class="tt">music.sfc</span> in luna (<span class="tt">opensnes run</span>) or any SNES emulator.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-5"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-2"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">text</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files"></a>
@@ -314,17 +257,15 @@ Files</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">UI and SNESMOD API calls  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">UI, transport, effect selection, SNESMOD calls  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build config with SNESMOD rules  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build config with SNESMOD rules (<span class="tt">SOUNDBANK_SRC</span> lists both modules)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">music/pollen8.it</span>  </td><td class="markdownTableBodyNone">Sample Impulse Tracker module  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">music/nocturne.it</span>  </td><td class="markdownTableBodyNone">The music: "Daveo Nocturne"  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">soundbank.h</span>  </td><td class="markdownTableBodyNone">Generated: module IDs, bank number  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">sfx/neo_lumen_sfx.it</span>  </td><td class="markdownTableBodyNone">The effects: four samples  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">soundbank.asm</span>  </td><td class="markdownTableBodyNone">Generated: soundbank data  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">soundbank.bnk</span>  </td><td class="markdownTableBodyNone">Generated: compiled soundbank  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">soundbank.h</span>, <span class="tt">soundbank.asm</span>, <span class="tt">soundbank.bnk</span>  </td><td class="markdownTableBodyNone">Generated by the build  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="memory-layout-1"></a>
@@ -334,23 +275,21 @@ ROM</h3>
 <div class="fragment"><div class="line">Bank 0:    Code</div>
 <div class="line">Bank 1:    Soundbank data (its own bank, at its start; more banks if it is larger)</div>
 <div class="line">Others:    Tiles, tilemaps and other const data (the asset banks)</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="spc-ram"></a>
-SPC RAM</h3>
-<div class="fragment"><div class="line">$0000-$00FF: Driver variables</div>
-<div class="line">$0200-$CFFF: Module data, samples</div>
-<div class="line">$D000-$FFFF: Echo buffer (if enabled)</div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="spc-ram-as-this-example-leaves-it"></a>
+SPC RAM, as this example leaves it</h3>
+<div class="fragment"><div class="line">$0400-$19FF: the SNESMOD driver</div>
+<div class="line">$1A00-$61C7: the nocturne: module data and its 8 instruments</div>
+<div class="line">$61C8-$A9E3: the four effects (jump, powerup, laser, confirm)</div>
+<div class="line">$A9E4-$D6FF: free (11 548 bytes)</div>
+<div class="line">$D700-$FEFF: the echo buffer</div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="exercises"></a>
 Exercises</h2>
-<h3 class="doxsection"><a class="anchor" id="exercise-1-add-sound-effects"></a>
-Exercise 1: Add Sound Effects</h3>
-<p>Use <span class="tt"><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a></span> to trigger sounds on button presses.</p>
-<h3 class="doxsection"><a class="anchor" id="exercise-2-multiple-modules"></a>
-Exercise 2: Multiple Modules</h3>
-<p>Add a second <span class="tt">.it</span> file and switch between them with SELECT button.</p>
-<h3 class="doxsection"><a class="anchor" id="exercise-3-echo-effects"></a>
-Exercise 3: Echo Effects</h3>
-<p>Enable echo in your tracker module and hear the reverb.</p>
+<ol type="1">
+<li><b>A longer echo</b>: give the nocturne <span class="tt">edl 10</span> in its song message (<span class="tt">devtools/audio_assets/songs.py</span>), check <span class="tt">inspect</span> again, and see which effects still fit.</li>
+<li><b>Pan</b>: play the effect left or right of the player (<span class="tt">pan</span> 0 or 255).</li>
+<li><b>A second song</b>: add a third <span class="tt">.it</span> file and switch with SELECT.</li>
+</ol>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="common-issues"></a>
 Common Issues</h2>
@@ -359,60 +298,31 @@ No audio output</h3>
 <ul>
 <li>Check <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is called every frame</li>
 <li>Verify <span class="tt"><a class="el" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c" title="Initialize SNESMOD audio engine.">snesmodInit()</a></span> before <span class="tt"><a class="el" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1" title="Start module playback.">snesmodPlay()</a></span></li>
-<li>Check emulator audio is enabled</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="music-sounds-wrong"></a>
-Music sounds wrong</h3>
+<h3 class="doxsection"><a class="anchor" id="an-effect-sounds-wrong-or-the-echo-crackles"></a>
+An effect sounds wrong, or the echo crackles</h3>
 <ul>
-<li>Verify module exports correctly from OpenMPT</li>
-<li>Check channel count (8 max)</li>
-<li>Verify sample rate (32kHz max)</li>
+<li>The effect probably does not fit: see "Room for the Effects"</li>
+<li>Effects loaded before <span class="tt"><a class="el" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358" title="Load a module from the soundbank.">snesmodLoadModule()</a></span> are lost: load them after</li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="build-fails-converting-the-module"></a>
 Build fails converting the module</h3>
 <ul>
-<li>Check <span class="tt">.it</span> file is valid Impulse Tracker format</li>
 <li><span class="tt">opensnes-music inspect music/song.it</span> says what the converter reads in it</li>
-</ul>
-<h3 class="doxsection"><a class="anchor" id="a-press-does-nothing-or-late"></a>
-A press does nothing, or late</h3>
-<ul>
-<li>Ensure <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is called EVERY frame</li>
-<li>Check for infinite loops blocking the main loop</li>
-</ul>
-<hr  />
-<h2 class="doxsection"><a class="anchor" id="technical-notes"></a>
-Technical Notes</h2>
-<h3 class="doxsection"><a class="anchor" id="why-tracker-based-music"></a>
-Why Tracker-Based Music?</h3>
-<p>Tracker modules are efficient for the SNES:</p><ul>
-<li>Compact pattern data (repeatable)</li>
-<li>Samples shared across patterns</li>
-<li>Volume, panning, effects per-channel</li>
-<li>No streaming required</li>
-</ul>
-<h3 class="doxsection"><a class="anchor" id="converting-by-hand"></a>
-Converting by hand</h3>
-<div class="fragment"><div class="line">opensnes-music bank -o . --name soundbank music/song.it</div>
-</div><!-- fragment --><ul>
-<li><span class="tt">--name</span>: base name of the files written</li>
-<li><span class="tt">-o</span>: output directory</li>
-<li><span class="tt">opensnes-music --help</span> lists the rest</li>
 </ul>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="whats-next-1"></a>
 What's Next?</h2>
-<p><b>Sound Effects:</b> <a href="examples_audio_snesmod_sfx.html">SNESMOD SFX</a> - Sound effect playback with pitch control</p>
+<p><b>Sound from a WAV:</b> <a href="examples_audio_sfx_from_wav.html">sfx_from_wav</a> - effects without SNESMOD</p>
 <p><b>Graphics:</b> <a href="examples_sprites_simple_sprite.html">Simple Sprite</a> - Display a sprite on screen</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="credits"></a>
 Credits</h2>
-<p>SNESMOD driver by Mukunda Johnson.</p>
-<p>Sample music "pollen8" - Public domain.</p>
-<hr  />
+<p>SNESMOD driver by Mukunda Johnson. The program began as PVSnesLib's "music" and "effects" examples by alekmaul.</p>
+<p>"Daveo Nocturne" and its instruments are composed and synthesized for OpenSNES (<span class="tt">devtools/audio_assets/</span>, CC0). The four effects are Kenney's "Digital Audio" and "Interface Sounds" (kenney.nl, CC0).</p>
 <h2 class="doxsection"><a class="anchor" id="license-1"></a>
 License</h2>
-<p>Code: MIT SNESMOD: See snesmod.org license </p>
+<p>Code: MIT. The music and the effects: CC0. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

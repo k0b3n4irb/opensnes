@@ -123,44 +123,313 @@ $(function(){initNavTree('input_2controller_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Single controller input display.  
+<p>Both controllers on a terminal's test screen: buttons lit, the edges, a frame counter.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="gameloop_8h_source.html">snes/gameloop.h</a>&gt;</code><br />
+<code>#include &quot;res/screen.inc&quot;</code><br />
+<code>#include &quot;res/cast.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:Lamp" id="r_Lamp"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structLamp.html">Lamp</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A lamp: the button it shows, its place on a pad's drawing, its tile.  <a href="structLamp.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:af31124019367814bc62bbaa63625ff29" id="r_af31124019367814bc62bbaa63625ff29"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af31124019367814bc62bbaa63625ff29">LAMPS</a>&#160;&#160;&#160;14</td></tr>
+<tr class="memdesc:af31124019367814bc62bbaa63625ff29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of lamps on a pad: one per button, two per shoulder.  <br /></td></tr>
+<tr class="memitem:a5fb02b736c0c917dc78a96516bf2aac2" id="r_a5fb02b736c0c917dc78a96516bf2aac2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5fb02b736c0c917dc78a96516bf2aac2">PAD_Y</a>&#160;&#160;&#160;32</td></tr>
+<tr class="memdesc:a5fb02b736c0c917dc78a96516bf2aac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Both pads' top edge (the shoulders).  <br /></td></tr>
+<tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">VRAM (word addresses): textModeInit() keeps $0000-$0FFF (font) and $3800 (its map)</div></td></tr>
+<tr class="memitem:a69f9f237baac2ee247f14425602af76e" id="r_a69f9f237baac2ee247f14425602af76e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a69f9f237baac2ee247f14425602af76e">OBJ_VRAM</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memitem:a00c0712aceacf4a307698b0e38e5eff8" id="r_a00c0712aceacf4a307698b0e38e5eff8"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a00c0712aceacf4a307698b0e38e5eff8">SCREEN_MAP</a>&#160;&#160;&#160;0x3C00</td></tr>
+<tr class="memitem:a274d56b1dd88abfddcaf91d6e57e4410" id="r_a274d56b1dd88abfddcaf91d6e57e4410"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a274d56b1dd88abfddcaf91d6e57e4410">SCREEN_TILES</a>&#160;&#160;&#160;0x1000</td></tr>
+<tr id="define-members-1" class="groupHeader"><td colspan="2"><div class="groupHeader">The sheet's tiles (res/cast.png, 128 px wide: one row of the sheet is one row of OBJ tiles)</div></td></tr>
+<tr class="memitem:a89d36a415b8e36c838ebd67c5458e772" id="r_a89d36a415b8e36c838ebd67c5458e772"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a89d36a415b8e36c838ebd67c5458e772">TILE_AVATAR</a>&#160;&#160;&#160;64</td></tr>
+<tr class="memitem:ae2e8a5ab10e587c7bbc0f2afb0f7726d" id="r_ae2e8a5ab10e587c7bbc0f2afb0f7726d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae2e8a5ab10e587c7bbc0f2afb0f7726d">TILE_LAMP</a>&#160;&#160;&#160;128</td></tr>
+<tr id="define-members-2" class="groupHeader"><td colspan="2"><div class="groupHeader">The bay the avatars walk in: their 32x32 sprites stay inside its outline</div></td></tr>
+<tr class="memitem:a7f6c9e62f4a8fb6b3b53d02e25390f2a" id="r_a7f6c9e62f4a8fb6b3b53d02e25390f2a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7f6c9e62f4a8fb6b3b53d02e25390f2a">BAY_X_MAX</a>&#160;&#160;&#160;206</td></tr>
+<tr class="memitem:aca715b622d31e8c58fda5f8064bfe75c" id="r_aca715b622d31e8c58fda5f8064bfe75c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aca715b622d31e8c58fda5f8064bfe75c">BAY_X_MIN</a>&#160;&#160;&#160;18</td></tr>
+<tr class="memitem:ad89aad22746ceb2cec20d81e4b6ccd73" id="r_ad89aad22746ceb2cec20d81e4b6ccd73"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad89aad22746ceb2cec20d81e4b6ccd73">BAY_Y_MAX</a>&#160;&#160;&#160;174</td></tr>
+<tr class="memitem:ad334d3961723f733ba5ac66d248a0305" id="r_ad334d3961723f733ba5ac66d248a0305"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad334d3961723f733ba5ac66d248a0305">BAY_Y_MIN</a>&#160;&#160;&#160;154</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ae29eef4e953a5a7b25fab7f0dac8089d" id="r_ae29eef4e953a5a7b25fab7f0dac8089d"><td class="memItemLeft">enum &#160;</td><td class="memItemRight">{ <a class="el" href="#ae29eef4e953a5a7b25fab7f0dac8089da8ef5c0bce69283a9986011a63eea8a6b">SOUTH</a>
+, <a class="el" href="#ae29eef4e953a5a7b25fab7f0dac8089dad0611de6f28d4a9c9eac959f5344698e">NORTH</a>
+, <a class="el" href="#ae29eef4e953a5a7b25fab7f0dac8089dab5b3793b961949c817c7c0d99c05dad7">EAST</a>
+, <a class="el" href="#ae29eef4e953a5a7b25fab7f0dac8089dae9449e8683a8199dad36b07a63b2f523">WEST</a>
+ }</td></tr>
+<tr class="memdesc:ae29eef4e953a5a7b25fab7f0dac8089d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Facings, in the sheet's order.  <a href="#ae29eef4e953a5a7b25fab7f0dac8089d">More...</a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a20f609e45388fd7dab26e378017d8071" id="r_a20f609e45388fd7dab26e378017d8071"><td class="memItemLeft">static const char *&#160;</td><td class="memItemRight"><a class="el" href="#a20f609e45388fd7dab26e378017d8071">first_name</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> mask)</td></tr>
+<tr class="memdesc:a20f609e45388fd7dab26e378017d8071"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of the first button set in a mask, for the edges.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — gameLoopRun never returns.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — the game loop runs on_init once, then on_update each frame.  <br /></td></tr>
 <tr class="memitem:a8a0d3bc95bdfda1fef8948aa09b48dd4" id="r_a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8a0d3bc95bdfda1fef8948aa09b48dd4">on_init</a> (void)</td></tr>
-<tr class="memdesc:a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">One-time setup. Static labels then screen on.  <br /></td></tr>
+<tr class="memdesc:a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Once, in force blank: the screen, the sheet, the labels.  <br /></td></tr>
 <tr class="memitem:ae658753de50085894acfe2b69fbd62e5" id="r_ae658753de50085894acfe2b69fbd62e5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae658753de50085894acfe2b69fbd62e5">on_update</a> (void)</td></tr>
-<tr class="memdesc:ae658753de50085894acfe2b69fbd62e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-frame: read joypad, paint the held button name.  <br /></td></tr>
+<tr class="memdesc:ae658753de50085894acfe2b69fbd62e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Every frame: the lamps, the edges, the counter, the avatars.  <br /></td></tr>
+<tr class="memitem:a2952ed089463406e0220454b20074304" id="r_a2952ed089463406e0220454b20074304"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2952ed089463406e0220454b20074304">show_pad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
+<tr class="memdesc:a2952ed089463406e0220454b20074304"><td class="mdescLeft">&#160;</td><td class="mdescRight">Light pad n's lamps for the buttons held, and print its bitmask.  <br /></td></tr>
+<tr class="memitem:ad87cf54d06abeefc5042b32814bad6cc" id="r_ad87cf54d06abeefc5042b32814bad6cc"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad87cf54d06abeefc5042b32814bad6cc">walk</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
+<tr class="memdesc:ad87cf54d06abeefc5042b32814bad6cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Walk pad n's avatar with its D-pad, inside the bay.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a2480366fc93e42c990a3975540ebe5b0" id="r_a2480366fc93e42c990a3975540ebe5b0"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2480366fc93e42c990a3975540ebe5b0">avatar_x</a> [2]</td></tr>
+<tr class="memdesc:a2480366fc93e42c990a3975540ebe5b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracle: each avatar's top-left, x (pad 1, pad 2).  <br /></td></tr>
+<tr class="memitem:ad1acdf7a4821b7d7a79926b3f74383c8" id="r_ad1acdf7a4821b7d7a79926b3f74383c8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad1acdf7a4821b7d7a79926b3f74383c8">avatar_y</a> [2]</td></tr>
+<tr class="memdesc:ad1acdf7a4821b7d7a79926b3f74383c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracle: each avatar's top-left, y (pad 1, pad 2).  <br /></td></tr>
+<tr class="memitem:ac5eba414674b42bb8cf6c09368a28785" id="r_ac5eba414674b42bb8cf6c09368a28785"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac5eba414674b42bb8cf6c09368a28785">facing</a> [2]</td></tr>
+<tr class="memdesc:ac5eba414674b42bb8cf6c09368a28785"><td class="mdescLeft">&#160;</td><td class="mdescRight">Each avatar's facing (SOUTH, NORTH, EAST, WEST).  <br /></td></tr>
+<tr class="memitem:a012e5b9201b064ea8c7b7349c7f38f61" id="r_a012e5b9201b064ea8c7b7349c7f38f61"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a012e5b9201b064ea8c7b7349c7f38f61">key_bit</a> [12]</td></tr>
+<tr class="memdesc:a012e5b9201b064ea8c7b7349c7f38f61"><td class="mdescLeft">&#160;</td><td class="mdescRight">The 12 buttons in the order the pad sends them, for the edges.  <br /></td></tr>
+<tr class="memitem:a3e2956073192e2e16c68327dae1747a2" id="r_a3e2956073192e2e16c68327dae1747a2"><td class="memItemLeft">static const char *const&#160;</td><td class="memItemRight"><a class="el" href="#a3e2956073192e2e16c68327dae1747a2">key_name</a> [12]</td></tr>
+<tr class="memdesc:a3e2956073192e2e16c68327dae1747a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Their names, padded to one width so a shorter one covers a longer.  <br /></td></tr>
+<tr class="memitem:a45c8f38b1957952a183a7b3382dc7f4c" id="r_a45c8f38b1957952a183a7b3382dc7f4c"><td class="memItemLeft">static const <a class="el" href="structLamp.html">Lamp</a>&#160;</td><td class="memItemRight"><a class="el" href="#a45c8f38b1957952a183a7b3382dc7f4c">lamps</a> [14]</td></tr>
+<tr class="memdesc:a45c8f38b1957952a183a7b3382dc7f4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The lamps of one pad; the drawing has a button under each.  <br /></td></tr>
+<tr class="memitem:a1a4057fa45a32deaccd6ffd293368556" id="r_a1a4057fa45a32deaccd6ffd293368556"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1a4057fa45a32deaccd6ffd293368556">pad_x</a> [2] = { 16, 136 }</td></tr>
+<tr class="memdesc:a1a4057fa45a32deaccd6ffd293368556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Each pad's top-left on screen.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Single controller input display. </p>
-<p>Reads the SNES controller and displays which button is currently held. The simplest possible input example — one controller, one text line, real-time feedback. This is the starting point for understanding how SNES games read player input.</p>
-<p>The SNES joypad has 12 buttons: 4 face buttons (A, B, X, Y), 2 shoulder buttons (L, R), a D-pad (4 directions), START, and SELECT. The NMI handler reads the joypad automatically every VBlank. Your code just calls <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a> to get the current state as a 16-bit bitmask.</p>
-<p>Ported from PVSnesLib "controller" example by alekmaul.</p>
+<div class="textblock"><p>Both controllers on a terminal's test screen: buttons lit, the edges, a frame counter. </p>
+<p>The pad test of a city terminal. The two controllers are drawn on screen, and each button held lights up on its pad's drawing, several at once; under each pad, the bitmask <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a> returns, in hex. Under them, the last button pressed and the last button released on pad 1, and the number of VBlanks since boot. In the test bay at the bottom, each pad's D-pad walks its avatar: Kit for pad 1, the raccoon for pad 2. This is the starting point for understanding how SNES games read player input, and the screen the console check uses.</p>
+<p>The SNES joypad has 12 buttons: 4 face buttons (A, B, X, Y), 2 shoulder buttons (L, R), a D-pad (4 directions), START, and SELECT. The NMI handler reads both joypads automatically every VBlank. Your code just calls <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(pad)</a> for the buttons down, <a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(pad)</a> for the ones that went down on this frame, and padReleased(pad) for the ones that came up.</p>
+<p>Ported from PVSnesLib "controller" example by alekmaul; the second pad was the two_players example, the counter the timer example, both merged here.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a> — 16-bit bitmask of currently held buttons</li>
-<li>KEY_A, KEY_B, KEY_X, KEY_Y, KEY_L, KEY_R — button constants</li>
-<li>KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT — D-pad constants</li>
-<li>KEY_START, KEY_SELECT — system button constants</li>
-<li>NMI handler reads joypads automatically (padUpdate is a no-op)</li>
+<li><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(n)</a> — 16-bit bitmask of the buttons down on pad n (0 or 1)</li>
+<li><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(n)</a> / padReleased(n) — the edges: down this frame, up this frame</li>
+<li>KEY_A, KEY_B, KEY_X, KEY_Y, KEY_L, KEY_R, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_START, KEY_SELECT — the bits, in the order the pad shifts them out (B Y SELECT START UP DOWN LEFT RIGHT A X L R)</li>
+<li>frame_count — the VBlanks since boot, counted by the NMI handler</li>
+<li>One lamp sprite per button, shown while its bit is set: the screen is a picture of the bitmask</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>Press any button — its name appears on screen immediately</li>
-<li>Release — the display clears</li>
-<li>Try pressing multiple buttons — only one is shown (first match)</li>
-<li>The response is instant (1 frame = 16ms latency)</li>
+<li>Hold buttons on pad 1 or pad 2: they light up on that pad's drawing (cyan for pad 1, pink for pad 2) while held, several at once, and the HELD value under it shows their bits</li>
+<li>The last button pressed and released on pad 1 stay on screen</li>
+<li>Each D-pad walks its own avatar in the test bay</li>
+<li>The counter goes up by 60 a second (50 on PAL); L+R together resets it</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, gameloop</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a7f6c9e62f4a8fb6b3b53d02e25390f2a" name="a7f6c9e62f4a8fb6b3b53d02e25390f2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f6c9e62f4a8fb6b3b53d02e25390f2a">&#9670;&#160;</a></span>BAY_X_MAX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BAY_X_MAX&#160;&#160;&#160;206</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aca715b622d31e8c58fda5f8064bfe75c" name="aca715b622d31e8c58fda5f8064bfe75c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca715b622d31e8c58fda5f8064bfe75c">&#9670;&#160;</a></span>BAY_X_MIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BAY_X_MIN&#160;&#160;&#160;18</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad89aad22746ceb2cec20d81e4b6ccd73" name="ad89aad22746ceb2cec20d81e4b6ccd73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad89aad22746ceb2cec20d81e4b6ccd73">&#9670;&#160;</a></span>BAY_Y_MAX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BAY_Y_MAX&#160;&#160;&#160;174</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad334d3961723f733ba5ac66d248a0305" name="ad334d3961723f733ba5ac66d248a0305"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad334d3961723f733ba5ac66d248a0305">&#9670;&#160;</a></span>BAY_Y_MIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BAY_Y_MIN&#160;&#160;&#160;154</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af31124019367814bc62bbaa63625ff29" name="af31124019367814bc62bbaa63625ff29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af31124019367814bc62bbaa63625ff29">&#9670;&#160;</a></span>LAMPS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LAMPS&#160;&#160;&#160;14</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Number of lamps on a pad: one per button, two per shoulder. </p>
+
+</div>
+</div>
+<a id="a69f9f237baac2ee247f14425602af76e" name="a69f9f237baac2ee247f14425602af76e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69f9f237baac2ee247f14425602af76e">&#9670;&#160;</a></span>OBJ_VRAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OBJ_VRAM&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5fb02b736c0c917dc78a96516bf2aac2" name="a5fb02b736c0c917dc78a96516bf2aac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fb02b736c0c917dc78a96516bf2aac2">&#9670;&#160;</a></span>PAD_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PAD_Y&#160;&#160;&#160;32</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Both pads' top edge (the shoulders). </p>
+
+</div>
+</div>
+<a id="a00c0712aceacf4a307698b0e38e5eff8" name="a00c0712aceacf4a307698b0e38e5eff8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00c0712aceacf4a307698b0e38e5eff8">&#9670;&#160;</a></span>SCREEN_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SCREEN_MAP&#160;&#160;&#160;0x3C00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a274d56b1dd88abfddcaf91d6e57e4410" name="a274d56b1dd88abfddcaf91d6e57e4410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a274d56b1dd88abfddcaf91d6e57e4410">&#9670;&#160;</a></span>SCREEN_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SCREEN_TILES&#160;&#160;&#160;0x1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a89d36a415b8e36c838ebd67c5458e772" name="a89d36a415b8e36c838ebd67c5458e772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89d36a415b8e36c838ebd67c5458e772">&#9670;&#160;</a></span>TILE_AVATAR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILE_AVATAR&#160;&#160;&#160;64</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>pad p's avatar starts at tile 64 p; + 4 per facing </p>
+
+</div>
+</div>
+<a id="ae2e8a5ab10e587c7bbc0f2afb0f7726d" name="ae2e8a5ab10e587c7bbc0f2afb0f7726d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2e8a5ab10e587c7bbc0f2afb0f7726d">&#9670;&#160;</a></span>TILE_LAMP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TILE_LAMP&#160;&#160;&#160;128</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the four 8x8 lamps: disc, square, pill, half a shoulder </p>
+
+</div>
+</div>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<a id="ae29eef4e953a5a7b25fab7f0dac8089d" name="ae29eef4e953a5a7b25fab7f0dac8089d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae29eef4e953a5a7b25fab7f0dac8089d">&#9670;&#160;</a></span>anonymous enum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Facings, in the sheet's order. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae29eef4e953a5a7b25fab7f0dac8089da8ef5c0bce69283a9986011a63eea8a6b" name="ae29eef4e953a5a7b25fab7f0dac8089da8ef5c0bce69283a9986011a63eea8a6b"></a>SOUTH&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae29eef4e953a5a7b25fab7f0dac8089dad0611de6f28d4a9c9eac959f5344698e" name="ae29eef4e953a5a7b25fab7f0dac8089dad0611de6f28d4a9c9eac959f5344698e"></a>NORTH&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae29eef4e953a5a7b25fab7f0dac8089dab5b3793b961949c817c7c0d99c05dad7" name="ae29eef4e953a5a7b25fab7f0dac8089dab5b3793b961949c817c7c0d99c05dad7"></a>EAST&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae29eef4e953a5a7b25fab7f0dac8089dae9449e8683a8199dad36b07a63b2f523" name="ae29eef4e953a5a7b25fab7f0dac8089dae9449e8683a8199dad36b07a63b2f523"></a>WEST&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a20f609e45388fd7dab26e378017d8071" name="a20f609e45388fd7dab26e378017d8071"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20f609e45388fd7dab26e378017d8071">&#9670;&#160;</a></span>first_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char * first_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>mask</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The name of the first button set in a mask, for the edges. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -176,7 +445,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point — gameLoopRun never returns. </p>
+<p>Entry point — the game loop runs on_init once, then on_update each frame. </p>
+<dl class="section return"><dt>Returns</dt><dd>Never returns </dd></dl>
 
 </div>
 </div>
@@ -203,7 +473,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>One-time setup. Static labels then screen on. </p>
+<p>Once, in force blank: the screen, the sheet, the labels. </p>
 
 </div>
 </div>
@@ -230,8 +500,242 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Per-frame: read joypad, paint the held button name. </p>
-<p><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> returns the bitmask of currently-pressed buttons (latched by the NMI handler this frame). The if/else cascade prints the first match — multiple-button combinations only show one. </p>
+<p>Every frame: the lamps, the edges, the counter, the avatars. </p>
+
+</div>
+</div>
+<a id="a2952ed089463406e0220454b20074304" name="a2952ed089463406e0220454b20074304"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2952ed089463406e0220454b20074304">&#9670;&#160;</a></span>show_pad()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_pad </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>pad</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Light pad n's lamps for the buttons held, and print its bitmask. </p>
+<p>&lt; the four 8x8 lamps: disc, square, pill, half a shoulder</p>
+
+</div>
+</div>
+<a id="ad87cf54d06abeefc5042b32814bad6cc" name="ad87cf54d06abeefc5042b32814bad6cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad87cf54d06abeefc5042b32814bad6cc">&#9670;&#160;</a></span>walk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void walk </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>pad</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Walk pad n's avatar with its D-pad, inside the bay. </p>
+<p>&lt; pad p's avatar starts at tile 64 p; + 4 per facing</p>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a2480366fc93e42c990a3975540ebe5b0" name="a2480366fc93e42c990a3975540ebe5b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2480366fc93e42c990a3975540ebe5b0">&#9670;&#160;</a></span>avatar_x</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> avatar_x[2]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Probe oracle: each avatar's top-left, x (pad 1, pad 2). </p>
+
+</div>
+</div>
+<a id="ad1acdf7a4821b7d7a79926b3f74383c8" name="ad1acdf7a4821b7d7a79926b3f74383c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1acdf7a4821b7d7a79926b3f74383c8">&#9670;&#160;</a></span>avatar_y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> avatar_y[2]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Probe oracle: each avatar's top-left, y (pad 1, pad 2). </p>
+
+</div>
+</div>
+<a id="ac5eba414674b42bb8cf6c09368a28785" name="ac5eba414674b42bb8cf6c09368a28785"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5eba414674b42bb8cf6c09368a28785">&#9670;&#160;</a></span>facing</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> facing[2]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Each avatar's facing (SOUTH, NORTH, EAST, WEST). </p>
+
+</div>
+</div>
+<a id="a012e5b9201b064ea8c7b7349c7f38f61" name="a012e5b9201b064ea8c7b7349c7f38f61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a012e5b9201b064ea8c7b7349c7f38f61">&#9670;&#160;</a></span>key_bit</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> key_bit[12]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                         = {</div>
+<div class="line">    <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>, <a class="code hl_define" href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a>, <a class="code hl_define" href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a>, <a class="code hl_define" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a>, <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>, <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>,</div>
+<div class="line">    <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>, <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>, <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>, <a class="code hl_define" href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a>, <a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a>, <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div>
+<div class="line">}</div>
+<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga600bb1ce7eb7b6ca4dcbb41546c32ec5"><div class="ttname"><a href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></div><div class="ttdeci">#define KEY_L</div><div class="ttdef"><b>Definition</b> input.h:86</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga832280ef5a7afeda19f32939951e8b10"><div class="ttname"><a href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a></div><div class="ttdeci">#define KEY_X</div><div class="ttdef"><b>Definition</b> input.h:85</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga90b3ea4616669bfe7fab021c68db7abf"><div class="ttname"><a href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a></div><div class="ttdeci">#define KEY_START</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaa020da9e48a194889ac72f94408b3c25"><div class="ttname"><a href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div><div class="ttdeci">#define KEY_R</div><div class="ttdef"><b>Definition</b> input.h:87</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaa8d060e03fe1ea2c54b64698c1b6c8b5"><div class="ttname"><a href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a></div><div class="ttdeci">#define KEY_SELECT</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:74</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gad9db04899df9fe71bb221c02721e28ac"><div class="ttname"><a href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a></div><div class="ttdeci">#define KEY_Y</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
+</div><!-- fragment -->
+<p>The 12 buttons in the order the pad sends them, for the edges. </p>
+
+</div>
+</div>
+<a id="a3e2956073192e2e16c68327dae1747a2" name="a3e2956073192e2e16c68327dae1747a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e2956073192e2e16c68327dae1747a2">&#9670;&#160;</a></span>key_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* const key_name[12]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                                 = {</div>
+<div class="line">    <span class="stringliteral">&quot;B     &quot;</span>, <span class="stringliteral">&quot;Y     &quot;</span>, <span class="stringliteral">&quot;SELECT&quot;</span>, <span class="stringliteral">&quot;START &quot;</span>, <span class="stringliteral">&quot;UP    &quot;</span>, <span class="stringliteral">&quot;DOWN  &quot;</span>,</div>
+<div class="line">    <span class="stringliteral">&quot;LEFT  &quot;</span>, <span class="stringliteral">&quot;RIGHT &quot;</span>, <span class="stringliteral">&quot;A     &quot;</span>, <span class="stringliteral">&quot;X     &quot;</span>, <span class="stringliteral">&quot;L     &quot;</span>, <span class="stringliteral">&quot;R     &quot;</span></div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>Their names, padded to one width so a shorter one covers a longer. </p>
+
+</div>
+</div>
+<a id="a45c8f38b1957952a183a7b3382dc7f4c" name="a45c8f38b1957952a183a7b3382dc7f4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45c8f38b1957952a183a7b3382dc7f4c">&#9670;&#160;</a></span>lamps</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structLamp.html">Lamp</a> lamps[14]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
+<div class="line">    { <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>, 74, 31, 0 }, { <a class="code hl_define" href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a>, 65, 22, 0 }, { <a class="code hl_define" href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a>, 42, 30, 2 }, { <a class="code hl_define" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a>, 54, 30, 2 },</div>
+<div class="line">    { <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>, 22, 14, 1 }, { <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>, 22, 30, 1 }, { <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>, 14, 22, 1 }, { <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>, 30, 22, 1 },</div>
+<div class="line">    { <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>, 83, 22, 0 }, { <a class="code hl_define" href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a>, 74, 13, 0 },</div>
+<div class="line">    { <a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a>, 10, 0, 3 }, { <a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a>, 18, 0, 3 }, { <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>, 78, 0, 3 }, { <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>, 86, 0, 3 },</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The lamps of one pad; the drawing has a button under each. </p>
+
+</div>
+</div>
+<a id="a1a4057fa45a32deaccd6ffd293368556" name="a1a4057fa45a32deaccd6ffd293368556"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a4057fa45a32deaccd6ffd293368556">&#9670;&#160;</a></span>pad_x</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad_x[2] = { 16, 136 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Each pad's top-left on screen. </p>
 
 </div>
 </div>

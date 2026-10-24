@@ -1,8 +1,0 @@
-var maps_2slope__collision_2main_8c =
-[
-    [ "main", "maps_2slope__collision_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "mapmario", "maps_2slope__collision_2main_8c.html#ae208c82b7ea35ddcb77dd3f611a76eea", null ],
-    [ "objmario", "maps_2slope__collision_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3", null ],
-    [ "tilesetatt", "maps_2slope__collision_2main_8c.html#a800a153a176eefc281a037732a616731", null ],
-    [ "tilesetdef", "maps_2slope__collision_2main_8c.html#a4965470887c9118da7d82fd0cba95f23", null ]
-];

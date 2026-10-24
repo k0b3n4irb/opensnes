@@ -130,20 +130,16 @@ The ladder</h2>
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="examples_maps_map_scroll.html">map_scroll</a>  </td><td class="markdownTableBodyNone">How do I author a map in Tiled and scroll it past the camera when it is bigger than VRAM (the <span class="tt">map</span> module)?  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_maps_dynamic_map.html">dynamic_map</a>  </td><td class="markdownTableBodyNone">How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes?  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_maps_slope_collision.html">slope_collision</a>  </td><td class="markdownTableBodyNone">How do I do tile collision with slopes — a full platformer?  </td></tr>
 </table>
-<p>Climb from a world authored in Tiled and scrolled past the camera (<span class="tt">map_scroll</span>) to a map rewritten at runtime (<span class="tt">dynamic_map</span>) to a character that stands on its slopes (<span class="tt">slope_collision</span>).</p>
+<p>Climb from a world authored in Tiled and scrolled past the camera (<span class="tt">map_scroll</span>) to a character that stands on its slopes and enemies that patrol it (<span class="tt">demos/platform_objects</span>).</p>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen-5"></a>
 The idea in one screen</h2>
 <p>A <b>hardware tilemap</b> is a 32×32 (2 KB) up to 64×64 (8 KB) grid of tile entries the PPU renders every frame; the hardware scroll registers pan across it for free. When the world is larger than 64×64, the <span class="tt">map</span> module <b>streams</b> fresh rows/columns into VRAM during VBlank as the camera moves (<span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>/<span class="tt"><a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera</a></span>), and <span class="tt">opensnes-level</span> turns a Tiled <span class="tt">.tmj</span> into the <span class="tt">.m16</span>/<span class="tt">.b16</span> data it consumes. <b>Collision</b> reads tile <em>properties</em> (solid, platform, slope angle) from the map rather than testing sprite boxes; <span class="tt"><a class="el" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597" title="Check collision with tile using custom tile size.">collideTileEx</a></span> / <span class="tt"><a class="el" href="object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes</a></span> add diagonal surfaces.</p>
-<p>Everything here runs inside the ~4 KB VBlank DMA budget by streaming one page per frame — the pattern <span class="tt">dynamic_map</span> demonstrates directly.</p>
+<p>Everything here runs inside the ~4 KB VBlank DMA budget by streaming a few rows or columns per frame (<span class="tt">map_scroll</span>).</p>
 <blockquote class="doxtable">
-<p>The capstone that fuses maps + entities + dialog is <a href="examples_games_rpg.html"><span class="tt">games/rpg</span></a>. </p>
+<p>The capstone that fuses maps + entities + dialog is <a href="examples_demos_rpg.html"><span class="tt">demos/rpg</span></a>. </p>
 </blockquote>
-<p><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a> <a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> <a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a> </p>
+<p><a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -6,7 +6,6 @@ var searchData=
   ['questions_3',['Frequently asked questions',['../faq.html',1,'documentation']]],
   ['questions_20after_20a_20port_4',['Questions after a port',['../migrating_pvsneslib.html#questions-after-a-port',1,'']]],
   ['queue_5',['queue',['../tutorial_audio.html#following-the-music-and-managing-the-queue',1,'Following the music and managing the queue'],['../tutorial_dma.html#several-small-uploads-in-one-vblank-the-queue',1,'Several small uploads in one VBlank: the queue']]],
-  ['quick_20flash_6',['Quick Flash',['../examples_transitions_fading.html#quick-flash',1,'']]],
-  ['quick_20start_7',['Quick Start',['../audio_8h.html#quick-start',1,'Quick Start'],['../profile_8h.html#quick-start-1',1,'Quick Start'],['../snesmod_8h.html#quick-start-2',1,'Quick Start']]],
-  ['quirks_20document_20the_20escape_8',['2. Hide quirks, document the escape',['../philosophy.html#autotoc_md2-hide-quirks-document-the-escape',1,'']]]
+  ['quick_20start_6',['Quick Start',['../audio_8h.html#quick-start',1,'Quick Start'],['../profile_8h.html#quick-start-1',1,'Quick Start'],['../snesmod_8h.html#quick-start-2',1,'Quick Start']]],
+  ['quirks_20document_20the_20escape_7',['2. Hide quirks, document the escape',['../philosophy.html#autotoc_md2-hide-quirks-document-the-escape',1,'']]]
 ];

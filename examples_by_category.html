@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_by_category.html','',''); });
   <div class="headertitle"><div class="title">Browse Examples by Category </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>All 85 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
+<div class="textblock"><p>All 60 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="text"></a>
 Text</h2>
@@ -133,8 +133,6 @@ Text</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_text_print_string.html" title="Print a string">Print a string</a>  </td><td class="markdownTableBodyNone">Print a string with the built-in font (<span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit</a></span> + <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_text_scroll_message.html" title="Scroll a message">Scroll a message</a>  </td><td class="markdownTableBodyNone">Move text: scroll the text layer for a marquee (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>)  </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_text_pixel_text.html" title="Pixel Text">Pixel Text</a>  </td><td class="markdownTableBodyNone">Proportional text composed at the pixel: <a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a> into a 2bpp layer  </td></tr>
 </table>
 <hr  />
@@ -157,19 +155,11 @@ Backgrounds</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode1.html" title="Mode 1 Example">Mode 1 Example</a>  </td><td class="markdownTableBodyNone">Mode 1 multi-layer backgrounds (4bpp + 2bpp)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a>  </td><td class="markdownTableBodyNone">BG3 priority bit for overlay effects  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode1_lz77.html" title="Mode 1 LZ77">Mode 1 LZ77</a>  </td><td class="markdownTableBodyNone">LZ77-compressed background data  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a>  </td><td class="markdownTableBodyNone">Mode 0: four 2bpp background layers (Kirby parallax)  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a>  </td><td class="markdownTableBodyNone">Mode 0: four 2bpp background layers (the city in parallax)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode3.html" title="Mode 3 — 256-Color Background">Mode 3 — 256-Color Background</a>  </td><td class="markdownTableBodyNone">Mode 3: 256-colour (8bpp) single layer  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>  </td><td class="markdownTableBodyNone">Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode4.html" title="mode4 — a 256-colour layer with offset-per-tile">mode4 — a 256-colour layer with offset-per-tile</a>  </td><td class="markdownTableBodyNone">Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode6.html" title="mode6 — one hi-res layer with offset-per-tile">mode6 — one hi-res layer with offset-per-tile</a>  </td><td class="markdownTableBodyNone">Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile in Mode 2 and Mode 4: per-column scroll from BG3">mode2 — offset-per-tile in Mode 2 and Mode 4: per-column scroll from BG3</a>  </td><td class="markdownTableBodyNone">Offset-per-tile in Mode 2 (two rows) and Mode 4 (one row, 256 colours): per-column scroll from BG3  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode5_hires.html" title="Hi-res text — BG Mode 5 + interlace (512 × 448)">Hi-res text — BG Mode 5 + interlace (512 × 448)</a>  </td><td class="markdownTableBodyNone">Mode 5 + interlace hi-res text (512×448) (krom port)  </td></tr>
 </table>
@@ -187,14 +177,12 @@ Sprites</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a>  </td><td class="markdownTableBodyNone">Frame animation, sprite sheets, H-flip  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_sprites_dynamic_sprite.html" title="Dynamic Sprite -- VRAM Streaming for Animated Sprites">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a>  </td><td class="markdownTableBodyNone">VRAM streaming, dynamic tile uploads  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_sprites_dynamic_sprite.html" title="Dynamic Sprite -- VRAM Streaming for Animated Sprites">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a>  </td><td class="markdownTableBodyNone">VRAM streaming, dynamic tile uploads; SELECT: metasprites under three OBJSEL size pairs  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_sprites_dynamic_metasprite.html" title="Dynamic Metasprite Engine">Dynamic Metasprite Engine</a>  </td><td class="markdownTableBodyNone">Dynamic metasprite engine with batched OAM updates  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a>  </td><td class="markdownTableBodyNone">A bouncing swarm + the per-sprite OAM throughput ceiling  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_sprites_world_sprites.html" title="World Sprites">World Sprites</a>  </td><td class="markdownTableBodyNone">World-space sprites: a camera, culling and OAM in one call per batch  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_sprites_world_sprites.html" title="World Sprites">World Sprites</a>  </td><td class="markdownTableBodyNone">World-space sprites: a camera, culling and OAM in one call per batch  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_sprites_aseprite_pipeline.html" title="Aseprite Pipeline">Aseprite Pipeline</a>  </td><td class="markdownTableBodyNone">The asset pipeline: an Aseprite export through <span class="tt">opensnes-sprite</span> into an animated metasprite  </td></tr>
 </table>
 <hr  />
@@ -207,7 +195,7 @@ Scrolling</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_scrolling_mixed_scroll.html" title="Mixed Scroll">Mixed Scroll</a>  </td><td class="markdownTableBodyNone">Multiple BG layers at different scroll rates  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_scrolling_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a>  </td><td class="markdownTableBodyNone">Streaming scroll with dynamic tile loading  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_scrolling_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a>  </td><td class="markdownTableBodyNone">A threshold camera over two layers in parallax  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_scrolling_parallax_scroll.html" title="Parallax Scrolling">Parallax Scrolling</a>  </td><td class="markdownTableBodyNone">Per-scanline HDMA parallax scrolling  </td></tr>
 </table>
@@ -228,6 +216,8 @@ Mode 7</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_dsp1_ground.html" title="DSP-1 Ground — the Super Mario Kart floor">DSP-1 Ground — the Super Mario Kart floor</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_extbg.html" title="Mode 7 EXTBG">Mode 7 EXTBG</a>  </td><td class="markdownTableBodyNone">EXTBG: one plane split in two layers by bit 7, a sprite between them  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_mode7_mode7_racing.html" title="mode7_racing — an F-Zero-style mini game">mode7_racing — an F-Zero-style mini game</a>  </td><td class="markdownTableBodyNone">F-Zero camera: a hover-bike race, rivals placed on the turning plane  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="hdma--raster"></a>
@@ -239,10 +229,8 @@ HDMA &amp; raster</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_hdma_gradient_colors.html" title="Gradient Colors -- HDMA Color Gradients">Gradient Colors -- HDMA Color Gradients</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM colour gradients  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_hdma_hdma_indirect_gradient.html" title="HDMA Indirect Gradient">HDMA Indirect Gradient</a>  </td><td class="markdownTableBodyNone">Indirect HDMA pointer-table gradient (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_hdma_hdma_wave.html" title="HDMA Wave">HDMA Wave</a>  </td><td class="markdownTableBodyNone">HDMA wave: a hand-built table (krom port), then the hdma module's helper  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_hdma_hdma_helpers.html" title="HDMA Helpers Demo">HDMA Helpers Demo</a>  </td><td class="markdownTableBodyNone">High-level HDMA effect library (wave, ripple, iris)  </td></tr>
 </table>
 <hr  />
@@ -255,15 +243,13 @@ Colour</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_palette_cycle.html" title="palette_cycle — animate by rotating CGRAM">palette_cycle — animate by rotating CGRAM</a>  </td><td class="markdownTableBodyNone">Palette cycling: animate by rotating CGRAM, no pixels moved  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a>  </td><td class="markdownTableBodyNone">Colour math (add/subtract blending)  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_color_transparency.html" title="Color Addition Transparency — and Pseudo-Hires">Color Addition Transparency — and Pseudo-Hires</a>  </td><td class="markdownTableBodyNone">Colour math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a>  </td><td class="markdownTableBodyNone">Shadow &amp; tint: darken or colour-cast a whole scene via fixed-colour math  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_direct_color.html" title="direct_color — the pixel byte IS the color">direct_color — the pixel byte IS the color</a>  </td><td class="markdownTableBodyNone">Direct colour mode: the 8bpp pixel byte IS the RGB colour  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_hicolor_1792.html" title="HiColor — 1792 colors from a 4bpp background">HiColor — 1792 colors from a 4bpp background</a>  </td><td class="markdownTableBodyNone">1792 colours from a 4bpp background via per-tile-row HDMA (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_color_pseudo_hires.html" title="Pseudo-Hires Blend">Pseudo-Hires Blend</a>  </td><td class="markdownTableBodyNone">50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="windows"></a>
@@ -273,11 +259,9 @@ Windows</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_windows_window.html" title="Window -- HDMA Triangle Masking">Window -- HDMA Triangle Masking</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_windows_window.html" title="Window -- HDMA Torch Beam: Masking and Lighting">Window -- HDMA Torch Beam: Masking and Lighting</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_windows_window_multi_hdma.html" title="Multi-window HDMA — both windows animated per scanline">Multi-window HDMA — both windows animated per scanline</a>  </td><td class="markdownTableBodyNone">Both hardware windows animated per scanline (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_windows_transparent_window.html" title="Transparent Window -- Color Math + HDMA">Transparent Window -- Color Math + HDMA</a>  </td><td class="markdownTableBodyNone">Colour math + HDMA windowed transparency  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="transitions"></a>
@@ -287,9 +271,7 @@ Transitions</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_transitions_fading.html" title="Fading Example">Fading Example</a>  </td><td class="markdownTableBodyNone">Brightness control, screen transitions  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_transitions_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_transitions_fading.html" title="Fade and Mosaic — Screen Transitions">Fade and Mosaic — Screen Transitions</a>  </td><td class="markdownTableBodyNone">Brightness fades at three speeds and the mosaic dissolve  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="input--peripherals"></a>
@@ -299,12 +281,10 @@ Input &amp; peripherals</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a>  </td><td class="markdownTableBodyNone">Standard joypad: button state, edge detection  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_input_controller.html" title="Controller Input — Both Pads, the Edges, the Frame Count">Controller Input — Both Pads, the Edges, the Frame Count</a>  </td><td class="markdownTableBodyNone">Standard joypad: button state, edge detection  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a>  </td><td class="markdownTableBodyNone">Joypad reading, two-player movement  </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a>  </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
 </table>
 <hr  />
@@ -315,23 +295,15 @@ Audio</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a>  </td><td class="markdownTableBodyNone">SPC700 music playback, transport controls (LoROM)  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music and Sound Effects">SNESMOD Music and Sound Effects</a>  </td><td class="markdownTableBodyNone">SPC700 music playback, transport controls, sound effects over the music  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a>  </td><td class="markdownTableBodyNone">Sound effects alongside music  </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a>  </td><td class="markdownTableBodyNone">Audio v2 engine driven entirely from C (resident SPC700 driver)  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_sfx_from_wav.html" title="SFX from WAV">SFX from WAV</a>  </td><td class="markdownTableBodyNone">One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — hot-swapping APU programs at runtime">apu_switch — hot-swapping APU programs at runtime</a>  </td><td class="markdownTableBodyNone">Hot-swapping APU programs at runtime  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_play_noise.html" title="play_noise — a drum kit with zero samples">play_noise — a drum kit with zero samples</a>  </td><td class="markdownTableBodyNone">A drum kit from the S-DSP white-noise generator (krom port)  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — two S-DSP programs, swapped at runtime">apu_switch — two S-DSP programs, swapped at runtime</a>  </td><td class="markdownTableBodyNone">Hot-swapping APU programs at runtime  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_pitch_mod.html" title="pitch_mod — hardware vibrato via pitch modulation">pitch_mod — hardware vibrato via pitch modulation</a>  </td><td class="markdownTableBodyNone">Hardware vibrato via pitch modulation (PMON) (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES&quot;">speech_synth — the SNES says "OPEN SNES"</a>  </td><td class="markdownTableBodyNone">BRR speech playback: the SNES says "OPEN SNES" (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_echo.html" title="Echo / reverb">Echo / reverb</a>  </td><td class="markdownTableBodyNone">S-DSP echo / reverb, isolated — START toggles dry/wet  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES… DAVEO&quot;">speech_synth — the SNES says "OPEN SNES… DAVEO"</a>  </td><td class="markdownTableBodyNone">BRR speech playback: the SNES says "OPEN SNES" (krom port)  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="maps"></a>
@@ -342,10 +314,6 @@ Maps</h2>
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a>  </td><td class="markdownTableBodyNone">Smooth tile-aligned scrolling with viewport tracking  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a>  </td><td class="markdownTableBodyNone">Dynamic tile map streaming  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a>  </td><td class="markdownTableBodyNone">Slopes and tile-based collision  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="game-math--mechanics"></a>
@@ -357,11 +325,7 @@ Game math &amp; mechanics</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_basics_collision_demo.html" title="Collision Detection Demo">Collision Detection Demo</a>  </td><td class="markdownTableBodyNone">Bounding-box sprite collision detection  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_basics_aim_target.html" title="aim_target">aim_target</a>  </td><td class="markdownTableBodyNone">Aim a cursor at moving targets — sprites + input  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_basics_fix32_orbit.html" title="fix32_orbit">fix32_orbit</a>  </td><td class="markdownTableBodyNone">16.16 fixed-point API: a sprite orbits the screen centre  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_basics_timer.html" title="VBlank Timer">VBlank Timer</a>  </td><td class="markdownTableBodyNone">Frame-accurate timers with VBlank counters  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_aim_target.html" title="aim_target">aim_target</a>  </td><td class="markdownTableBodyNone">Aim, distance and angle; a sprite orbiting in 16.16 fixed point  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_basics_scene_stack.html" title="Scene Stack">Scene Stack</a>  </td><td class="markdownTableBodyNone"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> stack: title → game → pause workflow  </td></tr>
 <tr class="markdownTableRowEven">
@@ -392,11 +356,7 @@ SA-1 Coprocessor</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_chips_sa1_hello.html" title="SA-1 Hello World">SA-1 Hello World</a>  </td><td class="markdownTableBodyNone">Boot diagnostic: SA-1 init, I-RAM handshake, register verification  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a>  </td><td class="markdownTableBodyNone">128-dot Lissajous murmuration driven by SA-1 math  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_chips_sa1_save.html" title="SA-1 Save">SA-1 Save</a>  </td><td class="markdownTableBodyNone">A boot counter in battery-backed BW-RAM: one more at every power-on  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="super-fx-gsu"></a>
 Super FX (GSU)</h3>
@@ -405,46 +365,41 @@ Super FX (GSU)</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_chips_superfx_hello.html" title="SuperFX Hello">SuperFX Hello</a>  </td><td class="markdownTableBodyNone">Boot + SRAM + FMULT hardware tests  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_superfx_3d.html" title="SuperFX 3D Cube">SuperFX 3D Cube</a>  </td><td class="markdownTableBodyNone">Rotating wireframe cube (Star Fox style 3D)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_chips_superfx_save.html" title="Super FX Save">Super FX Save</a>  </td><td class="markdownTableBodyNone">A boot counter in the GSU's battery-backed Game Pak RAM, above the framebuffers  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_superfx_game_skeleton.html" title="Super FX Game Skeleton">Super FX Game Skeleton</a>  </td><td class="markdownTableBodyNone">A 60 fps game loop while the GSU renders; double-buffered presentation  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="dsp-1-coprocessor"></a>
 DSP-1 Coprocessor</h3>
 <p>The DSP-1 (NEC µPD77C25) is a fixed-function fixed-point math coprocessor — matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).</p>
+<p>| Example | Description | |------&mdash;|----------&mdash;|</p>
+<hr  />
+<h2 class="doxsection"><a class="anchor" id="demos"></a>
+Demos</h2>
+<p>Playable demonstrations: several modules in one scene, without a game's rules (no score, no end).</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_chips_dsp1_cube.html" title="DSP-1 Cube">DSP-1 Cube</a>  </td><td class="markdownTableBodyNone">Pseudo-3D: a cube's 8 corners tumbling in 3D, rotated by the DSP-1  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_demos_platform_objects.html" title="Map and Objects">Map and Objects</a>  </td><td class="markdownTableBodyNone">Map engine with interactive objects  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_demos_shmup.html" title="shmup">shmup</a>  </td><td class="markdownTableBodyNone">Vertical shoot 'em up: Kit's glider over the city against the security's hunters  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_demos_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a>  </td><td class="markdownTableBodyNone">RPG template: Tiled map drives collision and entities, dialog boxes  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="games-capstones"></a>
-Games (capstones)</h2>
-<p>Complete game projects combining multiple subsystems.</p>
+<h2 class="doxsection"><a class="anchor" id="games"></a>
+Games</h2>
+<p>Complete games, from the title screen to the game over.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_games_breakout.html" title="Breakout">Breakout</a>  </td><td class="markdownTableBodyNone">Breakout clone: sprites, input, game logic, scoring  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_tetris.html" title="Tetris">Tetris</a>  </td><td class="markdownTableBodyNone">Tetris with Korobeiniki music, multi-line clear  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_games_blocks.html" title="Blocks">Blocks</a>  </td><td class="markdownTableBodyNone">Falling-blocks puzzle with Korobeiniki music, multi-line clear  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_likemario.html" title="LikeMario">LikeMario</a>  </td><td class="markdownTableBodyNone">Platformer with scrolling, animation, physics  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_mapandobjects.html" title="Map and Objects">Map and Objects</a>  </td><td class="markdownTableBodyNone">Map engine with interactive objects  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_shmup_1942.html" title="shmup_1942">shmup_1942</a>  </td><td class="markdownTableBodyNone">Vertical shoot 'em up (Kenney Pixel Shmup assets)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_mode7_racing.html" title="mode7_racing — an F-Zero-style mini game">mode7_racing — an F-Zero-style mini game</a>  </td><td class="markdownTableBodyNone">F-Zero-style racer on the rotating Mode 7 plane  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_mode7_flying.html" title="mode7_flying — a Pilotwings-style demo">mode7_flying — a Pilotwings-style demo</a>  </td><td class="markdownTableBodyNone">Pilotwings-style flight: altitude drives Mode 7 scale  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_games_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a>  </td><td class="markdownTableBodyNone">RPG template: Tiled map drives collision and entities, dialog boxes  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_games_rooftop_run.html" title="rooftop_run — Kit&#39;s Rooftop Run">rooftop_run — Kit's Rooftop Run</a>  </td><td class="markdownTableBodyNone">Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal  </td></tr>
 </table>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

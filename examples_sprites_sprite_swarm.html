@@ -130,31 +130,35 @@ Why it matters for your game</h2>
 <img src="sprite_swarm.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-31"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-22"></a>
 What you'll learn</h2>
 <p>The single idea: <b>the per-sprite update budget.</b> The SNES has 128 hardware sprites and moves them with one OAM DMA per frame — cheap. But computing and writing each sprite's position in C is not free: the OAM buffer lives in bank $7E (every write is a slow long address) and cc65816 spills registers in a busy loop. Measured on luna, the smooth-60 fps ceiling for per-sprite C motion is **~32 sprites**; 40 already drops to 30.</p>
-<p>So this swarm runs 32 dots at a rock-steady 60 fps, each bouncing independently. The motion is deliberately trivial (integer add + edge bounce — no multiply, no trig) so what you're seeing is the cost of the <em>OAM update itself</em>, not the maths. Positions are written straight into <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span>; a single <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> lets the NMI's DMA push them all.</p>
-<p><b>To go past the ceiling</b> you move the work off the main CPU or out of C: <a href="examples_chips_sa1_starfield.html">chips/sa1_starfield</a> runs 128 birds of Lissajous <em>trig</em> on the SA-1 at 10.74 MHz; a hand-written assembly update loop is the other route. Same 128-sprite hardware, a bigger compute budget.</p>
+<p>So this swarm runs 32 neon moths at a rock-steady 60 fps, each bouncing independently through a dark alley. The motion is deliberately trivial (integer add + edge bounce — no multiply, no trig) so what you're seeing is the cost of the <em>OAM update itself</em>, not the maths. Positions are written straight into <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span>; a single <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> lets the NMI's DMA push them all.</p>
+<p>The moths flap their wings at no per-sprite cost. Every one of them is tile 0, so every 8 frames one 32-byte DMA writes the other wing frame over that tile, and all 32 change together: animating a crowd is a VRAM write, not 32 OAM edits.</p>
+<p><b>To go past the ceiling</b> you move the work off the main CPU or out of C: <a href="examples_chips_sa1_starfield.html">chips/sa1_starfield</a> runs 128 moths of Lissajous <em>trig</em> on the SA-1 at 10.74 MHz; a hand-written assembly update loop is the other route. Same 128-sprite hardware, a bigger compute budget.</p>
 <h2 class="doxsection"><a class="anchor" id="what-to-observe--if-it-breaks-5"></a>
 What to observe / if it breaks</h2>
 <ul>
-<li><b>Correct run:</b> 32 red/cyan/yellow/white dots bounce around at a smooth 60 fps, reversing at the edges.</li>
+<li><b>Correct run:</b> 32 magenta/cyan/amber/violet moths bounce around the alley at a smooth 60 fps, reversing at the edges, flapping together.</li>
 <li><b>It stutters / runs slow:</b> you raised <span class="tt"><a class="el" href="chips_2sa1__starfield_2main_8c.html#ae33cce9568cb8d271c2d716d88786445">NBIRDS</a></span> past the C budget — each extra sprite is more bank-$7E writes and loop overhead. Profile before assuming the hardware is the limit; it usually isn't.</li>
-<li><b>Dots blink out where they pile up:</b> the per-scanline sprite limit (32 sprites / 34 8×8 tiles per line). Real hardware — spread them or accept it.</li>
+<li><b>Moths blink out where they pile up:</b> the per-scanline sprite limit (32 sprites / 34 8×8 tiles per line). Real hardware — spread them or accept it.</li>
 <li><b>Nothing visible:</b> sprites need <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_OBJ)</a></span> and colour 1 of an OBJ palette (CGRAM 128+) set to something non-black.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="sprites_2sprite__swarm_2main_8c.html#aefd40df56c53cc83d5999610fa9bd9ad" title="Probe oracle: frames elapsed (advances while the flock animates).">swarm_frame</a></span> advances once per displayed frame.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-49"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-34"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../testing/bin/luna run -n 3000000 sprite_swarm.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-68"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="assets-20"></a>
+Assets</h2>
+<p><span class="tt">res/moth.png</span> (two 8x8 frames) is drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">MOTH</span>); <span class="tt">res/alley.png</span> is the alley of <span class="tt">windows/window</span> (PixelLab, CC0, <span class="tt">assets/neo-lumen/README.md</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
 Modules used</h2>
-<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">tile</span> (<span class="tt"><a class="el" href="tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a" title="64 colour indices (0-15) to one 4bpp tile">tileEncode4bpp</a></span>)</p>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span></p>
 <p>Also linked: <span class="tt">math</span> — fixed-point sine / trigonometry.</p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-5"></a>
 Where you are</h2>
-<p>← previous: <a href="examples_sprites_dynamic_metasprite.html">dynamic_metasprite</a> · streaming a multi-tile character · the family caps here — for 128 sprites of heavy math, see <a href="examples_chips_sa1_starfield.html">chips/sa1_starfield</a> </p>
+<p>← previous: <a href="examples_sprites_dynamic_sprite.html">dynamic_sprite</a> · streaming sprite tiles, single and multi-tile · the family caps here — for 128 sprites of heavy math, see <a href="examples_chips_sa1_starfield.html">chips/sa1_starfield</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -151,7 +151,7 @@ Vertical wants different rules</h2>
 <li><b>Snap on ground only.</b> Track Y while grounded; during a jump, hold the camera and let the player rise and fall within the frame.</li>
 <li><b>Platform bands.</b> Move the vertical camera in discrete steps when the player settles on a new platform, not continuously.</li>
 </ul>
-<p><a class="el" href="examples_games_likemario.html" title="LikeMario">LikeMario</a> is a full platformer to read for how camera, scroll and streaming fit together.</p>
+<p><a class="el" href="examples_games_rooftop_run.html" title="rooftop_run — Kit&#39;s Rooftop Run">rooftop_run — Kit's Rooftop Run</a> is a full platformer to read for how camera, scroll and streaming fit together.</p>
 <h2 class="doxsection"><a class="anchor" id="clamp-to-the-world--room-locking"></a>
 Clamp to the world — room-locking</h2>
 <p>A camera that follows past the level's edge reveals the void beyond your tilemap. <b>Clamp the scroll</b> to the world: never below 0, never past <span class="tt">level_pixels − screen_pixels</span> on each axis. This is also where the camera meets the streaming map from <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> — the map engine ties the camera's position to which column it streams next, and the same clamp that stops the view at the edge stops you streaming past the last column.</p>
@@ -165,7 +165,7 @@ Clamp to the world — room-locking</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">World wider than VRAM, streamed  </td><td class="markdownTableBodyNone">camera drives column streaming  </td><td class="markdownTableBodyNone"><a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a>, <a class="el" href="examples_scrolling_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Free-scrolling 2D field  </td><td class="markdownTableBodyNone">clamp both axes to bounds  </td><td class="markdownTableBodyNone"><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a>  </td></tr>
+<td class="markdownTableBodyNone">Free-scrolling 2D field  </td><td class="markdownTableBodyNone">clamp both axes to bounds  </td><td class="markdownTableBodyNone"><a class="el" href="examples_demos_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a>  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="write-it-at-the-right-moment"></a>
 Write it at the right moment</h2>

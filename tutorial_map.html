@@ -130,17 +130,17 @@ What the map module is</h2>
 <h2 class="doxsection"><a class="anchor" id="the-tiled-pipeline"></a>
 The Tiled pipeline</h2>
 <p>You do not hand-author the binary formats. Draw the map in <a href="https://www.mapeditor.org/">Tiled</a> against a tileset picture, export JSON (<span class="tt">.tmj</span>), and put two settings files in <span class="tt">res/</span>: one converts the tileset picture with <span class="tt">opensnes-tileset</span>, the other the level with <a class="el" href="tools_opensnes_level.html" title="opensnes-level — Tiled levels to SNES map data">opensnes-level — Tiled levels to SNES map data</a>, against the <span class="tt">.map</span> the first one writes (<span class="tt">examples/maps/map_scroll</span>):</p>
-<div class="fragment"><div class="line"># res/tilesMario.png.toml</div>
+<div class="fragment"><div class="line"># res/roofs.png.toml</div>
 <div class="line">tool = &quot;opensnes-tileset&quot;</div>
 <div class="line"> </div>
 <div class="line">[convert]</div>
-<div class="line">colors = 48</div>
-</div><!-- fragment --><div class="fragment"><div class="line"># res/tiledMario.tmj.toml</div>
+<div class="line">colors = 16</div>
+</div><!-- fragment --><div class="fragment"><div class="line"># res/rooftops.tmj.toml</div>
 <div class="line">tool = &quot;opensnes-level&quot;</div>
 <div class="line"> </div>
 <div class="line">[convert]</div>
-<div class="line">tileset = &quot;tilesMario.map&quot;</div>
-</div><!-- fragment --><p>The build converts the level after the pictures, so the tileset's <span class="tt">.map</span> is fresh when the level reads it; the Makefile names neither. By hand it is <span class="tt">opensnes-level convert res/tiledMario.tmj --tileset res/tilesMario.map</span>. It emits four files the modules consume:</p>
+<div class="line">tileset = &quot;roofs.map&quot;</div>
+</div><!-- fragment --><p>The build converts the level after the pictures, so the tileset's <span class="tt">.map</span> is fresh when the level reads it; the Makefile names neither. By hand it is <span class="tt">opensnes-level convert res/rooftops.tmj --tileset res/roofs.map</span>. It emits four files the modules consume:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Content  </th><th class="markdownTableHeadNone">Consumed by  </th></tr>
@@ -153,7 +153,7 @@ The Tiled pipeline</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.o16</span>  </td><td class="markdownTableBodyNone">the Entities object layer  </td><td class="markdownTableBodyNone">the <span class="tt">object</span> module  </td></tr>
 </table>
-<p>and <span class="tt">&lt;map&gt;.inc</span>, which declares them for C: <span class="tt">tiledMario_BG1_map</span>, <span class="tt">tiledMario_tiledef</span>, <span class="tt">tiledMario_tileattr</span>, <span class="tt">tiledMario_objects</span> (each with <span class="tt">_end</span>).</p>
+<p>and <span class="tt">&lt;map&gt;.inc</span>, which declares them for C: <span class="tt">rooftops_BG1_map</span>, <span class="tt">rooftops_tiledef</span>, <span class="tt">rooftops_tileattr</span>, <span class="tt">rooftops_objects</span> (each with <span class="tt">_end</span>).</p>
 <p>Three more keys of <span class="tt">[convert]</span> serve games that do <b>not</b> use the <span class="tt">map</span> module and want the same content in a different shape:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -165,7 +165,7 @@ The Tiled pipeline</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">collision = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.c16</span> — one collision byte per map cell  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> (a flattened grid, indexed directly)  </td></tr>
 </table>
-<p><span class="tt">examples/games/rpg</span> scrolls a fixed 64×64 town with <span class="tt">background</span>, not <span class="tt">map</span> (its <span class="tt">town.tmj</span> gives the same quadrant map under <span class="tt">--quadrant</span>); <span class="tt">examples/maps/map_scroll</span> uses the default <span class="tt">map</span> pipeline. Pick the module that matches the map size — <span class="tt">map</span> for worlds larger than 64×64, <span class="tt">background</span> for a fixed screen or two.</p>
+<p><span class="tt">examples/demos/rpg</span> scrolls a fixed 64×64 town with <span class="tt">background</span>, not <span class="tt">map</span> (its <span class="tt">res/town.tmj.toml</span> asks for <span class="tt">quadrant</span>, <span class="tt">collision</span> and <span class="tt">entities</span>); <span class="tt">examples/maps/map_scroll</span> uses the default <span class="tt">map</span> pipeline. Pick the module that matches the map size — <span class="tt">map</span> for worlds larger than 64×64, <span class="tt">background</span> for a fixed screen or two.</p>
 <blockquote class="doxtable">
 <p><b>cute_tiled needs no special export.</b> <span class="tt">opensnes-level</span> minifies the JSON itself, so a pretty-printed <span class="tt">.tmj</span> from a generator script parses fine. </p>
 </blockquote>
@@ -208,7 +208,7 @@ The minimum viable scroller</h2>
 <div class="line">        <a class="code hl_function" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a>();                     <span class="comment">// DMA the staged strip to VRAM</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
 <div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
@@ -229,8 +229,8 @@ The minimum viable scroller</h2>
 <div class="ttc" id="amap_8h_html_aa36598a0b40be791f4845574e0c5db1f"><div class="ttname"><a href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a></div><div class="ttdeci">void mapVblank(void)</div><div class="ttdoc">Transfer map updates to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
-<div class="ttc" id="asprites_2world__sprites_2main_8c_html_a12d35ad58f591e8935ab963c345d36b1"><div class="ttname"><a href="sprites_2world__sprites_2main_8c.html#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></div><div class="ttdeci">u16 cam_y</div><div class="ttdef"><b>Definition</b> main.c:78</div></div>
-<div class="ttc" id="asprites_2world__sprites_2main_8c_html_a24bbdbaee0318752f200bcfe0612606b"><div class="ttname"><a href="sprites_2world__sprites_2main_8c.html#a24bbdbaee0318752f200bcfe0612606b">cam_x</a></div><div class="ttdeci">u16 cam_x</div><div class="ttdoc">Probe oracles: the camera, the coins placed this frame, the walker in the front slot.</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
+<div class="ttc" id="asprites_2world__sprites_2main_8c_html_a12d35ad58f591e8935ab963c345d36b1"><div class="ttname"><a href="sprites_2world__sprites_2main_8c.html#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></div><div class="ttdeci">u16 cam_y</div><div class="ttdef"><b>Definition</b> main.c:91</div></div>
+<div class="ttc" id="asprites_2world__sprites_2main_8c_html_a24bbdbaee0318752f200bcfe0612606b"><div class="ttname"><a href="sprites_2world__sprites_2main_8c.html#a24bbdbaee0318752f200bcfe0612606b">cam_x</a></div><div class="ttdeci">u16 cam_x</div><div class="ttdoc">Probe oracles: the camera, the shards placed this frame, the resident in the front slot.</div><div class="ttdef"><b>Definition</b> main.c:90</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>The three-call rhythm each frame is the whole contract:</p>
 <ul>
@@ -245,8 +245,8 @@ Collision against the map</h2>
 <div class="line">    <span class="comment">// walkable — the tile&#39;s attribute is 0</span></div>
 <div class="line">}</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile = <a class="code hl_function" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>);   <span class="comment">// the raw metatile id</span></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Kit&#39;s hitbox, top-left corner, Y.</div><div class="ttdef"><b>Definition</b> main.c:78</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Kit&#39;s hitbox, top-left corner, in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
 <div class="ttc" id="amap_8h_html_a49fd2a70bfc38c5c4ba5ea883b863dc7"><div class="ttname"><a href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a></div><div class="ttdeci">u16 mapGetMetaTilesProp(u16 xpos, u16 ypos)</div><div class="ttdoc">Get tile collision property at map coordinates.</div></div>
 <div class="ttc" id="amap_8h_html_ad95ef475b3953c77cd646919e1cf1ce3"><div class="ttname"><a href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a></div><div class="ttdeci">u16 mapGetMetaTile(u16 xpos, u16 ypos)</div><div class="ttdoc">Get metatile index at map coordinates.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp</a></span> is the map-engine equivalent of <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span>; use it when the map lives in the <span class="tt">map</span> module. (A game on the <span class="tt">background</span> module with a <span class="tt">.c16</span> grid (<span class="tt">collision = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>) uses <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> instead — see the <a href="tutorial_collision.html">collision tutorial</a>.)</p>
@@ -262,8 +262,7 @@ One-way and second-layer options</h2>
 Worked patterns (the shipped examples)</h2>
 <ul>
 <li><b><span class="tt">examples/maps/map_scroll</span></b> — the full Tiled pipeline (a <span class="tt">.tmj</span> drawn in Tiled, converted with <span class="tt">opensnes-level</span>, loaded with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>) and the minimum scroller above, a large map followed by a sprite.</li>
-<li><b><span class="tt">examples/maps/slope_collision</span></b> — per-tile collision <em>attributes</em> driving slope physics (the <span class="tt">.b16</span> values mean more than solid/empty).</li>
-<li><b><span class="tt">examples/maps/dynamic_map</span></b> — rewriting map tiles at runtime.</li>
+<li><b><span class="tt">examples/demos/platform_objects</span></b> — per-tile collision <em>attributes</em> driving slope physics (the <span class="tt">.b16</span> values mean more than solid/empty).</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="gotchas-4"></a>
 Gotchas</h2>

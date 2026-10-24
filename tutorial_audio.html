@@ -195,7 +195,7 @@ Basic Music Playback</h3>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
@@ -239,7 +239,8 @@ Sound Effects</h3>
 <div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:340</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="volume-control"></a>
+</div><!-- fragment --><p><b>An effect has to fit.</b> <span class="tt"><a class="el" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97" title="Load a sound effect from the soundbank.">snesmodLoadEffect()</a></span> copies the sample into the SPC700's RAM after the module, and the echo buffer sits at the top of that RAM. The driver does not check the room: an effect that does not fit is written over the echo buffer, and both are heard wrong, with no error (<span class="tt"><a class="el" href="known_limitations.html">KNOWN_LIMITATIONS.md</a></span>). <span class="tt">opensnes-music inspect music.it</span> prints what the module leaves free ("N free of M"); add up the effects before loading them. <span class="tt"><a class="el" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358" title="Load a module from the soundbank.">snesmodLoadModule()</a></span> frees every effect, so load the effects after it. <span class="tt">examples/audio/snesmod_music</span> loads four effects beside a module with an echo, with the figures: what the module leaves, what each effect takes.</p>
+<h3 class="doxsection"><a class="anchor" id="volume-control"></a>
 Volume Control</h3>
 <div class="fragment"><div class="line"><span class="comment">// Set module volume (0-255; a module starts at 255 — 127 is half)</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(255);</div>
@@ -386,8 +387,7 @@ Tips</h2>
 <h2 class="doxsection"><a class="anchor" id="example-roms"></a>
 Example ROMs</h2>
 <ul>
-<li><span class="tt">examples/audio/snesmod_music/</span> - Music playback demo</li>
-<li><span class="tt">examples/audio/snesmod_sfx/</span> - Sound effects demo</li>
+<li><span class="tt">examples/audio/snesmod_music/</span> - Music playback with transport controls, and effects over it</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="next-steps-1"></a>
 Next Steps</h2>

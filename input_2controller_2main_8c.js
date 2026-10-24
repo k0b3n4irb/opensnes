@@ -1,6 +1,28 @@
 var input_2controller_2main_8c =
 [
+    [ "Lamp", "structLamp.html", "structLamp" ],
+    [ "BAY_X_MAX", "input_2controller_2main_8c.html#a7f6c9e62f4a8fb6b3b53d02e25390f2a", null ],
+    [ "BAY_X_MIN", "input_2controller_2main_8c.html#aca715b622d31e8c58fda5f8064bfe75c", null ],
+    [ "BAY_Y_MAX", "input_2controller_2main_8c.html#ad89aad22746ceb2cec20d81e4b6ccd73", null ],
+    [ "BAY_Y_MIN", "input_2controller_2main_8c.html#ad334d3961723f733ba5ac66d248a0305", null ],
+    [ "LAMPS", "input_2controller_2main_8c.html#af31124019367814bc62bbaa63625ff29", null ],
+    [ "OBJ_VRAM", "input_2controller_2main_8c.html#a69f9f237baac2ee247f14425602af76e", null ],
+    [ "PAD_Y", "input_2controller_2main_8c.html#a5fb02b736c0c917dc78a96516bf2aac2", null ],
+    [ "SCREEN_MAP", "input_2controller_2main_8c.html#a00c0712aceacf4a307698b0e38e5eff8", null ],
+    [ "SCREEN_TILES", "input_2controller_2main_8c.html#a274d56b1dd88abfddcaf91d6e57e4410", null ],
+    [ "TILE_AVATAR", "input_2controller_2main_8c.html#a89d36a415b8e36c838ebd67c5458e772", null ],
+    [ "TILE_LAMP", "input_2controller_2main_8c.html#ae2e8a5ab10e587c7bbc0f2afb0f7726d", null ],
+    [ "first_name", "input_2controller_2main_8c.html#a20f609e45388fd7dab26e378017d8071", null ],
     [ "main", "input_2controller_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "on_init", "input_2controller_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4", null ],
-    [ "on_update", "input_2controller_2main_8c.html#ae658753de50085894acfe2b69fbd62e5", null ]
+    [ "on_update", "input_2controller_2main_8c.html#ae658753de50085894acfe2b69fbd62e5", null ],
+    [ "show_pad", "input_2controller_2main_8c.html#a2952ed089463406e0220454b20074304", null ],
+    [ "walk", "input_2controller_2main_8c.html#ad87cf54d06abeefc5042b32814bad6cc", null ],
+    [ "avatar_x", "input_2controller_2main_8c.html#a2480366fc93e42c990a3975540ebe5b0", null ],
+    [ "avatar_y", "input_2controller_2main_8c.html#ad1acdf7a4821b7d7a79926b3f74383c8", null ],
+    [ "facing", "input_2controller_2main_8c.html#ac5eba414674b42bb8cf6c09368a28785", null ],
+    [ "key_bit", "input_2controller_2main_8c.html#a012e5b9201b064ea8c7b7349c7f38f61", null ],
+    [ "key_name", "input_2controller_2main_8c.html#a3e2956073192e2e16c68327dae1747a2", null ],
+    [ "lamps", "input_2controller_2main_8c.html#a45c8f38b1957952a183a7b3382dc7f4c", null ],
+    [ "pad_x", "input_2controller_2main_8c.html#a1a4057fa45a32deaccd6ffd293368556", null ]
 ];

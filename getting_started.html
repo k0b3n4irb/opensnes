@@ -191,7 +191,7 @@ A4. Run Your First ROM</h3>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>Any other SNES emulator opens the <span class="tt">.sfc</span> as well (Mesen, bsnes, Snes9x — see the table above). </p>
 </blockquote>
-<p>You should see "TEXT MODULE TEST" in white on a dark blue screen.</p>
+<p>You should see "OS: RUE BASSE NET" and "READY" in white on a dark blue-green screen.</p>
 <h3 class="doxsection"><a class="anchor" id="a5-create-your-own-project"></a>
 A5. Create Your Own Project</h3>
 <p>The SDK ships an <b><span class="tt">opensnes</span> CLI</b> (in the extracted <span class="tt">bin/</span> directory) that scaffolds, builds, and runs a project for you. Put it on your <span class="tt">PATH</span> once — from the extracted SDK directory:</p>
@@ -203,7 +203,7 @@ A5. Create Your Own Project</h3>
 </div><!-- fragment --><p><span class="tt">opensnes init</span> gives you a project that builds and runs from the start. Pick a template:</p>
 <ul>
 <li><b><span class="tt">--template blank</span></b> — a "HELLO SNES!" text screen, the simplest starting point.</li>
-<li><b><span class="tt">--template <a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span></b> — a sprite you steer with the D-pad: the SDK's starter project. Its picture, <span class="tt">res/player.png</span>, has a settings file beside it (<span class="tt">res/player.png.toml</span>) that the build reads to convert it, the model for every asset you add; <span class="tt">test/</span> holds two luna tests that <span class="tt">make test</span> runs.</li>
+<li><b><span class="tt">--template <a class="el" href="demos_2shmup_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span></b> — a sprite you steer with the D-pad: the SDK's starter project. Its picture, <span class="tt">res/player.png</span>, has a settings file beside it (<span class="tt">res/player.png.toml</span>) that the build reads to convert it, the model for every asset you add; <span class="tt">test/</span> holds two luna tests that <span class="tt">make test</span> runs.</li>
 </ul>
 <p>Other commands (<a class="el" href="tools_opensnes.html" title="opensnes — the project tool">opensnes — the project tool</a>): <span class="tt">opensnes build</span>, <span class="tt">opensnes clean</span>, and <span class="tt">opensnes doctor</span> (checks your toolchain, library, and emulator and tells you what is missing). Run <span class="tt">opensnes --help</span> for the full list.</p>
 <h4 class="doxsection"><a class="anchor" id="manual-setup-the-long-way"></a>
@@ -229,7 +229,7 @@ Manual setup (the long way)</h4>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -251,7 +251,7 @@ Project Structure</h3>
 <div class="line">    └── walk_right.toml</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="test-your-game"></a>
 Test Your Game</h3>
-<p>Projects can declare automated tests that run in <b>luna</b>, the same cycle-accurate emulator the SDK's own test suite uses, with luna's own manifests: one <span class="tt">test/&lt;name&gt;.toml</span> per test, run by <span class="tt">luna test</span>. Opt-in is simply the presence of a <span class="tt">test/*.toml</span>. The <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span> template ships these two (<span class="tt">rom</span> names the project's <span class="tt">TARGET</span>):</p>
+<p>Projects can declare automated tests that run in <b>luna</b>, the same cycle-accurate emulator the SDK's own test suite uses, with luna's own manifests: one <span class="tt">test/&lt;name&gt;.toml</span> per test, run by <span class="tt">luna test</span>. Opt-in is simply the presence of a <span class="tt">test/*.toml</span>. The <span class="tt"><a class="el" href="demos_2shmup_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span> template ships these two (<span class="tt">rom</span> names the project's <span class="tt">TARGET</span>):</p>
 <div class="fragment"><div class="line"># test/boot.toml — a visual baseline and WRAM values at frame 180</div>
 <div class="line">rom = &quot;../game.sfc&quot;</div>
 <div class="line">frames = 180</div>
@@ -283,7 +283,7 @@ Test Your Game</h3>
 <ul>
 <li><b>WRAM values</b> — <span class="tt">[checkpoint.values]</span> entries are read by luna at <span class="tt">at_frame</span>, with symbol names resolved from your ROM's <span class="tt">.sym</span> file: write the name the variable has in your C. Two sources may define a <span class="tt">static</span> of the same name; luna then refuses the bare name and lists the candidates, each with its source file as a suffix (<span class="tt">"player_x.main"</span> for the one of <span class="tt">main.c</span>, quoted because of the dot). A value is a number, or <span class="tt">{ eq = 0x10, width = 1 }</span> to set the width; <span class="tt">[checkpoint.delta]</span> says <span class="tt">"increased"</span> / <span class="tt">"unchanged"</span> between two checkpoints;</li>
 <li><b>Visual baselines</b> — <span class="tt">asserts.fbhash</span> is the hash of the frame at <span class="tt">frames</span>; <span class="tt">make test-update</span> rewrites it in place, comments kept, after an intended change of what the game shows;</li>
-<li><b>The machine</b> — <span class="tt">region = "<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a>"</span> runs the test under PAL, <span class="tt">power_on</span> / <span class="tt">seed</span> the RAM the ROM boots on; <span class="tt">[asserts.dma] unsafe_writes = 0</span> fails on a VRAM write outside blanking.</li>
+<li><b>The machine</b> — <span class="tt">region = "<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a>"</span> runs the test under PAL, <span class="tt">power_on</span> / <span class="tt">seed</span> the RAM the ROM boots on; <span class="tt">[asserts.dma] unsafe_writes = 0</span> fails on a VRAM write outside blanking.</li>
 </ul>
 <p><span class="tt">luna test --help</span> lists everything a manifest can say. Commit <span class="tt">test/</span> to your repo; rerun <span class="tt">make test-update</span> when you intentionally change what the game shows.</p>
 <hr  />

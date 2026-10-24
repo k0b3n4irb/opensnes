@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['lineclearresult_0',['LineClearResult',['../structLineClearResult.html',1,'']]]
+  ['lamp_0',['Lamp',['../structLamp.html',1,'']]],
+  ['lineclearresult_1',['LineClearResult',['../structLineClearResult.html',1,'']]],
+  ['look_2',['Look',['../structLook.html',1,'']]]
 ];

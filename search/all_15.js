@@ -8,13 +8,12 @@ var searchData=
   ['job_3a_20the_20code_20cache_5',['Letting the Game Run During a Job: the Code Cache',['../tutorial_superfx_advanced.html#letting-the-game-run-during-a-job-the-code-cache',1,'']]],
   ['jobs_20in_20one_20program_3a_20entry_20points_6',['Several Jobs in One Program: Entry Points',['../tutorial_superfx_advanced.html#several-jobs-in-one-program-entry-points',1,'']]],
   ['joy1_204_20auto_20read_20results_7',['$4218-$421F - JOY1-4 (Auto-Read Results)',['../registers.html#autotoc_md4218-421f---joy1-4-auto-read-results',1,'']]],
-  ['joypad_20read_8',['Auto-Joypad Read',['../examples_input_two_players.html#auto-joypad-read',1,'']]],
-  ['joypad_20registers_9',['Joypad Registers',['../registers.html#joypad-registers',1,'']]],
-  ['joypad_20status_10',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md4212---hvbjoy-blankjoypad-status',1,'']]],
-  ['juice_20on_20real_20hardware_11',['Game feel: juice on real hardware',['../craft_game_feel.html',1,'craft']]],
-  ['jumps_20and_20tables_20in_20rom_3a_20gsu_5fbank_12',['Absolute jumps and tables in ROM: &lt;span class=&quot;tt&quot;&gt;GSU_BANK&lt;/span&gt;',['../tutorial_superfx_advanced.html#absolute-jumps-and-tables-in-rom-gsu_bank',1,'']]],
-  ['just_20building_20it_13',['Designing the level, not just building it',['../craft_tiles_to_levels.html#designing-the-level-not-just-building-it',1,'']]],
-  ['just_20pixels_14',['A tile carries meaning, not just pixels',['../craft_tiles_to_levels.html#a-tile-carries-meaning-not-just-pixels',1,'']]],
-  ['just_20work_15',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md-superfree-assets-in-any-bank-just-work',1,'']]],
-  ['just_20works_16',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#why-pvsneslib-just-works',1,'']]]
+  ['joypad_20registers_8',['Joypad Registers',['../registers.html#joypad-registers',1,'']]],
+  ['joypad_20status_9',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md4212---hvbjoy-blankjoypad-status',1,'']]],
+  ['juice_20on_20real_20hardware_10',['Game feel: juice on real hardware',['../craft_game_feel.html',1,'craft']]],
+  ['jumps_20and_20tables_20in_20rom_3a_20gsu_5fbank_11',['Absolute jumps and tables in ROM: &lt;span class=&quot;tt&quot;&gt;GSU_BANK&lt;/span&gt;',['../tutorial_superfx_advanced.html#absolute-jumps-and-tables-in-rom-gsu_bank',1,'']]],
+  ['just_20building_20it_12',['Designing the level, not just building it',['../craft_tiles_to_levels.html#designing-the-level-not-just-building-it',1,'']]],
+  ['just_20pixels_13',['A tile carries meaning, not just pixels',['../craft_tiles_to_levels.html#a-tile-carries-meaning-not-just-pixels',1,'']]],
+  ['just_20work_14',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md-superfree-assets-in-any-bank-just-work',1,'']]],
+  ['just_20works_15',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#why-pvsneslib-just-works',1,'']]]
 ];

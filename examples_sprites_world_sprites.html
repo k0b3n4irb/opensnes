@@ -126,32 +126,58 @@ $(function(){initNavTree('examples_sprites_world_sprites.html','',''); });
 <img src="world_sprites.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <p>Seventeen coins drift over a 512 × 448 world, six square walkers pace up and down near its centre, and the D-pad scrolls a 256 × 224 view of it. Every frame the example hands its world-space arrays to <span class="tt"><a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld()</a></span>, once per batch: the call subtracts the camera, hides what is off screen, writes the OAM entries and the ninth x bit, and reports in <span class="tt">visible[]</span> which sprites it placed — the loop a scrolling game runs every frame, in assembly. The walkers are sorted by depth and the batch's <span class="tt">order</span> says which walker each slot shows, the way a game seen from above sorts its actors.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-50"></a>
+    <p>A square of the Rue basse seen from above, 512 × 448: seventeen data shards drift over the paving, six residents — Kit, a frog, an owl, a pangolin, a raccoon and a rat — pace up and down round the neon ring at its centre, and the D-pad scrolls a 256 × 224 view of it (BG1, a 64 × 64 map, scrolls with the camera). Every frame the example hands its world-space arrays to <span class="tt"><a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld()</a></span>, once per batch: the call subtracts the camera, hides what is off screen, writes the OAM entries and the ninth x bit, and reports in <span class="tt">visible[]</span> which sprites it placed — the loop a scrolling game runs every frame, in assembly. The residents are sorted by depth and the batch's <span class="tt">order</span> says which resident each slot shows, the way a game seen from above sorts its actors; each faces the way it walks (its back turned going up).</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-33"></a>
 SNES Concepts</h2>
 <ul>
 <li>World coordinates minus a camera give screen coordinates; a sprite partly off the left edge needs the ninth x bit (x in 256..511), which the PPU reads as negative.</li>
 <li>OAM culling: a sprite off screen is hidden (x = 257, y = 240), not left where it was.</li>
-<li>OAM order is drawing order: the lower slot is in front. Seen from above, the sprite lower on the screen is nearer, so the walkers are sorted by y every frame (an insertion sort of six bytes) and <span class="tt">order</span> permutes the slots — the arrays stay indexed by the walker, nothing is copied.</li>
+<li>OAM order is drawing order: the lower slot is in front. Seen from above, the sprite lower on the screen is nearer, so the residents are sorted by y every frame (an insertion sort of six bytes) and <span class="tt">order</span> permutes the slots — the arrays stay indexed by the resident, nothing is copied.</li>
 <li>Structure of arrays (one array per property) is what the 65816 indexes cheaply; an <span class="tt"><a class="el" href="structOamWorldBatch.html" title="A batch of sprites in world coordinates, for oamPlaceWorld().">OamWorldBatch</a></span> is filled with their addresses once.</li>
-<li>A batch has one size: the coins are the SMALL size of <span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span> (16 × 16), the walkers the LARGE one (32 × 32), set once with <span class="tt"><a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a></span>: the call never touches the size bit.</li>
-<li><span class="tt">visible[]</span> tells the game which sprites were placed — here it counts the coins in view; a game reads it to stream the animation frames of the sprites that are shown and skip the others, so that a sprite off screen costs no VRAM DMA.</li>
+<li>A batch has one size: the shards are the SMALL size of <span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span> (16 × 16), the residents the LARGE one (32 × 32), set once with <span class="tt"><a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a></span>: the call never touches the size bit.</li>
+<li>A sprite's frame is its entry of the batch's <span class="tt">tile</span> array: a resident walking up gets its north frame, one walking down its south frame, and the call writes whichever is there. Each resident has its OBJ palette (1 to 6, in its attribute); the shards share palette 0.</li>
+<li><span class="tt">visible[]</span> tells the game which sprites were placed — here it counts the shards in view; a game reads it to stream the animation frames of the sprites that are shown and skip the others, so that a sprite off screen costs no VRAM DMA.</li>
 <li>A batch costs the same whether its sprites are on screen or not (the call tests each one); a game that hides a whole group skips the call with a flag of its own rather than placing hidden sprites.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="controls-34"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-30"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">D-pad  </td><td class="markdownTableBodyNone">Scroll the camera  </td></tr>
+<td class="markdownTableBodyNone">D-pad  </td><td class="markdownTableBodyNone">Scroll the camera (and the paving), up to the kerb  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-20"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-13"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-69"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="vram-layout-7"></a>
+VRAM Layout</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Region  </th><th class="markdownTableHeadNone">Content  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$0000  </td><td class="markdownTableBodyNone">BG1 tilemap, 64 × 64 (four 32 × 32 pages, 8 KB)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">$1000  </td><td class="markdownTableBodyNone">BG1 tiles: the square, 275 tiles (4bpp)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">$4000  </td><td class="markdownTableBodyNone">OBJ tiles: twelve frames of the residents, then the shard (tile 192)  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="assets-21"></a>
+Assets</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What it is  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/plaza.png</span>  </td><td class="markdownTableBodyNone">the square, 512 × 512: running-bond paving, the kerb and its cyan strip, the pink ring, manhole covers, puddles holding the neon  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/residents.png</span>  </td><td class="markdownTableBodyNone">the sheet, 128 px wide (one row of OBJ tiles): frame 2k resident k facing south, 2k + 1 facing north; the shard at the start of the fourth row  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings (<span class="tt">opensnes-tileset</span>, <span class="tt">opensnes-sprite</span>); the build converts and links them  </td></tr>
+</table>
+<p>The residents and the shard are Néo-Lumen art (PixelLab, CC0); the square is drawn by <span class="tt">devtools/art_assets/build.py</span>, which also lays out the sheet (<span class="tt">assets/neo-lumen/README.md</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">tile</span> </p>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

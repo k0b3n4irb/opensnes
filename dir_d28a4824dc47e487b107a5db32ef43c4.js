@@ -5,6 +5,7 @@ var dir_d28a4824dc47e487b107a5db32ef43c4 =
     [ "basics", "dir_11144b04fe32445669d7ec23d224b8fb.html", "dir_11144b04fe32445669d7ec23d224b8fb" ],
     [ "chips", "dir_9e091f3c70fadb018c87c69315755ec4.html", "dir_9e091f3c70fadb018c87c69315755ec4" ],
     [ "color", "dir_a6233f11c25a6b7b9b4345713ea1198a.html", "dir_a6233f11c25a6b7b9b4345713ea1198a" ],
+    [ "demos", "dir_18fad6f51288fbbac8c86743937ab4d6.html", "dir_18fad6f51288fbbac8c86743937ab4d6" ],
     [ "fundamentals", "dir_799e5ff613eee8f881f50db81391cba4.html", "dir_799e5ff613eee8f881f50db81391cba4" ],
     [ "games", "dir_becf1ea6f4c3aedd00716ce2d1a94e66.html", "dir_becf1ea6f4c3aedd00716ce2d1a94e66" ],
     [ "hdma", "dir_ba15eae6718420cabaf99ba87d209fd6.html", "dir_ba15eae6718420cabaf99ba87d209fd6" ],

@@ -29,7 +29,7 @@ var tools =
     [ "opensnes — the project tool", "tools_opensnes.html", null ],
     [ "The opensnes-* tools: conventions", "tools_conventions.html", null ],
     [ "Your project's Makefile", "tools_build.html", null ],
-    [ "luna — command reference (pinned v1.39.0)", "tools_luna.html", null ],
+    [ "luna — command reference (pinned v1.40.0)", "tools_luna.html", null ],
     [ "Legacy tools", "tools_legacy.html", [
       [ "gfx4snes", "tools_legacy.html#tools_gfx4snes", null ],
       [ "tmx2snes", "tools_legacy.html#tools_tmx2snes", null ],

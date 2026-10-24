@@ -184,7 +184,7 @@ Basic Usage</h2>
 <div class="line">        <span class="comment">// Update sprites/backgrounds</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -443,7 +443,7 @@ Attribution</h2>
 <p>A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1). Named rand() until 2026-09-22 (that name was removed on 2026-10-05) — a libc name for a function that is not the libc one (no RAND_MAX, 1-65535, a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>), which collides the day any C library code is linked.</p>
 <dl class="section return"><dt>Returns</dt><dd>Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero seed is replaced, see <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (the srand() of 0.x, removed 2026-10-05).">rngSeed()</a>)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 256;</div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">Drones&#39; hitboxes, top-left corner X.</div><div class="ttdef"><b>Definition</b> main.c:83</div></div>
 <div class="ttc" id="aconsole_8h_html_af00b46ef13a81876e2a8806eee9dde8c"><div class="ttname"><a href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a></div><div class="ttdeci">u16 rngNext(void)</div><div class="ttdoc">Next pseudo-random 16-bit number.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --> 
@@ -505,7 +505,7 @@ Attribution</h2>
 <div class="line">    <a class="code hl_function" href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_a5a1bfaf2babf4d8dac31cafc468c735f"><div class="ttname"><a href="#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a></div><div class="ttdeci">void setBrightness(u8 brightness)</div><div class="ttdoc">Set screen brightness.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:144</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

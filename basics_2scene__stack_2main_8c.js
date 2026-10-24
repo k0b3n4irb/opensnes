@@ -1,5 +1,11 @@
 var basics_2scene__stack_2main_8c =
 [
+    [ "VRAM_BG1_GFX", "basics_2scene__stack_2main_8c.html#a66dfb3e79e2ee8c70cdb20e50b48b654", null ],
+    [ "VRAM_BG1_MAP", "basics_2scene__stack_2main_8c.html#a062335e0c6d2c2294bf2782b300c7a60", null ],
+    [ "VRAM_BG2_GFX", "basics_2scene__stack_2main_8c.html#aba14270cc3cca97712782e0ed46263be", null ],
+    [ "VRAM_BG2_MAP", "basics_2scene__stack_2main_8c.html#a887794f9b169e435e406eed5ff0a9c3b", null ],
+    [ "VRAM_BG3_FONT", "basics_2scene__stack_2main_8c.html#a7eb53dcf8226af94ea280e66d733072c", null ],
+    [ "VRAM_BG3_MAP", "basics_2scene__stack_2main_8c.html#a5496de1e71cd26388ff2055d7804d1f5", null ],
     [ "counter_init", "basics_2scene__stack_2main_8c.html#a7e844f40aac8d1061abf89325fbcd7d8", null ],
     [ "counter_update", "basics_2scene__stack_2main_8c.html#ab55aeb54c54ffc06b611f98f5d5816dd", null ],
     [ "main", "basics_2scene__stack_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],

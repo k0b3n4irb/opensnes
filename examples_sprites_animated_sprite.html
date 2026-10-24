@@ -126,13 +126,13 @@ $(function(){initNavTree('examples_sprites_animated_sprite.html','',''); });
 <img src="animated_sprite.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-7"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-6"></a>
 What This Example Shows</h2>
 <p>How to animate a character sprite that walks in 4 directions with 3 animation frames each. Demonstrates sprite sheet layout, direction state machines, and horizontal flip to reuse art.</p>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-8"></a>
+<h2 class="doxsection"><a class="anchor" id="prerequisites-6"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">sprites/simple_sprite</span> first (OAM basics, tile loading).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-29"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-26"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -146,20 +146,20 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Right  </td><td class="markdownTableBodyNone">Walk right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-44"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-30"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/animated_sprite</div>
-</div><!-- fragment --><p>Then open <span class="tt">animated_sprite.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-15"></a>
+</div><!-- fragment --><p>Then open <span class="tt">animated_sprite.sfc</span> in luna (<span class="tt">luna-gui animated_sprite.sfc</span>) or any emulator.</p>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-11"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-sprite-sheet-layout"></a>
 1. Sprite sheet layout</h3>
-<p>The sprite sheet is a PNG strip containing 9 frames of 16x16 sprites, loaded to VRAM at startup via <span class="tt"><a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a></span>. Each 16x16 sprite occupies 2 tile columns in VRAM. The frame index maps to tile numbers:</p>
+<p>The sprite sheet is a column of fifteen 32x32 frames of Kit seen from above: five walking down, five walking up, five walking to the right. It is loaded to VRAM at startup via <span class="tt"><a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a></span>. The converter lays 32x32 blocks out four to a 128-pixel row of OBJ VRAM, so block <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6">k</a></span> starts at tile <span class="tt">(<a class="el" href="games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6">k</a> % 4) * 4 + (<a class="el" href="games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6">k</a> / 4) * 64</span>:</p>
 <ul>
-<li>Walking down: tiles 0, 2, 4</li>
-<li>Walking up: tiles 6, 8, 10</li>
-<li>Walking right: tiles 12, 14, 32</li>
+<li>Walking down (blocks 0-4): tiles 0, 4, 8, 12, 64</li>
+<li>Walking up (blocks 5-9): tiles 68, 72, 76, 128, 132</li>
+<li>Walking right (blocks 10-14): tiles 136, 140, 192, 196, 200</li>
 <li>Walking left: same as right, but with <span class="tt"><a class="el" href="sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3" title="Metasprite horizontal flip flag.">OBJ_FLIPX</a></span></li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-state-machine"></a>
@@ -178,24 +178,20 @@ How It Works</h2>
 </div><!-- fragment --><p>Left and right share the same animation row &ndash; the PPU's horizontal flip flag (<span class="tt"><a class="el" href="sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3" title="Metasprite horizontal flip flag.">OBJ_FLIPX</a></span>) mirrors the sprite at zero CPU cost. This is a standard SNES technique that halves the sprite art needed for left/right movement.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-animation-timing"></a>
 3. Animation timing</h3>
-<div class="fragment"><div class="line"><a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_delay++;</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_delay &gt;= <a class="code hl_define" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a>) {</div>
-<div class="line">    <a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_delay = 0;</div>
-<div class="line">    <a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_frame++;</div>
-<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_frame &gt;= 3) <a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.anim_frame = 0;</div>
-<div class="line">}</div>
-<div class="ttc" id="asprites_2animated__sprite_2main_8c_html_a22e2bc93d6832b63ced1b19352729024"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a></div><div class="ttdeci">Monster monster</div><div class="ttdoc">The player-controlled character sprite, initialized facing down at (100, 100).</div><div class="ttdef"><b>Definition</b> main.c:109</div></div>
+<p>One clip per facing, from the <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> module; the clip holds the tile numbers and the cadence:</p>
+<div class="fragment"><div class="line"><a class="code hl_define" href="anim_8h.html#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a>(walk_down, <a class="code hl_define" href="anim_8h.html#ac2f8f711a52b203de5a6469e086c963f">ANIM_LOOP</a>, <a class="code hl_define" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a>, 0, 4, 8, 12, 64);</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="anim_8h.html#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a>(&amp;<a class="code hl_variable" href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a>, &amp;walk_down);       <span class="comment">/* continues if already playing */</span></div>
+<div class="line"><a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a>.gfx_frame = <a class="code hl_function" href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a>(&amp;<a class="code hl_variable" href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a>);   <span class="comment">/* the tile number for oamSet() */</span></div>
+<div class="ttc" id="aanim_8h_html_a35cf99090ec3c39a40eb25db6f87b05d"><div class="ttname"><a href="anim_8h.html#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a></div><div class="ttdeci">#define DECLARE_ANIM_CLIP(name, mode_, speed_,...)</div><div class="ttdoc">Declare a static const AnimClip with uniform frame duration.</div><div class="ttdef"><b>Definition</b> anim.h:202</div></div>
+<div class="ttc" id="aanim_8h_html_a7a416dc50a4020c4810d7b205bb0304b"><div class="ttname"><a href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a></div><div class="ttdeci">u16 animTick(AnimPlayer *p)</div><div class="ttdoc">Advance one tick; return the current frame value.</div></div>
+<div class="ttc" id="aanim_8h_html_a82791dbe279dc728e3946f838f8e2cf1"><div class="ttname"><a href="anim_8h.html#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a></div><div class="ttdeci">void animPlay(AnimPlayer *p, const AnimClip *clip)</div><div class="ttdoc">Start (or keep) a clip — continue-if-same semantics.</div></div>
+<div class="ttc" id="aanim_8h_html_ac2f8f711a52b203de5a6469e086c963f"><div class="ttname"><a href="anim_8h.html#ac2f8f711a52b203de5a6469e086c963f">ANIM_LOOP</a></div><div class="ttdeci">#define ANIM_LOOP</div><div class="ttdoc">Loop mode: wrap to frame 0 after the last frame.</div><div class="ttdef"><b>Definition</b> anim.h:59</div></div>
+<div class="ttc" id="agames_2rooftop__run_2main_8c_html_abd0611a2b49c085f2b68f1656452c09c"><div class="ttname"><a href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a></div><div class="ttdeci">static AnimPlayer kit_anim</div><div class="ttdef"><b>Definition</b> main.c:253</div></div>
+<div class="ttc" id="asprites_2animated__sprite_2main_8c_html_a40d20879d5ecca950af2b5d40fa95874"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a></div><div class="ttdeci">Walker kit</div><div class="ttdoc">Kit, the player-controlled sprite, initialized facing down at (100, 100).</div><div class="ttdef"><b>Definition</b> main.c:109</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_aca96d6bd10d9a1eca2363540f9d3f5a8"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a></div><div class="ttdeci">#define ANIM_DELAY</div><div class="ttdoc">Number of frames to hold each animation frame before advancing.</div><div class="ttdef"><b>Definition</b> main.c:106</div></div>
 </div><!-- fragment --><p>Animation only advances when a direction button is held. <span class="tt"><a class="el" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8" title="Number of frames to hold each animation frame before advancing.">ANIM_DELAY</a></span> (6 frames) controls walking speed &ndash; at 60 fps, this means about 10 animation steps per second.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md4-tile-calculation"></a>
-4. Tile calculation</h3>
-<p>The tile number is computed from the state and frame:</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (state == <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d">W_DOWN</a>)  tile = <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> * 2;          <span class="comment">/* 0, 2, 4 */</span></div>
-<div class="line"><span class="keywordflow">if</span> (state == <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa1b27b1e4284a41371a37847cc1dfe65d">W_UP</a>)    tile = 6 + <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> * 2;      <span class="comment">/* 6, 8, 10 */</span></div>
-<div class="line"><span class="keywordflow">if</span> (state == <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a>) tile = 12 + <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> * 2;     <span class="comment">/* 12, 14, (32) */</span></div>
-<div class="ttc" id="amaps_2map__scroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
-</div><!-- fragment --><p>Frame 2 of the right-walk is at tile 32 (next row in VRAM) because the sheet wraps at 16 tiles per row.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-45"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-28"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="obj_flipx----hardware-horizontal-mirror"></a>
 OBJ_FLIPX &ndash; Hardware Horizontal Mirror</h3>
@@ -203,10 +199,10 @@ OBJ_FLIPX &ndash; Hardware Horizontal Mirror</h3>
 <h3 class="doxsection"><a class="anchor" id="sprite-sheets-in-vram"></a>
 Sprite Sheets in VRAM</h3>
 <p>All animation frames are loaded into VRAM at once via <span class="tt"><a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a></span>. The active frame is selected by changing the tile number in <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>. This means switching frames is instant &ndash; just change a number, no DMA needed.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md16x16-tiles-in-oam"></a>
-16x16 Tiles in OAM</h3>
-<p>In OAM, a 16x16 sprite uses 4 hardware 8x8 tiles arranged in a 2x2 grid. The tile number refers to the top-left tile; the PPU fills in the rest automatically using the SNES tile numbering convention (right tile = tile+1, bottom tiles follow the 16-tile-per-row VRAM layout).</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-15"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md32x32-tiles-in-oam"></a>
+32x32 Tiles in OAM</h3>
+<p>In OAM, a 32x32 sprite uses 16 hardware 8x8 tiles arranged in a 4x4 grid. The tile number refers to the top-left tile; the PPU fills in the rest automatically using the SNES tile numbering convention (right tile = tile+1, each row below is 16 tiles further, the 16-tile-per-row VRAM layout). <span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span> makes "large" mean 32x32, and <span class="tt">oamSetSize(0, OBJ_LARGE)</span> picks it for this sprite.</p>
+<h2 class="doxsection"><a class="anchor" id="project-structure-11"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -214,13 +210,13 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Input handling, state machine, animation logic  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/sprites.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the sprite sheet (<span class="tt">opensnes-sprite</span>: 16-pixel blocks, 16 colours); the build converts the PNG and links the result, <span class="tt">res/sprites.inc</span> declares the symbols  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/kit_walk.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the sprite sheet (<span class="tt">opensnes-sprite</span>: 32-pixel blocks, 16 colours); the build converts the PNG and links the result, <span class="tt">res/kit_walk.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/sprites.png</span>  </td><td class="markdownTableBodyNone">Source sprite sheet (9 frames, 16x16 each)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/kit_walk.png</span>  </td><td class="markdownTableBodyNone">Kit's walk seen from above, 15 frames of 32x32 in a column; generated for OpenSNES, CC0 (<span class="tt">assets/neo-lumen/</span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma input</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-9"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-8"></a>
 Going Further</h2>
 <ul>
 <li><b>Add diagonal movement</b>: Check for simultaneous Up+Right, Down+Left, etc. Choose a direction state based on the last-pressed direction.</li>
@@ -231,9 +227,9 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-62"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-44"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">anim</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

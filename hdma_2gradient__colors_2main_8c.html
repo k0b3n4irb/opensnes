@@ -123,48 +123,127 @@ $(function(){initNavTree('hdma_2gradient__colors_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>HDMA-driven per-scanline backdrop color gradient.  
+<p>HDMA-driven backdrop gradients: a direct table, and an indirect one.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="hdma_8h_source.html">snes/hdma.h</a>&gt;</code><br />
-<code>#include &quot;res/opensnes.inc&quot;</code><br />
+<code>#include &quot;res/logo.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a7858ba6d3b9540fecf4ff41d2e32b78b" id="r_a7858ba6d3b9540fecf4ff41d2e32b78b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7858ba6d3b9540fecf4ff41d2e32b78b">BAND_LINES</a>&#160;&#160;&#160;7</td></tr>
+<tr class="memitem:a46ee023ac3f5d103e533843238d2e52a" id="r_a46ee023ac3f5d103e533843238d2e52a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a46ee023ac3f5d103e533843238d2e52a">NBANDS</a>&#160;&#160;&#160;32</td></tr>
+<tr class="memdesc:a46ee023ac3f5d103e533843238d2e52a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bands of the indirect gradient, and scanlines per band (32 x 7 = 224).  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:acaf7eeeed696b62ba9ab99e5abc9fe70" id="r_acaf7eeeed696b62ba9ab99e5abc9fe70"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#acaf7eeeed696b62ba9ab99e5abc9fe70">buildIndirect</a> (void)</td></tr>
+<tr class="memdesc:acaf7eeeed696b62ba9ab99e5abc9fe70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the indirect gradient's payloads and pointer table, once.  <br /></td></tr>
 <tr class="memitem:a2b343bc67d8186b5bbaafe2711db8f94" id="r_a2b343bc67d8186b5bbaafe2711db8f94"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2b343bc67d8186b5bbaafe2711db8f94">disableGradient</a> (void)</td></tr>
 <tr class="memdesc:a2b343bc67d8186b5bbaafe2711db8f94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the HDMA gradient and restore a flat backdrop color.  <br /></td></tr>
 <tr class="memitem:a3bb2cc2d1414873f04b4bfb504a9b3f1" id="r_a3bb2cc2d1414873f04b4bfb504a9b3f1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3bb2cc2d1414873f04b4bfb504a9b3f1">enableGradient</a> (void)</td></tr>
 <tr class="memdesc:a3bb2cc2d1414873f04b4bfb504a9b3f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the HDMA backdrop color gradient effect.  <br /></td></tr>
+<tr class="memitem:ac6848e19197b202dc5b008b0d699a530" id="r_ac6848e19197b202dc5b008b0d699a530"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac6848e19197b202dc5b008b0d699a530">enableIndirect</a> (void)</td></tr>
+<tr class="memdesc:ac6848e19197b202dc5b008b0d699a530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switch channel 6 to the indirect gradient.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; HDMA-driven per-scanline backdrop color gradient.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:abf222233a4cef60952d9e8c6930e473f" id="r_abf222233a4cef60952d9e8c6930e473f"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abf222233a4cef60952d9e8c6930e473f">band_data</a> [32][4]</td></tr>
+<tr class="memdesc:abf222233a4cef60952d9e8c6930e473f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bands' payloads: [CGADD][CGADD][color_lo][color_hi] each.  <br /></td></tr>
 <tr class="memitem:ac02a749aefafdaf51906904af640e33a" id="r_ac02a749aefafdaf51906904af640e33a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac02a749aefafdaf51906904af640e33a">hdmaGradientList</a> []</td></tr>
 <tr class="memdesc:ac02a749aefafdaf51906904af640e33a"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for the background layer.  <br /></td></tr>
+<tr class="memitem:a0f089355db851d283a48715859fcb354" id="r_a0f089355db851d283a48715859fcb354"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0f089355db851d283a48715859fcb354">itable</a> [32 *3+1]</td></tr>
+<tr class="memdesc:a0f089355db851d283a48715859fcb354"><td class="mdescLeft">&#160;</td><td class="mdescRight">The indirect table: [count][ptr_lo][ptr_hi] per band + terminator.  <br /></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
 <tr class="memitem:a35bf2dfefd617848209ae1f535119d6e" id="r_a35bf2dfefd617848209ae1f535119d6e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a35bf2dfefd617848209ae1f535119d6e">pada</a></td></tr>
 <tr class="memitem:a1834737427fa0f0b2f09e8b9e39fd1ba" id="r_a1834737427fa0f0b2f09e8b9e39fd1ba"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1834737427fa0f0b2f09e8b9e39fd1ba">padb</a></td></tr>
+<tr class="memitem:ae264bc9e95567b5d6ed4eeeff52b5177" id="r_ae264bc9e95567b5d6ed4eeeff52b5177"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae264bc9e95567b5d6ed4eeeff52b5177">padx</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>HDMA-driven per-scanline backdrop color gradient. </p>
-<p>Uses HDMA to rewrite CGRAM color 0 (the backdrop color) on every scanline group, creating a smooth vertical color gradient behind the background layer. HDMA channel 6 is configured in mode 3 (2REG_2X), which writes 4 bytes per entry to consecutive register pairs: two bytes to CGADD ($2121) to select color index 0, then two bytes to CGDATA ($2122) to write the 15-bit BGR color value. A pre-built HDMA table in ROM defines the gradient colors for each scanline group. This technique was widely used in SNES games for sky gradients, underwater tinting, and lava glow effects without consuming any CPU time.</p>
+<div class="textblock"><p>HDMA-driven backdrop gradients: a direct table, and an indirect one. </p>
+<p>Uses HDMA to rewrite CGRAM color 0 (the backdrop color) on every scanline group, creating a smooth vertical color gradient behind the background layer. HDMA channel 6 is configured in mode 3 (2REG_2X), which writes 4 bytes per entry to consecutive register pairs: two bytes to CGADD ($2121) to select color index 0, then two bytes to CGDATA ($2122) to write the 15-bit BGR color value. A pre-built HDMA table in ROM defines the gradient colors for each scanline group: the city's sky at dusk, behind the OpenSNES logo. This technique was widely used in SNES games for sky gradients, underwater tinting, and lava glow effects without consuming any CPU time.</p>
+<p>Press X for the same effect through INDIRECT HDMA: the table holds [count][pointer] entries and the PPU fetches each band's 4-byte payload through the pointer ($43x7 selects its bank). The payloads live in a WRAM array the CPU can rewrite freely — the layout of dynamic per-scanline palettes. The indirect gradient is krom (Peter Lemon)'s "Red Space
+Indirect HDMA" (32 red bands of 7 lines), ported to C.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>HDMA mode 3 (2REG_2X) targeting CGADD + CGDATA</li>
 <li>Per-scanline CGRAM color modification (color 0 = backdrop)</li>
 <li>HDMA table format: [count] [CGADD_lo] [CGADD_hi] [color_lo] [color_hi]</li>
 <li>Runtime HDMA enable/disable toggling</li>
+<li>INDIRECT HDMA (DMAP bit 6): [count][ptr16] entries, the payload's bank in $43x7, which <a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a> writes; a count of 7 fetches the payload once and holds it for 7 lines</li>
+<li>A C pointer's bank for $43x7: (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)data &gt;&gt; 16)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>A vertical color gradient covers the screen behind the background tiles</li>
+<li>A dusk gradient (night, violet, magenta, amber) behind Kit and the wordmark</li>
 <li>Press A to disable the gradient (flat backdrop color returns)</li>
 <li>Press B to re-enable the gradient effect</li>
+<li>Press X for the indirect gradient: 32 red bands, brightest at the top</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, hdma, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a7858ba6d3b9540fecf4ff41d2e32b78b" name="a7858ba6d3b9540fecf4ff41d2e32b78b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7858ba6d3b9540fecf4ff41d2e32b78b">&#9670;&#160;</a></span>BAND_LINES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BAND_LINES&#160;&#160;&#160;7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a46ee023ac3f5d103e533843238d2e52a" name="a46ee023ac3f5d103e533843238d2e52a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee023ac3f5d103e533843238d2e52a">&#9670;&#160;</a></span>NBANDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NBANDS&#160;&#160;&#160;32</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bands of the indirect gradient, and scanlines per band (32 x 7 = 224). </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="acaf7eeeed696b62ba9ab99e5abc9fe70" name="acaf7eeeed696b62ba9ab99e5abc9fe70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaf7eeeed696b62ba9ab99e5abc9fe70">&#9670;&#160;</a></span>buildIndirect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void buildIndirect </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build the indirect gradient's payloads and pointer table, once. </p>
+<p>A red ramp $1F..$00 (BGR555: red is bits 0-4, so the high byte stays 0); each band's entry points at its payload and holds it for BAND_LINES lines. </p>
+
+</div>
+</div>
 <a id="a2b343bc67d8186b5bbaafe2711db8f94" name="a2b343bc67d8186b5bbaafe2711db8f94"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2b343bc67d8186b5bbaafe2711db8f94">&#9670;&#160;</a></span>disableGradient()</h2>
 
@@ -207,6 +286,26 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ac6848e19197b202dc5b008b0d699a530" name="ac6848e19197b202dc5b008b0d699a530"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6848e19197b202dc5b008b0d699a530">&#9670;&#160;</a></span>enableIndirect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void enableIndirect </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Switch channel 6 to the indirect gradient. </p>
+<p>Same channel, same registers (2REG_2X to CGADD); the table is the pointer table, and the payloads' bank goes in $43x7. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -229,6 +328,30 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="abf222233a4cef60952d9e8c6930e473f" name="abf222233a4cef60952d9e8c6930e473f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf222233a4cef60952d9e8c6930e473f">&#9670;&#160;</a></span>band_data</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> band_data[32][4]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The bands' payloads: [CGADD][CGADD][color_lo][color_hi] each. </p>
+
+</div>
+</div>
 <a id="ac02a749aefafdaf51906904af640e33a" name="ac02a749aefafdaf51906904af640e33a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac02a749aefafdaf51906904af640e33a">&#9670;&#160;</a></span>hdmaGradientList</h2>
 
@@ -259,6 +382,30 @@ Variables</h2></td></tr>
 <li>Bytes 3-4: written to CGDATA (15-bit BGR color for this scanline group)</li>
 </ul>
 <p>The table ends with a 0x00 terminator byte. HDMA processes this table automatically every frame without CPU intervention, rewriting the backdrop color at each scanline group boundary to produce a smooth vertical gradient. </p>
+
+</div>
+</div>
+<a id="a0f089355db851d283a48715859fcb354" name="a0f089355db851d283a48715859fcb354"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f089355db851d283a48715859fcb354">&#9670;&#160;</a></span>itable</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> itable[32 *3+1]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The indirect table: [count][ptr_lo][ptr_hi] per band + terminator. </p>
 
 </div>
 </div>
@@ -304,6 +451,21 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Edge-detection flag for B button </p>
+
+</div>
+</div>
+<a id="ae264bc9e95567b5d6ed4eeeff52b5177" name="ae264bc9e95567b5d6ed4eeeff52b5177"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae264bc9e95567b5d6ed4eeeff52b5177">&#9670;&#160;</a></span>padx</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> padx</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Edge-detection flag for X button </p>
 
 </div>
 </div>

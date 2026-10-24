@@ -126,22 +126,27 @@ $(function(){initNavTree('backgrounds_2mode3_2main_8c.html','',''); });
 <p>Mode 3 full-color (256-color, 8bpp) background.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;res/bg.inc&quot;</code><br />
+<code>#include &quot;res/canal.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a6f6f629f73ce5b47b350e9ffe6dbe820" id="r_a6f6f629f73ce5b47b350e9ffe6dbe820"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6f6f629f73ce5b47b350e9ffe6dbe820">MAP_ADDR</a>&#160;&#160;&#160;0x7000</td></tr>
+<tr class="memdesc:a6f6f629f73ce5b47b350e9ffe6dbe820"><td class="mdescLeft">&#160;</td><td class="mdescRight">The picture, converted by the build from res/canal.png (res/canal.png.toml).  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The picture, converted by the build from res/bg.bmp (res/bg.bmp.toml).  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; load 256-color tileset and display Mode 3 image.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 3 full-color (256-color, 8bpp) background. </p>
-<p>Displays a 256-color background using Mode 3, the highest color-depth tiled mode on the SNES. Each tile is 64 bytes (8 bitplanes), so this tileset (39 KB) is larger than a ROM bank: the converter writes it in two parts, bg_tiles and bg_tiles_1, and the linker places each where it has room. A C pointer carries its bank byte, so <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> takes each part wherever it landed.</p>
-<p>This is a port of the PVSnesLib "Mode3" example.</p>
+<p>Displays a 256-color background using Mode 3, the highest color-depth tiled mode on the SNES: a city canal at night, 253 colours, its haze a gradient no 16-colour palette could hold. Each tile is 64 bytes (8 bitplanes), so this tileset (770 tiles, 48 KB) is larger than a ROM bank: the converter writes it in two parts, canal_tiles and canal_tiles_1, and the linker places each where it has room. A C pointer carries its bank byte, so <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> takes each part wherever it landed.</p>
+<p>This began as the PVSnesLib "Mode3" example.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Mode 3: BG1 at 8bpp (256 colors from the whole CGRAM), BG2 at 4bpp</li>
 <li>8bpp tile format: 64 bytes per tile (8 interleaved bitplanes)</li>
 <li>Data larger than a ROM bank: two parts, each copied with its own bank</li>
-<li>VRAM layout: tiles at $0000 (large), tilemap at $6000</li>
+<li>VRAM layout: tiles at $0000 (24640 words), tilemap at $7000</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -152,7 +157,25 @@ Functions</h2></td></tr>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a6f6f629f73ce5b47b350e9ffe6dbe820" name="a6f6f629f73ce5b47b350e9ffe6dbe820"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f6f629f73ce5b47b350e9ffe6dbe820">&#9670;&#160;</a></span>MAP_ADDR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAP_ADDR&#160;&#160;&#160;0x7000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The picture, converted by the build from res/canal.png (res/canal.png.toml). </p>
+<p>VRAM word address of the tilemap, past the 770 tiles (770 x 32 words = $6040) </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -168,8 +191,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The picture, converted by the build from res/bg.bmp (res/bg.bmp.toml). </p>
-<p>Entry point &ndash; load 256-color tileset and display Mode 3 image</p>
+<p>Entry point &ndash; load 256-color tileset and display Mode 3 image. </p>
 <p>Forces blank, DMAs the 8bpp tile data (two parts, each at most a ROM bank), the tilemap and the 256-color palette into VRAM/CGRAM, then configures Mode 3 and turns on the screen. BG1 has 256 colors per tile (8 bitplanes), the richest color depth of any tiled SNES mode; the tradeoff is one such layer, plus a 16-color BG2 that is unused here.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
 

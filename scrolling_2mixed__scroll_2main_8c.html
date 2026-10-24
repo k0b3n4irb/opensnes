@@ -123,12 +123,13 @@ $(function(){initNavTree('scrolling_2mixed__scroll_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Mixed scrolling with fixed and auto-scrolling background layers.  
+<p>Mixed scrolling, a title screen: three layers, three scrolls — the rain, a fixed logo, a moving message.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="scrolling_2mixed__scroll_2vram__map_8h_source.html">vram_map.h</a>&quot;</code><br />
-<code>#include &quot;res/opensnes.inc&quot;</code><br />
-<code>#include &quot;res/shader.inc&quot;</code><br />
+<code>#include &quot;res/logo.inc&quot;</code><br />
+<code>#include &quot;res/rain.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -137,28 +138,34 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:abc0fa15ce154a5984ee0e8999ffcff9f" id="r_abc0fa15ce154a5984ee0e8999ffcff9f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abc0fa15ce154a5984ee0e8999ffcff9f">msgX</a> = 0</td></tr>
+<tr class="memdesc:abc0fa15ce154a5984ee0e8999ffcff9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The message's horizontal scroll (BG3).  <br /></td></tr>
 <tr class="memitem:af9529d671c3b039626d154728894df1b" id="r_af9529d671c3b039626d154728894df1b"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af9529d671c3b039626d154728894df1b">scrX</a> = 0</td></tr>
-<tr class="memdesc:af9529d671c3b039626d154728894df1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000).  <br /></td></tr>
+<tr class="memdesc:af9529d671c3b039626d154728894df1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tile data &ndash; the rain, a repeating picture (4bpp, tiles at VRAM $4000).  <br /></td></tr>
 <tr class="memitem:a2349c3f40df58d5ea4c0d99fe5a2ca73" id="r_a2349c3f40df58d5ea4c0d99fe5a2ca73"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a> = 0</td></tr>
 <tr class="memdesc:a2349c3f40df58d5ea4c0d99fe5a2ca73"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 vertical scroll offset (auto-incremented each frame).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Mixed scrolling with fixed and auto-scrolling background layers. </p>
-<p>Layers two Mode 1 backgrounds: BG1 displays a repeating shader pattern that auto-scrolls diagonally each frame, while BG2 shows a static logo that remains fixed. Each layer uses its own tile set and palette slot in VRAM and CGRAM (BG1 tiles at $4000 with palette slot 1, BG2 tiles at $5000 with palette slot 0). The tilemaps are placed at non-overlapping VRAM addresses ($1800 for BG1, $1400 for BG2). This demonstrates how the SNES PPU composites multiple BG layers with independent scroll offsets, making it straightforward to combine static UI elements with animated backgrounds.</p>
+<div class="textblock"><p>Mixed scrolling, a title screen: three layers, three scrolls — the rain, a fixed logo, a moving message. </p>
+<p>The title screen of the Néo-Lumen examples. Layers two Mode 1 backgrounds: BG1 displays the night behind the title — rain and far lights, a picture that repeats — and auto-scrolls diagonally each frame, one pixel left and two down, the slope of the rain; BG2 shows the logo, which remains fixed. Each layer uses its own tile set and palette slot in VRAM and CGRAM (BG1 tiles at $4000 with palette slot 1, BG2 tiles at $5000 with palette slot 0). The tilemaps are placed at non-overlapping VRAM addresses ($1800 for BG1, $1400 for BG2). This demonstrates how the SNES PPU composites multiple BG layers with independent scroll offsets, making it straightforward to combine static UI elements with animated backgrounds.</p>
+<p>A third layer, BG3 (2bpp), carries a line of text from the text module, scrolled horizontally at its own pace: a scrolling message is a scrolled background like any other (it was the scroll_message example).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Independent per-layer scroll registers (BG1 scrolls, BG2 stays fixed)</li>
 <li>Multiple tile sets sharing VRAM without overlap</li>
 <li>Separate palette slots per layer (<span class="tt">palette-entry</span> in a picture's settings file)</li>
-<li>Mode 1 dual-layer compositing (BG1 behind BG2)</li>
+<li>Mode 1 layer order: BG1 is in front of BG2 at the same priority, so the logo's tiles carry the priority bit (<span class="tt">priority = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> in its settings)</li>
+<li>BG3 in Mode 1: 2bpp, its palettes in CGRAM 0-31 (shared with the 4bpp layers' — the text takes 2bpp slot 7, colours 28-31, which BG1's thirteen colours (CGRAM 16-28) leave free but for 28, the transparent one of the slot), above the others with BG3_MODE1_PRIORITY_HIGH and the tile priority bit</li>
+<li>The text module on a layer of your choice: textLoadFont / textInit</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>The shader pattern (BG1) scrolls diagonally and wraps seamlessly</li>
-<li>The logo (BG2) remains stationary in the center</li>
+<li>The rain (BG1) falls diagonally and wraps seamlessly</li>
+<li>The logo (BG2), Kit and the wordmark, remains stationary in the center</li>
 <li>Both layers composite together with proper priority ordering</li>
+<li>The message (BG3) slides left one pixel a frame, in front of both</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
@@ -178,16 +185,32 @@ Variables</h2></td></tr>
 
 <p>Entry point &ndash; mixed scrolling with auto-scrolling BG1 and fixed BG2. </p>
 <p>Loads two Mode 1 background layers into non-overlapping VRAM regions:</p><ul>
-<li>BG1: shader pattern (tiles at $4000, tilemap at $1800, palette slot 1)</li>
+<li>BG1: the rain (tiles at $4000, tilemap at $1800, palette slot 1)</li>
 <li>BG2: static logo (tiles at $5000, tilemap at $1400, palette slot 0)</li>
 </ul>
-<p>Each frame, BG1's scroll position is incremented diagonally by 1 pixel in both X and Y, causing the shader pattern to scroll continuously. BG2 has no scroll updates, so it remains fixed on screen. The SNES PPU composites both layers together, with BG2 (the logo) appearing on top of BG1 due to default priority ordering.</p>
-<dl class="section note"><dt>Note</dt><dd>The tile, map and palette symbols come from the generated res/opensnes.inc and res/shader.inc (opensnes-tileset writes them from the settings files beside the pictures).</dd></dl>
+<p>Each frame, BG1's scroll position moves one pixel right and two up, so the rain falls one pixel left and two down, continuously. BG2 has no scroll updates, so it remains fixed on screen. The SNES PPU composites both layers together, with BG2 (the logo) on top of BG1 because its tiles carry the priority bit.</p>
+<dl class="section note"><dt>Note</dt><dd>The tile, map and palette symbols come from the generated res/logo.inc and res/rain.inc (opensnes-tileset writes them from the settings files beside the pictures).</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>
 
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="abc0fa15ce154a5984ee0e8999ffcff9f" name="abc0fa15ce154a5984ee0e8999ffcff9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc0fa15ce154a5984ee0e8999ffcff9f">&#9670;&#160;</a></span>msgX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> msgX = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The message's horizontal scroll (BG3). </p>
+
+</div>
+</div>
 <a id="af9529d671c3b039626d154728894df1b" name="af9529d671c3b039626d154728894df1b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af9529d671c3b039626d154728894df1b">&#9670;&#160;</a></span>scrX</h2>
 
@@ -200,7 +223,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000). </p>
+<p>BG1 tile data &ndash; the rain, a repeating picture (4bpp, tiles at VRAM $4000). </p>
 <p>BG1 palette (16 colors loaded to CGRAM slot 1, offset 16).</p>
 <p>BG1 tilemap (32x32 tile grid loaded to VRAM $1800).</p>
 <p>BG2 tile data &ndash; static logo (4bpp, tiles at VRAM $5000).</p>

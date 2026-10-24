@@ -123,16 +123,17 @@ $(function(){initNavTree('mode7_2extbg_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Mode 7 EXTBG: one plane split in two layers, a sprite between them.  
+<p>Mode 7 EXTBG: one plane split in two layers, an orb flying between them.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mode7_8h_source.html">snes/mode7.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="tile_8h_source.html">snes/tile.h</a>&gt;</code><br />
+<code>#include &quot;res/plane.inc&quot;</code><br />
+<code>#include &quot;res/orb.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a1dbddc195b7f11b27a17d27243feb7f3" id="r_a1dbddc195b7f11b27a17d27243feb7f3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1dbddc195b7f11b27a17d27243feb7f3">PILLAR_ROW</a>&#160;&#160;&#160;12</td></tr>
-<tr class="memdesc:a1dbddc195b7f11b27a17d27243feb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pillar row and the ball's height on screen.  <br /></td></tr>
+<tr class="memitem:ab885c7da314c00473e322d9ef4361859" id="r_ab885c7da314c00473e322d9ef4361859"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab885c7da314c00473e322d9ef4361859">ORB_Y</a>&#160;&#160;&#160;96</td></tr>
+<tr class="memdesc:ab885c7da314c00473e322d9ef4361859"><td class="mdescLeft">&#160;</td><td class="mdescRight">The orb's height on screen, in pixels.  <br /></td></tr>
 <tr class="memitem:a446998f668b17e1e0c368b4667ef7165" id="r_a446998f668b17e1e0c368b4667ef7165"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a446998f668b17e1e0c368b4667ef7165">VRAM_OBJ</a>&#160;&#160;&#160;0x4000</td></tr>
 <tr class="memdesc:a446998f668b17e1e0c368b4667ef7165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite tiles in VRAM (words): name base slot 2, past Mode 7's 32 KB.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -140,62 +141,46 @@ Macros</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:af1dc991105af7df8c0839c8c25881585" id="r_af1dc991105af7df8c0839c8c25881585"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#af1dc991105af7df8c0839c8c25881585">applyExtBg</a> (void)</td></tr>
 <tr class="memdesc:af1dc991105af7df8c0839c8c25881585"><td class="mdescLeft">&#160;</td><td class="mdescRight">EXTBG on: BG2 (split by bit 7) on screen; off: BG1.  <br /></td></tr>
-<tr class="memitem:acb4f6b5addcb20b5ce557565e2a06d56" id="r_acb4f6b5addcb20b5ce557565e2a06d56"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#acb4f6b5addcb20b5ce557565e2a06d56">buildBall</a> (void)</td></tr>
-<tr class="memdesc:acb4f6b5addcb20b5ce557565e2a06d56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a 16 x 16 ball and upload it as sprite tiles 0, 1, 16, 17.  <br /></td></tr>
-<tr class="memitem:ad3eccefdca1ad2ffed415be442f8af9e" id="r_ad3eccefdca1ad2ffed415be442f8af9e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad3eccefdca1ad2ffed415be442f8af9e">buildPlane</a> (void)</td></tr>
-<tr class="memdesc:ad3eccefdca1ad2ffed415be442f8af9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the plane: checkered floor, 2 x 2-tile pillars on one row.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a27ecf1723452e2be865ff1f223b58290" id="r_a27ecf1723452e2be865ff1f223b58290"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a27ecf1723452e2be865ff1f223b58290">ball_pal</a> [3] = { 0, <a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 28, 4), <a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 16, 2) }</td></tr>
-<tr class="memdesc:a27ecf1723452e2be865ff1f223b58290"><td class="mdescLeft">&#160;</td><td class="mdescRight">OBJ palette 1 (CGRAM 144-159): transparent, yellow, orange.  <br /></td></tr>
-<tr class="memitem:a357839011a84a33d2a2175465355ecc8" id="r_a357839011a84a33d2a2175465355ecc8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a357839011a84a33d2a2175465355ecc8">ball_x</a></td></tr>
-<tr class="memitem:a0bb370bb196ddd918a4495353e682f78" id="r_a0bb370bb196ddd918a4495353e682f78"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0bb370bb196ddd918a4495353e682f78">ballpx</a> [256]</td></tr>
-<tr class="memdesc:a0bb370bb196ddd918a4495353e682f78"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ball, 16 x 16 pixels, and one encoded 8 x 8 tile.  <br /></td></tr>
-<tr class="memitem:a75e29ab35f4628b74d0bfed87ed47fce" id="r_a75e29ab35f4628b74d0bfed87ed47fce"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a75e29ab35f4628b74d0bfed87ed47fce">bg_pal</a> [5]</td></tr>
-<tr class="memdesc:a75e29ab35f4628b74d0bfed87ed47fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">CGRAM 0-4 (BG2 and BG1), 131-132 (the pillar as BG1 reads it).  <br /></td></tr>
 <tr class="memitem:af2356516c9b2ec14b6ac2d9a2376cf16" id="r_af2356516c9b2ec14b6ac2d9a2376cf16"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af2356516c9b2ec14b6ac2d9a2376cf16">extbg_on</a></td></tr>
-<tr class="memdesc:af2356516c9b2ec14b6ac2d9a2376cf16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles: EXTBG on, the ball's x.  <br /></td></tr>
-<tr class="memitem:a21c093383af02cf9b4649a128fdaf5c8" id="r_a21c093383af02cf9b4649a128fdaf5c8"><td class="memItemLeft">static <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a21c093383af02cf9b4649a128fdaf5c8">m7map</a> [128 *128]</td></tr>
-<tr class="memdesc:a21c093383af02cf9b4649a128fdaf5c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The 128 x 128 Mode 7 tilemap, built at run time (16 KB: FAR).  <br /></td></tr>
-<tr class="memitem:aa32a484124874723859af0e41fd15a47" id="r_aa32a484124874723859af0e41fd15a47"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa32a484124874723859af0e41fd15a47">m7tiles</a> [3 *64]</td></tr>
-<tr class="memdesc:aa32a484124874723859af0e41fd15a47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Three 8bpp Mode 7 tiles: floor A, floor B, pillar.  <br /></td></tr>
-<tr class="memitem:a74098e4602b8556df3349bc817680573" id="r_a74098e4602b8556df3349bc817680573"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a74098e4602b8556df3349bc817680573">px</a> [64]</td></tr>
-<tr class="memitem:a4b24fbfead388e007e43fcdc6e13e592" id="r_a4b24fbfead388e007e43fcdc6e13e592"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4b24fbfead388e007e43fcdc6e13e592">tilebuf</a> [32]</td></tr>
+<tr class="memdesc:af2356516c9b2ec14b6ac2d9a2376cf16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles: EXTBG on, the orb's x.  <br /></td></tr>
+<tr class="memitem:a30e52ebc3059eb2df30603ee18a7b794" id="r_a30e52ebc3059eb2df30603ee18a7b794"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a30e52ebc3059eb2df30603ee18a7b794">orb_x</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Mode 7 EXTBG: one plane split in two layers, a sprite between them. </p>
-<p>Mode 7 has a single layer — unless SETINI bit 6 (EXTBG) is set. Then BG2 shows the same plane as BG1 (same tilemap, same pixels, same transform), but reads each pixel's bit 7 as a priority bit and bits 0-6 as its colour. Front to back: sprites 3, sprites 2, BG2 pixels with bit 7 set, sprites 1, BG1, sprites 0, BG2 pixels with bit 7 clear. A priority-1 sprite therefore slides over the floor (bit 7 clear) and under the pillars (bit 7 set) of one and the same Mode 7 plane.</p>
-<p>The ball crosses a row of pillars on its own; press A to switch EXTBG off (BG1 shown instead: one layer, the ball in front of everything) and on.</p>
+<div class="textblock"><p>Mode 7 EXTBG: one plane split in two layers, an orb flying between them. </p>
+<p>Mode 7 has a single layer — unless SETINI bit 6 (EXTBG) is set. Then BG2 shows the same plane as BG1 (same tilemap, same pixels, same transform), but reads each pixel's bit 7 as a priority bit and bits 0-6 as its colour. Front to back: sprites 3, sprites 2, BG2 pixels with bit 7 set, sprites 1, BG1, sprites 0, BG2 pixels with bit 7 clear. A priority-1 sprite therefore flies over the pixels whose bit 7 is clear and under those whose bit 7 is set, in one and the same Mode 7 plane.</p>
+<p>The plane is the city seen from above with the elevated metro over it: the viaducts and the train are drawn with colours 0x81-0x8D, the streets, roofs and canal below with colours 16 and up. An energy orb crosses the screen on its own, over the roofs and under the viaducts; press A to switch EXTBG off (BG1 shown instead: one layer, the orb in front of everything) and on.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SETINI ($2133) bit 6 through <span class="tt"><a class="el" href="mode7_8h.html#a0e44ac5fc77a39c643b06d55b00b768f" title="Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer.">mode7SetExtBg()</a></span></li>
 <li>Mode 7 EXTBG priority: BG2's high pixels above priority-1 sprites, its low pixels below every sprite and below BG1 (hence BG2 alone on screen)</li>
-<li>One pixel, two colours: 0x83 is colour 3 on BG2 (7-bit) and colour 131 on BG1 (8-bit)</li>
-<li>Mode 7 VRAM interleave (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>), a plane and its tiles built at run time in a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> buffer</li>
+<li>One pixel, two colours: 0x81 is colour 1 on BG2 (7-bit) and colour 129 on BG1 (8-bit), so the palette carries the viaducts' colours twice</li>
+<li>Mode 7 VRAM interleave (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>The yellow ball passes in front of the green floor and behind the grey pillars — the same Mode 7 plane, split by bit 7 of its pixels.</li>
-<li>Press A: EXTBG off, BG1 on screen, the ball now covers the pillars too.</li>
+<li>The orb passes over the roofs, the streets and the canal, and under the three viaducts and the train — the same Mode 7 plane, split by bit 7 of its pixels.</li>
+<li>Press A: EXTBG off, BG1 on screen, the orb now covers the viaducts too.</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, sprite, input, mode7, tile</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, sprite, input, mode7</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">mode7.h</a> (<a class="el" href="mode7_8h.html#a0e44ac5fc77a39c643b06d55b00b768f" title="Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer.">mode7SetExtBg</a>), <a class="el" href="tutorial_mode7.html">docs/tutorials/mode7.md</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
-<a id="a1dbddc195b7f11b27a17d27243feb7f3" name="a1dbddc195b7f11b27a17d27243feb7f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1dbddc195b7f11b27a17d27243feb7f3">&#9670;&#160;</a></span>PILLAR_ROW</h2>
+<a id="ab885c7da314c00473e322d9ef4361859" name="ab885c7da314c00473e322d9ef4361859"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab885c7da314c00473e322d9ef4361859">&#9670;&#160;</a></span>ORB_Y</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PILLAR_ROW&#160;&#160;&#160;12</td>
+          <td class="memname">#define ORB_Y&#160;&#160;&#160;96</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The pillar row and the ball's height on screen. </p>
+<p>The orb's height on screen, in pixels. </p>
 
 </div>
 </div>
@@ -243,60 +228,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acb4f6b5addcb20b5ce557565e2a06d56" name="acb4f6b5addcb20b5ce557565e2a06d56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb4f6b5addcb20b5ce557565e2a06d56">&#9670;&#160;</a></span>buildBall()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void buildBall </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Draw a 16 x 16 ball and upload it as sprite tiles 0, 1, 16, 17. </p>
-
-</div>
-</div>
-<a id="ad3eccefdca1ad2ffed415be442f8af9e" name="ad3eccefdca1ad2ffed415be442f8af9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3eccefdca1ad2ffed415be442f8af9e">&#9670;&#160;</a></span>buildPlane()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void buildPlane </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill the plane: checkered floor, 2 x 2-tile pillars on one row. </p>
-
-</div>
-</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -315,96 +246,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a27ecf1723452e2be865ff1f223b58290" name="a27ecf1723452e2be865ff1f223b58290"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27ecf1723452e2be865ff1f223b58290">&#9670;&#160;</a></span>ball_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ball_pal[3] = { 0, <a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 28, 4), <a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 16, 2) }</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>OBJ palette 1 (CGRAM 144-159): transparent, yellow, orange. </p>
-
-</div>
-</div>
-<a id="a357839011a84a33d2a2175465355ecc8" name="a357839011a84a33d2a2175465355ecc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a357839011a84a33d2a2175465355ecc8">&#9670;&#160;</a></span>ball_x</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ball_x</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0bb370bb196ddd918a4495353e682f78" name="a0bb370bb196ddd918a4495353e682f78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0bb370bb196ddd918a4495353e682f78">&#9670;&#160;</a></span>ballpx</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ballpx[256]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The ball, 16 x 16 pixels, and one encoded 8 x 8 tile. </p>
-
-</div>
-</div>
-<a id="a75e29ab35f4628b74d0bfed87ed47fce" name="a75e29ab35f4628b74d0bfed87ed47fce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75e29ab35f4628b74d0bfed87ed47fce">&#9670;&#160;</a></span>bg_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> bg_pal[5]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
-<div class="line">    <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(2, 2, 6), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(6, 20, 6), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(3, 12, 3), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(26, 26, 28), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(14, 14, 16),</div>
-<div class="line">}</div>
-<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:88</div></div>
-</div><!-- fragment -->
-<p>CGRAM 0-4 (BG2 and BG1), 131-132 (the pillar as BG1 reads it). </p>
-
-</div>
-</div>
 <a id="af2356516c9b2ec14b6ac2d9a2376cf16" name="af2356516c9b2ec14b6ac2d9a2376cf16"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af2356516c9b2ec14b6ac2d9a2376cf16">&#9670;&#160;</a></span>extbg_on</h2>
 
@@ -417,98 +258,20 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Probe oracles: EXTBG on, the ball's x. </p>
+<p>Probe oracles: EXTBG on, the orb's x. </p>
 
 </div>
 </div>
-<a id="a21c093383af02cf9b4649a128fdaf5c8" name="a21c093383af02cf9b4649a128fdaf5c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21c093383af02cf9b4649a128fdaf5c8">&#9670;&#160;</a></span>m7map</h2>
+<a id="a30e52ebc3059eb2df30603ee18a7b794" name="a30e52ebc3059eb2df30603ee18a7b794"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30e52ebc3059eb2df30603ee18a7b794">&#9670;&#160;</a></span>orb_x</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> m7map[128 *128]</td>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> orb_x</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The 128 x 128 Mode 7 tilemap, built at run time (16 KB: FAR). </p>
-
-</div>
-</div>
-<a id="aa32a484124874723859af0e41fd15a47" name="aa32a484124874723859af0e41fd15a47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa32a484124874723859af0e41fd15a47">&#9670;&#160;</a></span>m7tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> m7tiles[3 *64]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Three 8bpp Mode 7 tiles: floor A, floor B, pillar. </p>
-
-</div>
-</div>
-<a id="a74098e4602b8556df3349bc817680573" name="a74098e4602b8556df3349bc817680573"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74098e4602b8556df3349bc817680573">&#9670;&#160;</a></span>px</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> px[64]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4b24fbfead388e007e43fcdc6e13e592" name="a4b24fbfead388e007e43fcdc6e13e592"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b24fbfead388e007e43fcdc6e13e592">&#9670;&#160;</a></span>tilebuf</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilebuf[32]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

@@ -135,17 +135,17 @@ Learning Objectives</h2>
 <li>4bpp tile format basics</li>
 <li>Palette organization</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="prerequisites-1"></a>
+<h2 class="doxsection"><a class="anchor" id="prerequisites"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed text examples</li>
 <li>Basic understanding of tiles and tilemaps</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="what-this-example-does-1"></a>
+<h2 class="doxsection"><a class="anchor" id="what-this-example-does"></a>
 What This Example Does</h2>
-<p>Displays a static background image using Mode 1:</p><ul>
-<li>BG1 with 16 colors (4bpp)</li>
+<p>Displays a static background image using Mode 1, a rainy street at night:</p><ul>
+<li>BG1 with 16 colors (4bpp), 883 distinct tiles</li>
 <li>Demonstrates standard SNES background setup</li>
 <li>Foundation for most SNES games</li>
 </ul>
@@ -157,9 +157,26 @@ What This Example Does</h2>
 <div class="line">|                                        |</div>
 <div class="line">|                                        |</div>
 <div class="line">+----------------------------------------+</div>
-</div><!-- fragment --><p><b>Controls:</b> None (static display)</p>
+</div><!-- fragment --><p><b>Controls:</b></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Button  </th><th class="markdownTableHeadNone">Action  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Show BG1 from the LZ77-decompressed copy of the tiles (VRAM $4000)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Show it from the plain copy (VRAM $0000)  </td></tr>
+</table>
+<p>The picture does not change: that is the point of the second copy.</p>
+<h3 class="doxsection"><a class="anchor" id="the-same-tiles-compressed"></a>
+The same tiles, compressed</h3>
+<p><span class="tt">res/street_lz.png</span> is the same picture with <span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> in its settings file: the build stores its tiles LZ77-compressed, <b>18816 bytes</b> in ROM for the <b>28256</b> of the plain copy. At boot the example decodes them straight into VRAM, in force blank:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;res/street_lz.inc&quot;</span>   <span class="comment">/* street_lz_tiles[] (compressed), _pal[], _map[] */</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a>(street_lz_tiles, 0x4000);</div>
+<div class="ttc" id="alzss_8h_html_a98bf298dae04c21afcd57da9f2f92104"><div class="ttname"><a href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a></div><div class="ttdeci">void lzssDecodeVram(const u8 *source, u16 address)</div><div class="ttdoc">Decompress LZ77 data directly to VRAM.</div></div>
+</div><!-- fragment --><p>and A / B switch BG1's character base between the two copies (<span class="tt">bgSetGfxPtr(0, 0x4000)</span> or <span class="tt">0x0000</span>) — one register, at any time. With <span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> the <span class="tt">.inc</span> declares the arrays only, no <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>: <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> would copy the compressed bytes. Two thirds of the ROM for one call at load time. A painting compresses less than a flat logo: LZ77 saves on repeats, and almost every tile of this picture is a little different (a 2592-byte logo went to 652 bytes, a quarter).</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="code-type-1"></a>
+<h2 class="doxsection"><a class="anchor" id="code-type"></a>
 Code Type</h2>
 <p><b>C with Library Functions</b></p>
 <table class="markdownTable">
@@ -213,7 +230,7 @@ Basic Setup</h2>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x1000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load tiles and palette */</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0,</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0,</div>
 <div class="line">              tiles_size, palette_size,</div>
 <div class="line">              <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x4000);</div>
 <div class="line"> </div>
@@ -221,11 +238,11 @@ Basic Setup</h2>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a>, 0x1000, tilemap_size);</div>
 <div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
 <div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
-<div class="ttc" id="acolor_2hicolor__1792_2main_8c_html_a0f3022f9764c547f3d14e6646b2b6f99"><div class="ttname"><a href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a></div><div class="ttdeci">static u16 tilemap[896]</div><div class="ttdoc">Generated 32x28 tilemap (krom&#39;s fixed pattern — see buildTilemap).</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
+<div class="ttc" id="acolor_2hicolor__1792_2main_8c_html_a0f3022f9764c547f3d14e6646b2b6f99"><div class="ttname"><a href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a></div><div class="ttdeci">static u16 tilemap[896]</div><div class="ttdoc">Generated 32x28 tilemap (krom&#39;s fixed pattern — see buildTilemap).</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga11724b6748ce0954e9b43819263537fc"><div class="ttname"><a href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a></div><div class="ttdeci">#define SC_32x32</div><div class="ttdef"><b>Definition</b> background.h:36</div></div>
+<div class="ttc" id="atext_2pixel__text_2main_8c_html_aed41e53efdee92d24f64b3bae717c207"><div class="ttname"><a href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></div><div class="ttdeci">static const u8 palette[]</div><div class="ttdef"><b>Definition</b> main.c:83</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md3-enable-display"></a>
 3. Enable Display</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;  <span class="comment">/* Show BG1 on main screen */</span></div>
@@ -236,12 +253,12 @@ Basic Setup</h2>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="vram-layout"></a>
 VRAM Layout</h2>
-<p>A typical Mode 1 VRAM layout:</p>
-<div class="fragment"><div class="line">$0000-$0FFF: BG1 tilemap (32x32 = 2KB)</div>
-<div class="line">$1000-$1FFF: BG2 tilemap (optional)</div>
-<div class="line">$2000-$3FFF: BG3 tilemap (optional)</div>
-<div class="line">$4000-$7FFF: Tile graphics (16KB available)</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="tilemap-format"></a>
+<p>This example's layout (word addresses), tight because the picture is there twice:</p>
+<div class="fragment"><div class="line">$0000-$372F: BG1 tiles, plain copy (883 tiles x 16 words)</div>
+<div class="line">$4000-$772F: BG1 tiles, the LZ77-decompressed copy</div>
+<div class="line">$7800-$7BFF: BG1 tilemap (32x32 entries)</div>
+</div><!-- fragment --><p>A character base is a multiple of $1000 words and a tilemap base a multiple of $400, which is what decides these three addresses.</p>
+<h3 class="doxsection"><a class="anchor" id="tilemap-format"></a>
 Tilemap Format</h3>
 <p>Each tilemap entry is 2 bytes:</p>
 <div class="fragment"><div class="line">Byte 0: Tile number (0-255)</div>
@@ -262,16 +279,16 @@ Tilemap Format</h3>
 <div class="line">Row layout: BP0, BP1, BP0, BP1... (16 bytes)</div>
 <div class="line">            BP2, BP3, BP2, BP3... (16 bytes)</div>
 </div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-2"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-1"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/backgrounds/mode1</div>
-</div><!-- fragment --><p>Then open <span class="tt">mode1.sfc</span> in your emulator (Mesen2 recommended).</p>
+</div><!-- fragment --><p>Then open <span class="tt">mode1.sfc</span> in luna (<span class="tt">luna-gui mode1.sfc</span>) or any emulator.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-9"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-5"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">asset</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
-<h2 class="doxsection"><a class="anchor" id="files-2"></a>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">asset</span>, <span class="tt">lzss</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
+<h2 class="doxsection"><a class="anchor" id="files-1"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -279,9 +296,13 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Background setup code  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>, 16 colours); the build converts it and links the result, <span class="tt">res/opensnes.inc</span> declares the <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/street.png</span>  </td><td class="markdownTableBodyNone">the picture: a rainy street at night, 256x256 (the last 32 rows are below the screen), 16 colours; generated for OpenSNES, CC0 (<span class="tt">assets/neo-lumen/</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build configuration (<span class="tt">LIB_MODULES := console sprite dma background</span>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/street.png.toml</span>  </td><td class="markdownTableBodyNone">its import settings (<span class="tt">opensnes-tileset</span>, 16 colours); the build converts it and links the result, <span class="tt">res/street.inc</span> declares the <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">res/street_lz.png.toml</span>  </td><td class="markdownTableBodyNone">the same picture with <span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>: its tiles are linked LZ77-compressed, <span class="tt">res/street_lz.inc</span> declares the arrays  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build configuration (<span class="tt">LIB_MODULES := console sprite dma background asset lzss input</span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">res/</span>  </td><td class="markdownTableBodyNone">Source graphics files  </td></tr>
 </table>
@@ -291,7 +312,7 @@ Exercises</h2>
 <h3 class="doxsection"><a class="anchor" id="exercise-1-add-a-second-layer"></a>
 Exercise 1: Add a Second Layer</h3>
 <p>Enable BG2 with a different tileset: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x1800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, tiles_bg2, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 1, ...);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, tiles_bg2, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 1, ...);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;</div>
 <div class="ttc" id="agroup__reg__const_html_gaae76565c377b5604fdbfa058ca79b433"><div class="ttname"><a href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a></div><div class="ttdeci">#define TM_BG2</div><div class="ttdef"><b>Definition</b> registers.h:444</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-2-change-palette"></a>
@@ -310,7 +331,7 @@ Exercise 4: Add Priority</h3>
 <p>Use BG3 for a status bar that appears over BG1: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(2, 0x2000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"><span class="comment">/* Set BG3 priority higher in tilemap entries */</span></div>
 </div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="technical-notes-1"></a>
+<h2 class="doxsection"><a class="anchor" id="technical-notes"></a>
 Technical Notes</h2>
 <h3 class="doxsection"><a class="anchor" id="mode-1-priorities"></a>
 Mode 1 Priorities</h3>
@@ -337,11 +358,11 @@ Color Palette</h3>
 <li>Colors 128-255: Sprite palettes</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="whats-next-3"></a>
+<h2 class="doxsection"><a class="anchor" id="whats-next-2"></a>
 What's Next?</h2>
-<p><b>More BG layers:</b> <a href="examples_backgrounds_mode1_bg3_priority.html">BG3 Priority</a> - HUD overlay in Mode 1</p>
+<p><b>More BG layers:</b> <a href="examples_basics_panel_hud.html">Panel HUD</a> - a HUD on BG3, in front of the scene</p>
 <p><b>Sprites:</b> <a href="examples_sprites_simple_sprite.html">Simple Sprite</a> - Display a sprite</p>
-<p><b>Effects:</b> <a href="../../effects/fading/">Fading</a> - Screen transitions </p>
+<p><b>Effects:</b> <a href="examples_transitions_fading.html">Fading</a> - Screen transitions </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

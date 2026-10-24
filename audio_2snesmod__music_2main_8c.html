@@ -123,37 +123,73 @@ $(function(){initNavTree('audio_2snesmod__music_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Tracker music playback with transport controls via SNESMOD.  
+<p>Tracker music with transport controls, and sound effects over it, via SNESMOD.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="snesmod_8h_source.html">snes/snesmod.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
 <code>#include &quot;soundbank.h&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:adae8021d63052c74619497c15c70595e" id="r_adae8021d63052c74619497c15c70595e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#adae8021d63052c74619497c15c70595e">NUM_EFFECTS</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memdesc:adae8021d63052c74619497c15c70595e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of effects loaded.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — initialize audio, display controls, run transport loop.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ad1e66e2a3607bab15e971590552c1bea" id="r_ad1e66e2a3607bab15e971590552c1bea"><td class="memItemLeft">static const char *const&#160;</td><td class="memItemRight"><a class="el" href="#ad1e66e2a3607bab15e971590552c1bea">effect_name</a> [4]</td></tr>
+<tr class="memdesc:ad1e66e2a3607bab15e971590552c1bea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Their names on screen, padded to the same width.  <br /></td></tr>
+<tr class="memitem:ae2068dd80f1297f277316dbf88cd4f6d" id="r_ae2068dd80f1297f277316dbf88cd4f6d"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae2068dd80f1297f277316dbf88cd4f6d">effect_source</a> [4]</td></tr>
+<tr class="memdesc:ae2068dd80f1297f277316dbf88cd4f6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The effects' sources in the soundbank, in the order they are loaded.  <br /></td></tr>
+<tr class="memitem:a7871932225facb04b9d8092031ff9330" id="r_a7871932225facb04b9d8092031ff9330"><td class="memItemLeft">static const char *const&#160;</td><td class="memItemRight"><a class="el" href="#a7871932225facb04b9d8092031ff9330">pitch_name</a> [3] = { &quot;LOW &quot;, &quot;NORMAL&quot;, &quot;HIGH &quot; }</td></tr>
+<tr class="memitem:ae494ae89300c677dc780164bdb4a48d7" id="r_ae494ae89300c677dc780164bdb4a48d7"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae494ae89300c677dc780164bdb4a48d7">pitch_value</a> [3]</td></tr>
+<tr class="memdesc:ae494ae89300c677dc780164bdb4a48d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The three pitches of <a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a>, and their names.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Tracker music playback with transport controls via SNESMOD. </p>
-<p>Plays an Impulse Tracker (.it) module through the SPC700 sound processor using the SNESMOD library. Provides transport controls: play, stop, pause/resume, volume up/down, and fade out.</p>
-<p>Ported from PVSnesLib "music" example by alekmaul.</p>
+<div class="textblock"><p>Tracker music with transport controls, and sound effects over it, via SNESMOD. </p>
+<p>Plays an Impulse Tracker (.it) module through the SPC700 sound processor using the SNESMOD library, with transport controls (play, stop, pause/resume, volume, fade out), and fires sound effects over the music.</p>
+<p>The soundbank holds two modules: the music (nocturne) and a module that is only a set of instruments (neo_lumen_sfx), whose samples become the sound effects. Effects are uploaded into the SPC700's RAM after the module, in the room the module and its echo buffer leave, and the driver does not check: an effect past the room is copied over the echo buffer, which the echo then overwrites. <span class="tt">opensnes-music inspect</span> gives the room (the README has the figures); the four effects fit.</p>
+<p>The music and the instruments are composed and synthesized for OpenSNES (devtools/audio_assets); the effects are Kenney's (kenney.nl, CC0). The program began as PVSnesLib's "music" and "effects" examples by alekmaul.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SPC700 audio: separate coprocessor with 64 KB audio RAM</li>
 <li>SNESMOD workflow: init → setSoundbank → loadModule → play</li>
 <li>Per-frame <a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a>: sends the queued commands (play, stop, volume, sound effects) to the SPC700, which plays the patterns itself</li>
 <li>Module volume and fade control</li>
+<li>Sound effects: <a class="el" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97" title="Load a sound effect from the soundbank.">snesmodLoadEffect()</a> uploads a sample, <a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a> plays it on a free voice, with volume, pan and pitch</li>
+<li>SPC RAM is shared: module, samples, echo buffer and effects</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>Music plays immediately on boot</li>
 <li>A=play, B=stop, X=pause/resume, L/R=volume, START=fade out</li>
+<li>LEFT/RIGHT choose an effect, UP/DOWN its pitch, Y plays it over the music</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, background, text</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snesmod.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="adae8021d63052c74619497c15c70595e" name="adae8021d63052c74619497c15c70595e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adae8021d63052c74619497c15c70595e">&#9670;&#160;</a></span>NUM_EFFECTS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NUM_EFFECTS&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Number of effects loaded. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -171,6 +207,110 @@ Functions</h2></td></tr>
 
 <p>Entry point — initialize audio, display controls, run transport loop. </p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns </dd></dl>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="ad1e66e2a3607bab15e971590552c1bea" name="ad1e66e2a3607bab15e971590552c1bea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1e66e2a3607bab15e971590552c1bea">&#9670;&#160;</a></span>effect_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* const effect_name[4]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                                    = {</div>
+<div class="line">    <span class="stringliteral">&quot;JUMP   &quot;</span>, <span class="stringliteral">&quot;POWERUP&quot;</span>, <span class="stringliteral">&quot;LASER  &quot;</span>, <span class="stringliteral">&quot;CONFIRM&quot;</span></div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>Their names on screen, padded to the same width. </p>
+
+</div>
+</div>
+<a id="ae2068dd80f1297f277316dbf88cd4f6d" name="ae2068dd80f1297f277316dbf88cd4f6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2068dd80f1297f277316dbf88cd4f6d">&#9670;&#160;</a></span>effect_source</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> effect_source[4]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                               = {</div>
+<div class="line">    SFX_JUMP, SFX_POWERUP, SFX_LASER, SFX_CONFIRM</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The effects' sources in the soundbank, in the order they are loaded. </p>
+
+</div>
+</div>
+<a id="a7871932225facb04b9d8092031ff9330" name="a7871932225facb04b9d8092031ff9330"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7871932225facb04b9d8092031ff9330">&#9670;&#160;</a></span>pitch_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* const pitch_name[3] = { &quot;LOW &quot;, &quot;NORMAL&quot;, &quot;HIGH &quot; }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae494ae89300c677dc780164bdb4a48d7" name="ae494ae89300c677dc780164bdb4a48d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae494ae89300c677dc780164bdb4a48d7">&#9670;&#160;</a></span>pitch_value</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pitch_value[3]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                            = {</div>
+<div class="line">    4  , 8  , 12  </div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The three pitches of <a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a>, and their names. </p>
 
 </div>
 </div>

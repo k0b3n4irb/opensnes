@@ -123,57 +123,250 @@ $(function(){initNavTree('windows_2window_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>HDMA-driven triangle window masking on selectable BG layers.  
+<p>An HDMA-shaped window: a torch beam in a dark alley, masking layers or lighting them.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;res/bg1.inc&quot;</code><br />
-<code>#include &quot;res/bg2.inc&quot;</code><br />
+<code>#include &quot;res/alley.inc&quot;</code><br />
+<code>#include &quot;res/rain.inc&quot;</code><br />
+<code>#include &quot;res/kit.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:afd901262d75b5c13b84d33c6acdf5654" id="r_afd901262d75b5c13b84d33c6acdf5654"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afd901262d75b5c13b84d33c6acdf5654">BEAM_LINES</a>&#160;&#160;&#160;(224 - <a class="el" href="#a160e4a66b4f0b631407fbb12f21d69a3">BEAM_TOP</a>)</td></tr>
+<tr class="memdesc:afd901262d75b5c13b84d33c6acdf5654"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lines of the beam, BEAM_TOP to the last visible line (223).  <br /></td></tr>
+<tr class="memitem:a160e4a66b4f0b631407fbb12f21d69a3" id="r_a160e4a66b4f0b631407fbb12f21d69a3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a160e4a66b4f0b631407fbb12f21d69a3">BEAM_TOP</a>&#160;&#160;&#160;(<a class="el" href="#a9856ab574278b694b6f69dcc3d3f81a0">BEAM_Y</a> - 70)</td></tr>
+<tr class="memdesc:a160e4a66b4f0b631407fbb12f21d69a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">First line of the beam: it widens by one line every 3 pixels, so at x 255 it spans BEAM_Y - 70 to the bottom of the screen.  <br /></td></tr>
 <tr class="memitem:adf4a0593a765b51301f1aa85c1262f00" id="r_adf4a0593a765b51301f1aa85c1262f00"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#adf4a0593a765b51301f1aa85c1262f00">W12SEL_BG1</a>&#160;&#160;&#160;0x03   /* BG1: enable(0x02) + invert(0x01) */</td></tr>
 <tr class="memdesc:adf4a0593a765b51301f1aa85c1262f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">W12SEL value to enable Window 1 on BG1 with inversion (mask outside).  <br /></td></tr>
 <tr class="memitem:ad3e4f60bae6292b70f00e419a32bf8e0" id="r_ad3e4f60bae6292b70f00e419a32bf8e0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad3e4f60bae6292b70f00e419a32bf8e0">W12SEL_BG2</a>&#160;&#160;&#160;0x30   /* BG2: enable(0x20) + invert(0x10) */</td></tr>
 <tr class="memdesc:ad3e4f60bae6292b70f00e419a32bf8e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">W12SEL value to enable Window 1 on BG2 with inversion.  <br /></td></tr>
 <tr class="memitem:a0ed35cd555421addfc69ec44fdf83c30" id="r_a0ed35cd555421addfc69ec44fdf83c30"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a0ed35cd555421addfc69ec44fdf83c30">W12SEL_BOTH</a>&#160;&#160;&#160;0x33   /* Both BGs */</td></tr>
 <tr class="memdesc:a0ed35cd555421addfc69ec44fdf83c30"><td class="mdescLeft">&#160;</td><td class="mdescRight">W12SEL value to enable Window 1 on both BG1 and BG2 with inversion.  <br /></td></tr>
+<tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">VRAM layout (word addresses; a BG's tiles start on a $1000 boundary)</div></td></tr>
+<tr class="memitem:a062335e0c6d2c2294bf2782b300c7a60" id="r_a062335e0c6d2c2294bf2782b300c7a60"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a062335e0c6d2c2294bf2782b300c7a60">VRAM_BG1_MAP</a>&#160;&#160;&#160;0x0000</td></tr>
+<tr class="memitem:a75ec3171efbfd345d2b96dcede29ded2" id="r_a75ec3171efbfd345d2b96dcede29ded2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a75ec3171efbfd345d2b96dcede29ded2">VRAM_BG1_TILES</a>&#160;&#160;&#160;0x1000</td></tr>
+<tr class="memitem:a887794f9b169e435e406eed5ff0a9c3b" id="r_a887794f9b169e435e406eed5ff0a9c3b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a887794f9b169e435e406eed5ff0a9c3b">VRAM_BG2_MAP</a>&#160;&#160;&#160;0x0400</td></tr>
+<tr class="memitem:ab202e5cd47fa03ebeb38e0a3b0c8940b" id="r_ab202e5cd47fa03ebeb38e0a3b0c8940b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab202e5cd47fa03ebeb38e0a3b0c8940b">VRAM_BG2_TILES</a>&#160;&#160;&#160;0x5000</td></tr>
+<tr class="memitem:a446998f668b17e1e0c368b4667ef7165" id="r_a446998f668b17e1e0c368b4667ef7165"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a446998f668b17e1e0c368b4667ef7165">VRAM_OBJ</a>&#160;&#160;&#160;0x6000</td></tr>
+<tr id="define-members-1" class="groupHeader"><td colspan="2"><div class="groupHeader">Kit and his torch</div></td></tr>
+<tr class="memitem:a4b398aa45f2555325932a872c5327e8e" id="r_a4b398aa45f2555325932a872c5327e8e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a4b398aa45f2555325932a872c5327e8e">BEAM_X</a>&#160;&#160;&#160;44</td></tr>
+<tr class="memitem:a9856ab574278b694b6f69dcc3d3f81a0" id="r_a9856ab574278b694b6f69dcc3d3f81a0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a9856ab574278b694b6f69dcc3d3f81a0">BEAM_Y</a>&#160;&#160;&#160;187</td></tr>
+<tr class="memitem:ac696baeb52142dcbca7996c0fe04f003" id="r_ac696baeb52142dcbca7996c0fe04f003"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac696baeb52142dcbca7996c0fe04f003">KIT_X</a>&#160;&#160;&#160;16</td></tr>
+<tr class="memitem:afe81428a3ef9bd18f766d9f153c56ead" id="r_afe81428a3ef9bd18f766d9f153c56ead"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afe81428a3ef9bd18f766d9f153c56ead">KIT_Y</a>&#160;&#160;&#160;168</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a4412c69291201775560aaa87325c075d" id="r_a4412c69291201775560aaa87325c075d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4412c69291201775560aaa87325c075d">buildBeam</a> (void)</td></tr>
+<tr class="memdesc:a4412c69291201775560aaa87325c075d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the two tables of the beam.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: HDMA triangle window masking with selectable BG layers.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: an HDMA beam window with selectable BG layers.  <br /></td></tr>
+<tr class="memitem:ae5ab3c717097db4a7a44b6e56b768646" id="r_ae5ab3c717097db4a7a44b6e56b768646"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae5ab3c717097db4a7a44b6e56b768646">setup_light</a> (void)</td></tr>
+<tr class="memdesc:ae5ab3c717097db4a7a44b6e56b768646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use the beam as the region of colour math instead of a mask.  <br /></td></tr>
 <tr class="memitem:a6d8be50ef64f4849ce6ab1db9ac1ed22" id="r_a6d8be50ef64f4849ce6ab1db9ac1ed22"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a6d8be50ef64f4849ce6ab1db9ac1ed22">setup_window</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> w12sel_val)</td></tr>
 <tr class="memdesc:a6d8be50ef64f4849ce6ab1db9ac1ed22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure HDMA-driven window masking on the specified BG layers.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ae8ca7c4d0b07e2c52fa9fd77df638833" id="r_ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae8ca7c4d0b07e2c52fa9fd77df638833">tablelefttriangle</a> []</td></tr>
-<tr class="memdesc:ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 1 (converted by the build from res/)  <br /></td></tr>
-<tr class="memitem:a05283269f5b57e738841b4cfe551530c" id="r_a05283269f5b57e738841b4cfe551530c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a05283269f5b57e738841b4cfe551530c">tablerighttriangle</a> []</td></tr>
-<tr class="memdesc:a05283269f5b57e738841b4cfe551530c"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the right window boundary (WH1, $2127).  <br /></td></tr>
+<tr class="memitem:a37f355b3f65ccc98806119121f2081ab" id="r_a37f355b3f65ccc98806119121f2081ab"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a37f355b3f65ccc98806119121f2081ab">rain_x</a></td></tr>
+<tr class="memdesc:a37f355b3f65ccc98806119121f2081ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The rain's scroll: it falls a pixel left for four down.  <br /></td></tr>
+<tr class="memitem:af8054ee509ca8d1591b4979a38ab79d6" id="r_af8054ee509ca8d1591b4979a38ab79d6"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af8054ee509ca8d1591b4979a38ab79d6">rain_y</a></td></tr>
+<tr class="memitem:a7f3eb2dd03d6c14d58a1541b91863822" id="r_a7f3eb2dd03d6c14d58a1541b91863822"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7f3eb2dd03d6c14d58a1541b91863822">tablelefttriangle</a> [2+1+(224 -(187 - 70))+1]</td></tr>
+<tr class="memdesc:a7f3eb2dd03d6c14d58a1541b91863822"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the left window boundary (WH0, $2126).  <br /></td></tr>
+<tr class="memitem:ac6c1dfac8096665d4a568ac7ce1f9923" id="r_ac6c1dfac8096665d4a568ac7ce1f9923"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac6c1dfac8096665d4a568ac7ce1f9923">tablerighttriangle</a> [2+1+(224 -(187 - 70))+1]</td></tr>
+<tr class="memdesc:ac6c1dfac8096665d4a568ac7ce1f9923"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the right window boundary (WH1, $2127).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>HDMA-driven triangle window masking on selectable BG layers. </p>
-<p>Demonstrates the SNES window masking hardware combined with HDMA to create a triangle-shaped cutout that clips background layers. Two backgrounds are loaded (BG1 and BG2), and the user can apply the window mask to either or both layers via button presses.</p>
-<p>HDMA channels 4 and 5 drive WH0 ($2126) and WH1 ($2127) in repeat mode, updating the left and right window boundaries every scanline to form a diamond/triangle shape. The W12SEL register ($2123) controls which BG layers are affected by Window 1, with the invert bit set so pixels outside the triangle are masked (clipped to black).</p>
-<p>Ported from PVSnesLib "Window" example. Uses the window module (windowEnable / windowSetInvert / windowSetMainMask) with PVSnesLib's register values, so the frames match its original.</p>
+<div class="textblock"><p>An HDMA-shaped window: a torch beam in a dark alley, masking layers or lighting them. </p>
+<p>Kit stands in a dark back alley with a torch. The beam is a window: its left edge (WH0) changes on every scanline, driven by HDMA, so the window is a cone that leaves the torch and opens to the right. Two backgrounds are loaded — the alley (BG1) and the rain falling in front of it (BG2) — and the buttons choose what the beam does to them.</p>
+<p>HDMA channels 4 and 5 drive WH0 ($2126) and WH1 ($2127) in repeat mode, updating the left and right window boundaries every scanline. The W12SEL register ($2123) controls which BG layers are affected by Window 1, with the invert bit set so pixels outside the beam are masked (clipped to black). Kit is a sprite, and the window is not enabled on sprites: he stays visible in the dark.</p>
+<p>The same window has a second use: instead of hiding layers, it can mark where colour math happens. Press Y and the beam stops clipping and lights instead — colour math adds a warm fixed colour inside it only (CGWSEL "inside the colour window"), the way a game draws a light, a shadow or a dialogue box over the scene.</p>
+<p>Ported from PVSnesLib's "Window" example; the colour-math mode is its "TransparentWindow" example (by Digifox), adding instead of subtracting.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Window masking via W12SEL ($2123) and TMW ($212E) registers</li>
-<li>HDMA repeat mode for per-scanline WH0/WH1 updates</li>
+<li>HDMA repeat mode for per-scanline WH0/WH1 updates, the table computed at boot from the shape it draws</li>
 <li>Window inversion (mask outside vs inside the region)</li>
 <li>Runtime window reconfiguration via register writes</li>
+<li>The colour window (WOBJSEL) as the region of colour math (CGWSEL/CGADSUB)</li>
+<li>Fixed colour source (COLDATA, $2132) added to brighten</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>A triangle/diamond shape masks portions of the background layers</li>
-<li>Press A to apply window to BG1 only</li>
-<li>Press X to apply window to BG2 only</li>
-<li>Press B to apply window to both BG1 and BG2</li>
+<li>At boot the alley and the rain are black but for the torch's beam</li>
+<li>Press A: the beam on the alley only — the rain falls everywhere</li>
+<li>Press X: the beam on the rain only — the alley is lit, the rain shows only where the torch catches it</li>
+<li>Press B: the beam on both again</li>
+<li>Press Y: nothing is clipped, and the beam brightens what it falls on</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, background, window, hdma</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a> </dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, background, window, hdma, colormath</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="window_8h.html" title="SNES Window/Masking System.">window.h</a>, <a class="el" href="colormath_8h.html" title="SNES Color Math (Blending/Transparency).">colormath.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="afd901262d75b5c13b84d33c6acdf5654" name="afd901262d75b5c13b84d33c6acdf5654"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd901262d75b5c13b84d33c6acdf5654">&#9670;&#160;</a></span>BEAM_LINES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BEAM_LINES&#160;&#160;&#160;(224 - <a class="el" href="#a160e4a66b4f0b631407fbb12f21d69a3">BEAM_TOP</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Lines of the beam, BEAM_TOP to the last visible line (223). </p>
+
+</div>
+</div>
+<a id="a160e4a66b4f0b631407fbb12f21d69a3" name="a160e4a66b4f0b631407fbb12f21d69a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a160e4a66b4f0b631407fbb12f21d69a3">&#9670;&#160;</a></span>BEAM_TOP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BEAM_TOP&#160;&#160;&#160;(<a class="el" href="#a9856ab574278b694b6f69dcc3d3f81a0">BEAM_Y</a> - 70)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First line of the beam: it widens by one line every 3 pixels, so at x 255 it spans BEAM_Y - 70 to the bottom of the screen. </p>
+
+</div>
+</div>
+<a id="a4b398aa45f2555325932a872c5327e8e" name="a4b398aa45f2555325932a872c5327e8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b398aa45f2555325932a872c5327e8e">&#9670;&#160;</a></span>BEAM_X</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BEAM_X&#160;&#160;&#160;44</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the beam's tip: the torch, at (27, 19) in his frame </p>
+
+</div>
+</div>
+<a id="a9856ab574278b694b6f69dcc3d3f81a0" name="a9856ab574278b694b6f69dcc3d3f81a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9856ab574278b694b6f69dcc3d3f81a0">&#9670;&#160;</a></span>BEAM_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BEAM_Y&#160;&#160;&#160;187</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac696baeb52142dcbca7996c0fe04f003" name="ac696baeb52142dcbca7996c0fe04f003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac696baeb52142dcbca7996c0fe04f003">&#9670;&#160;</a></span>KIT_X</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define KIT_X&#160;&#160;&#160;16</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kit's sprite x </p>
+
+</div>
+</div>
+<a id="afe81428a3ef9bd18f766d9f153c56ead" name="afe81428a3ef9bd18f766d9f153c56ead"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe81428a3ef9bd18f766d9f153c56ead">&#9670;&#160;</a></span>KIT_Y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define KIT_Y&#160;&#160;&#160;168</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kit's sprite y: his feet on the alley's ground </p>
+
+</div>
+</div>
+<a id="a062335e0c6d2c2294bf2782b300c7a60" name="a062335e0c6d2c2294bf2782b300c7a60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a062335e0c6d2c2294bf2782b300c7a60">&#9670;&#160;</a></span>VRAM_BG1_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_MAP&#160;&#160;&#160;0x0000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the alley's map, 32x32 </p>
+
+</div>
+</div>
+<a id="a75ec3171efbfd345d2b96dcede29ded2" name="a75ec3171efbfd345d2b96dcede29ded2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75ec3171efbfd345d2b96dcede29ded2">&#9670;&#160;</a></span>VRAM_BG1_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_TILES&#160;&#160;&#160;0x1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the alley's 889 tiles, up to $478F </p>
+
+</div>
+</div>
+<a id="a887794f9b169e435e406eed5ff0a9c3b" name="a887794f9b169e435e406eed5ff0a9c3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a887794f9b169e435e406eed5ff0a9c3b">&#9670;&#160;</a></span>VRAM_BG2_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG2_MAP&#160;&#160;&#160;0x0400</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the rain's map, 32x32 </p>
+
+</div>
+</div>
+<a id="ab202e5cd47fa03ebeb38e0a3b0c8940b" name="ab202e5cd47fa03ebeb38e0a3b0c8940b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab202e5cd47fa03ebeb38e0a3b0c8940b">&#9670;&#160;</a></span>VRAM_BG2_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG2_TILES&#160;&#160;&#160;0x5000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the rain's tiles </p>
+
+</div>
+</div>
+<a id="a446998f668b17e1e0c368b4667ef7165" name="a446998f668b17e1e0c368b4667ef7165"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a446998f668b17e1e0c368b4667ef7165">&#9670;&#160;</a></span>VRAM_OBJ</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_OBJ&#160;&#160;&#160;0x6000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kit </p>
+
+</div>
+</div>
 <a id="adf4a0593a765b51301f1aa85c1262f00" name="adf4a0593a765b51301f1aa85c1262f00"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adf4a0593a765b51301f1aa85c1262f00">&#9670;&#160;</a></span>W12SEL_BG1</h2>
 
@@ -223,6 +416,34 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a4412c69291201775560aaa87325c075d" name="a4412c69291201775560aaa87325c075d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4412c69291201775560aaa87325c075d">&#9670;&#160;</a></span>buildBeam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void buildBeam </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compute the two tables of the beam. </p>
+<p>&lt; the beam's tip: the torch, at (27, 19) in his frame</p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -238,9 +459,46 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point: HDMA triangle window masking with selectable BG layers. </p>
-<p>Loads two BG layers, applies a diamond-shaped window mask via HDMA, and enters a loop where button presses reconfigure which layers are clipped.</p>
+<p>Entry point: an HDMA beam window with selectable BG layers. </p>
+<p>Loads the alley, the rain and Kit, computes the beam, and enters a loop where button presses reconfigure what the beam does.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
+<p>&lt; the alley's map, 32x32</p>
+<p>&lt; the alley's 889 tiles, up to $478F</p>
+<p>&lt; the alley's map, 32x32</p>
+<p>&lt; the rain's map, 32x32</p>
+<p>&lt; the rain's tiles</p>
+<p>&lt; the rain's map, 32x32</p>
+<p>&lt; Kit</p>
+<p>&lt; Kit's sprite x</p>
+<p>&lt; Kit's sprite y: his feet on the alley's ground</p>
+
+</div>
+</div>
+<a id="ae5ab3c717097db4a7a44b6e56b768646" name="ae5ab3c717097db4a7a44b6e56b768646"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5ab3c717097db4a7a44b6e56b768646">&#9670;&#160;</a></span>setup_light()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void setup_light </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Use the beam as the region of colour math instead of a mask. </p>
+<p>The HDMA tables are the same; what changes is what the window is for. No layer is clipped (TMW = 0): the colour window, not inverted, is the beam, and colour math adds a warm fixed colour (6, 5, 2) to BG1 and BG2 inside it only (CGWSEL bits 5-4 = 01). PVSnesLib's TransparentWindow subtracted, to darken; adding lights. </p>
 
 </div>
 </div>
@@ -272,8 +530,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Configure HDMA-driven window masking on the specified BG layers. </p>
-<p>Sets up the SNES window hardware and HDMA channels to clip the specified background layers using the triangle-shaped boundary tables, with the same register values as PVSnesLib's setModeHdmaWindow().</p>
-<p>The window "inverts" masking (via the invert bits in W12SEL), so pixels OUTSIDE the triangle shape are clipped to black, while pixels inside remain visible. This is the opposite of the default behavior (which masks inside).</p>
+<p>The window "inverts" masking (via the invert bits in W12SEL), so pixels OUTSIDE the beam are clipped to black, while pixels inside remain visible. This is the opposite of the default behavior (which masks inside).</p>
 <p>HDMA channels 4 and 5 are used (not 7, which carries every DMA of the NMI handler). HDMA is disabled before reconfiguration and re-enabled after to avoid partial-table reads during the transition.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -286,69 +543,83 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="ae8ca7c4d0b07e2c52fa9fd77df638833" name="ae8ca7c4d0b07e2c52fa9fd77df638833"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8ca7c4d0b07e2c52fa9fd77df638833">&#9670;&#160;</a></span>tablelefttriangle</h2>
+<a id="a37f355b3f65ccc98806119121f2081ab" name="a37f355b3f65ccc98806119121f2081ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f355b3f65ccc98806119121f2081ab">&#9670;&#160;</a></span>rain_x</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> rain_x</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The rain's scroll: it falls a pixel left for four down. </p>
+
+</div>
+</div>
+<a id="af8054ee509ca8d1591b4979a38ab79d6" name="af8054ee509ca8d1591b4979a38ab79d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8054ee509ca8d1591b4979a38ab79d6">&#9670;&#160;</a></span>rain_y</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> rain_y</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7f3eb2dd03d6c14d58a1541b91863822" name="a7f3eb2dd03d6c14d58a1541b91863822"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f3eb2dd03d6c14d58a1541b91863822">&#9670;&#160;</a></span>tablelefttriangle</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tablelefttriangle[]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tablelefttriangle[2+1+(224 -(187 - 70))+1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                     = {</div>
-<div class="line">    60, 0xFF,           </div>
-<div class="line">    0x80 | 64,          </div>
-<div class="line">    0x7F, 0x7E, 0x7D, 0x7C, 0x7B, 0x7A, 0x79, 0x78,</div>
-<div class="line">    0x77, 0x76, 0x75, 0x74, 0x73, 0x72, 0x71, 0x70,</div>
-<div class="line">    0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x69, 0x68,</div>
-<div class="line">    0x67, 0x66, 0x65, 0x64, 0x63, 0x62, 0x61, 0x60,</div>
-<div class="line">    0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,</div>
-<div class="line">    0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,</div>
-<div class="line">    0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,</div>
-<div class="line">    0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F,</div>
-<div class="line">    0xFF, 0             </div>
-<div class="line">}</div>
-</div><!-- fragment -->
-<p>4bpp tile data for background layer 1 (converted by the build from res/) </p>
-<p>Tilemap data for BG1 (32x32 grid)</p>
-<p>16-color palette for BG1</p>
-<p>4bpp tile data for background layer 2 (converted by the build from res/)</p>
-<p>Tilemap data for BG2 (32x32 grid)</p>
-<p>16-color palette for BG2 (loaded to CGRAM palette slot 1)</p>
-<p>HDMA table for the left window boundary (WH0, $2126).</p>
-<p>Defines a diamond/triangle shape: the left edge starts at x=0x7F (pixel 127, center of screen), narrows toward x=0x60 (pixel 96) over 32 scanlines, then widens back to 0x7F over 32 more scanlines. The 60-line header disables the window above the triangle by setting WH0=0xFF (left &gt; right = no window). </p>
+
+<p>HDMA table for the left window boundary (WH0, $2126). </p>
+<p>BEAM_TOP lines with WH0 = 255 (left &gt; right: no window), then one value a line for the beam — BEAM_X + 3 x |line - BEAM_Y|, the cone's edge, or 255 where that is past the screen — then the end of the table. </p>
 
 </div>
 </div>
-<a id="a05283269f5b57e738841b4cfe551530c" name="a05283269f5b57e738841b4cfe551530c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05283269f5b57e738841b4cfe551530c">&#9670;&#160;</a></span>tablerighttriangle</h2>
+<a id="ac6c1dfac8096665d4a568ac7ce1f9923" name="ac6c1dfac8096665d4a568ac7ce1f9923"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6c1dfac8096665d4a568ac7ce1f9923">&#9670;&#160;</a></span>tablerighttriangle</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tablerighttriangle[]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tablerighttriangle[2+1+(224 -(187 - 70))+1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                      = {</div>
-<div class="line">    60, 0x00,           </div>
-<div class="line">    0x80 | 64,          </div>
-<div class="line">    0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88,</div>
-<div class="line">    0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90,</div>
-<div class="line">    0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98,</div>
-<div class="line">    0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0xA0,</div>
-<div class="line">    0x9F, 0x9E, 0x9D, 0x9C, 0x9B, 0x9A, 0x99, 0x98,</div>
-<div class="line">    0x97, 0x96, 0x95, 0x94, 0x93, 0x92, 0x91, 0x90,</div>
-<div class="line">    0x8F, 0x8E, 0x8D, 0x8C, 0x8B, 0x8A, 0x89, 0x88,</div>
-<div class="line">    0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81,</div>
-<div class="line">    0x00, 0             </div>
-<div class="line">}</div>
-</div><!-- fragment -->
+
 <p>HDMA table for the right window boundary (WH1, $2127). </p>
-<p>Mirrors the left table: starts at x=0x81 (pixel 129), expands outward to x=0xA0 (pixel 160) then converges back. Together with tablelefttriangle, this creates a diamond shape centered at pixel 128 that is 64 scanlines tall. </p>
+<p>The cone reaches the right edge of the screen on every line it covers: WH1 = 255 there, and 0 (no window) above it. </p>
 
 </div>
 </div>

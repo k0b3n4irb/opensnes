@@ -132,18 +132,16 @@ The ladder</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_windows_window.html">window</a>  </td><td class="markdownTableBodyNone">How do I mask part of the screen with one window?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_windows_window.html">window</a>  </td><td class="markdownTableBodyNone">How do I mask part of the screen with one window, or darken only inside it?  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="examples_windows_window_multi_hdma.html">window_multi_hdma</a>  </td><td class="markdownTableBodyNone">How do I shape <em>both</em> windows per scanline?  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_windows_transparent_window.html">transparent_window</a>  </td><td class="markdownTableBodyNone">How do I combine a window with colour math (a darkened region)?  </td></tr>
 </table>
-<p>Climb from one static rectangle to two HDMA-shaped windows to a window gating colour math.</p>
+<p>Climb from one HDMA-shaped window — used as a mask, then as the region of colour math — to both windows shaped per scanline.</p>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen-9"></a>
 The idea in one screen</h2>
 <p>Each window is a left/right edge pair (<span class="tt">WH0</span>/<span class="tt">WH1</span>, <span class="tt">$2126</span>–<span class="tt">$2129</span>); a layer or colour math reads a per-layer bit that says "apply me inside / outside the
 window." Set the edges once and you get a static rectangle. Rewrite the edges <b>every scanline</b> with HDMA and the two straight edges trace any curve — a circle, a wave, a shrinking iris. Point colour math at the window instead of a layer and you darken/tint only the shape.</p>
-<p><a class="el" href="examples_windows_transparent_window.html" title="Transparent Window -- Color Math + HDMA">Transparent Window -- Color Math + HDMA</a> <a class="el" href="examples_windows_window.html" title="Window -- HDMA Triangle Masking">Window -- HDMA Triangle Masking</a> <a class="el" href="examples_windows_window_multi_hdma.html" title="Multi-window HDMA — both windows animated per scanline">Multi-window HDMA — both windows animated per scanline</a> </p>
+<p><a class="el" href="examples_windows_window.html" title="Window -- HDMA Torch Beam: Masking and Lighting">Window -- HDMA Torch Beam: Masking and Lighting</a> <a class="el" href="examples_windows_window_multi_hdma.html" title="Multi-window HDMA — both windows animated per scanline">Multi-window HDMA — both windows animated per scanline</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

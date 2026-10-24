@@ -1,7 +1,21 @@
 var searchData=
 [
   ['k_0',['k',['../games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6',1,'main.c']]],
-  ['koopatroopanum_1',['koopatroopanum',['../koopatroopa_8c.html#ae3d6d007cf2553f4f13f79656418d114',1,'koopatroopa.c']]],
-  ['koopatroopax_2',['koopatroopax',['../koopatroopa_8c.html#a6233b6b9ad8f42297bbf552f29e5ce2a',1,'koopatroopa.c']]],
-  ['koopatroopay_3',['koopatroopay',['../koopatroopa_8c.html#a5eb98bd1101ba8eb86b987c859f2ff0c',1,'koopatroopa.c']]]
+  ['key_5fbit_1',['key_bit',['../input_2controller_2main_8c.html#a012e5b9201b064ea8c7b7349c7f38f61',1,'main.c']]],
+  ['key_5fname_2',['key_name',['../input_2controller_2main_8c.html#a3e2956073192e2e16c68327dae1747a2',1,'main.c']]],
+  ['kit_3',['kit',['../sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874',1,'main.c']]],
+  ['kit_5faction_4',['kit_action',['../games_2rooftop__run_2main_8c.html#a2567aca28cf89ff1b7a11ed26594c529',1,'main.c']]],
+  ['kit_5fanim_5',['kit_anim',['../games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c',1,'kit_anim:&#160;main.c'],['../sprites_2animated__sprite_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c',1,'kit_anim:&#160;main.c']]],
+  ['kit_5fsafe_6',['kit_safe',['../games_2rooftop__run_2main_8c.html#ab83fa525a552e23dff8e508d5f48cd76',1,'main.c']]],
+  ['kit_5fx_7',['kit_x',['../games_2rooftop__run_2main_8c.html#a7f0dda667456daf1218088d67fde5452',1,'main.c']]],
+  ['kit_5fxfrac_8',['kit_xfrac',['../games_2rooftop__run_2main_8c.html#afc5119f0734b5cf4834e3e54a563c52f',1,'main.c']]],
+  ['kit_5fxvel_9',['kit_xvel',['../games_2rooftop__run_2main_8c.html#a4f7251e4978c000a8b00cf8efe47f4f3',1,'main.c']]],
+  ['kit_5fy_10',['kit_y',['../games_2rooftop__run_2main_8c.html#a59e15cec19de0b89d381ac32d0804c1e',1,'main.c']]],
+  ['kit_5fyfrac_11',['kit_yfrac',['../games_2rooftop__run_2main_8c.html#af3ec087cf5a96dd116b75c1c28ce621c',1,'main.c']]],
+  ['kit_5fyvel_12',['kit_yvel',['../games_2rooftop__run_2main_8c.html#a8d129ab225b03b15a7dc6acaa862de29',1,'main.c']]],
+  ['kitfidx_13',['kitfidx',['../kit_8c.html#a49e0db6f68d5c5898a9caebaf4b4012e',1,'kit.c']]],
+  ['kitflp_14',['kitflp',['../kit_8c.html#ac996a8c45dc6adced64c6e7a00068b2a',1,'kit.c']]],
+  ['kitid_15',['kitid',['../kit_8c.html#a68e6f421448561948aa73b5314a9dbfd',1,'kit.c']]],
+  ['kitx_16',['kitx',['../kit_8c.html#a51daea947660414b79831754e5410d4e',1,'kit.c']]],
+  ['kity_17',['kity',['../kit_8c.html#a9113bbb6a68422fa0332cc1587995ac9',1,'kit.c']]]
 ];

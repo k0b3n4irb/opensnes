@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.39.0)</title>
+<title>luna — command reference (pinned v1.40.0)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.39.0) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.40.0) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">testing/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -296,6 +296,12 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --no-render</div>
 <div class="line">          Leave the picture uncomputed. The machine runs exactly the same (cycles, registers, VRAM / OAM / CGRAM, the `$213E` sprite flags) but no pixel is composed, about half the time of a run. For a run that reads memory and never the screen; refused with an option that reads the picture</div>
+<div class="line"> </div>
+<div class="line">      --layer-shots &lt;LAYER_SHOTS&gt;</div>
+<div class="line">          Write each layer of the last frame alone into this directory: `bg1.png` … `bg4.png`, `obj.png`, transparent where the layer shows nothing. Each is composed with the picture, line by line, so it is the same instant as `--screenshot`, HDMA and mid-frame writes included. A layer shows its own colour (before colour math, master brightness applied) wherever it reaches the main or the sub screen, TM / TS and their windows applied. The `--out` JSON gains `layers.overlaps`: every pair of layers that both show a pixel, with the count and the box around them</div>
+<div class="line"> </div>
+<div class="line">      --layers &lt;LAYERS&gt;</div>
+<div class="line">          With `--layer-shots`: only these layers, comma-separated (`bg1,bg2,bg3,bg4,obj`; default all five)</div>
 <div class="line"> </div>
 <div class="line">      --dump-vram &lt;DUMP_VRAM&gt;</div>
 <div class="line">          Dump all 64 KB of PPU VRAM (raw bytes) to this file after the run. For diagnosing the framebuffer DMA → VRAM → display path</div>
@@ -783,6 +789,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --out &lt;OUT&gt;        Output directory for the report, screenshots, and bug files [default: tests/roms/bench]</div>
 <div class="line">  -f, --frames &lt;FRAMES&gt;  Frames to run per ROM [default: 600]</div>
 <div class="line">      --input &lt;INPUT&gt;    Override the default Start-pulse input (`frame:hex`, like `state --input`) applied to clear title screens</div>
+<div class="line">      --jobs &lt;JOBS&gt;      Bench up to N ROMs at once (0 = one per CPU). Each ROM gets its own emulator; the progress lines, the report and the bug files are the same, in the same order, as a serial run [default: 1]</div>
 <div class="line">  -h, --help             Print help</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-spc-dump"></a>
 <span class="tt">luna spc-dump</span></h2>

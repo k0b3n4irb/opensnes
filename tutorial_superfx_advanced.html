@@ -295,10 +295,8 @@ Presenting Frames: a Double Buffer the NMI Moves</h2>
 <div class="ttc" id="asuperfx_8h_html_a3765f516c293b584f063a05ac723f75a"><div class="ttname"><a href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a">gsuPresent</a></div><div class="ttdeci">void gsuPresent(void)</div><div class="ttdoc">Queue the frame the last job drew; the next job draws in the other.</div></div>
 <div class="ttc" id="asuperfx_8h_html_a5c6d08013690338aaa4dc06074da9d73"><div class="ttname"><a href="superfx_8h.html#a5c6d08013690338aaa4dc06074da9d73">gsuPresentInit</a></div><div class="ttdeci">u8 gsuPresentInit(u16 vram_a, u16 vram_b, u8 flags)</div><div class="ttdoc">Set up presentation for gsu_scmr&#39;s geometry.</div></div>
 <div class="ttc" id="asuperfx_8h_html_ae7a88cd0ea3830d8a308cf5c0ca8b00a"><div class="ttname"><a href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a">gsuSetupHdmaBlanking</a></div><div class="ttdeci">void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank)</div><div class="ttdoc">Setup HDMA screen blanking for DMA bandwidth.</div></div>
-</div><!-- fragment --><p><span class="tt">examples/chips/superfx_game_skeleton</span> is that loop: a crosshair follows the D-pad at 60 frames per second while the cube is rendered and presented at</p><ol type="1">
-<li>With a blocking <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> the loop is simpler (<span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a>;
-<a class="el" href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a>;</span>) and the transfer still overlaps the next job, but the game waits for each job.</li>
-</ol>
+</div><!-- fragment --><p><span class="tt">examples/chips/superfx_game_skeleton</span> is that loop: a sight follows the D-pad at 60 frames per second while a hologram of 34 lines is rendered and presented at 30. With a blocking <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> the loop is simpler (<span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a>;
+<a class="el" href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a>;</span>) and the transfer still overlaps the next job, but the game waits for each job.</p>
 <p><b>How fast frames land.</b> The NMI reads the V counter and moves what the rest of the blank window allows, at most 152 bytes per line (DMA is 8 master cycles a byte, 1324 usable per line: snesdev-wiki, Timing). The window is the VBlank, extended into the top band of <span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking</a></span> when the bottom band is at least one line (it keeps force blank across line 0). The bottom band gives the NMI nothing: the NMI starts at line</p><ol type="1">
 <li>Measured on luna with <span class="tt">superfx_game_skeleton</span> (a 256×128 4bpp frame, 16 KB; the game loop at 60 fps in every case):</li>
 </ol>
@@ -312,9 +310,9 @@ Presenting Frames: a Double Buffer the NMI Moves</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">76 / 4  </td><td class="markdownTableBodyNone">16 112  </td><td class="markdownTableBodyNone">30  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">84 / 4  </td><td class="markdownTableBodyNone">16 384, the whole frame  </td><td class="markdownTableBodyNone">30: the job is now the limit  </td></tr>
+<td class="markdownTableBodyNone">84 / 4  </td><td class="markdownTableBodyNone">16 384, the whole frame  </td><td class="markdownTableBodyNone">31: the job is now the limit  </td></tr>
 </table>
-<p>Past that point the job decides: while the previous frame moves, the job waits for Game Pak RAM, and in the skeleton the worst job took 135 000 clocks of work plus 137 000 of waiting, about three quarters of a frame.</p>
+<p>Past that point the job decides: while the previous frame moves, the job waits for Game Pak RAM, and the skeleton's (clear 16 KB, then draw 34 lines) presents 31 frames a second with the whole frame moved in one VBlank, against 30 at 40 / 40.</p>
 <p><b>What it costs.</b> The DMA halts the CPU and the GSU waits for Game Pak RAM for as long as a piece takes; a RAM-heavy job (clearing a buffer, PLOT) loses most of that time. The single-buffer path reaches the same 30 frames per second on this scene (<span class="tt">superfx_3d</span>, which also uses the bottom band), but its CPU does nothing else: it waits for the job, then for the band, then for the DMA.</p>
 <p><b>Rules.</b></p>
 <ul>
@@ -332,9 +330,8 @@ Saving</h2>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#define SAVE_AT 0xE000          </span><span class="comment">/* past the two 16 KB framebuffers */</span><span class="preprocessor"></span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), <a class="code hl_define" href="chips_2sa1__save_2main_8c.html#a47a7c73f0dd12121a3fe8d0995206ec1">SAVE_AT</a>);</div>
-<div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), <a class="code hl_define" href="chips_2sa1__save_2main_8c.html#a47a7c73f0dd12121a3fe8d0995206ec1">SAVE_AT</a>);</div>
-<div class="ttc" id="achips_2sa1__save_2main_8c_html_a47a7c73f0dd12121a3fe8d0995206ec1"><div class="ttname"><a href="chips_2sa1__save_2main_8c.html#a47a7c73f0dd12121a3fe8d0995206ec1">SAVE_AT</a></div><div class="ttdeci">#define SAVE_AT</div><div class="ttdoc">BW-RAM byte offset of the save block.</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
+<div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), SAVE_AT);</div>
+<div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), SAVE_AT);</div>
 <div class="ttc" id="asram_8h_html"><div class="ttname"><a href="sram_8h.html">sram.h</a></div><div class="ttdoc">SNES SRAM (Save RAM) Functions.</div></div>
 <div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 <div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
@@ -353,8 +350,6 @@ Example ROMs</h2>
 <td class="markdownTableBodyNone"><a href="examples_chips_superfx_3d.html">superfx_3d</a>  </td><td class="markdownTableBodyNone">Single-buffer presentation in the letterbox bands  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="examples_chips_superfx_game_skeleton.html">superfx_game_skeleton</a>  </td><td class="markdownTableBodyNone">A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_chips_superfx_save.html">superfx_save</a>  </td><td class="markdownTableBodyNone">The saving section above: a boot counter in the Game Pak RAM, block at <span class="tt">$E000</span>  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="see-also-16"></a>
 See also</h2>

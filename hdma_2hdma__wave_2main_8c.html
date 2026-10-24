@@ -128,7 +128,7 @@ $(function(){initNavTree('hdma_2hdma__wave_2main_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="hdma_8h_source.html">snes/hdma.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
-<code>#include &quot;res/water.inc&quot;</code><br />
+<code>#include &quot;res/canal.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -176,10 +176,10 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>HDMA wave: build the table by hand, then let the hdma module do it. </p>
-<p>One water image, one per-scanline ripple, two ways to make it.</p>
+<p>One picture, one per-scanline ripple, two ways to make it.</p>
 <p>At boot the ripple comes from an HDMA table written BY HAND and animated the way krom's assembler demo does it: the table is never rewritten; each VBlank the table START POINTER advances one entry, so line L reads entry phase+L and the crests flow up the screen. That is the HDMA table format itself — <span class="tt">[line-count, value...]</span> entries and a terminator — and the cheapest animation there is.</p>
 <p>Press A and the same ripple comes from the <span class="tt">hdma</span> module instead: <a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH()</a> computes the sine table in RAM and <a class="el" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216" title="Update wave animation.">hdmaWaveUpdate()</a> animates it, with the amplitude now a parameter (LEFT/RIGHT). The defaults (amplitude 10, frequency 10: a 25.6-line period) sit close to krom's table (round(10 * sin), a ~25.8-line quasi-period), so the switch shows the helper reproducing what the hand-built table did. Press A again to go back.</p>
-<p>C port of "SNES Wave HDMA Demo" by krom (Peter Lemon), github.com/PeterLemon/SNES, PPU/HDMA/WaveHDMA — technique reproduced on the <a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">snes/hdma.h</a> API in the original demo configuration (BG Mode 3, full-screen 256-color image). Art is original: procedurally generated water caustics (res/water.bmp), no krom assets.</p>
+<p>C port of "SNES Wave HDMA Demo" by krom (Peter Lemon), github.com/PeterLemon/SNES, PPU/HDMA/WaveHDMA — technique reproduced on the <a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">snes/hdma.h</a> API in the original demo configuration (BG Mode 3, full-screen 256-color image). The picture is ours, no krom assets: the city canal at night (res/canal.png), the one backgrounds/mode3 shows.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>HDMA table format: <span class="tt">count</span> byte (1 = apply to one scanline) followed by the register payload (2 bytes for a write-twice register), then a 0x00 terminator byte</li>
 <li>HDMA_MODE_1REG_2X: one register written twice per line — exactly what the 16-bit scroll registers ($210D BG1HOFS low/high) expect</li>
@@ -189,7 +189,7 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>At boot: the water image in tight sine ripples flowing UPWARD at one scanline per frame — krom's exact table (896 entries, verbatim) and cadence (wrap at 672); the white rulers every 64px stay straight</li>
+<li>At boot: the canal at night in tight sine ripples flowing UPWARD at one scanline per frame — krom's exact table (896 entries, verbatim) and cadence (wrap at 672); the white rulers every 64px stay straight</li>
 <li>Press A: the hdma module takes over (channel 6 instead of 0); the ripple looks nearly the same</li>
 <li>LEFT/RIGHT (module mode): amplitude from 2 to 24 pixels, in steps of 2</li>
 <li>Press A again: back to the hand-built table, from where it was</li>

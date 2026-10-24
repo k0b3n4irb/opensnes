@@ -126,7 +126,7 @@ $(function(){initNavTree('tools_legacy.html','',''); });
 <p>Moving an asset over is one settings file beside it (<span class="tt">res/hero.png.toml</span>, with a <span class="tt">tool</span> line and one table, <a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>): the build then converts it on its own, and the old Makefile line goes. A project that still sets <span class="tt">GFXSRC</span> stops with a message naming the replacement; the <span class="tt">.wav</span> → <span class="tt">.brr</span> rule is gone too (a <span class="tt">.wav.toml</span> beside the sound replaces it). Music needs nothing: <span class="tt">SOUNDBANK_SRC</span> works as before, converted by <a class="el" href="tools_opensnes_music.html" title="opensnes-music — Impulse Tracker to soundbank">opensnes-music — Impulse Tracker to soundbank</a>.</p>
 <h1 class="doxsection"><a class="anchor" id="tools_gfx4snes"></a>
 gfx4snes</h1>
-<p>Converts an indexed PNG or BMP into tiles (<span class="tt">.pic</span>), a palette (<span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>) and, with <span class="tt">-m</span>, a tilemap (<span class="tt">.map</span>); with <span class="tt">-T</span> it also writes a metasprite table. A background is now <span class="tt">opensnes-tileset convert</span> (<a class="el" href="tools_opensnes_tileset.html" title="opensnes-tileset — pictures to tilesets and tilemaps">opensnes-tileset — pictures to tilesets and tilemaps</a>), a sprite sheet <span class="tt">opensnes-sprite sheet</span> (<a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a>).</p>
+<p>Converts an indexed PNG or BMP into tiles (<span class="tt">.pic</span>), a palette (<span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>) and, with <span class="tt">-m</span>, a tilemap (<span class="tt">.map</span>); with <span class="tt">-T</span> it also writes a metasprite table. A background is now <span class="tt">opensnes-tileset convert</span> (<a class="el" href="tools_opensnes_tileset.html" title="opensnes-tileset — pictures to tilesets and tilemaps">opensnes-tileset — pictures to tilesets and tilemaps</a>), a sprite sheet <span class="tt">opensnes-sprite sheet</span> (<a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a>).</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">gfx4snes  </th><th class="markdownTableHeadNone">opensnes-tileset convert / opensnes-sprite sheet  </th></tr>
@@ -145,7 +145,7 @@ gfx4snes</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-p</span>  </td><td class="markdownTableBodyNone">the palette is written by default; <span class="tt">--no-palette</span> skips it  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a> FILE</span>  </td><td class="markdownTableBodyNone"><span class="tt">--<a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a> FILE</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a> FILE</span>  </td><td class="markdownTableBodyNone"><span class="tt">--<a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a> FILE</span>  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-e N</span>  </td><td class="markdownTableBodyNone"><span class="tt">--palette-entry N</span>  </td></tr>
 <tr class="markdownTableRowEven">
@@ -207,7 +207,7 @@ img2snes</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">--round-snes</span>  </td><td class="markdownTableBodyNone"><span class="tt">--round</span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-p ref.png</span>  </td><td class="markdownTableBodyNone"><span class="tt">--<a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a> ref.png</span> (or a <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-p ref.png</span>  </td><td class="markdownTableBodyNone"><span class="tt">--<a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a> ref.png</span> (or a <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-s FACTOR</span>  </td><td class="markdownTableBodyNone"><span class="tt">--scale PERCENT</span> (<span class="tt">-s 2.0</span> is <span class="tt">--scale 200</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -248,7 +248,7 @@ wav2brr</h1>
 <p>A looping sample no longer has to be built by hand: the loop lives in the settings file, and the build encodes it.</p>
 <h1 class="doxsection"><a class="anchor" id="tools_palplan"></a>
 palplan</h1>
-<p>Plans a project's <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> files into the 8 background and 8 sprite palette slots of CGRAM and writes the <span class="tt">PAL_&lt;NAME&gt;_CGRAM</span> offsets. Now <span class="tt">opensnes-palette plan</span> (<a class="el" href="tools_opensnes_palette.html" title="opensnes-palette — a project&#39;s palettes">opensnes-palette — a project's palettes</a>), which the build runs after the pictures' conversions.</p>
+<p>Plans a project's <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> files into the 8 background and 8 sprite palette slots of CGRAM and writes the <span class="tt">PAL_&lt;NAME&gt;_CGRAM</span> offsets. Now <span class="tt">opensnes-palette plan</span> (<a class="el" href="tools_opensnes_palette.html" title="opensnes-palette — a project&#39;s palettes">opensnes-palette — a project's palettes</a>), which the build runs after the pictures' conversions.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">palplan  </th><th class="markdownTableHeadNone">opensnes-palette plan  </th></tr>
@@ -265,7 +265,7 @@ palplan</h1>
 </table>
 <h1 class="doxsection"><a class="anchor" id="tools_aseprite2snes"></a>
 aseprite2snes</h1>
-<p>Turns the JSON Aseprite writes with <span class="tt">--data --list-tags</span> into <span class="tt"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a></span> tables, one per tag, for the <span class="tt">anim</span> module. Now <span class="tt">opensnes-sprite anim</span> (<a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a>).</p>
+<p>Turns the JSON Aseprite writes with <span class="tt">--data --list-tags</span> into <span class="tt"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a></span> tables, one per tag, for the <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> module. Now <span class="tt">opensnes-sprite <a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> (<a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a>).</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">aseprite2snes  </th><th class="markdownTableHeadNone">opensnes-sprite anim  </th></tr>

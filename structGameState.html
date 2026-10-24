@@ -143,8 +143,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Centralized game state structure. </p>
-<p>Coordinates are <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> because the scroll thresholds subtract and compare them: a signed type keeps "left of the threshold" a plain <span class="tt">&lt;</span>. (This comment used to claim that separate <span class="tt">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> coordinates were miscompiled and that the struct was REQUIRED. That described a compiler of early 2026; <span class="tt">examples/input/move_sprite</span> moves a sprite from plain <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> locals and its luna manifest pins the motion to the pixel.)</p>
-<dl class="section see"><dt>See also</dt><dd>animated_sprite example for reference implementation </dd></dl>
+<p>Coordinates are <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> because the scroll thresholds subtract and compare them: a signed type keeps "left of the threshold" a plain <span class="tt">&lt;</span>. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="ac63759cbb1d5e2dfee0ac788e5bc6df2" name="ac63759cbb1d5e2dfee0ac788e5bc6df2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac63759cbb1d5e2dfee0ac788e5bc6df2">&#9670;&#160;</a></span>bg1_scroll_x</h2>
@@ -187,7 +186,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>BG2 horizontal scroll offset (parallax) </p>
+<p>BG2 horizontal scroll offset (parallax: half of BG1's) </p>
 
 </div>
 </div>
@@ -273,7 +272,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> X position (screen coords) </p>
+<p>Kit's X position (screen coords) </p>
 
 </div>
 </div>
@@ -288,7 +287,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> Y position (screen coords) </p>
+<p>Kit's Y position (screen coords) </p>
 
 </div>
 </div>
@@ -321,7 +320,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
-<li>examples/games/shmup_1942/<a class="el" href="games_2shmup__1942_2main_8c.html">main.c</a></li>
+<li>examples/demos/shmup/<a class="el" href="demos_2shmup_2main_8c.html">main.c</a></li>
 <li>examples/scrolling/continuous_scroll/<a class="el" href="scrolling_2continuous__scroll_2main_8c.html">main.c</a></li>
 </ul>
 </div><!-- contents -->

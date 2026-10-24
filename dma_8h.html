@@ -223,12 +223,12 @@ Banks</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[];</div>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>[];</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line"><a class="code hl_function" href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
+<div class="line"><a class="code hl_function" href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
+<div class="ttc" id="atext_2pixel__text_2main_8c_html_aed41e53efdee92d24f64b3bae717c207"><div class="ttname"><a href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></div><div class="ttdeci">static const u8 palette[]</div><div class="ttdef"><b>Definition</b> main.c:83</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank — <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a>, INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching and the write is rejected.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The bank comes from <code class="param">source's</code> own bank byte: a palette may live in any bank. </dd></dl>
 

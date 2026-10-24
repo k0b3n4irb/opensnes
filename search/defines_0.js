@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['accel_0',['ACCEL',['../games_2mode7__racing_2main_8c.html#ad2d7243c099b33b2343976dd3ee8b36b',1,'main.c']]],
+  ['accel_0',['ACCEL',['../mode7_2mode7__racing_2main_8c.html#ad2d7243c099b33b2343976dd3ee8b36b',1,'main.c']]],
   ['act_5fburn_1',['ACT_BURN',['../map_8h.html#aab4c8cebd89d6e8b2a68e709784829d5',1,'map.h']]],
   ['act_5fclimb_2',['ACT_CLIMB',['../map_8h.html#ab9c13fbe07aac09e69bc677fe3f0fcaa',1,'map.h']]],
   ['act_5fdie_3',['ACT_DIE',['../map_8h.html#a7843ff58f7ae21834eee28a3cefbbd3a',1,'map.h']]],
@@ -24,5 +24,12 @@ var searchData=
   ['animframe_21',['animFrame',['../anim_8h.html#abc3e816720673a92012cafe18ddad90d',1,'anim.h']]],
   ['animstop_22',['animStop',['../anim_8h.html#a5aade032e76fa23c37fe77fe3342f1a5',1,'anim.h']]],
   ['animtickmeta_23',['animTickMeta',['../anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57',1,'anim.h']]],
-  ['animtickoam_24',['animTickOam',['../anim_8h.html#adaabd540bba5a7d29a706b44f873ed3a',1,'anim.h']]]
+  ['animtickoam_24',['animTickOam',['../anim_8h.html#adaabd540bba5a7d29a706b44f873ed3a',1,'anim.h']]],
+  ['automaton_5fdraw_5fdx_25',['AUTOMATON_DRAW_DX',['../automaton_8c.html#aae53bcf981a135b8f28e2c62627d57e9',1,'automaton.c']]],
+  ['automaton_5fdraw_5fdy_26',['AUTOMATON_DRAW_DY',['../automaton_8c.html#a67df006b2d134d0786e64f266b15e511',1,'automaton.c']]],
+  ['automaton_5fframes_27',['AUTOMATON_FRAMES',['../automaton_8c.html#a0209e036345eb915d05e98713103808c',1,'automaton.c']]],
+  ['automaton_5fleft_28',['AUTOMATON_LEFT',['../automaton_8c.html#aadcba61d685eb3a8cc98ff9723c91729',1,'automaton.c']]],
+  ['automaton_5frate_29',['AUTOMATON_RATE',['../automaton_8c.html#a35ef60b7be14a6afa1ea3de292707e50',1,'automaton.c']]],
+  ['automaton_5fright_30',['AUTOMATON_RIGHT',['../automaton_8c.html#a4a7a8804f7fa7966cdf50cd9a18ef4cd',1,'automaton.c']]],
+  ['automaton_5fxveloc_31',['AUTOMATON_XVELOC',['../automaton_8c.html#ab201030951c06d891356a01d12fc34c4',1,'automaton.c']]]
 ];

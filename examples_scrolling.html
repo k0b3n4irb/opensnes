@@ -131,13 +131,13 @@ The ladder</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="examples_scrolling_mixed_scroll.html">mixed_scroll</a>  </td><td class="markdownTableBodyNone">How do I scroll layers at different rates for depth?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="examples_scrolling_continuous_scroll.html">continuous_scroll</a>  </td><td class="markdownTableBodyNone">How do I scroll a world bigger than one screen, streaming tiles at the seam?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_scrolling_continuous_scroll.html">continuous_scroll</a>  </td><td class="markdownTableBodyNone">How does a camera follow the player through a world wider than the screen?  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="examples_scrolling_parallax_scroll.html">parallax_scroll</a>  </td><td class="markdownTableBodyNone">How do I get per-scanline parallax with HDMA?  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen-7"></a>
 The idea in one screen</h2>
-<p>Every background has hardware scroll registers (<span class="tt">BGxHOFS</span>/<span class="tt">BGxVOFS</span>); you change <em>where the PPU reads</em>, never the tilemap, so scrolling is nearly free. Scroll two layers at different rates and the far one looks distant (<span class="tt">mixed_scroll</span>). When the world is larger than the 32×32 tilemap, stream a fresh column of tiles into VRAM each time the camera crosses a tile boundary (<span class="tt">continuous_scroll</span>). For a gradient of speeds within <em>one</em> layer, rewrite the scroll register <b>every scanline</b> with HDMA (<span class="tt">parallax_scroll</span>).</p>
+<p>Every background has hardware scroll registers (<span class="tt">BGxHOFS</span>/<span class="tt">BGxVOFS</span>); you change <em>where the PPU reads</em>, never the tilemap, so scrolling is nearly free. Scroll two layers at different rates and the far one looks distant (<span class="tt">mixed_scroll</span>). A camera follows the player by scrolling the world instead of moving him past a line of the screen (<span class="tt">continuous_scroll</span>, over 64x32 maps); when the world is larger than the tilemap, a map engine streams a fresh column of tiles into VRAM each time the camera crosses a tile boundary (<span class="tt">maps/</span>). For a gradient of speeds within <em>one</em> layer, rewrite the scroll register <b>every scanline</b> with HDMA (<span class="tt">parallax_scroll</span>).</p>
 <blockquote class="doxtable">
 <p>Next stop in Stage 3: <a href="examples_maps.html"><span class="tt">maps/</span></a> — let a map engine and a Tiled pipeline drive the world instead of hand-streaming it. </p>
 </blockquote>

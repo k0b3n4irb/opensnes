@@ -126,7 +126,7 @@ $(function(){initNavTree('sprites_2simple__sprite_2main_8c.html','',''); });
 <p>Display a single static 32x32 sprite.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;res/sprite32.inc&quot;</code><br />
+<code>#include &quot;res/kit.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -135,7 +135,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Display a single static 32x32 sprite. </p>
-<p>Minimal example showing how to load and display one hardware sprite on the SNES. Sprite tile data is DMA'd to VRAM, a 16-color palette is loaded to CGRAM at address 128 (sprite palette 0), and the OBJ size register (OBJSEL, $2101) is configured for small=8x8 / large=32x32 mode.</p>
+<p>Minimal example showing how to load and display one hardware sprite on the SNES: Kit, the fox-kit courier of the examples. Sprite tile data is DMA'd to VRAM, a 16-color palette is loaded to CGRAM at address 128 (sprite palette 0), and the OBJ size register (OBJSEL, $2101) is configured for small=8x8 / large=32x32 mode.</p>
 <p>The sprite is placed at screen center using <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>, which writes to the 544-byte OAM buffer that the NMI handler DMAs to the PPU each VBlank. The tile number is calculated from the offset between the OBJSEL name base and the VRAM address where the tile data was loaded.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>OAM (Object Attribute Memory): 128 sprite entries, 544 bytes total</li>

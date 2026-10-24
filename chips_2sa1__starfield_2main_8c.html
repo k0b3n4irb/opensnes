@@ -123,10 +123,12 @@ $(function(){initNavTree('chips_2sa1__starfield_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>SA-1 Murmuration Demo — 128 dots in Lissajous sine patterns.  
+<p>SA-1 Murmuration Demo — 128 neon moths in Lissajous sine patterns.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sa1_8h_source.html">snes/sa1.h</a>&gt;</code><br />
+<code>#include &quot;res/mote.inc&quot;</code><br />
+<code>#include &quot;res/skyline.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -140,22 +142,21 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a5a0158a895fec2258ed59056f9904acc" id="r_a5a0158a895fec2258ed59056f9904acc"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5a0158a895fec2258ed59056f9904acc">dot_tile</a> []</td></tr>
 <tr class="memitem:a59527e9325cf39fb54f0fa5bc4f7d0bd" id="r_a59527e9325cf39fb54f0fa5bc4f7d0bd"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>SA-1 Murmuration Demo — 128 dots in Lissajous sine patterns. </p>
-<p>The SA-1 computes 128 "bird" positions using overlapping Lissajous sine patterns at 10.74 MHz. The main CPU reads positions from I-RAM and displays them as pixel sprites. No assets — generated in code.</p>
+<div class="textblock"><p>SA-1 Murmuration Demo — 128 neon moths in Lissajous sine patterns. </p>
+<p>The SA-1 computes 128 positions using overlapping Lissajous sine patterns at 10.74 MHz. The main CPU reads them from I-RAM and displays them as a cloud of neon moths over the city's far skyline in the rain.</p>
 <p>Each bird's position is the sum of two sine harmonics per axis, with prime-number phase multipliers creating organic flock spread: X = sin[bird*3 + frame]/2 + sin[bird*7 + frame*2]/4 + 32 Y = sin[bird*5 + frame+64]/2 + sin[bird*11 + frame*3]/4 + 16</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>The SA-1 computes while the main CPU displays: positions written to shared I-RAM, read by the 65816 each frame</li>
 <li>A sync byte in I-RAM as the handshake between the two CPUs</li>
-<li>Sprites built in code (a 2x2 dot tile), no asset</li>
+<li>One tiny sprite (a 4x3 moth in an 8x8 tile) for all 128: the cloud bunches up, and a line shows at most 32 sprites</li>
 <li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: 128 positions copied from I-RAM each frame in one loop</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>128 dots moving in smooth, coordinated flock-like patterns</li>
+<li>128 moths moving in smooth, coordinated flock-like patterns over the skyline</li>
 <li>The pattern resembles a murmuration (starling flock)</li>
 <li>All math computed by SA-1 coprocessor at 10.74 MHz</li>
 </ul>
@@ -223,49 +224,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a5a0158a895fec2258ed59056f9904acc" name="a5a0158a895fec2258ed59056f9904acc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a0158a895fec2258ed59056f9904acc">&#9670;&#160;</a></span>dot_tile</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dot_tile[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                         = {</div>
-<div class="line">    </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    0x18, 0x18,  </div>
-<div class="line">    0x18, 0x18,  </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    0x00, 0x00,  </div>
-<div class="line">    </div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">    0x18, 0x18,  </div>
-<div class="line">    0x18, 0x18,</div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">    0x00, 0x00,</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>2x2 pixel dot tile (4bpp, 8x8, pixels 3-4 on rows 3-4) </p>
-
-</div>
-</div>
 <a id="a59527e9325cf39fb54f0fa5bc4f7d0bd" name="a59527e9325cf39fb54f0fa5bc4f7d0bd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a59527e9325cf39fb54f0fa5bc4f7d0bd">&#9670;&#160;</a></span>pal</h2>
 
@@ -286,20 +244,13 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">                     = {</div>
-<div class="line">    </div>
-<div class="line">    0x0000, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,</div>
-<div class="line">    0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,</div>
-<div class="line">    </div>
-<div class="line">    0x0000, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318,</div>
-<div class="line">    0x6318, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318, 0x6318,</div>
-<div class="line">    </div>
-<div class="line">    0x0000, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210,</div>
-<div class="line">    0x4210, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210, 0x4210,</div>
-<div class="line">    </div>
-<div class="line">    0x0000, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108,</div>
-<div class="line">    0x2108, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108, 0x2108,</div>
+<div class="line">    0x0000, <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(14, 28, 30), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(29, 31, 31), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   </div>
+<div class="line">    0x0000, <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(10, 22, 26), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(22, 28, 30), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,</div>
+<div class="line">    0x0000, <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>( 7, 16, 20), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(16, 22, 26), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,</div>
+<div class="line">    0x0000, <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>( 5, 11, 15), <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(10, 16, 20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   </div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Sprite palettes: 4 brightness levels for depth illusion </p>
+<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:88</div></div>
+</div><!-- fragment --><p>Sprite palettes: 4 brightness levels for depth illusion — the wings (1) in a cyan that dims with distance, the body (2) a touch brighter </p>
 
 </div>
 </div>

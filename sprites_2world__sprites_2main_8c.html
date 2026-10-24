@@ -126,46 +126,49 @@ $(function(){initNavTree('sprites_2world__sprites_2main_8c.html','',''); });
 <p>World-space sprites — a camera, culling, a depth sort and OAM in one call per batch.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="tile_8h_source.html">snes/tile.h</a>&gt;</code><br />
+<code>#include &quot;res/plaza.inc&quot;</code><br />
+<code>#include &quot;res/residents.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ad610f56a934e206dd08aa33a8de82d24" id="r_ad610f56a934e206dd08aa33a8de82d24"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad610f56a934e206dd08aa33a8de82d24">CAM_XMAX</a>&#160;&#160;&#160;(<a class="el" href="games_2rpg_2main_8c.html#a08d53ef62bd678bc1c1f9c2f531efdb2">WORLD_W</a> - 256)</td></tr>
+<tr class="memitem:a08b4f0a78b8b477ebd1ea57f7adfa140" id="r_a08b4f0a78b8b477ebd1ea57f7adfa140"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a08b4f0a78b8b477ebd1ea57f7adfa140">BG_VRAM</a>&#160;&#160;&#160;0x1000</td></tr>
+<tr class="memitem:ad610f56a934e206dd08aa33a8de82d24" id="r_ad610f56a934e206dd08aa33a8de82d24"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad610f56a934e206dd08aa33a8de82d24">CAM_XMAX</a>&#160;&#160;&#160;(<a class="el" href="demos_2rpg_2main_8c.html#a08d53ef62bd678bc1c1f9c2f531efdb2">WORLD_W</a> - 256)</td></tr>
 <tr class="memdesc:ad610f56a934e206dd08aa33a8de82d24"><td class="mdescLeft">&#160;</td><td class="mdescRight">The camera may not show past the world's edge.  <br /></td></tr>
-<tr class="memitem:a85011f5d38d808f8f01e4e9b2a63f997" id="r_a85011f5d38d808f8f01e4e9b2a63f997"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a85011f5d38d808f8f01e4e9b2a63f997">CAM_YMAX</a>&#160;&#160;&#160;(<a class="el" href="games_2rpg_2main_8c.html#aec23d2d26d02217a4342289840020546">WORLD_H</a> - 224)</td></tr>
-<tr class="memitem:a3b5b3bfae7fbfb59c398860aac341db5" id="r_a3b5b3bfae7fbfb59c398860aac341db5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3b5b3bfae7fbfb59c398860aac341db5">NCOINS</a>&#160;&#160;&#160;17</td></tr>
-<tr class="memdesc:a3b5b3bfae7fbfb59c398860aac341db5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coins in the world (the 16 x 16 batch).  <br /></td></tr>
-<tr class="memitem:a699dd5a9b368e82fe6a267bb2476f0e2" id="r_a699dd5a9b368e82fe6a267bb2476f0e2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a699dd5a9b368e82fe6a267bb2476f0e2">NWALK</a>&#160;&#160;&#160;6</td></tr>
-<tr class="memdesc:a699dd5a9b368e82fe6a267bb2476f0e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Walkers (the 32 x 32 batch, sorted by depth).  <br /></td></tr>
+<tr class="memitem:a85011f5d38d808f8f01e4e9b2a63f997" id="r_a85011f5d38d808f8f01e4e9b2a63f997"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a85011f5d38d808f8f01e4e9b2a63f997">CAM_YMAX</a>&#160;&#160;&#160;(<a class="el" href="demos_2rpg_2main_8c.html#aec23d2d26d02217a4342289840020546">WORLD_H</a> - 224)</td></tr>
+<tr class="memitem:af53226ffd949ef2f3857166c4f1c673c" id="r_af53226ffd949ef2f3857166c4f1c673c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af53226ffd949ef2f3857166c4f1c673c">MAP_VRAM</a>&#160;&#160;&#160;0x0000</td></tr>
+<tr class="memdesc:af53226ffd949ef2f3857166c4f1c673c"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1's 64x64 map (4096 words, four 32x32 pages) and its tiles.  <br /></td></tr>
+<tr class="memitem:a2cd84acb2e9acce35594edff79ab1404" id="r_a2cd84acb2e9acce35594edff79ab1404"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a2cd84acb2e9acce35594edff79ab1404">NRES</a>&#160;&#160;&#160;6</td></tr>
+<tr class="memdesc:a2cd84acb2e9acce35594edff79ab1404"><td class="mdescLeft">&#160;</td><td class="mdescRight">Residents (the 32 x 32 batch, sorted by depth).  <br /></td></tr>
+<tr class="memitem:a5fddcc754a9eec77ebb3cf19a36b51b3" id="r_a5fddcc754a9eec77ebb3cf19a36b51b3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5fddcc754a9eec77ebb3cf19a36b51b3">NSHARDS</a>&#160;&#160;&#160;17</td></tr>
+<tr class="memdesc:a5fddcc754a9eec77ebb3cf19a36b51b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shards in the world (the 16 x 16 batch).  <br /></td></tr>
+<tr class="memitem:a1185c7c06af1e8dce0275d3f735b63a2" id="r_a1185c7c06af1e8dce0275d3f735b63a2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1185c7c06af1e8dce0275d3f735b63a2">RES_ID</a>&#160;&#160;&#160;<a class="el" href="#a5fddcc754a9eec77ebb3cf19a36b51b3">NSHARDS</a></td></tr>
+<tr class="memdesc:a1185c7c06af1e8dce0275d3f735b63a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The residents' OAM ids follow the shards'.  <br /></td></tr>
+<tr class="memitem:a9c07f08d856ab08210b35dee4035090b" id="r_a9c07f08d856ab08210b35dee4035090b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a9c07f08d856ab08210b35dee4035090b">SHARD_TILE</a>&#160;&#160;&#160;192</td></tr>
+<tr class="memdesc:a9c07f08d856ab08210b35dee4035090b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The shard's tile: the first 16 x 16 block of the sheet's fourth row.  <br /></td></tr>
 <tr class="memitem:a6bb8764daa4560fdad7f6f1f9c9139f0" id="r_a6bb8764daa4560fdad7f6f1f9c9139f0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6bb8764daa4560fdad7f6f1f9c9139f0">SPR_VRAM</a>&#160;&#160;&#160;0x4000</td></tr>
 <tr class="memdesc:a6bb8764daa4560fdad7f6f1f9c9139f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite tile VRAM word address.  <br /></td></tr>
-<tr class="memitem:a3539041f82d25aedfe039753fe5004ae" id="r_a3539041f82d25aedfe039753fe5004ae"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3539041f82d25aedfe039753fe5004ae">WALK_ID</a>&#160;&#160;&#160;<a class="el" href="#a3b5b3bfae7fbfb59c398860aac341db5">NCOINS</a></td></tr>
-<tr class="memdesc:a3539041f82d25aedfe039753fe5004ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">The walkers' OAM ids follow the coins'.  <br /></td></tr>
 <tr class="memitem:aec23d2d26d02217a4342289840020546" id="r_aec23d2d26d02217a4342289840020546"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec23d2d26d02217a4342289840020546">WORLD_H</a>&#160;&#160;&#160;448</td></tr>
 <tr class="memitem:a08d53ef62bd678bc1c1f9c2f531efdb2" id="r_a08d53ef62bd678bc1c1f9c2f531efdb2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a08d53ef62bd678bc1c1f9c2f531efdb2">WORLD_W</a>&#160;&#160;&#160;512</td></tr>
 <tr class="memdesc:a08d53ef62bd678bc1c1f9c2f531efdb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">World size in pixels.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a13f82cb447be028f5af43f1a48a876aa" id="r_a13f82cb447be028f5af43f1a48a876aa"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a13f82cb447be028f5af43f1a48a876aa">load_shape</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *rows, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> name, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="maps_2map__scroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d">flipx</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipy)</td></tr>
-<tr class="memdesc:a13f82cb447be028f5af43f1a48a876aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode one 8 x 8 shape (8 rows of bits, colour index 1) to VRAM name <span class="tt">name</span>, mirrored left-right (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d" title="Horizontal flip flag (1 = facing left).">flipx</a></span>) and / or top-bottom (<span class="tt">flipy</span>): a big sprite has ONE attribute byte for all its tiles, so each corner and edge is its own tile.  <br /></td></tr>
+<tr class="memitem:a62b6b51deb4f434ba2b437808714f918" id="r_a62b6b51deb4f434ba2b437808714f918"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a62b6b51deb4f434ba2b437808714f918">frame_tile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> f)</td></tr>
+<tr class="memdesc:a62b6b51deb4f434ba2b437808714f918"><td class="mdescLeft">&#160;</td><td class="mdescRight">The OAM tile of frame <code class="param">f</code> of res/residents.png.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memitem:ae23d4d18e77aead6615b3aa92eb098c7" id="r_ae23d4d18e77aead6615b3aa92eb098c7"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae23d4d18e77aead6615b3aa92eb098c7">sort_walkers</a> (void)</td></tr>
-<tr class="memdesc:ae23d4d18e77aead6615b3aa92eb098c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort the walkers by y, the lowest on screen first: an insertion sort of six bytes.  <br /></td></tr>
+<tr class="memitem:ae22e800e1e7b56ba27224a4018ebd577" id="r_ae22e800e1e7b56ba27224a4018ebd577"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae22e800e1e7b56ba27224a4018ebd577">sort_residents</a> (void)</td></tr>
+<tr class="memdesc:ae22e800e1e7b56ba27224a4018ebd577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort the residents by y, the lowest on screen first: an insertion sort of six bytes.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a24bbdbaee0318752f200bcfe0612606b" id="r_a24bbdbaee0318752f200bcfe0612606b"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a24bbdbaee0318752f200bcfe0612606b">cam_x</a></td></tr>
-<tr class="memdesc:a24bbdbaee0318752f200bcfe0612606b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles: the camera, the coins placed this frame, the walker in the front slot.  <br /></td></tr>
+<tr class="memdesc:a24bbdbaee0318752f200bcfe0612606b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles: the camera, the shards placed this frame, the resident in the front slot.  <br /></td></tr>
 <tr class="memitem:a12d35ad58f591e8935ab963c345d36b1" id="r_a12d35ad58f591e8935ab963c345d36b1"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></td></tr>
-<tr class="memitem:a24fb24e7080b83fa993c3eeaf94c5863" id="r_a24fb24e7080b83fa993c3eeaf94c5863"><td class="memItemLeft">static <a class="el" href="structOamWorldBatch.html">OamWorldBatch</a>&#160;</td><td class="memItemRight"><a class="el" href="#a24fb24e7080b83fa993c3eeaf94c5863">coins</a></td></tr>
-<tr class="memdesc:a24fb24e7080b83fa993c3eeaf94c5863"><td class="mdescLeft">&#160;</td><td class="mdescRight">The two batches: the coins (16 x 16) and the walkers (32 x 32, sorted).  <br /></td></tr>
-<tr class="memitem:a74098e4602b8556df3349bc817680573" id="r_a74098e4602b8556df3349bc817680573"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a74098e4602b8556df3349bc817680573">px</a> [64]</td></tr>
-<tr class="memdesc:a74098e4602b8556df3349bc817680573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scratch: an 8 x 8 tile as pixel indices, and its 4bpp form.  <br /></td></tr>
-<tr class="memitem:a4b24fbfead388e007e43fcdc6e13e592" id="r_a4b24fbfead388e007e43fcdc6e13e592"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4b24fbfead388e007e43fcdc6e13e592">tilebuf</a> [32]</td></tr>
-<tr class="memitem:ad33eec3df1384c3c7ccb56968896af1b" id="r_ad33eec3df1384c3c7ccb56968896af1b"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad33eec3df1384c3c7ccb56968896af1b">walk_order</a> [6]</td></tr>
-<tr class="memdesc:ad33eec3df1384c3c7ccb56968896af1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The walkers' drawing order: slot i of the batch shows walker order[i].  <br /></td></tr>
-<tr class="memitem:a4407dc992f1ed72e8c2a2ccb6dcd13f9" id="r_a4407dc992f1ed72e8c2a2ccb6dcd13f9"><td class="memItemLeft">static <a class="el" href="structOamWorldBatch.html">OamWorldBatch</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4407dc992f1ed72e8c2a2ccb6dcd13f9">walkers</a></td></tr>
+<tr class="memitem:a45433961286182d5ede70c2919b4f236" id="r_a45433961286182d5ede70c2919b4f236"><td class="memItemLeft">static <a class="el" href="structOamWorldBatch.html">OamWorldBatch</a>&#160;</td><td class="memItemRight"><a class="el" href="#a45433961286182d5ede70c2919b4f236">crowd</a></td></tr>
+<tr class="memitem:a28581dc32e681b710874a306c4827cdb" id="r_a28581dc32e681b710874a306c4827cdb"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a28581dc32e681b710874a306c4827cdb">res_order</a> [6]</td></tr>
+<tr class="memdesc:a28581dc32e681b710874a306c4827cdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The residents' drawing order: slot i of the batch shows resident order[i].  <br /></td></tr>
+<tr class="memitem:a6fe0a0fddda8a4018c31a398631a44c6" id="r_a6fe0a0fddda8a4018c31a398631a44c6"><td class="memItemLeft">static <a class="el" href="structOamWorldBatch.html">OamWorldBatch</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6fe0a0fddda8a4018c31a398631a44c6">shards</a></td></tr>
+<tr class="memdesc:a6fe0a0fddda8a4018c31a398631a44c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The two batches: the shards (16 x 16) and the residents (32 x 32, sorted).  <br /></td></tr>
 <tr class="memitem:a0be223dce7ce6ad79b7aaedfff96bdc6" id="r_a0be223dce7ce6ad79b7aaedfff96bdc6"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0be223dce7ce6ad79b7aaedfff96bdc6">wattr</a> [17+6]</td></tr>
 <tr class="memitem:a3e5aba6465454f3ddfdb0a29e12ad851" id="r_a3e5aba6465454f3ddfdb0a29e12ad851"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3e5aba6465454f3ddfdb0a29e12ad851">world_front</a></td></tr>
 <tr class="memitem:a1bdfc1d91dd3471440873a3d1382834b" id="r_a1bdfc1d91dd3471440873a3d1382834b"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1bdfc1d91dd3471440873a3d1382834b">world_visible</a></td></tr>
@@ -178,10 +181,10 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>World-space sprites — a camera, culling, a depth sort and OAM in one call per batch. </p>
-<p>A scrolling game keeps its actors in WORLD coordinates (a 512 x 448 field here) and shows a 256 x 224 window of it. Every frame it has to subtract the camera from each actor, decide whether the result is on screen, write the OAM entry or hide it, and set the ninth x bit for a sprite half out on the left. <a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld()</a> does it in assembly for a whole batch, about 1,700 a sprite on the library bench (<span class="tt"><a class="el" href="perf.html">docs/PERF.md</a></span>, row <span class="tt">world</span>).</p>
-<p>The game keeps one array per property (structure of arrays: what the 65816 indexes cheaply) and fills an <a class="el" href="structOamWorldBatch.html" title="A batch of sprites in world coordinates, for oamPlaceWorld().">OamWorldBatch</a> with their addresses once. Two batches, because a batch has one size: 17 coins of 16 x 16 (the SMALL size of OBJ_SIZE16_L32) and six walkers of 32 x 32 (the LARGE size, set once with <a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a>: the call never touches the size bit).</p>
-<p>The walkers show <span class="tt">order</span>. Seen from above, the one lower on the screen is nearer and must be drawn in front — and OAM order is drawing order, the lower slot in front. So the walkers are sorted by y every frame (an insertion sort of six bytes) and the batch's <span class="tt">order</span> says which walker each slot shows: the arrays stay indexed by the walker, only the six bytes of <span class="tt">order</span> move.</p>
-<p>Hold the D-pad to move the camera. <span class="tt">visible[]</span> comes back from the call: the example counts the coins in view with it (<span class="tt"><a class="el" href="#a1bdfc1d91dd3471440873a3d1382834b">world_visible</a></span>); a game reads it to stream the animation frames of the sprites that are shown and skip the others — a sprite off screen should cost no VRAM DMA.</p>
+<p>A square of the Rue basse, seen from above: data shards drift over the paving and six residents pace up and down round the neon ring at its centre. A scrolling game keeps its actors in WORLD coordinates (the square is 512 x 448, BG1 a 64x64 map scrolled with the camera) and shows a 256 x 224 window of it. Every frame it has to subtract the camera from each actor, decide whether the result is on screen, write the OAM entry or hide it, and set the ninth x bit for a sprite half out on the left. <a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld()</a> does it in assembly for a whole batch, about 1,700 a sprite on the library bench (<span class="tt"><a class="el" href="perf.html">docs/PERF.md</a></span>, row <span class="tt">world</span>).</p>
+<p>The game keeps one array per property (structure of arrays: what the 65816 indexes cheaply) and fills an <a class="el" href="structOamWorldBatch.html" title="A batch of sprites in world coordinates, for oamPlaceWorld().">OamWorldBatch</a> with their addresses once. Two batches, because a batch has one size: 17 shards of 16 x 16 (the SMALL size of OBJ_SIZE16_L32) and six residents of 32 x 32 (the LARGE size, set once with <a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a>: the call never touches the size bit).</p>
+<p>The residents show <span class="tt">order</span>. Seen from above, the one lower on the screen is nearer and must be drawn in front — and OAM order is drawing order, the lower slot in front. So the residents are sorted by y every frame (an insertion sort of six bytes) and the batch's <span class="tt">order</span> says which resident each slot shows: the arrays stay indexed by the resident, only the six bytes of <span class="tt">order</span> move. Each one faces the way it walks: its frame (south going down, north going up) is its entry of <span class="tt">tile</span>.</p>
+<p>Hold the D-pad to move the camera. <span class="tt">visible[]</span> comes back from the call: the example counts the shards in view with it (<span class="tt"><a class="el" href="#a1bdfc1d91dd3471440873a3d1382834b">world_visible</a></span>); a game reads it to stream the animation frames of the sprites that are shown and skip the others — a sprite off screen should cost no VRAM DMA.</p>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>World coordinates minus a camera = screen coordinates; a sprite partly off the left edge needs the ninth x bit (x in 256..511), which the PPU reads as negative</li>
@@ -190,12 +193,26 @@ Variables</h2></td></tr>
 <li>Structure of arrays for per-sprite data, and the size bit set once</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>Six square walkers pace up and down near the centre and pass in front of and behind one another as their y changes; gold coins drift over the field; the D-pad scrolls the camera and stops at the world's edge. <span class="tt"><a class="el" href="#a1bdfc1d91dd3471440873a3d1382834b">world_visible</a></span> (probe oracle) follows how many coins are in view, <span class="tt"><a class="el" href="#a3e5aba6465454f3ddfdb0a29e12ad851">world_front</a></span> which walker is in the front slot, <span class="tt"><a class="el" href="#a24bbdbaee0318752f200bcfe0612606b" title="Probe oracles: the camera, the coins placed this frame, the walker in the front slot.">cam_x</a></span> / <span class="tt"><a class="el" href="#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></span> the camera.</dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, input, tile</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>Six residents (Kit, a frog, an owl, a pangolin, a raccoon, a rat) pace up and down round the ring and pass in front of and behind one another as their y changes, turning their back when they walk up; the shards drift over the square; the D-pad scrolls the camera (and the paving with it) and stops at the kerb. <span class="tt"><a class="el" href="#a1bdfc1d91dd3471440873a3d1382834b">world_visible</a></span> (probe oracle) follows how many shards are in view, <span class="tt"><a class="el" href="#a3e5aba6465454f3ddfdb0a29e12ad851">world_front</a></span> which resident is in the front slot, <span class="tt"><a class="el" href="#a24bbdbaee0318752f200bcfe0612606b" title="Probe oracles: the camera, the shards placed this frame, the resident in the front slot.">cam_x</a></span> / <span class="tt"><a class="el" href="#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></span> the camera.</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">lib/include/snes/sprite.h</a> — <a class="el" href="structOamWorldBatch.html" title="A batch of sprites in world coordinates, for oamPlaceWorld().">OamWorldBatch</a>, <a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld</a>, <a class="el" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize</a> </dd>
 <dd>
 examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a> direct OAM writes, no camera </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a08b4f0a78b8b477ebd1ea57f7adfa140" name="a08b4f0a78b8b477ebd1ea57f7adfa140"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08b4f0a78b8b477ebd1ea57f7adfa140">&#9670;&#160;</a></span>BG_VRAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BG_VRAM&#160;&#160;&#160;0x1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad610f56a934e206dd08aa33a8de82d24" name="ad610f56a934e206dd08aa33a8de82d24"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad610f56a934e206dd08aa33a8de82d24">&#9670;&#160;</a></span>CAM_XMAX</h2>
 
@@ -203,7 +220,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CAM_XMAX&#160;&#160;&#160;(<a class="el" href="games_2rpg_2main_8c.html#a08d53ef62bd678bc1c1f9c2f531efdb2">WORLD_W</a> - 256)</td>
+          <td class="memname">#define CAM_XMAX&#160;&#160;&#160;(<a class="el" href="demos_2rpg_2main_8c.html#a08d53ef62bd678bc1c1f9c2f531efdb2">WORLD_W</a> - 256)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -219,42 +236,90 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CAM_YMAX&#160;&#160;&#160;(<a class="el" href="games_2rpg_2main_8c.html#aec23d2d26d02217a4342289840020546">WORLD_H</a> - 224)</td>
+          <td class="memname">#define CAM_YMAX&#160;&#160;&#160;(<a class="el" href="demos_2rpg_2main_8c.html#aec23d2d26d02217a4342289840020546">WORLD_H</a> - 224)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a3b5b3bfae7fbfb59c398860aac341db5" name="a3b5b3bfae7fbfb59c398860aac341db5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b5b3bfae7fbfb59c398860aac341db5">&#9670;&#160;</a></span>NCOINS</h2>
+<a id="af53226ffd949ef2f3857166c4f1c673c" name="af53226ffd949ef2f3857166c4f1c673c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af53226ffd949ef2f3857166c4f1c673c">&#9670;&#160;</a></span>MAP_VRAM</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define NCOINS&#160;&#160;&#160;17</td>
+          <td class="memname">#define MAP_VRAM&#160;&#160;&#160;0x0000</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Coins in the world (the 16 x 16 batch). </p>
+<p>BG1's 64x64 map (4096 words, four 32x32 pages) and its tiles. </p>
 
 </div>
 </div>
-<a id="a699dd5a9b368e82fe6a267bb2476f0e2" name="a699dd5a9b368e82fe6a267bb2476f0e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a699dd5a9b368e82fe6a267bb2476f0e2">&#9670;&#160;</a></span>NWALK</h2>
+<a id="a2cd84acb2e9acce35594edff79ab1404" name="a2cd84acb2e9acce35594edff79ab1404"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cd84acb2e9acce35594edff79ab1404">&#9670;&#160;</a></span>NRES</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define NWALK&#160;&#160;&#160;6</td>
+          <td class="memname">#define NRES&#160;&#160;&#160;6</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Walkers (the 32 x 32 batch, sorted by depth). </p>
+<p>Residents (the 32 x 32 batch, sorted by depth). </p>
+
+</div>
+</div>
+<a id="a5fddcc754a9eec77ebb3cf19a36b51b3" name="a5fddcc754a9eec77ebb3cf19a36b51b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fddcc754a9eec77ebb3cf19a36b51b3">&#9670;&#160;</a></span>NSHARDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NSHARDS&#160;&#160;&#160;17</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Shards in the world (the 16 x 16 batch). </p>
+
+</div>
+</div>
+<a id="a1185c7c06af1e8dce0275d3f735b63a2" name="a1185c7c06af1e8dce0275d3f735b63a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1185c7c06af1e8dce0275d3f735b63a2">&#9670;&#160;</a></span>RES_ID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RES_ID&#160;&#160;&#160;<a class="el" href="#a5fddcc754a9eec77ebb3cf19a36b51b3">NSHARDS</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The residents' OAM ids follow the shards'. </p>
+
+</div>
+</div>
+<a id="a9c07f08d856ab08210b35dee4035090b" name="a9c07f08d856ab08210b35dee4035090b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c07f08d856ab08210b35dee4035090b">&#9670;&#160;</a></span>SHARD_TILE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SHARD_TILE&#160;&#160;&#160;192</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The shard's tile: the first 16 x 16 block of the sheet's fourth row. </p>
 
 </div>
 </div>
@@ -271,22 +336,6 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </div><div class="memdoc">
 
 <p>Sprite tile VRAM word address. </p>
-
-</div>
-</div>
-<a id="a3539041f82d25aedfe039753fe5004ae" name="a3539041f82d25aedfe039753fe5004ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3539041f82d25aedfe039753fe5004ae">&#9670;&#160;</a></span>WALK_ID</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define WALK_ID&#160;&#160;&#160;<a class="el" href="#a3b5b3bfae7fbfb59c398860aac341db5">NCOINS</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The walkers' OAM ids follow the coins'. </p>
 
 </div>
 </div>
@@ -321,8 +370,8 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a13f82cb447be028f5af43f1a48a876aa" name="a13f82cb447be028f5af43f1a48a876aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13f82cb447be028f5af43f1a48a876aa">&#9670;&#160;</a></span>load_shape()</h2>
+<a id="a62b6b51deb4f434ba2b437808714f918" name="a62b6b51deb4f434ba2b437808714f918"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62b6b51deb4f434ba2b437808714f918">&#9670;&#160;</a></span>frame_tile()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -331,24 +380,10 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void load_shape </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frame_tile </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>rows</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>flipx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>flipy</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -358,7 +393,8 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </table>
 </div><div class="memdoc">
 
-<p>Encode one 8 x 8 shape (8 rows of bits, colour index 1) to VRAM name <span class="tt">name</span>, mirrored left-right (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d" title="Horizontal flip flag (1 = facing left).">flipx</a></span>) and / or top-bottom (<span class="tt">flipy</span>): a big sprite has ONE attribute byte for all its tiles, so each corner and edge is its own tile. </p>
+<p>The OAM tile of frame <code class="param">f</code> of res/residents.png. </p>
+<p>A 32x32 frame is 4x4 tiles and a row of OBJ tiles is 16 wide, so frame f (four a row of the sheet) starts at column (f % 4) * 4 of tile row (f / 4) * 4. Frame 2k is resident k facing south, 2k + 1 facing north. </p>
 
 </div>
 </div>
@@ -379,8 +415,8 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 
 </div>
 </div>
-<a id="ae23d4d18e77aead6615b3aa92eb098c7" name="ae23d4d18e77aead6615b3aa92eb098c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae23d4d18e77aead6615b3aa92eb098c7">&#9670;&#160;</a></span>sort_walkers()</h2>
+<a id="ae22e800e1e7b56ba27224a4018ebd577" name="ae22e800e1e7b56ba27224a4018ebd577"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae22e800e1e7b56ba27224a4018ebd577">&#9670;&#160;</a></span>sort_residents()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -389,7 +425,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void sort_walkers </td>
+          <td class="memname">void sort_residents </td>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -402,7 +438,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </table>
 </div><div class="memdoc">
 
-<p>Sort the walkers by y, the lowest on screen first: an insertion sort of six bytes. </p>
+<p>Sort the residents by y, the lowest on screen first: an insertion sort of six bytes. </p>
 
 </div>
 </div>
@@ -419,7 +455,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
       </table>
 </div><div class="memdoc">
 
-<p>Probe oracles: the camera, the coins placed this frame, the walker in the front slot. </p>
+<p>Probe oracles: the camera, the shards placed this frame, the resident in the front slot. </p>
 
 </div>
 </div>
@@ -437,8 +473,8 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 
 </div>
 </div>
-<a id="a24fb24e7080b83fa993c3eeaf94c5863" name="a24fb24e7080b83fa993c3eeaf94c5863"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24fb24e7080b83fa993c3eeaf94c5863">&#9670;&#160;</a></span>coins</h2>
+<a id="a45433961286182d5ede70c2919b4f236" name="a45433961286182d5ede70c2919b4f236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45433961286182d5ede70c2919b4f236">&#9670;&#160;</a></span>crowd</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -447,7 +483,30 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structOamWorldBatch.html">OamWorldBatch</a> coins</td>
+          <td class="memname"><a class="el" href="structOamWorldBatch.html">OamWorldBatch</a> crowd</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>the residents </p>
+
+</div>
+</div>
+<a id="a28581dc32e681b710874a306c4827cdb" name="a28581dc32e681b710874a306c4827cdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28581dc32e681b710874a306c4827cdb">&#9670;&#160;</a></span>res_order</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> res_order[6]</td>
         </tr>
       </table>
   </td>
@@ -457,12 +516,12 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </table>
 </div><div class="memdoc">
 
-<p>The two batches: the coins (16 x 16) and the walkers (32 x 32, sorted). </p>
+<p>The residents' drawing order: slot i of the batch shows resident order[i]. </p>
 
 </div>
 </div>
-<a id="a74098e4602b8556df3349bc817680573" name="a74098e4602b8556df3349bc817680573"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74098e4602b8556df3349bc817680573">&#9670;&#160;</a></span>px</h2>
+<a id="a6fe0a0fddda8a4018c31a398631a44c6" name="a6fe0a0fddda8a4018c31a398631a44c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fe0a0fddda8a4018c31a398631a44c6">&#9670;&#160;</a></span>shards</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -471,7 +530,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> px[64]</td>
+          <td class="memname"><a class="el" href="structOamWorldBatch.html">OamWorldBatch</a> shards</td>
         </tr>
       </table>
   </td>
@@ -481,75 +540,7 @@ examples/sprites/sprite_swarm — the same sprites moved <a class="el" href="gam
 </table>
 </div><div class="memdoc">
 
-<p>Scratch: an 8 x 8 tile as pixel indices, and its 4bpp form. </p>
-
-</div>
-</div>
-<a id="a4b24fbfead388e007e43fcdc6e13e592" name="a4b24fbfead388e007e43fcdc6e13e592"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b24fbfead388e007e43fcdc6e13e592">&#9670;&#160;</a></span>tilebuf</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilebuf[32]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad33eec3df1384c3c7ccb56968896af1b" name="ad33eec3df1384c3c7ccb56968896af1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad33eec3df1384c3c7ccb56968896af1b">&#9670;&#160;</a></span>walk_order</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> walk_order[6]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The walkers' drawing order: slot i of the batch shows walker order[i]. </p>
-
-</div>
-</div>
-<a id="a4407dc992f1ed72e8c2a2ccb6dcd13f9" name="a4407dc992f1ed72e8c2a2ccb6dcd13f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4407dc992f1ed72e8c2a2ccb6dcd13f9">&#9670;&#160;</a></span>walkers</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structOamWorldBatch.html">OamWorldBatch</a> walkers</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>The two batches: the shards (16 x 16) and the residents (32 x 32, sorted). </p>
 
 </div>
 </div>

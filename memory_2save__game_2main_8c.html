@@ -127,6 +127,8 @@ $(function(){initNavTree('memory_2save__game_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sram_8h_source.html">snes/sram.h</a>&gt;</code><br />
+<code>#include &quot;res/terminal.inc&quot;</code><br />
+<code>#include &quot;res/icon.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -135,17 +137,26 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a99acfa2e8b6be6c9e3ee9a2d2df6b3f1" id="r_a99acfa2e8b6be6c9e3ee9a2d2df6b3f1"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a99acfa2e8b6be6c9e3ee9a2d2df6b3f1">CARD1_ROW</a>&#160;&#160;&#160;13</td></tr>
+<tr class="memdesc:a99acfa2e8b6be6c9e3ee9a2d2df6b3f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cards' first text row: slot 1's card is rows 13-16, slot 2's 19-22.  <br /></td></tr>
+<tr class="memitem:a759aa121cfda5ea19a356473b1752541" id="r_a759aa121cfda5ea19a356473b1752541"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a759aa121cfda5ea19a356473b1752541">CARD2_ROW</a>&#160;&#160;&#160;19</td></tr>
 <tr class="memitem:a3ef531cbe1242a15cd087b7542356808" id="r_a3ef531cbe1242a15cd087b7542356808"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>&#160;&#160;&#160;8</td></tr>
 <tr class="memdesc:a3ef531cbe1242a15cd087b7542356808"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size in bytes of one save slot (must equal sizeof(SaveState)).  <br /></td></tr>
 <tr class="memitem:a86e7f1b7f5ebbab30d693661f380d1b9" id="r_a86e7f1b7f5ebbab30d693661f380d1b9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:a86e7f1b7f5ebbab30d693661f380d1b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">SRAM byte offset for save slot 1 (starts at byte 0).  <br /></td></tr>
 <tr class="memitem:a31de44a4d7df249dd52269e2192fad86" id="r_a31de44a4d7df249dd52269e2192fad86"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a31de44a4d7df249dd52269e2192fad86">SLOT2</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:a31de44a4d7df249dd52269e2192fad86"><td class="mdescLeft">&#160;</td><td class="mdescRight">SRAM byte offset multiplier for save slot 2 (starts at byte 8).  <br /></td></tr>
+<tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">VRAM (word addresses): textModeInit() keeps $0000 (font) and $3800 (text map)</div></td></tr>
+<tr class="memitem:a69f9f237baac2ee247f14425602af76e" id="r_a69f9f237baac2ee247f14425602af76e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a69f9f237baac2ee247f14425602af76e">OBJ_VRAM</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memitem:af08380ecf757575bf9d121eafa35f02f" id="r_af08380ecf757575bf9d121eafa35f02f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af08380ecf757575bf9d121eafa35f02f">TERM_MAP</a>&#160;&#160;&#160;0x3C00</td></tr>
+<tr class="memitem:ad94fc85e2e721e173adfdb060012bc95" id="r_ad94fc85e2e721e173adfdb060012bc95"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a>&#160;&#160;&#160;0x1000</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; SRAM save/load demo with two slots.  <br /></td></tr>
+<tr class="memitem:ae1fc44f0e15cc32485e6942b83a44d9b" id="r_ae1fc44f0e15cc32485e6942b83a44d9b"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae1fc44f0e15cc32485e6942b83a44d9b">show_slot</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> row, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, const char *what, const <a class="el" href="structSaveState.html">SaveState</a> *s)</td></tr>
+<tr class="memdesc:ae1fc44f0e15cc32485e6942b83a44d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a slot's status in its card, and show Kit's icon there.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -159,25 +170,70 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SRAM battery-backed save with multiple save slots. </p>
 <p>Demonstrates SRAM (Static RAM) persistence on the SNES. SRAM is a small battery-backed memory region (typically 2-32KB) mapped at $70:0000-$7D:FFFF (LoROM) that retains data when the console is powered off. This is how SNES cartridges implement save games.</p>
-<p>The example uses two save slots at different SRAM offsets, each storing a <a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> struct (player position and camera coordinates). <a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a> copies RAM data to SRAM, and <a class="el" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset()</a> reads it back. The loaded values are displayed as hex on screen to verify round-trip integrity.</p>
+<p>The screen is a save terminal of the Rue basse: two slot cards on a terminal's glass (BG2), the text on BG1 in front. The example uses two save slots at different SRAM offsets, each storing a <a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> struct (player position and camera coordinates). <a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a> copies RAM data to SRAM, and <a class="el" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset()</a> reads it back. The loaded values are displayed as hex in the slot's card to verify round-trip integrity, and Kit's icon appears in a card once the slot has been written or read.</p>
 <p>The ROM header must declare SRAM support (USE_SRAM := 1) and size (SRAM_SIZE := 3 for 8KB) so emulators and flash carts allocate the battery-backed region.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SRAM battery-backed persistence for save games</li>
 <li>Multiple save slots via byte offset addressing</li>
 <li>ROM header SRAM size declaration (affects emulator behavior)</li>
 <li>Struct serialization to/from SRAM</li>
+<li>Mode 0: the text on BG1 and a 2bpp picture on BG2, each with its own palettes (BG2's start at CGRAM 32)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>Press A to write test data to Slot 1, B to read it back</li>
 <li>Press X to write different data to Slot 2, Y to read it back</li>
-<li>Loaded values (camX, camY, posX, posY) appear as hex numbers</li>
+<li>Loaded values (camX, camY, posX, posY) appear as hex numbers in the slot's card, with Kit's icon</li>
 <li>Data persists across emulator reset if SRAM saving is enabled</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, text, background, sprite, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">sram.h</a>, <a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a>, <a class="el" href="text_8h.html" title="Text rendering functions for OpenSNES.">text.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a99acfa2e8b6be6c9e3ee9a2d2df6b3f1" name="a99acfa2e8b6be6c9e3ee9a2d2df6b3f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99acfa2e8b6be6c9e3ee9a2d2df6b3f1">&#9670;&#160;</a></span>CARD1_ROW</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CARD1_ROW&#160;&#160;&#160;13</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The cards' first text row: slot 1's card is rows 13-16, slot 2's 19-22. </p>
+
+</div>
+</div>
+<a id="a759aa121cfda5ea19a356473b1752541" name="a759aa121cfda5ea19a356473b1752541"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a759aa121cfda5ea19a356473b1752541">&#9670;&#160;</a></span>CARD2_ROW</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CARD2_ROW&#160;&#160;&#160;19</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69f9f237baac2ee247f14425602af76e" name="a69f9f237baac2ee247f14425602af76e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69f9f237baac2ee247f14425602af76e">&#9670;&#160;</a></span>OBJ_VRAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OBJ_VRAM&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3ef531cbe1242a15cd087b7542356808" name="a3ef531cbe1242a15cd087b7542356808"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3ef531cbe1242a15cd087b7542356808">&#9670;&#160;</a></span>SAVE_SIZE</h2>
 
@@ -226,6 +282,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af08380ecf757575bf9d121eafa35f02f" name="af08380ecf757575bf9d121eafa35f02f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af08380ecf757575bf9d121eafa35f02f">&#9670;&#160;</a></span>TERM_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TERM_MAP&#160;&#160;&#160;0x3C00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad94fc85e2e721e173adfdb060012bc95" name="ad94fc85e2e721e173adfdb060012bc95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad94fc85e2e721e173adfdb060012bc95">&#9670;&#160;</a></span>TERM_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TERM_TILES&#160;&#160;&#160;0x1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
@@ -251,6 +335,56 @@ Variables</h2></td></tr>
 </ul>
 <p>The SRAM region is battery-backed, so saved data persists across power cycles on real hardware and across emulator sessions (if SRAM saving is enabled in the emulator settings).</p>
 <dl class="section return"><dt>Returns</dt><dd>0 (never reached &ndash; infinite game loop) </dd></dl>
+
+</div>
+</div>
+<a id="ae1fc44f0e15cc32485e6942b83a44d9b" name="ae1fc44f0e15cc32485e6942b83a44d9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1fc44f0e15cc32485e6942b83a44d9b">&#9670;&#160;</a></span>show_slot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void show_slot </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>row</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>what</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structSaveState.html">SaveState</a> *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write a slot's status in its card, and show Kit's icon there. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row</td><td>The card's first text row (CARD1_ROW or CARD2_ROW) </td></tr>
+    <tr><td class="paramname">id</td><td>The slot's sprite (0 or 1): its icon in the card's well </td></tr>
+    <tr><td class="paramname">what</td><td>"SAVED" or "LOADED" </td></tr>
+    <tr><td class="paramname">s</td><td>The values to print, or NULL after a save </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

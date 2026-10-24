@@ -223,7 +223,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>) &lt;&lt; 8))</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:148</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:145</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment -->
@@ -496,7 +496,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = H (screen X), <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = V (screen Y), <a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = M (scale/depth — use it to size sprites with distance). Requires a prior dsp1SetCamera. Takes ~627 DSP cycles (~83 µs); the driver polls, so timing is handled for you. </p>
+<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = H (screen X, right-positive), <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = V (screen Y, down-positive), both relative to the screen centre, and <a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = M (scale/depth — use it to size sprites with distance). M is positive for a point in front of the eye; behind it (M &lt;= 0) H and V come back mirrored, so hide such a point instead of drawing it. Requires a prior dsp1SetCamera. Takes ~627 DSP cycles (~83 µs); the driver polls, so timing is handled for you. </p>
 
 </div>
 </div>
@@ -617,7 +617,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <p>Rotate a 2D point about the origin (DSP-1 command $0C, "Rotate"). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: 9-tile prefab track (original art).">angle</a></td><td>16-bit rotation angle (A) </td></tr>
+    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).">angle</a></td><td>16-bit rotation angle (A) </td></tr>
     <tr><td class="paramname">x</td><td>point X (I) </td></tr>
     <tr><td class="paramname">y</td><td>point Y (I)</td></tr>
   </table>
@@ -654,7 +654,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <li><a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = <b>Vva</b>, the horizon raster, relative to Vof — the horizon is on screen line <span class="tt">112 + Vof + Vva</span>, and the ground below it streams from raster <span class="tt">Vva + 2</span> (see dsp1Raster);</li>
 <li><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = <b>Cx</b>, <a class="el" href="#af126a02087f50c1591f744aa50d3c5f9" title="dsp1_o3">dsp1_o3</a> = <b>Cy</b>: ground coordinates of the point under the imaginary centre — write them to M7X/M7Y (mode7SetCenter) when driving Mode 7 from dsp1Raster.</li>
 </ul>
-<p>Raster numbers are down-positive and relative to the screen centre; note that dsp1Project's V is the opposite (up-positive). Call once (and again whenever the camera moves), then dsp1Project points or dsp1Raster the ground. <span class="tt">lfe</span>/<span class="tt">les</span> are best tuned empirically — see the values used by examples/chips/dsp1_cube; <span class="tt">les</span> is also the vertical focal length. </p>
+<p>Raster numbers are down-positive and relative to the screen centre, like dsp1Project's V. With <span class="tt">aas</span> = 0 the camera looks along −Y. Call once (and again whenever the camera moves), then dsp1Project points or dsp1Raster the ground. <span class="tt">lfe</span>/<span class="tt">les</span> are best tuned empirically — see the values used by examples/mode7/dsp1_ground; <span class="tt">les</span> is also the vertical focal length. </p>
 
 </div>
 </div>
@@ -680,7 +680,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <p>Screen point → ground plane (DSP-1 command $0E, "Target"). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">h</td><td>screen X relative to the centre (I; mirrored like dsp1Project's H) </td></tr>
+    <tr><td class="paramname">h</td><td>screen X relative to the centre (I; right-positive, like dsp1Project's H) </td></tr>
     <tr><td class="paramname">v</td><td>screen raster relative to the imaginary centre (I; down-positive)</td></tr>
   </table>
   </dd>
@@ -711,7 +711,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <p>Scaled sine and cosine of an angle (DSP-1 command $04, "Triangle"). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: 9-tile prefab track (original art).">angle</a></td><td>16-bit angle (A; full turn = 2^16) </td></tr>
+    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: the Néo-Lumen city from above (devtools/art_assets/mode7.py).">angle</a></td><td>16-bit angle (A; full turn = 2^16) </td></tr>
     <tr><td class="paramname">radius</td><td>integer magnitude (I) to scale the result by</td></tr>
   </table>
   </dd>

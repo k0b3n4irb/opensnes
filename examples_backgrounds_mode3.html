@@ -129,19 +129,20 @@ $(function(){initNavTree('examples_backgrounds_mode3.html','',''); });
 Screenshot</div></div>
     <h2 class="doxsection"><a class="anchor" id="description-1"></a>
 Description</h2>
-<p>Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The tileset (39 KB) is larger than a ROM bank, so the converter writes it in two parts and the example copies each with <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span>, whose pointer carries the bank.</p>
+<p>Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The picture is a city canal at night in 253 colours: the haze over the water fades through dozens of shades, which no 16-colour palette could hold. Its tileset (770 tiles, 48 KB) is larger than a ROM bank, so the converter writes it in two parts and the example copies each with <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span>, whose pointer carries the bank.</p>
 <h2 class="doxsection"><a class="anchor" id="architecture-1"></a>
 Architecture</h2>
 <ul>
 <li><b>Mode 3</b>: BG1 at 8bpp (256 colors), BG2 at 4bpp (16 colors, unused here)</li>
 <li><b>BG1</b>: Full 256-color image</li>
-<li>Tileset in two parts (<span class="tt">bg_tiles</span>, <span class="tt">bg_tiles_1</span>), two DMA transfers</li>
-<li>Picture converted by the build from <span class="tt">res/bg.bmp</span> (<span class="tt">res/bg.bmp.toml</span>)</li>
+<li>Tileset in two parts (<span class="tt">canal_tiles</span>, <span class="tt">canal_tiles_1</span>), two DMA transfers</li>
+<li>VRAM: tiles at $0000 (770 x 32 words, up to $6040), tilemap at $7000</li>
+<li>Picture converted by the build from <span class="tt">res/canal.png</span> (<span class="tt">res/canal.png.toml</span>): generated for OpenSNES, CC0 (<span class="tt">assets/neo-lumen/</span>), its haze added by hand</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="ported-from-1"></a>
-Ported from</h2>
-<p>PVSnesLib "Mode3" example.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-2"></a>
+<h2 class="doxsection"><a class="anchor" id="origin-1"></a>
+Origin</h2>
+<p>Began as the PVSnesLib "Mode3" example.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-1"></a>
 Modules</h2>
 <p><span class="tt">console dma background</span> </p>
 </div></div><!-- contents -->

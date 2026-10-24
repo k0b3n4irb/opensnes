@@ -126,8 +126,8 @@ $(function(){initNavTree('examples_text_pixel_text.html','',''); });
 <img src="pixel_text.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <p>Four lines of a narrow font at a 6-pixel pitch, none of them on the tile grid, composed in RAM and sent to VRAM: the <span class="tt">text</span> module puts one glyph per tile, and a game that wants proportional text, or a label at any x and y, composes its own 2bpp layer. The primitive is <span class="tt"><a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a></span>, which ORs rows of a glyph into one tile and the tile to its right at a pixel shift; two calls per glyph cover the four tiles a glyph at (x, y) can touch. Press A and every line moves one pixel right, the glyphs crossing tile boundaries as they go. No assets: a 5x7 font declared as bits becomes 2bpp glyphs at boot.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-51"></a>
+    <p>The menu screen of a noodle bar's terminal in the Rue basse: a bowl over a message panel, and in the panel four lines of a narrow font at a 6-pixel pitch, none of them on the tile grid, composed in RAM and sent to VRAM: the <span class="tt">text</span> module puts one glyph per tile, and a game that wants proportional text, or a label at any x and y, composes its own 2bpp layer. The primitive is <span class="tt"><a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a></span>, which ORs rows of a glyph into one tile and the tile to its right at a pixel shift; two calls per glyph cover the four tiles a glyph at (x, y) can touch. Press A and every line moves one pixel right, the glyphs crossing tile boundaries as they go. The text is not an asset: a 5x7 font declared as bits becomes 2bpp glyphs at boot.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
 SNES Concepts</h2>
 <ul>
 <li>A 2bpp tile is 16 bytes, planes 0 and 1 interleaved per row. A layer of 160 tiles is 2560 bytes in FAR RAM, and tile n of the layer is tile n of the sheet in VRAM: the tilemap only places the tiles, the pixels are whatever the layer holds.</li>
@@ -135,8 +135,32 @@ SNES Concepts</h2>
 <li>The call only ORs, so the layer is cleared with <span class="tt"><a class="el" href="string_8h.html#a4f2933a10c46fe88c376b49f50dea67c" title="Fill n bytes with a value.">memset()</a></span> before a new layout, and glyphs may overlap.</li>
 <li>After a change the layer goes to VRAM in two halves of 1280 bytes, one per VBlank, inside the DMA budget of a frame.</li>
 <li>Cost: about 12 000 master cycles a glyph for its two calls (measured on luna), where the same work in C costs 40 000 to 50 000.</li>
+<li>Mode 0 gives each BG its own palettes: the layer (BG1) uses CGRAM 0-3, the terminal behind it (BG2) CGRAM 32-35, and colour 0 of each is transparent, so the glass shows between the letters.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="controls-35"></a>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-8"></a>
+VRAM Layout</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Word address  </th><th class="markdownTableHeadNone">Content  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">$0400</span>  </td><td class="markdownTableBodyNone">BG1 map: the layer's 160 tiles placed at column 6, row 10  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">$0800</span>  </td><td class="markdownTableBodyNone">BG2 map: the terminal  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">$1000</span>  </td><td class="markdownTableBodyNone">BG1 tiles: the layer, then one blank tile  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">$2000</span>  </td><td class="markdownTableBodyNone">BG2 tiles: the terminal  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="assets-22"></a>
+Assets</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">What  </th><th class="markdownTableHeadNone">Made by  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/terminal.png</span>  </td><td class="markdownTableBodyNone">the bar terminal's screen, 256x224, four colours, 2bpp (<span class="tt">res/terminal.png.toml</span>)  </td><td class="markdownTableBodyNone"><span class="tt">devtools/art_assets/build.py</span> (<span class="tt">bar_terminal</span>)  </td></tr>
+</table>
+<p>The font is the <span class="tt"><a class="el" href="text_2pixel__text_2main_8c.html#ac159ff712651efb0085066d6439b5d5f">font5x7</a></span> table of <span class="tt">main.c</span>, drawn by hand, CC0 like the rest of the Néo-Lumen assets (<span class="tt">assets/neo-lumen/README.md</span>).</p>
+<h2 class="doxsection"><a class="anchor" id="controls-31"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -144,10 +168,10 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Shift every line one pixel to the right (six steps, then back)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-21"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-14"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-70"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-51"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">tile</span>, <span class="tt">string</span> </p>
 </div></div><!-- contents -->

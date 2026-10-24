@@ -123,7 +123,7 @@ $(function(){initNavTree('audio_2apu__switch_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Hot-swapping APU programs at runtime — <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> in action.  
+<p>Two S-DSP programs — noise drums and hardware vibrato — hot-swapped with <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a>.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="apu_8h_source.html">snes/apu.h</a>&gt;</code><br />
@@ -149,14 +149,17 @@ Variables</h2></td></tr>
 <tr class="memitem:a4aad7560407e3d2eeb18363bdb4db13e" id="r_a4aad7560407e3d2eeb18363bdb4db13e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4aad7560407e3d2eeb18363bdb4db13e">spc_drums_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Hot-swapping APU programs at runtime — <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> in action. </p>
+<div class="textblock"><p>Two S-DSP programs — noise drums and hardware vibrato — hot-swapped with <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a>. </p>
 <p>The apu module's upload path (apuWaitBoot/apuUpload/apuExecute) runs once, at boot. This example adds the missing capability: replacing the running APU program at ANY time. The method is krom (Peter Lemon)'s PlayTwoSong protocol, productized: the 65816 writes APU_RESET_MAGIC to I/O port 0 (<a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a>); the SPC700 program polls for it in its wait loops (the APU_CHECK_RESET idiom), silences the DSP, and jumps back to the IPL boot ROM — ready for the next upload.</p>
-<p>Press A for the play_noise drum kit, B for the pitch_mod vibrato cello. Both APU programs are this repo's own — no external assets beyond the cello sample already attributed.</p>
+<p>Press A for the drum kit, B for the vibrato cello. Both APU programs are this repo's own ports of krom's demos: the drums are the DSP's white-noise generator alone (NON, the FLG noise clock, one ADSR per drum: krom's PlayNoise), the cello sings by pitch modulation (PMON: a silent voice as a hardware LFO: krom's PitchMod). No external assets beyond the cello sample already attributed.</p>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Cooperative APU reset: CPU→APU messaging over $2140 after boot</li>
 <li>The IPL ROM is re-entrant — jump to $FFC0 with the ROM re-enabled and the full boot handshake ($AA/$BB, $CC upload) works again</li>
 <li>Two independent APU programs in one ROM, uploaded on demand</li>
+<li>The S-DSP noise source (NON, FLG bits 0-4) as an instrument; the ADSR envelope is the drum type</li>
+<li>Pitch modulation (PMON): voice N-1's output scales voice N's pitch</li>
+<li>FIR echo setup (ESA/EDL/EFB/FIR0) in each program</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd>Drums start immediately. Press B: the kit cuts, the cello blooms. Press A: back to the drums. The backdrop tracks the active program (red = drums, amber = cello). Swap latency is a few frames — the SPC polls for the reset request every millisecond.</dd></dl>

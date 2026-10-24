@@ -285,7 +285,7 @@ Getting Started</h2>
 <div class="line">    <span class="keywordflow">while</span> (1) { <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>(); }</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
@@ -334,11 +334,11 @@ Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <div class="line">    <a class="code hl_define" href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a> = 0;           <span class="comment">/* Tell SA-1 we consumed */</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-<div class="ttc" id="achips_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:35</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
+<div class="ttc" id="achips_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:37</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:144</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="pattern-2-free-running-counter"></a>
 Pattern 2: Free-Running Counter</h3>
-<p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. See sa1_hello for register readback examples.</p>
+<p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads.</p>
 <div class="fragment"><div class="line">; SA-1 side: increment 32-bit counter forever</div>
 <div class="line">_sa1_count_loop:</div>
 <div class="line">    lda.l $003002       ; Load low word</div>
@@ -353,7 +353,27 @@ Pattern 2: Free-Running Counter</h3>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> lo = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3002;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> hi = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3004;</div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="i-ram-layout-convention"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="saving-to-bw-ram"></a>
+Saving to BW-RAM</h2>
+<p>On an SA-1 cartridge the battery keeps the SA-1's BW-RAM, not a separate SRAM chip. The SNES CPU sees it in banks <span class="tt">$40</span>-<span class="tt">$43</span>, and writes to it only once SBWE (<span class="tt">$2226</span>) bit 7 is set (<a href="https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol">fullsnes</a>); the crt0 sets it on an SA-1 build. <span class="tt">USE_SRAM := 1</span> beside <span class="tt">USE_SA1 := 1</span> declares the battery (cartridge type <span class="tt">$35</span>), and the <span class="tt">sram</span> module then reads and writes BW-RAM with the same calls as on any cartridge:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="sram_8h.html">snes/sram.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{ <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> magic; <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> boots; } SaveBlock;</div>
+<div class="line">SaveBlock save;</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), 0);</div>
+<div class="line"><span class="keywordflow">if</span> (save.magic != 0x5A1E) {     <span class="comment">/* a fresh cart holds power-on garbage */</span></div>
+<div class="line">    save.magic = 0x5A1E;</div>
+<div class="line">    save.boots = 0;</div>
+<div class="line">}</div>
+<div class="line">save.boots++;</div>
+<div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), 0);</div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+<div class="ttc" id="asram_8h_html"><div class="ttname"><a href="sram_8h.html">sram.h</a></div><div class="ttdoc">SNES SRAM (Save RAM) Functions.</div></div>
+<div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
+<div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
+</div><!-- fragment --><p>A magic word, not a zero, tells a block you wrote from whatever the chip powered up with. BW-RAM is also the SA-1's work RAM: keep the save in a region your SA-1 code does not use.</p>
+<h2 class="doxsection"><a class="anchor" id="i-ram-layout-convention"></a>
 I-RAM Layout Convention</h2>
 <p>We recommend this layout for SA-1 projects:</p>
 <table class="markdownTable">
@@ -432,11 +452,7 @@ Example ROMs</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What it demonstrates  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_chips_sa1_hello.html">sa1_hello</a>  </td><td class="markdownTableBodyNone">Boot diagnostic — verifies SA-1 initialization  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="examples_chips_sa1_starfield.html">sa1_starfield</a>  </td><td class="markdownTableBodyNone">128 sprites with sine-wave Lissajous patterns  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="examples_chips_sa1_save.html">sa1_save</a>  </td><td class="markdownTableBodyNone">A boot counter kept in the battery-backed BW-RAM, through the <span class="tt">sram</span> module  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="what-sa-1-cant-do"></a>
 What SA-1 Can't Do</h2>

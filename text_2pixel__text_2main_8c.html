@@ -128,6 +128,7 @@ $(function(){initNavTree('text_2pixel__text_2main_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="tile_8h_source.html">snes/tile.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string_8h_source.html">snes/string.h</a>&gt;</code><br />
+<code>#include &quot;res/terminal.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -138,6 +139,8 @@ Macros</h2></td></tr>
 <tr class="memitem:af53226ffd949ef2f3857166c4f1c673c" id="r_af53226ffd949ef2f3857166c4f1c673c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af53226ffd949ef2f3857166c4f1c673c">MAP_VRAM</a>&#160;&#160;&#160;0x0400</td></tr>
 <tr class="memitem:acd633835a520a62245ec6cfeb6d00e97" id="r_acd633835a520a62245ec6cfeb6d00e97"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acd633835a520a62245ec6cfeb6d00e97">PITCH</a>&#160;&#160;&#160;6                  /* pixels from one glyph to the next */</td></tr>
 <tr class="memitem:a3cfd3aa62338d12609f6d65bce97e9cd" id="r_a3cfd3aa62338d12609f6d65bce97e9cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3cfd3aa62338d12609f6d65bce97e9cd">ROWS</a>&#160;&#160;&#160;8</td></tr>
+<tr class="memitem:af08380ecf757575bf9d121eafa35f02f" id="r_af08380ecf757575bf9d121eafa35f02f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af08380ecf757575bf9d121eafa35f02f">TERM_MAP</a>&#160;&#160;&#160;0x0800             /* BG2: the terminal's map and tiles */</td></tr>
+<tr class="memitem:ad94fc85e2e721e173adfdb060012bc95" id="r_ad94fc85e2e721e173adfdb060012bc95"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a>&#160;&#160;&#160;0x2000</td></tr>
 <tr class="memitem:a24efc2648ce6ac7ab8397cbb8fb4c044" id="r_a24efc2648ce6ac7ab8397cbb8fb4c044"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a24efc2648ce6ac7ab8397cbb8fb4c044">TILES</a>&#160;&#160;&#160;(<a class="el" href="#ab59ad2ee1a48b83c2eef1f019ed8cc48">COLS</a> * <a class="el" href="#a3cfd3aa62338d12609f6d65bce97e9cd">ROWS</a>)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
@@ -162,16 +165,18 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Text — proportional text composed at the pixel in a 2bpp layer. </p>
-<p>The <span class="tt">text</span> module puts one glyph per tile, on the tile grid. A game that wants a narrow font at a 6-pixel pitch, or a label at any x and y, composes its text itself: a 2bpp tile layer kept in RAM, each glyph ORed into it at a pixel offset, the layer sent to VRAM when it changes. The primitive is <span class="tt"><a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a></span>: it puts rows of a glyph into one tile and the tile to its right, shifted by 0 to 7 pixels. A glyph placed at (x, y) touches up to four tiles — the row of tiles holding <span class="tt">y</span> and the one below — so two calls cover it, one per tile row. Nothing here is an asset: a 5x7 font is declared as bits and turned into 2bpp glyphs at boot.</p>
+<p>The menu screen of a noodle bar's terminal in the Rue basse: a bowl over a message panel (BG2, an asset), the bar's lines in a narrow font inside the panel (BG1, composed here).</p>
+<p>The <span class="tt">text</span> module puts one glyph per tile, on the tile grid. A game that wants a narrow font at a 6-pixel pitch, or a label at any x and y, composes its text itself: a 2bpp tile layer kept in RAM, each glyph ORed into it at a pixel offset, the layer sent to VRAM when it changes. The primitive is <span class="tt"><a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a></span>: it puts rows of a glyph into one tile and the tile to its right, shifted by 0 to 7 pixels. A glyph placed at (x, y) touches up to four tiles — the row of tiles holding <span class="tt">y</span> and the one below — so two calls cover it, one per tile row. The text is not an asset: a 5x7 font is declared as bits and turned into 2bpp glyphs at boot.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>A 2bpp tile is 16 bytes, planes 0 and 1 interleaved per row; a layer of N tiles is N x 16 bytes, and tile n of the layer is tile n of the sheet</li>
 <li>The tilemap only places tiles: the pixels come from the layer, so text at any position is a matter of writing the right bytes of the right tiles</li>
 <li>A glyph at x covers tile x / 8 and, shifted by x % 8, the tile after it; at y it covers rows y % 8 to 7 of one tile row and 0 to y % 8 - 1 of the next</li>
 <li>The layer lives in FAR RAM (2.5 KB) and is cleared with <a class="el" href="string_8h.html#a4f2933a10c46fe88c376b49f50dea67c" title="Fill n bytes with a value.">memset()</a> before a new layout; the upload is split over two VBlanks (1280 bytes each)</li>
+<li>Mode 0 gives each BG its own palettes: the layer uses CGRAM 0-3, the terminal behind it CGRAM 32-35, and colour 0 of both is transparent</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>Four lines of white text at a 6-pixel pitch, none aligned on the tile grid (y = 5, 21, 38, 51)</li>
+<li>Four lines of amber text at a 6-pixel pitch in the terminal's panel, none aligned on the tile grid (y = 5, 21, 38, 51 in the layer)</li>
 <li>Press A: every line moves one pixel to the right (six steps, then back), the glyphs crossing tile boundaries as they go</li>
 </ul>
 </dd></dl>
@@ -270,6 +275,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define ROWS&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af08380ecf757575bf9d121eafa35f02f" name="af08380ecf757575bf9d121eafa35f02f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af08380ecf757575bf9d121eafa35f02f">&#9670;&#160;</a></span>TERM_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TERM_MAP&#160;&#160;&#160;0x0800             /* BG2: the terminal's map and tiles */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad94fc85e2e721e173adfdb060012bc95" name="ad94fc85e2e721e173adfdb060012bc95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad94fc85e2e721e173adfdb060012bc95">&#9670;&#160;</a></span>TERM_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TERM_TILES&#160;&#160;&#160;0x2000</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -569,10 +602,10 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
-<div class="line">    0x00, 0x28,     </div>
+<div class="line">    0x41, 0x0C,     </div>
 <div class="line">    0x00, 0x00,     </div>
 <div class="line">    0x00, 0x00,     </div>
-<div class="line">    0xFF, 0x7F,     </div>
+<div class="line">    0x3F, 0x33,     </div>
 <div class="line">}</div>
 </div><!-- fragment -->
 </div>

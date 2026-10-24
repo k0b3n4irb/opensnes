@@ -126,13 +126,13 @@ $(function(){initNavTree('windows_2window__multi__hdma_2main_8c.html','',''); })
 <p>Multi-window HDMA — both windows' edges driven per scanline.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;res/rings.inc&quot;</code><br />
+<code>#include &quot;res/city.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a635f83dffe92dc5908a5054ea372a82a" id="r_a635f83dffe92dc5908a5054ea372a82a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a635f83dffe92dc5908a5054ea372a82a">VRAM_GFX</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memitem:a635f83dffe92dc5908a5054ea372a82a" id="r_a635f83dffe92dc5908a5054ea372a82a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a635f83dffe92dc5908a5054ea372a82a">VRAM_GFX</a>&#160;&#160;&#160;0x1000</td></tr>
 <tr class="memitem:a7e86a195c7d8001d20a2c1770430ccc7" id="r_a7e86a195c7d8001d20a2c1770430ccc7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7e86a195c7d8001d20a2c1770430ccc7">VRAM_MAP</a>&#160;&#160;&#160;0x0000</td></tr>
-<tr class="memdesc:a7e86a195c7d8001d20a2c1770430ccc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">256-color ring artwork (original, procedural)  <br /></td></tr>
+<tr class="memdesc:a7e86a195c7d8001d20a2c1770430ccc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The city behind the portholes, 8bpp (devtools/art_assets/build.py).  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -145,7 +145,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Multi-window HDMA — both windows' edges driven per scanline. </p>
-<p>Port of krom (Peter Lemon)'s WindowMultiHDMA demo (PeterLemon/SNES, PPU/Window/WindowMultiHDMA). One HDMA channel in 4-register mode streams WH0-WH3 ($2126-$2129) — BOTH windows' left/right edges — every scanline band, cutting a grid of portholes into BG1. The green backdrop (CGRAM color 0) shows wherever the combined window mask disables the layer; the D-pad scrolls the artwork underneath the static mask.</p>
+<p>Port of krom (Peter Lemon)'s WindowMultiHDMA demo (PeterLemon/SNES, PPU/Window/WindowMultiHDMA). One HDMA channel in 4-register mode streams WH0-WH3 ($2126-$2129) — BOTH windows' left/right edges — every scanline band, cutting a grid of portholes into BG1: the four windows of an aerial tram, with the city at dusk behind them. The backdrop (CGRAM color 0, the tram's wall) shows wherever the combined window mask disables the layer; the D-pad scrolls the city underneath the static mask.</p>
 <p>Window algebra (krom's exact setup): W1 and W2 both enabled on BG1 and both INVERTED, combined with AND — the layer is masked where (outside W1) AND (outside W2), i.e. visible inside either window.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>HDMA_MODE_4REG: one channel drives 4 consecutive PPU registers/line</li>
@@ -154,7 +154,7 @@ Variables</h2></td></tr>
 <li>Backdrop color as the "outside the windows" fill</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>A grid of rectangular portholes over a color-ring artwork; green everywhere else. D-pad scrolls the rings behind the fixed portholes.</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>Four portholes in the tram's dark wall, the city and its reflection in a canal behind them. D-pad scrolls the city behind the fixed portholes.</dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, hdma, window, input</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/PeterLemon/SNES">https://github.com/PeterLemon/SNES</a> — original demo </dd>
 <dd>
@@ -167,7 +167,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define VRAM_GFX&#160;&#160;&#160;0x4000</td>
+          <td class="memname">#define VRAM_GFX&#160;&#160;&#160;0x1000</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -186,8 +186,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>256-color ring artwork (original, procedural) </p>
-<p>krom's VRAM layout: map at word $0000, tiles at word $4000 </p>
+<p>The city behind the portholes, 8bpp (devtools/art_assets/build.py). </p>
+<p>VRAM: the map at word $0000, the tiles at $1000 (546 8bpp tiles, 34 KB, up to $543F: krom's $4000 would run past the end of VRAM). A BG's character base moves in steps of $1000 words (BG12NBA), so $1000 is the first one past the map. </p>
 
 </div>
 </div>
