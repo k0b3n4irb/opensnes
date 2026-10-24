@@ -2,6 +2,9 @@
 # pre-push hook: lint every commit about to leave this machine, the way the
 # Lint workflow does on the push range. A subject that fails here would
 # turn the push's Lint job red and could only be repaired by a force-push.
+# Then build every example from a clean export of the pushed commit
+# (devtools/check_clean_export.py): a file the commit leaves out turns
+# every build leg red.
 # Installed by `make hooks` (git config core.hooksPath scripts/githooks).
 #
 # stdin: one line per ref: <local ref> <local sha> <remote ref> <remote sha>
@@ -19,6 +22,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
         range="$remote_sha..$local_sha"
     fi
     python3 "$top/devtools/lint_commits.py" "$range" || status=1
+    # Every example must build from the pushed commit alone, as CI builds it.
+    python3 "$top/devtools/check_clean_export.py" "$local_sha" || status=1
 done
-[ "$status" -ne 0 ] && echo "pre-push: reword the commit(s) above before pushing (git rebase -i)." >&2
+[ "$status" -ne 0 ] && echo "pre-push: fix what is reported above before pushing (a subject: git rebase -i; a missing file: git add -f)." >&2
 exit $status

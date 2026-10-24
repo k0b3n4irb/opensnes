@@ -76,7 +76,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -134,6 +134,13 @@ lint-cproc-widths:
 hooks:
 	@git config core.hooksPath scripts/githooks
 	@echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"
+
+# Every example built from a clean export of HEAD (git archive, make clean,
+# make), the way CI builds it: a file the commit leaves out fails here
+# instead of on every CI leg (91419502: five .brr hidden by .gitignore).
+# Also run by the pre-push hook on the commit being pushed.
+check-clean-export:
+	@python3 devtools/check_clean_export.py
 
 # Doc-drift sentinel — version macros, ROADMAP status line, examples count
 # across active rules. See devtools/check_doc_drift.py and
@@ -791,6 +798,7 @@ help:
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + test-devtools + lint-commits)"
 	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
+	@echo "  check-clean-export - Build every example from a clean export of HEAD, as CI does"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
