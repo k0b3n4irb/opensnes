@@ -74,6 +74,13 @@ widened index no longer writes `lda #0 / sta hi`. 18 ROMs change, all MATCH;
 the audio hash of snesmod_music moved (`luna diff --audio --align-onset`,
 its input script: MATCH, max 0.74 %, onset unchanged at 37726).
 
+Measured by the two games on their real cases (before = develop with
+points 1 and 2): the second game's `path_move` 81 236 -> 68 110 cycles per
+step over frames 200-1400, lag frames 321 -> 297 of 1 200; in its worst
+window 95 784 -> 80 181 (-34 % since the start of the chantier), steps over
+three frames 221 -> 191 of about 720; game state identical. The first
+game's ROM 149 bytes smaller, 27 tests pass, one tick of three frames less.
+
 **Point 5 refused, for now.** Reading `tab[i + 1]` as `tab + 4` with the
 same X means rewriting `(u32)(u16)(i + 1) * 4` as `(u32)i * 4 + 4`, which is
 exact only when `i + 1` does not wrap at 65 536. Nothing bounds `i` here (it
