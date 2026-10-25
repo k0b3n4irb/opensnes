@@ -3,6 +3,8 @@
 Tracker music with transport controls, and sound effects fired over it, with
 SNESMOD, the tracker engine that runs on the SNES's sound processor.
 
+![Screenshot](snesmod_music.png)
+
 ## Learning Objectives
 
 After this lesson, you will understand:
