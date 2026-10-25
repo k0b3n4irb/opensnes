@@ -1,0 +1,7 @@
+# A10 (2026-10-25): these casts compile, and the two indexed accesses carry
+# bank $70 ($708040 = 32832 + 112 << 16) to an indirect-long access.
+in put_far: present adc\.w #112
+in put_far: present sta \[tcc__r9\]
+in get_const: present adc\.w #112
+in get_const: present lda \[tcc__r9\]
+in put_reg: present sta\.l \$002100

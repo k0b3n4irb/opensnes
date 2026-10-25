@@ -4,6 +4,14 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- feat(compiler): an integer constant above `$FFFF` cast to a plain pointer
+  is refused (`(u8 *)0x708040`): such a pointer kept its bank only at a
+  constant index, and `p[i]` read and wrote bank $00 without a word. The
+  message names the fix, a `FAR` or `const` pointee; casts to those, to an
+  address of bank $00's range and to a function pointer compile as before.
+  The code the compiler emits does not change.
+
 ## [0.52.0] — 2026-10-24
 
 The examples are ours. Every picture, sprite, tile, sample and module they
