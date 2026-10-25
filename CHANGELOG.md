@@ -59,6 +59,10 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- build(release): the binaries of the release zip carry no debug
+  information (`strip -S`): the Linux arm64 zip went from 30.6 MB to 8.4 MB
+  (76.6 MB to 22.1 MB extracted). The tools behave the same; a source build
+  of the SDK keeps `-g`.
 - perf(compiler): a 32-bit add, sub, and, or, xor or copy may put its result
   in its operand's slot, so a u32 value a loop carries stays in place: a
   16.16 path loop with four u32 values lost the 16 copies it made at the end

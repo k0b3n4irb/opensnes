@@ -46,6 +46,8 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
+# The host's strip(1), for the release zip; another toolchain sets its own.
+STRIP ?= strip
 
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
@@ -689,6 +691,11 @@ release: all
 	@mkdir -p $(RELEASE_DIR)/opensnes/make
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
+	@# Debug information out (2026-10-25): the tools and the toolchain are
+	@# built with -g for the sanitizers and gdb, which made 72 of the 76 MB of
+	@# the v0.50.0 zip's content. -S removes the debug sections only (GNU and
+	@# Apple strip alike); the symbol table stays for a backtrace.
+	@$(STRIP) -S $(RELEASE_DIR)/opensnes/bin/*
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
 	@# The objects only: the build links lib/build/<flavour>/*.o and never
 	@# reads the .asm the compiler wrote on the way (about 200 files).
