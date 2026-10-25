@@ -289,6 +289,26 @@ void nmiSet(VBlankCallback callback) {
     nmi_install(callback, (u8)((u32)callback >> 16));
 }
 
+/* nmiSetLag: the callback of lag frames (crt0 .nmi_lag). The pointer is
+ * written before the flag, with the NMI off, as nmi_install does. */
+extern volatile u8 nmi_lag_callback[4];
+extern volatile u8 nmi_has_lag_callback;
+
+void nmiSetLag(VBlankCallback callback) {
+    REG_NMITIMEN = 0;
+    if (callback) {
+        nmi_lag_callback[0] = (u16)callback & 0xFF;
+        nmi_lag_callback[1] = ((u16)callback >> 8) & 0xFF;
+        nmi_lag_callback[2] = (u8)((u32)callback >> 16);
+        nmi_lag_callback[3] = 0x00;
+        nmi_has_lag_callback = 1;
+    } else {
+        nmi_has_lag_callback = 0;
+    }
+    clearNmiFlag();
+    REG_NMITIMEN = nmitimen_shadow;
+}
+
 void nmiClear(void) {
     /* Restore default callback and clear fast flag */
     nmi_install((VBlankCallback)DefaultNmiCallback, 0);

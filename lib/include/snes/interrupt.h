@@ -98,6 +98,40 @@ void nmiSet(VBlankCallback callback);
  */
 void nmiClear(void);
 
+/**
+ * @brief Register a callback for lag frames
+ *
+ * A lag frame is a VBlank that arrives while the main loop is still
+ * computing (it has not called WaitForVBlank()): the library then skips
+ * its VBlank work and the nmiSet() callback, and runs this one instead.
+ * Something that must happen every frame whatever the game's load (a
+ * palette fade, a raster effect's table swap, a timer the player sees)
+ * registers the same function with both:
+ *
+ * @code
+ * nmiSet(tick);       // the frames the main thread waited for
+ * nmiSetLag(tick);    // and the others
+ * @endcode
+ *
+ * Cost: none while no lag callback is set (a flag tested on lag frames);
+ * the call itself, as nmiSet()'s, when one is.
+ *
+ * @param callback Function to call on lag frames, or NULL to stop
+ *
+ * @warning The main thread was interrupted at any instruction, not waiting:
+ *          everything nmiSet() forbids, and also
+ *          - read only data the main thread has finished writing (a buffer
+ *            it swaps, a value it writes in one instruction);
+ *          - no DMA on a channel the main thread uses: every library DMA
+ *            helper uses channel 0, and the library's own VBlank uploads
+ *            channel 7; write the registers of a channel of your own;
+ *          - no OAM upload: the main thread may be halfway through the
+ *            sprite table (oamMemory).
+ * @note The library's VBlank work (OAM, text, scroll, joypads) does not run
+ *       on a lag frame, with or without this callback.
+ */
+void nmiSetLag(VBlankCallback callback);
+
 /*============================================================================
  * Hardware IRQ (H/V timer)
  *============================================================================*/

@@ -242,6 +242,19 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
+; Lag-frame callback (nmiSetLag, since 2026-10-25)
+;------------------------------------------------------------------------------
+; Called by NmiHandler on a lag frame only (the main thread was not waiting),
+; while nmi_has_lag_callback is set; nmiSetLag writes the pointer first. Its
+; own section, for the reason .scope gives below.
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".nmi_lag" BANK 0 SLOT 1
+    nmi_lag_callback     dsb 4   ; 24-bit function pointer + padding
+    nmi_has_lag_callback dsb 1   ; 0 = none (the WRAM clear at boot), 1 = set
+.ENDS
+
+;------------------------------------------------------------------------------
 ; Super Scope State Variables (port 2 only)
 ;------------------------------------------------------------------------------
 ; Separate RAMSECTION to avoid inflating ".system" (which must stay small
@@ -1085,6 +1098,35 @@ FastNmi:
     ; (gsuPresentInit's GSU_PRESENT_ON_LAG_FRAMES; lib superfx.asm)
     jsl gsu_present_step_lag
 .endif
+    ; ...and the lag-frame callback, when one is set (nmiSetLag). Same call
+    ; as the user callback below: D on the NMI registers, DB $7E, the
+    ; software mul/div (in_nmi_ctx). The main thread was interrupted
+    ; anywhere, so the callback's rules are stricter (interrupt.h).
+    sep #$20
+    .ACCU 8
+    lda.w nmi_has_lag_callback
+    beq @lag_done
+    lda #1
+    sta.w in_nmi_ctx
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    pea $7E7E
+    plb
+    plb
+    phk
+    pea @lag_callback_done-1
+    jml [nmi_lag_callback]
+@lag_callback_done:
+    pea $0000
+    plb
+    plb
+    sep #$20
+    .ACCU 8
+    stz.w in_nmi_ctx
+@lag_done:
+    rep #$20
+    .ACCU 16
     jmp @nmi_restore
 
 @vblank_work:

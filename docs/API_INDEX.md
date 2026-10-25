@@ -136,7 +136,7 @@ its header.
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |
 | `input.h` | `mouseInit`, `mouseIsConnected`, `mouseGetX`, `mouseGetY`, `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseSetSensitivity`, `mouseGetSensitivity` | [input: the mouse](tutorials/input.md) |
 | `input.h` | `scopeInit`, `scopeIsConnected`, `scopeGetX`, `scopeGetY`, `scopeGetRawX`, `scopeGetRawY`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeButtonsRepeat`, `scopeSetHoldDelay`, `scopeSetRepeatDelay`, `scopeSinceShot` | [input: the Super Scope](tutorials/input.md) |
-| `interrupt.h` | `nmiSet`, `nmiClear`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
+| `interrupt.h` | `nmiSet`, `nmiClear`, `nmiSetLag`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
 | `math.h` | `easeInQuad`, `easeOutQuad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
 | `snesmod.h` | `snesmodGetPosition`, `snesmodFlush` | [audio: following the music](tutorials/audio.md) |

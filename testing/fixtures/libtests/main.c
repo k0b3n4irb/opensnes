@@ -1436,6 +1436,32 @@ static void test_glyph_blit(void)
     r_glyph_ok = ok;
 }
 
+/* nmiSetLag (2026-10-25): four NMIs the main thread does not wait for are
+ * four lag frames, and the lag callback runs on each; cleared, it runs on
+ * none. */
+u16 r_lagcb_lags;   /* lag frames counted by the NMI handler -> 4 */
+u16 r_lagcb_calls;  /* lag callback calls over the same frames -> 4 */
+u16 r_lagcb_after;  /* calls once cleared, over two more lag frames -> 0 */
+static u16 lagcb_n;
+extern volatile u16 lag_frame_counter;
+static void lag_tick(void) { lagcb_n++; }
+static void part_lagcb(void) {
+    u16 lag0, f0;
+    nmiSetLag(lag_tick);
+    f0 = frame_count;
+    while (frame_count == f0) { }          /* start on a frame boundary (a lag frame too) */
+    lagcb_n = 0;
+    lag0 = lag_frame_counter;
+    f0 = frame_count;
+    while ((u16)(frame_count - f0) < 4) { }
+    r_lagcb_lags = (u16)(lag_frame_counter - lag0);
+    r_lagcb_calls = lagcb_n;
+    nmiSetLag(0);
+    f0 = frame_count;
+    while ((u16)(frame_count - f0) < 2) { }
+    r_lagcb_after = (u16)(lagcb_n - r_lagcb_calls);
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1515,6 +1541,7 @@ int main(void) {
     part_div32();
     part_pu16();
     part_trun();
+    part_lagcb();
 
 
     coverage_bank_bytes();

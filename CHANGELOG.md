@@ -5,6 +5,11 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib,runtime): `nmiSetLag()` registers a callback the NMI handler runs
+  on lag frames, which skip the library's VBlank work and the `nmiSet()`
+  callback. Registered with both, a function runs every frame whatever the
+  game's load (asked by a second game). Its stricter rules are on the
+  header. While none is set, a lag frame costs one flag test.
 - feat(lib): `textPrintS16()` prints a signed number, `-` first when it is
   negative. An `s16` handed to `textPrintU16()` printed -52 as `65484`.
 - feat(lib): a call with a constant VRAM address the register cannot hold

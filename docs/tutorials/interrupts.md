@@ -32,6 +32,24 @@ it short — `make test-nmi-budget` measures the handler. Plain C
 multiplication and division are safe there; `fixMul()` and `fix32Mul()`
 are not. The full list is on `nmiSet()` in the header.
 
+A lag frame is the VBlank of a main loop that has not finished its frame.
+What must happen every frame whatever the load (a fade, the swap of a raster
+table, a timer the player watches) registers its function a second time with
+`nmiSetLag()`, which runs it on the lag frames only:
+
+```c
+nmiSet(tick);                    /* the frames the main loop waited for */
+nmiSetLag(tick);                 /* and the lag frames */
+/* ... */
+nmiSetLag(NULL);                 /* lag frames: nothing again */
+```
+
+The main loop was then interrupted at any instruction, so the rules are
+stricter than `nmiSet()`'s: read only what the main loop has finished
+writing, run no DMA on channel 0 (every library helper's) or 7 (the
+library's VBlank uploads), and never upload the sprite table, which may be
+half written. While none is set, a lag frame costs one test of a flag.
+
 ## Timer IRQs: code at a chosen scanline
 
 The CPU can be interrupted when the PPU's counters reach a position you
