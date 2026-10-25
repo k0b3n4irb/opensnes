@@ -1,4 +1,4 @@
-# Loop-carried u32 values copied every iteration (accepted 2026-10-22, not started)
+# Loop-carried u32 values copied every iteration (accepted 2026-10-22; points 1 and 2 done 2026-10-25)
 
 Requested by a second game (direct message, 2026-10-22): a 16.16 path loop
 in u32 costs about 84 instructions per iteration. Reproduced on `develop`
@@ -38,6 +38,27 @@ What the loop body wastes, in planned order:
    the high half is never read.
 5. **`tab[i + 1]` recomputes the index** instead of reading `tab+4` with
    the same X.
+
+**Done 2026-10-25 (QBE f259a21): points 1 and 2, 83 -> 62 instructions.**
+Not the phi coalescing itself: the slot colouring already let a phi share
+its argument's slot. What stopped it was the edge every 32-bit result had
+with its operands (`slot_edge(t, arg)` in `color_slots`), because a result
+half over an operand overwrites a word it has yet to read. Exact overlap is
+safe for add, sub, and, or, xor and copy (each word of the operands is read
+before the same word of the result is written), so those pairs became
+exact-or-disjoint partners, like a phi and its argument, and prefer each
+other's slot. The first try stopped the library build on the slot-ownership
+check (textPrint, `str += n; c = *str;`): the add was emitted into str's
+slot and also folded into the next load, which read str + n + n. A result
+that leads to a load's or store's address, through adds and copies, is
+excluded (fixture `ptr_advance_fold`). The `and` with a constant half of
+$FFFF skips that half, and both its instructions when the result is in its
+operand's slot (point 2). Fixture `loop_carried_u32`; 12 ROMs of the corpus
+change, all MATCH frame for frame; bench and libbench unchanged.
+
+Left, in order: point 3 (a loaded value through a stack slot before the
+`adc`), point 4 (the u16 -> u32 index extension whose high half nobody
+reads), point 5 (`tab[i + 1]` recomputing the index).
 
 The request passes the four checks of `exchanges.md`. This is a Class A
 chantier, in a separate worktree, after the assets lot. The finished

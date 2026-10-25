@@ -1,0 +1,4 @@
+# it compiles (the slot-ownership check would stop it), and the sum is not
+# stored over the pointer it is read with: after `adc 2,s` comes no `sta 2,s`
+in tp: present jsl run
+in tp: absent \tadc (\d+),s\n\tsta \1,s

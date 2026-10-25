@@ -1,0 +1,8 @@
+# no phi moves before the back edge: the last thing the body does is n--
+in f: absent \tlda \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @while_cond
+in f: present \tdec a\n\tsta \d+,s\n\tjmp @while_cond
+# the identity half of `& 0x00FFFFFF` is not emitted, the high one is
+in f: absent and\.w #65535
+in f: present and\.w #255
+# y += tab[i] in place: the sum is stored where y was read
+in f: present \tadc (\d+),s\n\tsta \1,s

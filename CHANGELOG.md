@@ -52,6 +52,12 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- perf(compiler): a 32-bit add, sub, and, or, xor or copy may put its result
+  in its operand's slot, so a u32 value a loop carries stays in place: a
+  16.16 path loop with four u32 values lost the 16 copies it made at the end
+  of every iteration, 83 instructions down to 62 (a second game's case).
+  A `& 0x00FFFFFF` no longer emits `and #$FFFF` on the low word. Twelve
+  examples' ROMs change; every one shows the same frames.
 - docs(lib): the `oamSet()` and `oamSetFast()` notes no longer cite the
   "framesize=158" cost of a version long gone.
 - feat(compiler): an integer constant above `$FFFF` cast to a plain pointer
