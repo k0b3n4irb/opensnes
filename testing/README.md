@@ -71,7 +71,7 @@ failure; `--rows 1-7` restricts it to the gate rows.
 `diff_corpus.py --ref <dir>` is the Class A proof for a compiler or
 library change: for every example it runs `luna diff <ref rom> <new rom>
 --frames <manifest frames> --tolerance N` and prints MATCH (with the
-boot-length offset luna found) or DIFF (PNG pairs under `/tmp/luna-diff/`).
+boot-length offset luna found) or DIFF (PNG pairs under `$OPENSNES_TMP/luna-diff/`, `/tmp/opensnes-tests` by default).
 The reference tree is the `examples/` ROMs built before the change; a
 DIFF is a rendering change to explain, never something to re-baseline
 over.

@@ -87,6 +87,13 @@ in the commit why the drift is benign. Precedent: `aa595933` after the
 indexed-long fusion, `912fb24a` after the #132 compiler fix. How deep the
 stack goes is gated separately (the stack floor of `rom_coverage.py`).
 
+What a run keeps between two steps (failed-capture PNGs, profiles, WRAM
+traces, the user-project test) goes under `$OPENSNES_TMP`
+(`/tmp/opensnes-tests` by default, `testing/lib/luna.py` `TMP_ROOT`), and
+`make tests` ends with `make clean-tmp`, which removes it, QBE's suite files
+and the pass markers of earlier days (2026-10-25). A failed run keeps it all.
+A new harness path goes under `TMP_ROOT`, never a literal `/tmp/...`.
+
 Coverage covers every example (`luna_runner.py --list`). Static analysis
 (`symmap.py`), the build (`make`), and compiler C→ASM checks remain separate
 make/devtools steps. luna runs SA-1 / Super FX / DSP-1 natively — no chip-ROM

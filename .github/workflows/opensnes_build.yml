@@ -459,5 +459,5 @@ jobs:
           name: luna-test artifacts
           path: |
             testing/baselines/
-            /tmp/luna-test-actual/
-            /tmp/luna-test-corpus/
+            /tmp/opensnes-tests/luna-test-actual/
+            /tmp/opensnes-tests/luna-test-corpus/

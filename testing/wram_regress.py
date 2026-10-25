@@ -52,7 +52,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from lib import find_luna, discover_example_roms, example_key  # noqa: E402
+from lib import TMP_ROOT, find_luna, discover_example_roms, example_key  # noqa: E402
 from luna_runner import _pool_map, load_manifest, missing_firmware  # noqa: E402
 
 BASELINE = HERE / "baselines" / "wram.json"
@@ -132,7 +132,7 @@ def stack_only_pages(rom: Path) -> range:
 
 
 def stream_hash(luna: str, rom: Path) -> str:
-    out = Path("/tmp/luna-wram") / f"{example_key(rom).replace('/', '_')}.txt"
+    out = TMP_ROOT / "luna-wram" / f"{example_key(rom).replace('/', '_')}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
     # Unlink first: a stale file from a previous run would pass the is_file()
     # check below and get hashed if wram-trace fails silently — which poisons

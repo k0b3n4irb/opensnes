@@ -75,8 +75,16 @@ else
     RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
 endif
 
+# Where the test harness and the user-project test write what they keep
+# between two steps (testing/lib/luna.py reads the same variable). One root, so
+# that `make clean-tmp` removes what a run left behind; `make tests` calls it
+# once everything has passed, and keeps it all when a step fails (the
+# messages point into it).
+OPENSNES_TMP ?= /tmp/opensnes-tests
+export OPENSNES_TMP
+
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -293,7 +301,18 @@ tests: test-compiler
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
+	@$(MAKE) -s clean-tmp
 	@echo "ALL CHECKS PASSED (luna)"
+
+# What the tests leave in the temporary directory: $(OPENSNES_TMP), the files
+# of QBE's suite that it never removes, and the pass markers of earlier days
+# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh; today's
+# stays, the pre-commit hook reads it).
+clean-tmp:
+	@rm -rf $(OPENSNES_TMP)
+	@rm -f /tmp/qbe.zzzz.*
+	@for f in /tmp/opensnes_tests_passed_*; do \
+		[ -e "$$f" ] && [ "$$f" != /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d) ] && rm -f "$$f"; done; true
 
 # The VBlank time budget on its own (gaps review R4): the same gate `make
 # tests` runs, handy while tuning the NMI handler. `--report` prints the
@@ -362,7 +381,7 @@ test-pal:
 # contributor runs must include everything CI runs. The deliberately wrong
 # assert must make `make test` exit non-zero. The sed is done in Python so
 # the target behaves the same on macOS (BSD sed) and Linux.
-TEST_PROJECT_DIR ?= /tmp/opensnes_test_project
+TEST_PROJECT_DIR ?= $(OPENSNES_TMP)/opensnes_test_project
 test-project:
 	@rm -rf $(TEST_PROJECT_DIR)
 	@OPENSNES_HOME=$(CURDIR) bin/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
@@ -799,6 +818,7 @@ help:
 	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  check-clean-export - Build every example from a clean export of HEAD, as CI does"
+	@echo "  clean-tmp - Remove what the tests left in \$$OPENSNES_TMP (default /tmp/opensnes-tests); make tests ends with it"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"

@@ -59,7 +59,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lib import REPO_ROOT, LUNA_VERSION, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402
+from lib import REPO_ROOT, LUNA_VERSION, TMP_ROOT, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402
 from luna_runner import capture_frames, load_manifest, missing_firmware  # noqa: E402
 from luna_runner import HERE  # noqa: E402
 sys.path.insert(0, str(REPO_ROOT / "devtools" / "symmap"))
@@ -254,7 +254,7 @@ def main() -> int:
     manifest = load_manifest()
     public = public_functions()
     hits: dict[str, set[str]] = {}          # function -> examples that executed it
-    tmp = Path("/tmp/luna-pcset"); tmp.mkdir(parents=True, exist_ok=True)
+    tmp = TMP_ROOT / "luna-pcset"; tmp.mkdir(parents=True, exist_ok=True)
     roms = 0
     legs = 0
     stack_under: list[str] = []                 # legs whose stack crossed the band top

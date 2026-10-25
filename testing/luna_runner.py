@@ -48,7 +48,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from lib import LUNA_VERSION, REPO_ROOT, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402,F401  (testing/lib: the one place that knows where luna and the corpus are)
+from lib import LUNA_VERSION, REPO_ROOT, TMP_ROOT, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402,F401  (testing/lib: the one place that knows where luna and the corpus are)
 
 BASELINE_DIR = HERE / "baselines"
 # Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
@@ -279,7 +279,7 @@ def run(update: bool, only: str | None) -> int:
             # Render into a staging dir; the PNGs replace the baselines only
             # once the capture is accepted (a refused capture used to
             # overwrite them before the refusal).
-            stage = Path("/tmp/luna-test-staging") / label
+            stage = TMP_ROOT / "luna-test-staging" / label
             stage.mkdir(parents=True, exist_ok=True)
             hashes, wdm_any, staged = [], False, []
             for i, frame in enumerate(points):
@@ -319,7 +319,7 @@ def run(update: bool, only: str | None) -> int:
         wdm_any = False
         err = None
         for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
-            actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
+            actual_png = _png_for(TMP_ROOT / "luna-test-actual", label, frame, i == 0)
             try:
                 fbhash, wdm = render(luna, rom, frame, actual_png, extra=res_args(key, manifest))
             except RuntimeError as e:
@@ -393,7 +393,7 @@ def coverage(luna: str) -> int:
     CPU not halted). Examples whose device input luna can't drive (manifest
     input_dependent, gap G4) are reported as boot+visual only, not a clean pass.
     """
-    out_dir = Path("/tmp/luna-test-corpus")
+    out_dir = TMP_ROOT / "luna-test-corpus"
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = load_manifest()
     roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
@@ -440,7 +440,7 @@ def coverage(luna: str) -> int:
         "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
         "clean functional pass. **DEAD** = ran but not live (crash/hang). "
         "**FAIL** = luna errored, or the ROM header's size byte does not cover "
-        "the file or its checksum complement does not match. PNGs: `/tmp/luna-test-corpus/`. (In-ROM "
+        "the file or its checksum complement does not match. PNGs: `$OPENSNES_TMP/luna-test-corpus/`. (In-ROM "
         "`SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)",
         "",
         "| Example | Status | Detail |",
