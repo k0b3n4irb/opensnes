@@ -103,8 +103,8 @@ rule, two spellings: an asset with one source is named after its source
 
 The first key is always `tool`: the build system's one generic rule reads
 it to know which tool converts the file. **That rule exists** (`make/common.mk`,
-`ASSET_TOML`): every `*.toml` and `res/*.toml` that names an `opensnes-*`
-tool is converted before the first C or ASM object (the tool's subcommand
+`ASSET_TOML`): every `*.toml`, `res/*.toml` and `res/*/*.toml` that names
+an `opensnes-*` tool is converted before the first C or ASM object (the tool's subcommand
 is the file's one table), and every `<stem>_data.as` the tools write is
 included by `assets_gen.asm` and assembled with the project. A fragment
 carries one `ASSET_SECTION` per blob (tiles, map, palette, sample), so the

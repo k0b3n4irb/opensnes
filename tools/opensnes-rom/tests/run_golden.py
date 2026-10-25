@@ -65,6 +65,48 @@ def copier():
 
 
 g.check("inspect copier.sfc (512 bytes in front)", "warned, same image", copier)
+
+
+def scenes():
+    """One folder per level under res/: the figure is the heaviest level plus
+    what res/ shares, not the sum. res/shared.pic 500 bytes and 16 colours;
+    res/lvl1 1000 bytes, res/lvl2 3000 bytes and 32 colours: the heaviest is
+    lvl2 at 3500 bytes and 48 colours (all of them), the total 4500.
+    Without the folders,
+    the total says it is everything at once."""
+    import json
+    import tempfile
+    errs = []
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        (work / "res" / "lvl1").mkdir(parents=True)
+        (work / "res" / "lvl2").mkdir()
+        (work / "res" / "shared.pic").write_bytes(bytes(500))
+        (work / "res" / "shared.pal").write_bytes(bytes(32))
+        (work / "res" / "lvl1" / "a.pic").write_bytes(bytes(1000))
+        (work / "res" / "lvl2" / "b.pic").write_bytes(bytes(3000))
+        (work / "res" / "lvl2" / "b.pal").write_bytes(bytes(64))
+        proc = g.run(["check", "--json", "good.sym"], work, ["good.sym", "good.c.asm"])
+        a = json.loads(proc.stdout).get("assets", {}) if proc.returncode == 0 else {}
+        want = {"vram_bytes": 4500, "colours": 48, "scenes": 2, "heaviest_scene": "res/lvl2",
+                "heaviest_scene_vram_bytes": 3500, "heaviest_scene_colours": 48}
+        for k, v in want.items():
+            if a.get(k) != v:
+                errs.append(f"assets.{k} = {a.get(k)!r}, {v!r} expected")
+        text = g.run(["check", "good.sym"], work, ["good.sym", "good.c.asm"]).stdout
+        if "heaviest scene res/lvl2: VRAM 3.4K/64K" not in text or "2 scenes" not in text:
+            errs.append("the text report does not name the heaviest scene: " + text.strip().splitlines()[-1])
+        for f in ("lvl1/a.pic", "lvl2/b.pic", "lvl2/b.pal"):
+            (work / "res" / f).unlink()
+        (work / "res" / "lvl1").rmdir()
+        (work / "res" / "lvl2").rmdir()
+        text = g.run(["check", "good.sym"], work, ["good.sym", "good.c.asm"]).stdout
+        if "every asset together, not necessarily loaded at once" not in text:
+            errs.append("without scenes, the total does not say what it is")
+    return errs
+
+
+g.check("check with res/lvl1 and res/lvl2 (one scene per folder)", "the heaviest scene, not the sum", scenes)
 g.expect_stdout("budget good.sfc (ROM by bank, RAM, video)", ["budget", "good.sfc"], golden="budget.txt", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_stdout("budget --json good.sfc", ["budget", "--json", "good.sfc"], golden="budget.json", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_refused("check missing.sym", ["check", "missing.sym"], needles=["cannot open"])

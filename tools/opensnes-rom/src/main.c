@@ -85,7 +85,12 @@ static int run_check(cli_ctx *ctx)
         cli_json_int(ctx, "bank_reads", r.bankreads);
         cli_json_int(ctx, "nmi_race", r.nmirace);
         cli_json_object(ctx, "assets"); cli_json_int(ctx, "vram_bytes", r.asset_vram); cli_json_int(ctx, "colours", r.asset_colours);
-        cli_json_int(ctx, "files", r.asset_files); cli_json_close(ctx);
+        cli_json_int(ctx, "files", r.asset_files); cli_json_int(ctx, "scenes", r.asset_scenes);
+        if (r.asset_scenes) {
+            cli_json_str(ctx, "heaviest_scene", r.scene_name);
+            cli_json_int(ctx, "heaviest_scene_vram_bytes", r.scene_vram); cli_json_int(ctx, "heaviest_scene_colours", r.scene_colours);
+        }
+        cli_json_close(ctx);
         cli_json_end(ctx);
     }
     return failed ? CLI_REFUSED : CLI_OK;
@@ -244,8 +249,12 @@ static int run_budget(cli_ctx *ctx)
         cli_json_int(ctx, "free", r.ram_free); cli_json_close(ctx);
         cli_json_object(ctx, "far_ram"); cli_json_int(ctx, "bytes", far_cap); cli_json_int(ctx, "used", far_cap - far_free);
         cli_json_int(ctx, "free", far_free); cli_json_close(ctx);
-        cli_json_object(ctx, "vram"); cli_json_int(ctx, "bytes", 0x10000); cli_json_int(ctx, "assets", r.asset_vram); cli_json_close(ctx);
-        cli_json_object(ctx, "cgram"); cli_json_int(ctx, "colours", 256); cli_json_int(ctx, "assets", r.asset_colours); cli_json_close(ctx);
+        cli_json_object(ctx, "vram"); cli_json_int(ctx, "bytes", 0x10000); cli_json_int(ctx, "assets", r.asset_vram);
+        if (r.asset_scenes) { cli_json_str(ctx, "heaviest_scene", r.scene_name); cli_json_int(ctx, "heaviest_scene_assets", r.scene_vram); }
+        cli_json_close(ctx);
+        cli_json_object(ctx, "cgram"); cli_json_int(ctx, "colours", 256); cli_json_int(ctx, "assets", r.asset_colours);
+        if (r.asset_scenes) cli_json_int(ctx, "heaviest_scene_assets", r.scene_colours);
+        cli_json_close(ctx);
         cli_json_int(ctx, "save_ram_bytes", h.ram_bytes);
         cli_json_end(ctx);
     } else {
@@ -265,9 +274,15 @@ static int run_budget(cli_ctx *ctx)
         bar_line("C variables $0000-$1FFF", ram_cap - r.ram_free, ram_cap, "bytes", NULL);
         bar_line("FAR $7E:2000-$FFFF", far_cap - far_free, far_cap, "bytes", NULL);
         if (h.ram_bytes) printf("  save RAM on the cartridge: %ld bytes%s\n", h.ram_bytes, h.has_battery ? " (battery)" : "");
-        printf("Video (the assets of the project, if all were loaded at once)\n");
-        bar_line("VRAM", r.asset_vram, 0x10000, "bytes", NULL);
-        bar_line("CGRAM", r.asset_colours, 256, "colours", NULL);
+        if (r.asset_scenes) {
+            printf("Video (the heaviest of %d scenes, %s, with what res/ shares)\n", r.asset_scenes, r.scene_name);
+            bar_line("VRAM", r.scene_vram, 0x10000, "bytes", NULL);
+            bar_line("CGRAM", r.scene_colours, 256, "colours", NULL);
+        } else {
+            printf("Video (the assets of the project, if all were loaded at once)\n");
+            bar_line("VRAM", r.asset_vram, 0x10000, "bytes", NULL);
+            bar_line("CGRAM", r.asset_colours, 256, "colours", NULL);
+        }
     }
     sym_free(&s);
     return CLI_OK;

@@ -19,6 +19,17 @@ All notable changes to OpenSNES are documented in this file.
   with `<name>_tiles_load(vram)` in its `.inc`, which copies every part;
   a caller that loaded `<name>_tiles` alone got the first 32 KB. mode2 and
   mode3 use it (ROMs unchanged).
+- feat(tools): `opensnes-tileset convert --metatiles 16` cuts a level into
+  16x16 metatiles: `<stem>.mtl` holds the distinct ones, four map entries
+  each, and `<stem>.mtm` one metatile number per block, without padding;
+  the `.inc` declares both and defines their count and the map's size. A
+  game drew its level from a 2 KB-padded `.map` turned into a table by hand.
+- feat(build,tools): the settings files of `res/<folder>/` are converted
+  too, and `opensnes-rom` counts each folder of `res/` as a scene: the
+  VRAM and CGRAM line gives the heaviest scene with what `res/` shares,
+  where it added up every level (a game read 298 % of VRAM with five levels
+  that are never loaded together). Without such folders the total says it
+  is everything at once.
 
 ### Fixed
 - fix(build): an asset is converted again when its `opensnes-*` tool is

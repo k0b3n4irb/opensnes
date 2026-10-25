@@ -377,8 +377,10 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 # ASSET_SECTIONs, one per blob), assembled with the
 # project. The artist never opens this Makefile; a hand-written data.asm
 # keeps working for the projects that have one.
-# ASSET_TOML lists the files (default: *.toml and res/*.toml that name a tool).
-ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
+# ASSET_TOML lists the files (default: *.toml, res/*.toml and res/*/*.toml that
+# name a tool: a game with several levels keeps one folder per level under res/,
+# which the VRAM report of opensnes-rom counts as one scene each).
+ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml res/*/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
 ASSET_STAMPS := $(addsuffix .done,$(ASSET_TOML))
 # a level (opensnes-level) reads the .map its tileset's conversion wrote, and a
 # palette plan (opensnes-palette [plan]) the .pal files the pictures' conversions
@@ -604,7 +606,7 @@ upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes 
 # is a dependency file written by the preprocessor, which the cc65816
 # driver does not offer yet.
 _CSRC_DIRS := $(filter-out ./,$(sort $(dir $(CSRC))))
-LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc \
+LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc res/*/*.h res/*/*.inc \
                    $(foreach d,$(_CSRC_DIRS),$(d)*.h $(d)*.inc $(d)res/*.h $(d)res/*.inc))
 %.c.o: %.c $(GEN_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
@@ -778,7 +780,7 @@ clean:
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
-		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
+		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .mtl .mtm .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
 	@rm -f $(GEN_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)

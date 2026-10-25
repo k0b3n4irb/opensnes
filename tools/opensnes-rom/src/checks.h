@@ -10,8 +10,11 @@
 typedef struct {
     long bank0_free, ram_free, ram_top, ram_total, far_free, far_top;
     int  ram_sections, far_sections;
-    long asset_vram, asset_colours;
+    long asset_vram, asset_colours;   /* every asset of the project */
     int  asset_files;
+    int  asset_scenes;                /* folders of res/ holding assets: one scene each */
+    long scene_vram, scene_colours;   /* the heaviest scene, the assets of res/ and above it included */
+    char scene_name[256];
     int  bank0, ram, datainit, bankreads, nmirace, sa1boot;   /* each check's verdict: 0 / 1 / 2 */
 } check_results;
 

@@ -148,6 +148,28 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
             fprintf(f, "/* larger than one 32 KB bank: written in parts of 32768 bytes; a column that\n"
                        " * crosses a part boundary is in two blocks */\n");
     }
+    if (spec->metatiles) {
+        char mpath[1100], up[256];
+        size_t k;
+        for (k = 0; name[k] && k < sizeof up - 1; k++) up[k] = (name[k] >= 'a' && name[k] <= 'z') ? (char)(name[k] - 32) : name[k];
+        up[k] = '\0';
+        fprintf(f, "\n/* 16x16 metatiles: %s_metatiles holds %d of them, four map entries each (top-left,\n"
+                   " * top-right, bottom-left, bottom-right; 8 bytes), %s_metamap one u16 metatile\n"
+                   " * number per 16x16 block of the picture, %d x %d, row after row. Identical blocks\n"
+                   " * share a metatile. The map entries carry tile, palette bank, priority and flips. */\n"
+                   "#define %s_METATILES %d\n#define %s_METAMAP_W %d\n#define %s_METAMAP_H %d\n",
+                name, spec->metatiles, name, spec->meta_w, spec->meta_h, up, spec->metatiles, up, spec->meta_w, up, spec->meta_h);
+        const char *whats[2] = { "metatiles", "metamap" }, *exts[2] = { ".mtl", ".mtm" };
+        for (int b = 0; b < 2; b++) {
+            snprintf(mpath, sizeof mpath, "%s%s", outbase, exts[b]);
+            int parts = parts_of(mpath);
+            for (int i = 0; i < parts; i++)
+                i == 0 ? fprintf(f, "extern const u8 %s_%s[], %s_%s_end[];\n", name, whats[b], name, whats[b])
+                       : fprintf(f, "extern const u8 %s_%s_%d[], %s_%s_%d_end[];\n", name, whats[b], i, name, whats[b], i);
+            if (parts > 1)
+                fprintf(f, "/* %s_%s is larger than one 32 KB bank: written in parts of 32768 bytes */\n", name, whats[b]);
+        }
+    }
     if (spec->has_meta)
         fprintf(f, "\n/* the metasprite table: #include \"%s_meta.inc\" once, in the file that draws it */\n", name);
     fprintf(f, "\n#endif\n");
@@ -165,6 +187,13 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         char cols_path[1100];
         snprintf(cols_path, sizeof cols_path, "%s.cmap", outbase);
         write_blob(f, name, "cols", cols_path);
+    }
+    if (spec->metatiles) {
+        char mpath[1100];
+        snprintf(mpath, sizeof mpath, "%s.mtl", outbase);
+        write_blob(f, name, "metatiles", mpath);
+        snprintf(mpath, sizeof mpath, "%s.mtm", outbase);
+        write_blob(f, name, "metamap", mpath);
     }
     fclose(f);
     return 0;

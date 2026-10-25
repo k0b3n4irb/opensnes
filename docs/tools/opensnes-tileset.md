@@ -11,10 +11,13 @@ converter is `gfx4snes -m`'s, linked as a library: the bytes are its own.
 opensnes-tileset convert res/town.png --colors 16            # 4 bpp, Mode 1: tiles, map, 16-colour palette
 opensnes-tileset convert res/title.png --bpp 8 --mode 7      # Mode 7: packed .pc7 / .mp7
 opensnes-tileset convert res/level.png --pages --flip --save # a 64x64 scrolling map in 32x32 pages
+opensnes-tileset convert res/lvl1/level.png --flip --metatiles 16   # a level as 16x16 metatiles: .pic, .mtl, .mtm
 ```
 
 **In:** an indexed PNG or BMP, cut into `--size` blocks (8 by default, the
-BG tile; 16 for metatiles). Duplicate blocks are stored once; `--flip` also
+BG tile; 16 for the PPU's 16x16 tile mode, one map entry per 16x16 block).
+For a table of 16x16 metatiles built from 8x8 tiles, see `--metatiles`
+below. Duplicate blocks are stored once; `--flip` also
 folds mirrored blocks, the map carrying the flip bits.
 
 **Out**, beside the input or in `--out`:
@@ -26,6 +29,25 @@ folds mirrored blocks, the map carrying the flip bits.
 | `town.cmap` | only with `--column-major`: the entries of `town.map` column after column (see below) |
 | `town.pal` | the palette (`--colors` entries, 256 by default); `--no-palette` skips it |
 | `town.inc`, `town_data.as` | the glue, in the lib's `asset.h` naming: `town.inc` declares `town_tiles`, `town_map`, `town_pal` (each with `_end`) and a ready `BgAsset town` (`DECLARE_BG_ASSET`, when the map is 32x32, 64x32, 32x64 or 64x64) so `bgLoad(0, &town, slot, tiles_vram, map_vram)` is the whole load; `town_data.as` is the `.incbin` fragment the build gathers into `assets_gen.asm` |
+
+**A level drawn in 16x16 metatiles.** A long level is rarely stored as one
+tilemap: it is a grid of metatiles, each four 8x8 tiles, and the game writes
+the four entries of a metatile into the tilemap as the camera moves.
+`--metatiles 16` (`metatiles = 16` in the settings file) cuts the picture
+into 16x16 blocks after the usual 8x8 conversion and writes, instead of the
+`.map`:
+
+| File | What it is |
+|---|---|
+| `level.mtl` | the distinct metatiles, in order of first appearance: four 16-bit map entries each, top-left, top-right, bottom-left, bottom-right (8 bytes), with tile number, palette bank, `--priority` and flips as in a `.map` |
+| `level.mtm` | one 16-bit metatile number per 16x16 block of the picture, row after row, `width / 16` by `height / 16`, no padding |
+
+Two identical blocks share one metatile, so the `.mtm` says, for every block
+of the picture, which metatile it became. `level.inc` declares
+`level_metatiles[]` and `level_metamap[]` (each with `_end`, in parts above
+32 KB) and defines `LEVEL_METATILES`, `LEVEL_METAMAP_W` and
+`LEVEL_METAMAP_H`. The picture's width and height must be multiples of 16;
+refused with Mode 7, `--pages`, `--column-major` and `--size 16`.
 
 **A map larger than the screen, scrolled in both axes.** Such a game keeps
 a window of the map in VRAM and feeds it a row and a column at a time. A row
