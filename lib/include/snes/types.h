@@ -319,4 +319,19 @@ typedef void (*VoidFn)(void);
  */
 #define OPENSNES_DEPRECATED(msg) __attribute__((deprecated(msg)))
 
+/**
+ * @brief Refuse a call whose constant argument the hardware cannot take
+ *
+ * In the clang pre-pass of every C file (make/common.mk), a call whose
+ * arguments make `cond` true at compile time is an error that says `msg`;
+ * a call with a run-time argument is not checked. cproc never sees it.
+ * Example: bgSetGfxPtr() refuses a VRAM address that is not a multiple of
+ * 0x1000 words, which the register would drop in silence.
+ */
+#ifdef __clang__
+#define OPENSNES_CHECK_ARGS(cond, msg) __attribute__((diagnose_if(cond, msg, "error")))
+#else
+#define OPENSNES_CHECK_ARGS(cond, msg)
+#endif
+
 #endif /* OPENSNES_TYPES_H */

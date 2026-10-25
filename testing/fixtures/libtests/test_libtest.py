@@ -90,7 +90,7 @@ CASES = [
     ("r_audio_load10",  2, 0),
     # the sample area reaches $FFC0 while no echo is configured, $C000 after
     ("r_trun_bad", 2, 0),   # textPrint runs: the last column, a newline, code 0x7F
-    ("r_pu16_bad", 2, 0), ("r_pu16_n", 2, 14),   # textPrintU16: the digits in the text buffer
+    ("r_pu16_bad", 2, 0), ("r_pu16_n", 2, 19),   # textPrintU16 / textPrintS16: the digits in the text buffer
     ("r_div32_bad", 2, 0), ("r_div32_n", 2, 73),   # 32-bit division vectors: 16-bit and wide divisors, signs
     ("r_audio_phase", 2, 0),     # 400 loads under a long vblank callback, each ending at another phase of the frame
     ("r_audio_free",  2, 0xF4B7),

@@ -120,8 +120,8 @@ miscompiled silently, and each has a mechanical workaround:
 | Variadic functions (`...`) | Fixed-arity wrappers |
 | Inline assembly inside C | A separate `.asm` file with a C prototype |
 
-`printf` is not in the core library by design. Use `textPrint`, `textPrintU16`
-and `textPrintHex`, or the debug channel (@ref tutorial_debugging) when you
+`printf` is not in the core library by design. Use `textPrint`, `textPrintU16`,
+`textPrintS16` and `textPrintHex`, or the debug channel (@ref tutorial_debugging) when you
 need output to the host rather than the screen.
 
 ## Step 4 — the API map
@@ -156,7 +156,7 @@ has to write itself, and whether that is a decision or a gap.
 
 | PVSnesLib | OpenSNES | Status |
 |---|---|---|
-| `consoleDrawText(x, y, "%d", v)`, `sprintf` | `textPrintAt`, `textPrintU16`, `textPrintHex` | **Decided.** No `printf` family in the library (PHILOSOPHY, non-goals); formatted output is three small printers |
+| `consoleDrawText(x, y, "%d", v)`, `sprintf` | `textPrintAt`, `textPrintU16`, `textPrintS16`, `textPrintHex` | **Decided.** No `printf` family in the library (PHILOSOPHY, non-goals); formatted output is four small printers |
 | `scoreAdd`, `scoreClear`, `scoreCmp`, `scoreCpy` (BCD score strings) | — | **Decided.** Game-side code; `examples/games/blocks` keeps its score in plain integers and prints it with `textPrintU16` |
 | `pixSetMode`, `pixSetPixel` (pixel plotting on a BG) | — | **Not provided.** No framebuffer on the 65816 side; the Super FX module draws bitmaps (`gsuPresent`) |
 | `WaitNVBlank(n)` | a loop over `WaitForVBlank()` | **Decided.** One primitive |

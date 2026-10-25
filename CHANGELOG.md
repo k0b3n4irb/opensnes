@@ -4,7 +4,31 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(lib): `textPrintS16()` prints a signed number, `-` first when it is
+  negative. An `s16` handed to `textPrintU16()` printed -52 as `65484`.
+- feat(lib): a call with a constant VRAM address the register cannot hold
+  is a build error: `bgSetGfxPtr()`, `bgInitTileSet()` and
+  `bgInitTileSetData()` want a multiple of 0x1000 words, `bgSetMapPtr()` a
+  multiple of 0x400 (the registers keep `vramAddr >> 12` and `>> 10`, and
+  tiles put at 0x0400 were read from 0x0000 without a word). The check is
+  clang's, in the syntax pass every C file goes through
+  (`OPENSNES_CHECK_ARGS`, `snes/types.h`); an address known only at run
+  time is not checked, and the code is unchanged.
+- feat(tools): a tileset larger than one 32 KB bank, written in parts, comes
+  with `<name>_tiles_load(vram)` in its `.inc`, which copies every part;
+  a caller that loaded `<name>_tiles` alone got the first 32 KB. mode2 and
+  mode3 use it (ROMs unchanged).
+
+### Fixed
+- fix(build): an asset is converted again when its `opensnes-*` tool is
+  newer than its stamp. After an SDK update, a project kept the `.inc` the
+  old tool wrote until `make clean`, and a C file calling what the new one
+  declares did not compile.
+
 ### Changed
+- docs(lib): the `oamSet()` and `oamSetFast()` notes no longer cite the
+  "framesize=158" cost of a version long gone.
 - feat(compiler): an integer constant above `$FFFF` cast to a plain pointer
   is refused (`(u8 *)0x708040`): such a pointer kept its bank only at a
   constant index, and `p[i]` read and wrote bank $00 without a word. The

@@ -67,6 +67,7 @@ def column_major():
 
 
 g.check("convert wide.png --column-major: the .cmap is the .map by columns, declared as wide_cols", "transposition checked independently", column_major())
+
 g.expect_refused("convert --column-major --mode 7 (one byte per entry)", ["convert", "--mode", "7", "--bpp", "8", "--column-major", "bg.png"],
                  copy=["bg.png"], needles=["--column-major with Mode 7"])
 g.expect_refused("convert --column-major --pages (not row after row)", ["convert", "--colors", "16", "--pages", "--column-major", "bg.png"],
@@ -145,6 +146,47 @@ def _indexed_png(rows, ncol=16, palette=None):
     raw = b"".join(b"\0" + bytes(r) for r in rows)
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, 3, 0, 0, 0))
             + chunk(b"PLTE", plte) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+
+
+def split_load():
+    """A tileset larger than one 32 KB bank is written in parts; the .inc
+    declares each and gives <stem>_tiles_load(vram), one dmaCopyVram per part,
+    part n at vram + n * 0x4000 words. 576 distinct 8bpp tiles: 36 864 bytes,
+    two parts."""
+    def run():
+        T = 24
+        rows = [[0] * (T * 8) for _ in range(T * 8)]
+        for ty in range(T):
+            for tx in range(T):
+                k = ty * T + tx
+                for y in range(8):
+                    for x in range(8):
+                        rows[ty * 8 + y][tx * 8 + x] = (x * 3 + y * 11 + 1) & 0xFF
+                rows[ty * 8][tx * 8] = k & 0xFF
+                rows[ty * 8][tx * 8 + 1] = k >> 8
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "big.png").write_bytes(_indexed_png(rows, ncol=256))
+            proc = g.run(["convert", "-q", "--bpp", "8", "--colors", "256", "big.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            inc = (work / "big.inc").read_text()
+            asm = (work / "big_data.as").read_text()
+        errs = []
+        for needle, where, text in (("extern const u8 big_tiles_1[], big_tiles_1_end[];", "big.inc", inc),
+                                    ("#define big_tiles_load(vram) do {", "big.inc", inc),
+                                    ("dmaCopyVram(big_tiles, (u16)((vram) + 0x0000), (u16)(big_tiles_end - big_tiles));", "big.inc", inc),
+                                    ("dmaCopyVram(big_tiles_1, (u16)((vram) + 0x4000), (u16)(big_tiles_1_end - big_tiles_1));", "big.inc", inc),
+                                    ('ASSET_SECTION "big_tiles_1"', "big_data.as", asm)):
+            if needle not in text:
+                errs.append(f"{where} lacks {needle!r}")
+        if "big_tiles_2" in inc:
+            errs.append("big.inc declares a third part for 36 864 bytes")
+        return errs
+    return run
+
+
+g.check("convert a 36 KB tileset: two parts, and big_tiles_load() loads both", "the .inc read for each part", split_load())
 
 
 def blank_tile(first_blank, extra, mode5=False):

@@ -135,7 +135,9 @@ u16 bgGetScrollY(u8 bg);
  * bgSetMapPtr(1, 0x0800, BG_MAP_64x32);
  * @endcode
  */
-void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize);
+void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)
+    OPENSNES_CHECK_ARGS((vramAddr & 0x03FF) != 0,
+                        "bgSetMapPtr: the tilemap address must be a multiple of 0x400 words; BGnSC keeps vramAddr >> 10");
 
 /**
  * @brief Set background tile graphics address
@@ -156,7 +158,9 @@ void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize);
  * @note BG1/BG2 share one register, BG3/BG4 share another.
  *       Setting one does not affect the other in the pair.
  */
-void bgSetGfxPtr(u8 bg, u16 vramAddr);
+void bgSetGfxPtr(u8 bg, u16 vramAddr)
+    OPENSNES_CHECK_ARGS((vramAddr & 0x0FFF) != 0,
+                        "bgSetGfxPtr: the tile address must be a multiple of 0x1000 words; BG12NBA/BG34NBA keep vramAddr >> 12");
 
 /**
  * @brief Initialize background layer to defaults
@@ -194,7 +198,9 @@ void bgInit(u8 bg);
  */
 void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette,
                    u8 paletteEntry, u16 tileSize, u16 paletteSize,
-                   u16 colorMode, u16 vramAddr);
+                   u16 colorMode, u16 vramAddr)
+    OPENSNES_CHECK_ARGS((vramAddr & 0x0FFF) != 0,
+                        "bgInitTileSet: the tile address must be a multiple of 0x1000 words (see bgSetGfxPtr)");
 
 /**
  * @brief Load tile graphics only (no palette)
@@ -204,7 +210,9 @@ void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette,
  * @param tileSize Size of tile data in bytes
  * @param vramAddr VRAM address for tiles
  */
-void bgInitTileSetData(u8 bgNumber, const u8 *tileSource, u16 tileSize, u16 vramAddr);
+void bgInitTileSetData(u8 bgNumber, const u8 *tileSource, u16 tileSize, u16 vramAddr)
+    OPENSNES_CHECK_ARGS(bgNumber != 0xFF && (vramAddr & 0x0FFF) != 0,
+                        "bgInitTileSetData: the tile address must be a multiple of 0x1000 words (see bgSetGfxPtr), or bgNumber 0xFF");
 
 /*============================================================================
  * Tilemap Utilities

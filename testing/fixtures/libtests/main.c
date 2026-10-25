@@ -1308,18 +1308,22 @@ static void part_div32(void) {
     }
 }
 
-/* textPrintU16 (2026-10-11, digits by subtraction): the characters that
- * land in the text buffer, and where the cursor stops. */
+/* textPrintU16 (2026-10-11, digits by subtraction) and textPrintS16
+ * (2026-10-25): the characters that land in the text buffer, and where the
+ * cursor stops. */
 u16 r_pu16_bad;     /* numbers printed wrong -> 0 */
-u16 r_pu16_n;       /* numbers printed -> 14 */
+u16 r_pu16_n;       /* numbers printed -> 19 */
 extern u8 tilemapBuffer[];
-static void chk_pu16(u16 v, const char *want) {
+static void chk_print(u16 v, u8 sgn, const char *want) {
     u16 k;
     u16 bad = 0;
     textSetPos(0, 20);
     textPrint("          ");
     textSetPos(0, 20);
-    textPrintU16(v);
+    if (sgn)
+        textPrintS16((s16)v);
+    else
+        textPrintU16(v);
     for (k = 0; want[k]; k++) {
         u16 cell = tilemapBuffer[(20 * 32 + k) * 2] | ((u16)tilemapBuffer[(20 * 32 + k) * 2 + 1] << 8);
         if ((cell & 0x03FF) != (u16)(text_config.font_tile - 32 + (u8)want[k])) bad = 1;
@@ -1328,6 +1332,8 @@ static void chk_pu16(u16 v, const char *want) {
     r_pu16_bad += bad;
     r_pu16_n++;
 }
+static void chk_pu16(u16 v, const char *want) { chk_print(v, 0, want); }
+static void chk_ps16(s16 v, const char *want) { chk_print((u16)v, 1, want); }
 static void part_pu16(void) {
     r_pu16_bad = 0;
     r_pu16_n = 0;
@@ -1336,6 +1342,8 @@ static void part_pu16(void) {
     chk_pu16(1000, "1000"); chk_pu16(9999, "9999");   chk_pu16(10000, "10000");
     chk_pu16(10001, "10001"); chk_pu16(30000, "30000"); chk_pu16(40005, "40005");
     chk_pu16(65535, "65535"); chk_pu16(60090, "60090");
+    chk_ps16(0, "0");       chk_ps16(52, "52");       chk_ps16(-52, "-52");
+    chk_ps16(32767, "32767"); chk_ps16(-32768, "-32768");
 }
 
 /* textPrint runs (2026-10-11, asm_textRun): a run that reaches the last

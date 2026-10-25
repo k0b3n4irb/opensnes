@@ -387,8 +387,13 @@ LATE_STAMPS := $(addsuffix .done,$(foreach t,$(ASSET_TOML),$(if $(shell grep -l 
 ifneq ($(ASSET_TOML),)
 ASMSRC += assets_gen.asm
 endif
+# The tool's binary is a prerequisite too: a project built again after an SDK
+# update converts its assets with the new tool (a stamp older than the tool
+# kept the .inc the old one wrote, and a C file calling what the new one
+# declares failed to compile until `make clean`).
+asset_tool = $(wildcard $(addprefix $(OPENSNES)/bin/,$(addsuffix $(2),$(shell sed -n 's/^tool *= *"\([^"]*\)".*/\1/p' $(1) | head -1))))
 define ASSET_RULE
-$(1).done: $(1) $(wildcard $(basename $(1))) .opensnes_config
+$(1).done: $(1) $(wildcard $(basename $(1))) .opensnes_config $(call asset_tool,$(1),) $(call asset_tool,$(1),.exe)
 	@tool=$$$$(sed -n 's/^tool *= *"\([^"]*\)".*/\1/p' $(1) | head -1); \
 	 sub=$$$$(sed -n 's/^\[\([a-z_]*\)\].*/\1/p' $(1) | head -1); \
 	 asset=$(basename $(1)); [ -f "$$$$asset" ] || asset=$(1); \

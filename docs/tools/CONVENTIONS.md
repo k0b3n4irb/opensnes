@@ -109,7 +109,9 @@ is the file's one table), and every `<stem>_data.as` the tools write is
 included by `assets_gen.asm` and assembled with the project. A fragment
 carries one `ASSET_SECTION` per blob (tiles, map, palette, sample), so the
 linker places each where it fits; a blob above 32 KB, the size of a bank,
-is cut in parts (`<name>_tiles`, `<name>_tiles_1`, …, each with `_end`). A project with settings files has no
+is cut in parts (`<name>_tiles`, `<name>_tiles_1`, …, each with `_end`); for tiles, the `.inc`
+also defines `<name>_tiles_load(vram)`, which copies every part, part *n* at `vram + n * 0x4000`
+words. A project with settings files has no
 hand-written `data.asm` and no conversion rule in its Makefile: the
 `starter/` is built this way. The rest is one table named after
 the subcommand, keys spelled exactly as the long options (`--size` is

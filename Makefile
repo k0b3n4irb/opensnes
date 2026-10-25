@@ -204,6 +204,7 @@ test-devtools:
 	@python3 devtools/test_check_nmi_wram_race.py
 	@python3 devtools/symmap/test_symmap.py
 	@python3 devtools/test_asset_budget.py
+	@python3 devtools/test_header_arg_checks.py
 	@cd testing && python3 -m unittest -q test_harness
 
 # Aggregate lint target — runs every lint we have. Run before opening a PR.

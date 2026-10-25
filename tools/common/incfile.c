@@ -98,7 +98,7 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
     const char *ms = spec->has_map ? map_size(spec->map_blocks_x, spec->map_blocks_y) : NULL;
     if (split) {
         fprintf(f, "/* a blob larger than one 32 KB bank is written in parts, one ASSET_SECTION each:\n"
-                   " * %s_tiles, %s_tiles_1, ... (each with _end) — load them with one dmaCopyVram per part */\n", name, name);
+                   " * %s_tiles, %s_tiles_1, ... (each with _end) — one dmaCopyVram per part, or %s_tiles_load() below for the tiles */\n", name, name, name);
         for (int i = 0; i < tiles_parts; i++)
             i == 0 ? fprintf(f, "extern const u8 %s_tiles[], %s_tiles_end[];\n", name, name)
                    : fprintf(f, "extern const u8 %s_tiles_%d[], %s_tiles_%d_end[];\n", name, i, name, i);
@@ -106,6 +106,17 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         for (int i = 0; spec->has_map && i < map_parts; i++)
             i == 0 ? fprintf(f, "extern const u8 %s_map[], %s_map_end[];\n", name, name)
                    : fprintf(f, "extern const u8 %s_map_%d[], %s_map_%d_end[];\n", name, i, name, i);
+        if (tiles_parts > 1) {
+            /* every part is one bank, 32768 bytes = 0x4000 words of VRAM, but the last */
+            fprintf(f, "\n/* every part of the tiles in one call: part n goes to vram + n * 0x4000 words, in force blank */\n"
+                       "#define %s_tiles_load(vram) do { \\\n", name);
+            for (int i = 0; i < tiles_parts; i++) {
+                char part[300];
+                i == 0 ? snprintf(part, sizeof part, "%s_tiles", name) : snprintf(part, sizeof part, "%s_tiles_%d", name, i);
+                fprintf(f, "    dmaCopyVram(%s, (u16)((vram) + 0x%04X), (u16)(%s_end - %s)); \\\n", part, i * 0x4000, part, part);
+            }
+            fprintf(f, "} while (0)\n");
+        }
     } else if (spec->lz) {
         fprintf(f, "/* LZ77-compressed tiles: lzssDecodeVram(%s_tiles, vram_addr); no asset bundle, bgLoad() would copy the compressed bytes */\n", name);
         fprintf(f, "extern const u8 %s_tiles[], %s_tiles_end[];\n", name, name);

@@ -53,10 +53,9 @@
 #include <snes/math.h>
 
 #include "res/street.inc"   /* generated: street_tiles[], street_pal[], street_map[], each with _end */
-#include "res/canal.inc"    /* generated: canal_tiles[] + canal_tiles_1[] (two bank-sized parts), canal_pal[], canal_map[] */
+#include "res/canal.inc"    /* generated: canal_tiles[] + canal_tiles_1[] (two bank-sized parts) and canal_tiles_load(), canal_pal[], canal_map[] */
 
-#define SCENE_CHR   0x0000   /* BG1's tiles, either scene: the street's 883, or the canal's first 32 KB */
-#define SCENE_CHR_1 0x4000   /* the canal's second part */
+#define SCENE_CHR   0x0000   /* BG1's tiles, either scene: the street's 883, or the canal's two parts */
 #define BG1_MAP     0x7000
 #define BG3_MAP     0x7400   /* BG3 = the OPT offset table, both modes */
 
@@ -78,8 +77,7 @@ static u16 zeros[32];     /* Mode 2: BG3 tile-row 0, no H offsets */
 static void loadScene(u8 mode4) {
     setScreenOff();
     if (mode4) {
-        dmaCopyVram(canal_tiles,   SCENE_CHR,   canal_tiles_end - canal_tiles);
-        dmaCopyVram(canal_tiles_1, SCENE_CHR_1, canal_tiles_1_end - canal_tiles_1);
+        canal_tiles_load(SCENE_CHR);   /* both parts: SCENE_CHR, then SCENE_CHR + 0x4000 */
         dmaCopyVram(canal_map, BG1_MAP, canal_map_end - canal_map);
         dmaCopyCGram(canal_pal, 0, canal_pal_end - canal_pal);
         setMode(BG_MODE4, 0);
