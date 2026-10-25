@@ -468,8 +468,12 @@ def run_seed(seed, luna: str, keep: bool):
                         + ", ".join(f"{SHAPES[k]}=0x{g:08X}" for k, g in enumerate(got)))
             msgs += ["    " + ln for ln in t.source(i).splitlines()]
             msgs.append(reduce_failure(t, bad, luna, name))
-    if not msgs and not keep:
-        shutil.rmtree(WORK / name, ignore_errors=True)
+    if not keep:
+        # the reduction's projects are scratch: what they found is in msgs
+        for scratch in WORK.glob(name + "_*"):
+            shutil.rmtree(scratch, ignore_errors=True)
+        if not msgs:
+            shutil.rmtree(WORK / name, ignore_errors=True)
     return seed, (1 if msgs else 0), msgs, model is None
 
 
@@ -489,7 +493,7 @@ def parse_seeds(spec: str) -> list:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--seeds", help="e.g. 5 or 1,2,9 or 100-163 or pinned (default: the gate)")
-    ap.add_argument("--keep", action="store_true", help="keep the generated projects of passing seeds")
+    ap.add_argument("--keep", action="store_true", help="keep the generated projects of passing seeds, and the reduction's projects of failing ones")
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
     ap.add_argument("--cc", help="path of another cc65816 to test (e.g. one built before a change)")
     args = ap.parse_args()

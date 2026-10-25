@@ -93,6 +93,11 @@ traces, the user-project test) goes under `$OPENSNES_TMP`
 `make tests` ends with `make clean-tmp`, which removes it, QBE's suite files
 and the pass markers of earlier days (2026-10-25). A failed run keeps it all.
 A new harness path goes under `TMP_ROOT`, never a literal `/tmp/...`.
+The differential tests build under `build/difftest/` and keep only the
+project of a failing seed (the reproducer); the reduction's and the probe's
+projects go as soon as their result is printed (`--keep` keeps everything).
+Until 2026-10-25 those were never removed: 6 236 projects, 6.0 GB, after a
+month of hunts. `make clean` removes the folder.
 
 Coverage covers every example (`luna_runner.py --list`). Static analysis
 (`symmap.py`), the build (`make`), and compiler C→ASM checks remain separate

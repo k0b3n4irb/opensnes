@@ -101,7 +101,7 @@ clean:
 	$(MAKE) -C $(TOOLS_PATH) clean
 	$(MAKE) -C $(LIB_PATH) clean
 	$(MAKE) -C $(EXAMPLES_PATH) clean
-	-rm -rf bin/
+	-rm -rf bin/ build/difftest/
 
 install: compiler tools lib cli
 	$(MAKE) -C $(COMPILER_PATH) install
