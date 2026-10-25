@@ -69,14 +69,24 @@ corpus/rearrange:
 corpus/stbimage:
 	@mkdir -p $@ && cp ../lib/font2snes/tests/fixtures/*.png ../lib/gfx4snes/tests/fixtures/*.png $@/
 
+# -close_fd_mask=3 closes the target's stdout and stderr: the parsers print a
+# warning per rejected input (smconv's IT loader wrote a million lines, 91 MB,
+# in one 600 s run). libFuzzer's own lines and the ASan / UBSan reports go to
+# a copy of stderr and still reach the log (checked on a crashing harness,
+# 2026-10-25). After a clean run, -merge=1 keeps only the inputs that add
+# coverage, so the corpus does not grow run after run.
 run: all $(addprefix corpus/,$(FUZZERS))
 	@for t in $(FUZZERS); do \
 		echo "== fuzz $$t for $(FUZZ_SECONDS)s"; \
-		ASAN_OPTIONS=detect_leaks=0 ./fuzz_$$t -max_total_time=$(FUZZ_SECONDS) -max_len=65536 \
+		ASAN_OPTIONS=detect_leaks=0 ./fuzz_$$t -max_total_time=$(FUZZ_SECONDS) -max_len=65536 -close_fd_mask=3 \
 			-artifact_prefix=corpus/$$t/crash- -print_final_stats=1 corpus/$$t > corpus/$$t.log 2>&1; \
 		st=$$?; grep -E "stat::number_of_executed_units|SUMMARY" corpus/$$t.log; \
 		if [ $$st -ne 0 ]; then echo "FUZZ FAIL: $$t (exit $$st) — corpus/$$t.log, corpus/$$t/crash-*"; \
 			grep -E -A12 "SUMMARY|ERROR" corpus/$$t.log | head -40; exit 1; fi; \
+		rm -rf corpus/$$t.min && mkdir corpus/$$t.min && \
+		ASAN_OPTIONS=detect_leaks=0 ./fuzz_$$t -merge=1 -close_fd_mask=3 -max_len=65536 corpus/$$t.min corpus/$$t \
+			> corpus/$$t.merge.log 2>&1 && rm -rf corpus/$$t && mv corpus/$$t.min corpus/$$t \
+			&& rm -f corpus/$$t.merge.log && echo "   corpus kept: $$(ls corpus/$$t | wc -l) input(s)"; \
 	done
 	@echo "fuzz: OK (no crash in $(FUZZ_SECONDS)s per target)"
 
