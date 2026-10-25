@@ -66,8 +66,9 @@ ifeq ($(OS),Windows_NT)
 	@cp $(QBE_DIR)/qbe.exe $(BIN_DIR)/qbe.exe
 	@cp $(CPROC_DIR)/cproc-qbe.exe $(BIN_DIR)/cproc-qbe.exe
 else
-	@cp $(QBE_DIR)/qbe $(BIN_DIR)/qbe
-	@cp $(CPROC_DIR)/cproc-qbe $(BIN_DIR)/cproc-qbe
+	@# hard links, not second copies (cp where links fail: another file system)
+	@ln -f $(QBE_DIR)/qbe $(BIN_DIR)/qbe 2>/dev/null || cp $(QBE_DIR)/qbe $(BIN_DIR)/qbe
+	@ln -f $(CPROC_DIR)/cproc-qbe $(BIN_DIR)/cproc-qbe 2>/dev/null || cp $(CPROC_DIR)/cproc-qbe $(BIN_DIR)/cproc-qbe
 endif
 	@$(MAKE) --no-print-directory $(BIN_DIR)/cc65816$(EXE_EXT)
 
@@ -166,9 +167,15 @@ $(WLA_BUILT_MARKER):
 	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang $(CMAKE_STATIC_FLAGS) . && $(MAKE) wla-65816 wla-spc700 wla-superfx wlalink
 	@touch $@
 
+# CMake builds in the source tree, and its make clean left 43 MB behind
+# (CMakeFiles/, the table generator, the binaries). git clean -X removes what
+# the submodule's .gitignore names and nothing it tracks; the generated top
+# Makefiles and ins_tbl_gen/ are untracked and not ignored there, so they are
+# named.
 wla-clean:
 	-cd $(WLA_DIR) && $(MAKE) clean 2>/dev/null || true
-	-rm -f $(WLA_DIR)/CMakeCache.txt
+	-git -C $(WLA_DIR) clean -fdXq 2>/dev/null || rm -rf $(WLA_DIR)/CMakeCache.txt $(WLA_DIR)/CMakeFiles
+	-rm -rf $(WLA_DIR)/Makefile $(WLA_DIR)/byte_tester/Makefile $(WLA_DIR)/ins_tbl_gen
 	-rm -f $(WLA_BUILT_MARKER)
 
 wla-install:
@@ -176,5 +183,6 @@ wla-install:
 ifeq ($(OS),Windows_NT)
 	@cp $(WLA_DIR)/binaries/wla-65816.exe $(WLA_DIR)/binaries/wla-spc700.exe $(WLA_DIR)/binaries/wla-superfx.exe $(WLA_DIR)/binaries/wlalink.exe $(BIN_DIR)/
 else
-	@cp $(WLA_DIR)/binaries/wla-65816 $(WLA_DIR)/binaries/wla-spc700 $(WLA_DIR)/binaries/wla-superfx $(WLA_DIR)/binaries/wlalink $(BIN_DIR)/
+	@for b in wla-65816 wla-spc700 wla-superfx wlalink; do \
+		ln -f $(WLA_DIR)/binaries/$$b $(BIN_DIR)/$$b 2>/dev/null || cp $(WLA_DIR)/binaries/$$b $(BIN_DIR)/$$b; done
 endif

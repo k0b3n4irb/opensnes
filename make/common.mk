@@ -367,9 +367,14 @@ ifneq ($(USE_SUPERFX),1)
 $(error LIB_MODULES: `superfx` needs USE_SUPERFX=1 — its C half is in every lib flavour but its asm half (gsu_cfgr, gsuLaunch…) only in lib/build/superfx, so it cannot link elsewhere)
 endif
 endif
+# Not on `make clean`: the SDK's clean empties lib/build before the
+# examples, and the check stopped every example's clean there (2026-09-26 to
+# 2026-10-25, its objects and ROMs stayed).
+ifneq ($(MAKECMDGOALS),clean)
 _LIB_AVAILABLE = $(sort $(patsubst %-asm,%,$(basename $(notdir $(wildcard $(LIBDIR)/*.o)))))
 $(foreach mod,$(LIB_MODULES),$(if $(wildcard $(LIBDIR)/$(mod).o $(LIBDIR)/$(mod)-asm.o),,\
   $(error LIB_MODULES: no library module `$(mod)` in $(LIBDIR). Available: $(_LIB_AVAILABLE))))
+endif
 endif
 INCLUDES := -I$(OPENSNES)/lib/include -I.
 ALL_CFLAGS := $(INCLUDES) -DVRAM_QUEUE_MAX=$(VRAM_QUEUE_MAX) $(CFLAGS)

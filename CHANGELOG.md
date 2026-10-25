@@ -50,6 +50,9 @@ All notable changes to OpenSNES are documented in this file.
   sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- fix(build): `make clean` of the SDK cleans the examples again: it empties
+  `lib/build` first, and the `LIB_MODULES` check stopped each example's clean
+  there, so their objects and ROMs stayed. The check is skipped on `clean`.
 - fix(tools): `opensnes-rom check` follows the callbacks given to
   `nmiSetLag()` when it looks for a WRAM data port write reachable from the
   NMI, as it does for `nmiSet()`'s; it let one through.
@@ -59,6 +62,11 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- build: `make clean-all` removes everything the tree regenerates (the
+  benchmarks' builds, the fuzz corpus, the release zips, the generated docs,
+  the tests' temporary files); the WLA-DX clean leaves its submodule as
+  checked out (43 MB of CMake output stayed); `bin/` holds hard links to the
+  tools and the toolchain instead of second copies.
 - build(release): the binaries of the release zip carry no debug
   information (`strip -S`): the Linux arm64 zip went from 30.6 MB to 8.4 MB
   (76.6 MB to 22.1 MB extracted). The tools behave the same; a source build

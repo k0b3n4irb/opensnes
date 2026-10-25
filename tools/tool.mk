@@ -67,7 +67,8 @@ $(BUILD):
 
 install: $(BIN)
 	@mkdir -p ../../bin
-	@cp $(BIN) ../../bin/
+	@# a hard link, not a second copy of a 3 MB static binary (cp where links fail)
+	@ln -f $(BIN) ../../bin/ 2>/dev/null || cp $(BIN) ../../bin/
 
 clean:
 	@rm -rf $(BUILD) $(BIN)
