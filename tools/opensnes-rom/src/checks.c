@@ -235,13 +235,54 @@ int check_sa1_boot(cli_ctx *ctx, const sym_file *s, const char *rom)
 
 typedef struct { long vram, colours; int files; } asset_sum;
 
+/* The top-level `vram = N` of a settings file (tools/common/cli.c reads it
+ * too, and refuses a bad value), or -1. */
+static long settings_vram(const char *path)
+{
+    FILE *f = fopen(path, "r");
+    if (!f) return -1;
+    char line[512];
+    long v = -1;
+    while (fgets(line, sizeof line, f)) {
+        char *p = line;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p == '[') break;                           /* the tables: the tool's */
+        if (strncmp(p, "vram", 4) != 0) continue;
+        p += 4;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p != '=') continue;
+        v = strtol(p + 1, NULL, 10);
+    }
+    fclose(f);
+    return v;
+}
+
 /* The assets under `dir`, recursively, but not under the folders of
  * `scenes_root` (the scenes, counted one by one) when it is given. */
 static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, int depth)
 {
     DIR *d = opendir(dir);
     if (!d || depth > 16) { if (d) closedir(d); return; }
+    /* the assets of this folder whose settings say what they hold in VRAM
+     * (`vram = N`): their files count N once, not their size */
+    enum { MAXV = 128 };
+    char vstem[MAXV][256];
+    long vbytes[MAXV];
+    int vused[MAXV], nv = 0;
     struct dirent *e;
+    while ((e = readdir(d)) != NULL && nv < MAXV) {
+        size_t l = strlen(e->d_name);
+        if (l < 6 || strcmp(e->d_name + l - 5, ".toml") != 0) continue;
+        char path[2048];
+        snprintf(path, sizeof path, "%s/%s", dir, e->d_name);
+        long v = settings_vram(path);
+        if (v < 0) continue;
+        snprintf(vstem[nv], sizeof vstem[nv], "%.*s", (int)(l - 5), e->d_name);   /* obj.png.toml -> obj.png */
+        char *dot = strrchr(vstem[nv], '.');
+        if (dot) *dot = '\0';                                                   /* -> obj */
+        vbytes[nv] = v; vused[nv] = 0; nv++;
+    }
+    rewinddir(d);
     while ((e = readdir(d)) != NULL) {
         if (!strcmp(e->d_name, ".") || !strcmp(e->d_name, "..")) continue;
         char path[2048];
@@ -259,6 +300,9 @@ static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, 
         snprintf(ext, sizeof ext, "%s", dot);
         for (char *p = ext; *p; p++) *p = (char)tolower((unsigned char)*p);
         if (!strcmp(ext, ".pic") || !strcmp(ext, ".pc7") || !strcmp(ext, ".map") || !strcmp(ext, ".mp7")) {
+            int k = 0;
+            while (k < nv && !((size_t)(dot - e->d_name) == strlen(vstem[k]) && !strncmp(e->d_name, vstem[k], (size_t)(dot - e->d_name)))) k++;
+            if (k < nv) { if (!vused[k]) { vused[k] = 1; a->vram += vbytes[k]; } a->files++; continue; }
             a->vram += (long)st.st_size; a->files++;
         } else if (!strcmp(ext, ".pal")) {
             a->colours += (long)st.st_size / 2; a->files++;

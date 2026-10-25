@@ -357,6 +357,7 @@ int cli_load_settings(cli_ctx *ctx, const char *input)
 int cli_load_settings_path(cli_ctx *ctx, const char *path)
 {
     ctx->nset = 0;
+    ctx->settings_vram = -1;
     snprintf(ctx->settings_path, sizeof ctx->settings_path, "%s", path);
     FILE *f = fopen(ctx->settings_path, "r");
     if (!f) return CLI_OK;                     /* no settings: nothing to do */
@@ -393,9 +394,23 @@ int cli_load_settings_path(cli_ctx *ctx, const char *path)
         snprintf(raw, sizeof raw, "%s", eq + 1);
         trim(raw);
         if (!toml_value(raw, val, sizeof val)) goto syntax;
+        if (!*table && strcmp(key, "vram") == 0) {
+            /* not the tool's: what this asset holds in VRAM at once, which
+             * opensnes-rom counts for its scene instead of the files' size
+             * (0: never resident, a sheet streamed through a cache) */
+            char *end;
+            long v = strtol(val, &end, 10);
+            if (!*val || *end || v < 0 || v > 65536) {
+                cli_error(ctx, ctx->settings_path, "line %d: vram = %s — the bytes this asset holds in VRAM at once, 0 to 65536", lineno, val);
+                fclose(f);
+                return CLI_REFUSED;
+            }
+            ctx->settings_vram = v;
+            continue;
+        }
         if (!*table) {
             if (strcmp(key, "tool") != 0) {
-                cli_error(ctx, ctx->settings_path, "line %d: '%s' before any table — only `tool = \"%s\"` goes there",
+                cli_error(ctx, ctx->settings_path, "line %d: '%s' before any table — only `tool = \"%s\"` and `vram = N` go there",
                           lineno, key, ctx->tool->name);
                 fclose(f);
                 return CLI_REFUSED;
@@ -446,7 +461,10 @@ int cli_save_settings_path(const cli_ctx *ctx, const char *path, const char *ass
     if (!f) { cli_error(ctx, path, "cannot write the settings"); return CLI_IO; }
     fprintf(f, "# import settings of %s, written by %s --save; the build reads `tool`\n",
             asset_name, ctx->tool->name);
-    fprintf(f, "tool = \"%s\"\n\n[%s]\n", ctx->tool->name, ctx->cmd->name);
+    fprintf(f, "tool = \"%s\"\n", ctx->tool->name);
+    if (ctx->settings_vram >= 0 && strcmp(ctx->settings_path, path) == 0)
+        fprintf(f, "vram = %ld\n", ctx->settings_vram);   /* kept: --save rewrites the file it was read from */
+    fprintf(f, "\n[%s]\n", ctx->cmd->name);
     for (int i = 0; i < ctx->cmd->nopts; i++) {
         const cli_opt *op = &ctx->cmd->opts[i];
         if (strcmp(op->name, "out") == 0 || strcmp(op->name, "save") == 0) continue;
@@ -591,6 +609,7 @@ int cli_main(const cli_tool *tool, int argc, char **argv)
 {
     static cli_ctx ctx;
     memset(&ctx, 0, sizeof ctx);
+    ctx.settings_vram = -1;
     ctx.tool = tool;
 
     if (argc < 2) { help_tool(tool, stderr); return CLI_USAGE; }

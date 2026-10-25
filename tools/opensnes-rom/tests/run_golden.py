@@ -40,6 +40,23 @@ g.expect_refused("check sa1_bank1.sym (SA1Start out of bank $00)", ["check", "--
                  copy=["sa1_bank1.sym"], needles=["SA1Start is at $01:8000", "16-bit", "BANK 0"])
 g.expect_refused("check nmirace.sym (WRAM port from an NMI callback)", ["check", "nmirace.sym"],
                  copy=["nmirace.sym", "nmirace.c.asm"], needles=["NMI / WRAM port race", "fill", "sta.w $2180"])
+
+
+def nmirace_lag():
+    """The same race from a callback given to nmiSetLag (it runs in the NMI, on lag frames)."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["check", "nmirace.sym"], work, ["nmirace.sym", "nmirace.c.asm"])
+        asm = (work / "nmirace.c.asm").read_text().replace("jsl nmiSet", "jsl nmiSetLag")
+        (work / "nmirace.c.asm").write_text(asm)
+        proc = g.run(["check", "nmirace.sym"], work)
+        if proc.returncode == 0 or "NMI / WRAM port race" not in proc.stdout + proc.stderr:
+            return ["a WRAM-port write from an nmiSetLag callback was not refused"]
+        return []
+
+
+g.check("check nmirace.sym with nmiSetLag", "refused like nmiSet", nmirace_lag)
 g.expect_stdout("inspect good.sfc hirom.sfc oddsize.sfc (header, checksum, digests)", ["inspect", "good.sfc", "hirom.sfc", "oddsize.sfc"],
                 golden="inspect.txt", copy=["good.sfc", "hirom.sfc", "oddsize.sfc"])
 g.expect_stdout("inspect --json good.sfc hirom.sfc", ["inspect", "--json", "good.sfc", "hirom.sfc"],
@@ -107,6 +124,35 @@ def scenes():
 
 
 g.check("check with res/lvl1 and res/lvl2 (one scene per folder)", "the heaviest scene, not the sum", scenes)
+
+
+def declared_vram():
+    """An asset's settings may say what it holds in VRAM at once (`vram = N`
+    before its table): its files then count N once instead of their size.
+    res/sheet.pic 42 000 bytes declared 8192 (a cache), res/lvl1/obj.pic
+    48 000 declared 0 (streamed through it), res/lvl1/walls.pic 30 000
+    undeclared: lvl1 is 8192 + 30 000 = 38 192."""
+    import json
+    import tempfile
+    errs = []
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        (work / "res" / "lvl1").mkdir(parents=True)
+        (work / "res" / "sheet.pic").write_bytes(bytes(42000))
+        (work / "res" / "sheet.png.toml").write_text('tool = "opensnes-sprite"\nvram = 8192\n\n[sheet]\n')
+        (work / "res" / "lvl1" / "obj.pic").write_bytes(bytes(48000))
+        (work / "res" / "lvl1" / "obj.png.toml").write_text('tool = "opensnes-sprite"\nvram = 0   # streamed\n\n[sheet]\n')
+        (work / "res" / "lvl1" / "walls.pic").write_bytes(bytes(30000))
+        (work / "res" / "lvl1" / "walls.png.toml").write_text('tool = "opensnes-tileset"\n\n[convert]\n')
+        proc = g.run(["check", "--json", "good.sym"], work, ["good.sym", "good.c.asm"])
+        a = json.loads(proc.stdout).get("assets", {}) if proc.returncode == 0 else {}
+        for k, v in {"scenes": 1, "heaviest_scene": "res/lvl1", "heaviest_scene_vram_bytes": 38192, "vram_bytes": 38192}.items():
+            if a.get(k) != v:
+                errs.append(f"assets.{k} = {a.get(k)!r}, {v!r} expected")
+    return errs
+
+
+g.check("check with vram = N in settings files (a cache, a streamed sheet)", "the declared bytes, once", declared_vram)
 g.expect_stdout("budget good.sfc (ROM by bank, RAM, video)", ["budget", "good.sfc"], golden="budget.txt", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_stdout("budget --json good.sfc", ["budget", "--json", "good.sfc"], golden="budget.json", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_refused("check missing.sym", ["check", "missing.sym"], needles=["cannot open"])

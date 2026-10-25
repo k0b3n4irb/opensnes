@@ -101,6 +101,12 @@ rule, two spellings: an asset with one source is named after its source
 (`hero.png.toml`), an asset with several is named after its product
 (`soundbank.toml`).
 
+One more key may sit before the table, `vram = N`: the bytes this asset
+holds in VRAM at once, when that is not its size (0 for a sprite sheet the
+game streams through a cache, the cache's size on one of them). The tools
+keep it on `--save` and ignore it otherwise; `opensnes-rom` counts it in its
+VRAM line (@ref tools_opensnes_rom).
+
 The first key is always `tool`: the build system's one generic rule reads
 it to know which tool converts the file. **That rule exists** (`make/common.mk`,
 `ASSET_TOML`): every `*.toml`, `res/*.toml` and `res/*/*.toml` that names

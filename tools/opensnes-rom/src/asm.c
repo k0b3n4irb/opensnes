@@ -283,7 +283,8 @@ static int is_jsl_nmiset(const char *line)
     if (!call_target(line, t, sizeof t)) return 0;
     const char *p = line;
     while (isspace((unsigned char)*p)) p++;
-    return strncasecmp(p, "jsl", 3) == 0 && strcmp(t, "nmiSet") == 0;
+    /* nmiSetLag's callback runs inside the NMI too (lag frames) */
+    return strncasecmp(p, "jsl", 3) == 0 && (strcmp(t, "nmiSet") == 0 || strcmp(t, "nmiSetLag") == 0);
 }
 
 static void chomp(char *s) { size_t l = strlen(s); while (l && (s[l - 1] == '\n' || s[l - 1] == '\r')) s[--l] = '\0'; }

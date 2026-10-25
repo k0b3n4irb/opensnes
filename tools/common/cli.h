@@ -88,6 +88,7 @@ typedef struct cli_ctx {
     char        set_val[CLI_MAX_OPTS][256];
     int         nset;
     char        settings_path[1024];
+    long        settings_vram;          /* the file's top-level `vram = N` (opensnes-rom's scene count), -1 when absent */
     int         json_depth, json_first[8], json_is_array[8];
 } cli_ctx;
 

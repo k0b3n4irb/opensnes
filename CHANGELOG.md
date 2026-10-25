@@ -35,8 +35,17 @@ All notable changes to OpenSNES are documented in this file.
   where it added up every level (a game read 298 % of VRAM with five levels
   that are never loaded together). Without such folders the total says it
   is everything at once.
+- feat(tools): an asset's settings file may say `vram = N` before its table,
+  the bytes it holds in VRAM at once: `opensnes-rom` counts N for its scene
+  instead of its files' size (0 for a sprite sheet streamed through a
+  cache, the cache's size on one sheet). The tools keep the key on
+  `--save`; a value outside 0..65536 is refused. A game's level with its
+  sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- fix(tools): `opensnes-rom check` follows the callbacks given to
+  `nmiSetLag()` when it looks for a WRAM data port write reachable from the
+  NMI, as it does for `nmiSet()`'s; it let one through.
 - fix(build): an asset is converted again when its `opensnes-*` tool is
   newer than its stamp. After an SDK update, a project kept the `.inc` the
   old tool wrote until `make clean`, and a C file calling what the new one

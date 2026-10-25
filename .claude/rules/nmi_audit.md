@@ -54,7 +54,7 @@ example's `*.c.asm` intermediates (`combined.asm` is no longer
 produced; until 2026-09-26 the build only ran the lint when that file
 existed, i.e. never on a fresh tree), identifies the
 NMI closure (NmiHandler + DefaultNmiCallback + every function passed
-to `nmiSet`/`nmiSetBank`), and **fails the build** if any reachable
+to `nmiSet` or, since 2026-10-25, `nmiSetLag`), and **fails the build** if any reachable
 function writes to `$2180-$2183`.
 
 Wired into `make/common.mk` post-link, runs after every example

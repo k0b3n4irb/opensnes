@@ -26,8 +26,8 @@ which stays.
 | **data-init sentinel** | `DataInitEnd` not at the end of `.data_init` | an object linked after `data_init_end.o` has globals that boot uninitialised |
 | **SA-1 boot** | `SA1Start` outside the ROM of bank $00 (an SA-1 ROM only) | the SA-1 reset vector is 16-bit: the SA-1 never runs a line, the S-CPU waits for it, and a SUPERFREE boot section gets there as soon as bank $00 fills |
 | **bank-blind reads** | a symbol read with 16-bit addressing (`lda.w sym`, `lda.w #sym` without `#:sym`) that the linker placed in bank $01+ | the read returns garbage; pass the data as a far pointer or keep it in bank $00 |
-| **NMI / WRAM port** | a write to `$2180-$2183` in a function reachable from `NmiHandler` or from a callback given to `nmiSet` | a mid-sequence interrupt corrupts the port's address and the main thread writes to the wrong place |
-| **assets** | nothing: one line with the VRAM and CGRAM weight of the converted graphics on disk | an inventory, not a budget; `opensnes budget` measures the running scene |
+| **NMI / WRAM port** | a write to `$2180-$2183` in a function reachable from `NmiHandler` or from a callback given to `nmiSet` or `nmiSetLag` | a mid-sequence interrupt corrupts the port's address and the main thread writes to the wrong place |
+| **assets** | nothing: one line with the VRAM and CGRAM weight of the converted graphics on disk; with one folder per level under `res/`, the heaviest level with what `res/` shares | an inventory, not a budget; an asset whose settings say `vram = N` counts N (a sheet streamed through a cache: `vram = 0`); `opensnes budget` measures the running scene |
 
 The figures print at every link (`OK: bank $00 ROM (code): 19177 bytes
 free`, `OK: C RAM band $0000-$1FFF: 4832 bytes free …`): they are the
@@ -91,8 +91,12 @@ Video (the assets of the project, if all were loaded at once)
 One report where the build prints several lines: what the linker placed
 in each ROM bank, the two RAM bands C can use (@ref tutorial_far_ram), the
 cartridge's save RAM, and the weight of the project's converted assets
-against VRAM and CGRAM (an upper bound: a game seldom loads every asset at
-once). It never fails on a figure — the thresholds are `check`'s — and
+against VRAM and CGRAM: every asset together, an upper bound, or, when
+`res/` has one folder per level, the heaviest level with what `res/` and the
+project's folder share. An asset whose settings file says `vram = N` (before
+its table) counts N bytes instead of its files' size: the bytes a cache
+reserves for a sprite sheet streamed through it, 0 for a sheet never
+resident. It never fails on a figure — the thresholds are `check`'s — and
 `--json` gives the same numbers per bank. `opensnes budget` builds the
 project and runs it (@ref tools_opensnes).
 

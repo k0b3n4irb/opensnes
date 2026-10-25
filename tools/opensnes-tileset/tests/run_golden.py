@@ -276,6 +276,29 @@ g.expect_refused("convert --metatiles 16 --mode 7", ["convert", "--metatiles", "
 g.expect_refused("convert --metatiles 16 --pages", ["convert", "--metatiles", "16", "--pages", "bg.png"], copy=["bg.png"], needles=["the metatile map replaces the map"])
 
 
+def vram_key():
+    """`vram = N` before the table is not the tool's: accepted, kept by
+    --save, and a value outside 0..65536 is refused."""
+    def run():
+        errs = []
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "bg.png.toml").write_text('tool = "opensnes-tileset"\nvram = 4096\n\n[convert]\ncolors = 16\n')
+            proc = g.run(["convert", "-q", "--save", "bg.png"], work, copy=["bg.png"])
+            if g.failure(proc):
+                return [g.failure(proc)]
+            if "vram = 4096" not in (work / "bg.png.toml").read_text():
+                errs.append("--save dropped `vram = 4096`")
+            (work / "bg.png.toml").write_text('tool = "opensnes-tileset"\nvram = 70000\n\n[convert]\n')
+            proc = g.run(["convert", "-q", "bg.png"], work)
+            if proc.returncode == 0 or "0 to 65536" not in proc.stderr:
+                errs.append("vram = 70000 not refused")
+        return errs
+    return run
+
+
+g.check("a settings file with vram = N (the scene count's, not the tool's)", "accepted, kept, bounded", vram_key())
+
 def blank_tile(first_blank, extra, mode5=False):
     """--blank: every cell of the map shows its own block, whether the picture
     starts with a blank block (it is tile 0, nothing is added) or not (a blank
