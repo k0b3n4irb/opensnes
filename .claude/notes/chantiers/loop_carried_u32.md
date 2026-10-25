@@ -56,6 +56,15 @@ $FFFF skips that half, and both its instructions when the result is in its
 operand's slot (point 2). Fixture `loop_carried_u32`; 12 ROMs of the corpus
 change, all MATCH frame for frame; bench and libbench unchanged.
 
+Measured by the second game on its real case the same day (same ROM and
+scenario, luna profile, before = develop 2087781e): `path_move` 102 532 ->
+81 236 master cycles per step over frames 200-1400 (-21 %), median step
+387 376 -> 364 188, lag frames 339 -> 321 of 1 200; in its worst window
+(frames 4500-7000) 120 866 -> 95 784, steps over three frames 255 -> 221 of
+about 710. Same game state at steps 300, 700 and 1500. It still needs about
+10 % in that window to hold three frames a step: points 3 to 5 are wanted.
+The first game's ROM shrank by 34 bytes, its 27 tests pass, load unchanged.
+
 Left, in order: point 3 (a loaded value through a stack slot before the
 `adc`), point 4 (the u16 -> u32 index extension whose high half nobody
 reads), point 5 (`tab[i + 1]` recomputing the index).
