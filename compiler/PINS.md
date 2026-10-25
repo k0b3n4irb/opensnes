@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | d337fd5767abf4f15e8bd0274eec25469755860b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | f259a211fc2f572bbff3aa555ffe119d31eaa86f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | ad9fe6cf1aee3534f658cb3127c4225b2b90acea | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -101,7 +101,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 136 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 137 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -113,6 +113,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+ad9fe6c w65816: a far u32 load whose one use is the next add is emitted inside it (the value goes from the table to the adc), and a multiply by a power of two lets its operand's dead high half stay dead — tab[i] with a u16 i no longer writes the widened index's high word; 62 -> 48 instructions; `QBE_NO_LOAD_ADD_FUSE=1`, `QBE_NO_MUL_HIGH_DEAD=1` (a second game, 2026-10-25)
 f259a21 w65816: a 32-bit add/sub/and/or/xor/copy result may take its operand's slot exactly (exact-or-disjoint partners, like a phi and its argument; not when the result leads to a load's or store's address, which the access may fold), and a constant $FFFF half of a Kl and is not emitted — a 16.16 loop's phi moves gone, 83 -> 62 instructions; `QBE_NO_KL_SHARE=1` (a second game, 2026-10-25)
 40839d8 w65816: an alloc of a run-time size is refused — it had a fixed 2-byte frame slot; a defence behind cproc's VLA refusal, for any other front end (audit 04-1, 2026-10-17)
 d1ad402 reassoc: the symbol of a union member, `add $u, 0`, folds like a bare one (a game built on the SDK, 2026-10-16)

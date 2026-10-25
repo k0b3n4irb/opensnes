@@ -58,6 +58,10 @@ All notable changes to OpenSNES are documented in this file.
   of every iteration, 83 instructions down to 62 (a second game's case).
   A `& 0x00FFFFFF` no longer emits `and #$FFFF` on the low word. Twelve
   examples' ROMs change; every one shows the same frames.
+- perf(compiler): a u32 read from a table goes straight to the add that
+  uses it, without a stop in a stack slot, and `tab[i]` with a u16 `i` no
+  longer writes the high word of the widened index: the same loop, 62 to
+  48 instructions. Eighteen examples' ROMs change, with the same frames.
 - docs(lib): the `oamSet()` and `oamSetFast()` notes no longer cite the
   "framesize=158" cost of a version long gone.
 - feat(compiler): an integer constant above `$FFFF` cast to a plain pointer

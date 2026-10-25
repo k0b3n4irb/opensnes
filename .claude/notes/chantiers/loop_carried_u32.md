@@ -1,4 +1,4 @@
-# Loop-carried u32 values copied every iteration (accepted 2026-10-22; points 1 and 2 done 2026-10-25)
+# Loop-carried u32 values copied every iteration (accepted 2026-10-22; points 1 to 4 done 2026-10-25, point 5 refused)
 
 Requested by a second game (direct message, 2026-10-22): a 16.16 path loop
 in u32 costs about 84 instructions per iteration. Reproduced on `develop`
@@ -65,9 +65,27 @@ about 710. Same game state at steps 300, 700 and 1500. It still needs about
 10 % in that window to hold three frames a step: points 3 to 5 are wanted.
 The first game's ROM shrank by 34 bytes, its 27 tests pass, load unchanged.
 
-Left, in order: point 3 (a loaded value through a stack slot before the
-`adc`), point 4 (the u16 -> u32 index extension whose high half nobody
-reads), point 5 (`tab[i + 1]` recomputing the index).
+**Points 3 and 4, 2026-10-25 (QBE ad9fe6c): 62 -> 48 instructions.** A
+32-bit far load whose one use is the 32-bit add right after it is emitted
+inside the add (`try_fuse_kl_load_add`): the value goes from the table to
+the `adc`. And a multiply by a constant power of two passes the "high half
+dead" mark to its operand (`is_pow2_mul` in `mark_addr_only_kl`), so the
+widened index no longer writes `lda #0 / sta hi`. 18 ROMs change, all MATCH;
+the audio hash of snesmod_music moved (`luna diff --audio --align-onset`,
+its input script: MATCH, max 0.74 %, onset unchanged at 37726).
+
+**Point 5 refused, for now.** Reading `tab[i + 1]` as `tab + 4` with the
+same X means rewriting `(u32)(u16)(i + 1) * 4` as `(u32)i * 4 + 4`, which is
+exact only when `i + 1` does not wrap at 65 536. Nothing bounds `i` here (it
+is `(u16)(ang >> 16) << 1` with `ang` carried by the loop): the same rule as
+the `i + 8` fold of `cdcc4580`. A game that knows its bound writes
+`tab[i] ... (&tab[i])[1]`, or a struct of two.
+
+**Left: dead stores to stack slots** (4 of the 48 in this loop: a value
+stored and handed on in A, never read from its slot). The flow pass
+(`peephole_flow`) tracks the sixteen direct-page words only; this
+function's frame is on the stack. Extending it to `N,s` slots is its own
+piece of work (offsets move with every push).
 
 The request passes the four checks of `exchanges.md`. This is a Class A
 chantier, in a separate worktree, after the assets lot. The finished

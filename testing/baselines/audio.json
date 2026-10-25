@@ -28,9 +28,9 @@
       "peak": 9939
     },
     "audio/snesmod_music": {
-      "sha256": "30b5035ad17d321cccc3c22e1a52ef793ae7c6df17aec606c839638a6c201e6a",
+      "sha256": "c5712df8f97c3c762901cbbc4fbc4256c1552ffda026a20150729f9d8649abc2",
       "samples": 159936,
-      "peak": 13654
+      "peak": 13140
     },
     "audio/sfx_from_wav": {
       "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",
