@@ -220,12 +220,17 @@ the frame the game **notes** each transfer; in VBlank one assembly routine
 
 /* during the frame */
 if (!vramQueuePush(frame_tiles, 0x0000, 128, VRAM_QUEUE_ROW)) {
-    /* 32 entries are waiting: keep this one for the next frame */
+    /* the queue is full: keep this one for the next frame */
 }
 
 WaitForVBlank();
 vramQueueFlush();          /* first thing in VBlank */
 ```
+
+The queue holds 32 entries; a project that needs more says so in its
+Makefile, `VRAM_QUEUE_MAX := 64` (1 to 255, 10 bytes of the C RAM band
+each). The VBlank does not grow with it: `vramQueueCost()` says what the
+entries waiting will take.
 
 `VRAM_QUEUE_COLUMN` steps 32 words after each word, for a column of a
 32-wide tilemap.

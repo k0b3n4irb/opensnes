@@ -44,8 +44,18 @@
 
 #include <snes/types.h>
 
-/** @brief Transfers the queue holds */
+/**
+ * @brief Transfers the queue holds
+ *
+ * 32 unless the project's Makefile says otherwise (`VRAM_QUEUE_MAX := 64`,
+ * 1 to 255): the build gives the C files this value and sizes the queue's
+ * arrays to it (templates/vramqueue_ram.asm). Each entry takes 10 bytes of
+ * the C RAM band ($0000-$1FFF). vramQueueFlush() sends every entry in one
+ * call: the VBlank budget stays the game's (vramQueueCost()).
+ */
+#ifndef VRAM_QUEUE_MAX
 #define VRAM_QUEUE_MAX     32
+#endif
 
 /** @brief Step after each word: the next VRAM word (a row, tiles) */
 #define VRAM_QUEUE_ROW     0x80

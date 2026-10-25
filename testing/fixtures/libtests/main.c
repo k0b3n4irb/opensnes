@@ -52,6 +52,7 @@ u16 r_vqs[8];
 static FAR u8 vq_sheet[576];
 /* vramQueueCost: bytes + 96 an entry, emptied by the flush, saturated */
 u16 r_vqc[8];
+u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -763,7 +764,7 @@ static void coverage_lot_b(void) {
     vramQueueFlush();
     r_vq[1] = vram_queue_count;             /* 0 */
     r_vqc[1] = vramQueueCost();             /* 0 */
-    r_vq[2] = vramQueueFree();              /* 32 */
+    r_vq[2] = vramQueueFree();              /* 40: VRAM_QUEUE_MAX of this fixture's Makefile */
     vramQueueFlush();                       /* empty: returns at once */
     r_vq[3] = 0x0A51;
     /* a 16x16 frame: strips at sheet + 0 and + 512, to VRAM words $6400 and
@@ -777,10 +778,17 @@ static void coverage_lot_b(void) {
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
     vramQueueFlush();
     r_vqs[5] = vramQueuePushSprite(vq_sheet, 0x6400, 4);       /* under 8 pixels: 0 */
-    vram_queue_count = 30;
+    vram_queue_count = VRAM_QUEUE_MAX - 2;
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
-    r_vqs[7] = vram_queue_count;                               /* still 30: nothing noted */
+    r_vqs[7] = vram_queue_count;                               /* still 38: nothing noted */
     vram_queue_count = 0;
+    /* the capacity the library reads (vram_queue_max, the project's) is the
+     * one C was given: pushes until one is refused */
+    r_vqcap = 0;
+    while (vramQueuePush(lotb_vram, 0x6200, 8, VRAM_QUEUE_ROW) && r_vqcap < 300)
+        r_vqcap++;                                             /* 40 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
     /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
      * by a sprite's strips; a count emptied by hand, then a flush, clears it */
     vram_queue_cost = 0xFF00;

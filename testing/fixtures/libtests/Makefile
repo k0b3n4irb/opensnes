@@ -13,6 +13,8 @@ USE_SRAM := 1
 # successive vectors without anything being wrong. The ratchet exists for
 # content FORCED into bank $00; with none, it could only fail at random.
 BANK0_FAIL_THRESHOLD := 0
+# not the default 32: proves the size reaches C and the queue's arrays alike
+VRAM_QUEUE_MAX := 40
 LIB_MODULES := console sprite dma background text math anim map audio fixed32 collision window input object colormath mosaic profile scene tile math_ease string vramqueue
 
 CSRC   := main.c

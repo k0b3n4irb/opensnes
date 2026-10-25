@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib,build): the VRAM queue's size is the project's:
+  `VRAM_QUEUE_MAX := 64` in its Makefile (1 to 255, 32 by default, 10
+  bytes of the C RAM band per entry). The library is built once, so the
+  queue's arrays and a capacity word the library reads are assembled per
+  project (`templates/vramqueue_ram.asm`), and C is given the same number.
+  A game's animated screen needs about 40 tile uploads a frame and was
+  capped at 32.
 - feat(lib,runtime): `nmiSetLag()` registers a callback the NMI handler runs
   on lag frames, which skip the library's VBlank work and the `nmiSet()`
   callback. Registered with both, a function runs every frame whatever the

@@ -265,8 +265,19 @@ ifeq ($(USE_DSP1),1)
 LIB_MODULES += dsp1
 endif
 
+# The VRAM queue's capacity (snes/vramqueue.h): the library is built once,
+# so the queue's arrays are assembled per project (templates/vramqueue_ram.asm)
+# and C is told the same number. 10 bytes of the C RAM band per entry.
+VRAM_QUEUE_MAX ?= 32
+ifneq ($(filter vramqueue,$(LIB_MODULES)),)
+ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
+$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
+endif
+VRAMQ_OBJ := vramqueue_ram.o
+endif
+
 # Assembler flags
-ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := -D VRAM_QUEUE_MAX_VAL=$(VRAM_QUEUE_MAX) -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 0 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
 $(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 0 to 16384)
 endif
@@ -361,7 +372,7 @@ $(foreach mod,$(LIB_MODULES),$(if $(wildcard $(LIBDIR)/$(mod).o $(LIBDIR)/$(mod)
   $(error LIB_MODULES: no library module `$(mod)` in $(LIBDIR). Available: $(_LIB_AVAILABLE))))
 endif
 INCLUDES := -I$(OPENSNES)/lib/include -I.
-ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
+ALL_CFLAGS := $(INCLUDES) -DVRAM_QUEUE_MAX=$(VRAM_QUEUE_MAX) $(CFLAGS)
 
 #------------------------------------------------------------------------------
 # Assets by their settings file (2026-10-05, docs/tools/CONVENTIONS.md)
@@ -611,7 +622,7 @@ LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc res/*/*.h res/*/*.inc \
 %.c.o: %.c $(GEN_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
-		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
+		clang $(CLANG_LINT_FLAGS) -DVRAM_QUEUE_MAX=$(VRAM_QUEUE_MAX) -I $(OPENSNES)/lib/include $< || \
 			{ $(call upgrade_hint,$<); echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1; }; \
 	fi
 endif
@@ -697,12 +708,17 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP) .opensnes_config
 # Linking
 #------------------------------------------------------------------------------
 
+# The VRAM queue's storage at the project's size (VRAM_QUEUE_MAX, above)
+vramqueue_ram.o: $(TEMPLATES)/vramqueue_ram.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] vramqueue_ram ($(VRAM_QUEUE_MAX) entries)"
+	$(call wrap_asm,$<,$@)
+
 # All objects in link order
 LINK_OBJS := crt0.o $(RUNTIME_OBJ) $(RAM_CODE_START_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
-LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
+LINK_OBJS += $(VRAMQ_OBJ) $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
 
 linkfile: $(LINK_OBJS) .opensnes_config
 	@echo "[objects]" > $@
@@ -776,7 +792,7 @@ clean:
 	@rm -f data_init_start.o data_init_start.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
-	@rm -f data_init_end.o data_init_end.wrap.asm
+	@rm -f data_init_end.o data_init_end.wrap.asm vramqueue_ram.o vramqueue_ram.wrap.asm
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \

@@ -27,18 +27,12 @@
 .endif
 .endif
 
-.EQU VRAM_QUEUE_MAX 32          ; vramqueue.h says the same
 .EQU VRAM_QUEUE_ENTRY_COST 96   ; vramqueue.h says the same
 
-.RAMSECTION ".vram_queue" BANK 0 SLOT 1
-    vram_queue_src      dsb VRAM_QUEUE_MAX*2    ; source address
-    vram_queue_bank     dsb VRAM_QUEUE_MAX*2    ; its bank (low byte)
-    vram_queue_addr     dsb VRAM_QUEUE_MAX*2    ; VRAM word address
-    vram_queue_size     dsb VRAM_QUEUE_MAX*2    ; bytes
-    vram_queue_step     dsb VRAM_QUEUE_MAX*2    ; VMAIN (low byte)
-    vram_queue_count    dsb 2                   ; entries waiting
-    vram_queue_cost     dsb 2                   ; bytes + VRAM_QUEUE_ENTRY_COST each
-.ENDS
+; The arrays, vram_queue_count, vram_queue_cost and the capacity word
+; vram_queue_max are the project's (templates/vramqueue_ram.asm, at the
+; size VRAM_QUEUE_MAX of its Makefile, 32 by default): the library is
+; built once for every project and reads the capacity at run time.
 
 .SECTION ".text.vramQueueFlush" SUPERFREE
 
@@ -53,9 +47,10 @@ vramQueueFlush:
     .INDEX 16
     lda.w vram_queue_count
     beq @out
-    cmp.w #VRAM_QUEUE_MAX+1
+    cmp.l vram_queue_max
+    beq +
     bcc +
-    lda.w #VRAM_QUEUE_MAX   ; a count nobody could have pushed: do not run past the arrays
+    lda.l vram_queue_max    ; a count nobody could have pushed: do not run past the arrays
 +   asl a
     sta.b tcc__r9           ; end of the queue, in bytes
     sep #$20
@@ -120,7 +115,7 @@ vramQueuePush:
     .ACCU 16
     .INDEX 16
     lda.w vram_queue_count
-    cmp.w #VRAM_QUEUE_MAX
+    cmp.l vram_queue_max
     bcc +
     lda.w #0
     rtl
@@ -176,7 +171,8 @@ vramQueuePushSprite:
     sta.b tcc__r9       ; strips left
     clc
     adc.w vram_queue_count
-    cmp.w #VRAM_QUEUE_MAX+1
+    cmp.l vram_queue_max
+    beq +
     bcc +
 @no:
     lda.w #0

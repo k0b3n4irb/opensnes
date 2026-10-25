@@ -238,10 +238,11 @@ CASES = [
     ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
-    ("r_vq", 8, 3 | (0 << 16) | (32 << 32) | (0x0A51 << 48)),
+    ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
+    ("r_vqcap", 2, 40),
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit
-    ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 30]))),
+    ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 38]))),
     # vramQueueCost: bytes + 96 an entry (300 for 8 + 0 + 4 bytes, 320 for
     # a 16x16 frame), 0 after a flush, $FFFF rather than a wrap three ways
     ("r_vqc", 16, sum(w << (16 * i) for i, w in enumerate([300, 0, 320, 0xFFFF, 0, 0xFFFF, 0xFFFF, 0]))),
