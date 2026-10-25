@@ -80,11 +80,12 @@ another way (`How`, below).
   stand-alone example, written by us.
   On 2026-10-17 its name had been public for a week (a project note and
   thirteen files, two release tags); the history was rewritten that day.
-- **What is decided is written down** (notes, `CHANGELOG`; what concerns the
-  game alone goes to its private folder outside this repository, named in
-  the user's private memory): a message disappears with its session. A long piece is still a
-  dated report (`.claude/notes/partners/`, `~/workspace/partner-reports/`);
-  the message points to it. snes-rag has no standing session: it is still
+- **What is decided is written down** (notes, `CHANGELOG`; what concerns a
+  game alone goes to `.claude/notes/private/`, which git ignores — since
+  2026-10-25; before, a folder outside the repository, lost that day in a
+  clean-up of the workspace): a message disappears with its session. A long
+  piece is still a dated report (`.claude/notes/partners/`); the message
+  points to it. snes-rag has no standing session: it is still
   reached by files (`partners.md`).
 
 ## The owner's word

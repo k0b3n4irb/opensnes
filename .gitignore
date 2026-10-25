@@ -77,6 +77,11 @@ __pycache__/
 # doesn't accidentally match `.claude/notes/projects/` etc.
 /projects/
 
+# What concerns a game alone (its measurements, its project note, the SHA
+# map of the 2026-10-17 rewrite): on this machine, never in the history
+# (.claude/rules/exchanges.md)
+.claude/notes/private/
+
 # Build directories
 build/
 bin/

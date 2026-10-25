@@ -48,31 +48,39 @@ the same day, with what you tried and what you needed. Concretely:
 `/tmp` or on one machine: a report that lives only in `/tmp` is lost with
 the session, and the *answers* to it are project knowledge. Since
 2026-10-10 the owner no longer carries them: a report to luna is announced
-to luna's session directly (`exchanges.md`), and its file delivered in the
-exchange folder below; snes-rag, which has no standing session, is reached
-by its folder only.
+to luna's session directly (`exchanges.md`); snes-rag, which has no standing
+session, is reached by its folder only.
 
-**snes-rag's exchange folder** (on this machine):
-`/media/psf/Home/workspaces/SNES/snes-rag/.claude/notes/partners/opensnes/`.
-Their `from_` reports land there, and **ours are always delivered there**
-(owner instruction, 2026-10-02): write the `to_` file in the repo, then copy
-it into that folder. Check which `to_` files they already have first, so an
-outdated report is folded into the current one instead of sent late.
+This folder is the archive, and it is versioned on purpose: on 2026-10-25
+the shared `~/workspace/partner-reports/` went in a clean-up of the
+workspace, and luna rebuilt its own archive from ours (86 files). Nothing of
+a game goes in it (`exchanges.md`), so nothing in it needs hiding.
 
-**luna's exchange folder** (on this machine, since 2026-10-06):
-`~/workspace/partner-reports/opensnes/`, named
-`AAAA-MM-JJ_<émetteur>-vers-<destinataire>_<sujet>.md` (its `INDEX.md` is
-one level up). Read it at every exchange: four notes of 2026-10-05 sat
-there unanswered because we only looked at what the owner pasted. Copy
-each `luna-vers-opensnes` file into the repo as `from_luna_…`, and deliver
-each `to_luna_…` there as `opensnes-vers-luna_…` (the owner may already
-have).
+**luna** (since 2026-10-25): a report to luna is written here and announced
+to luna's session by message, which names the file; luna copies it into its
+own archive (`luna/.claude/notes/partners/opensnes/`, ignored by its git).
+A note luna sends arrives the same way and is copied here as `from_luna_…`.
+We write nothing in luna's tree. From 2026-10-06 to 2026-10-25 both sides
+delivered into `~/workspace/partner-reports/opensnes/`, which no longer
+exists.
+
+**snes-rag's exchange folder** (on this machine): the `opensnes/` folder of
+snes-rag's partner notes, in its clone beside this one —
+`../snes-rag/.claude/notes/partners/opensnes/` today, and
+`../../snes-rag/.claude/notes/partners/opensnes/` from
+`~/workspace/sephiroth/sdk/opensnes` (the layout the owner chose on
+2026-10-25). Their `from_` reports land there, and **ours are always
+delivered there** (owner instruction, 2026-10-02): write the `to_` file in
+the repo, then copy it into that folder. Check which `to_` files they
+already have first, so an outdated report is folded into the current one
+instead of sent late. Until 2026-10-25 this rule named a path under
+`/media/psf/Home/workspaces/SNES/`, which no longer exists.
 
 **The game** is not a partner in the sense of this rule — it is the first
 project built on the SDK, and since 2026-10-10 it speaks to us directly and
-we to it (`exchanges.md`). What it shows us is kept outside this repository,
-in its private folder (the user's private memory names it): the game is
-under licence and is never named here.
+we to it (`exchanges.md`). What it shows us is kept out of the history, in
+`.claude/notes/private/` (ignored by git): the game is under licence and is
+never named in what is committed.
 
 Every `to_` report has the same spine: header (who, which pin / index
 fingerprint, status: sent as is, or still accumulating), what the
