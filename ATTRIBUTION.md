@@ -113,6 +113,14 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Location**: `tools/third_party/cute_tiled.h`
 - **What it does**: Tiled `.tmx` / `.tmj` map parsing for `opensnes-level`
 
+### doxygen-awesome-css
+- **Author**: jothepro
+- **Repository**: https://github.com/jothepro/doxygen-awesome-css
+- **License**: MIT (`docs/doxygen-awesome-css/LICENSE`)
+- **Version**: v2.4.1
+- **Location**: `docs/doxygen-awesome-css/` (the six theme files the
+  Doxyfile names, unchanged)
+- **What it does**: the theme of the generated API documentation
 
 ## Tools
 

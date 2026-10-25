@@ -672,7 +672,7 @@ docs:
 	@echo "========================================="
 
 # The P7 gate: the same build with warnings as errors, run by the doc-render
-# job on Linux with the pinned Doxygen and the CSS submodule checked out.
+# job on Linux with the pinned Doxygen.
 docs-strict: DOXY_STRICT := 1
 docs-strict: docs
 
