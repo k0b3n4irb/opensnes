@@ -10,7 +10,7 @@ versioned, shared, and survives clones. Migration completed 2026-05-10.
 | Bucket | Path | Versioned | Visible to contributors |
 |---|---|---|---|
 | **Project notes** | `.claude/notes/` (repo) | ✅ git | ✅ on clone |
-| **User auto-memory** | `~/.claude/projects/-home-kobenairb-workspace-sephiroth-sdk-opensnes/memory/` | ❌ | ❌ |
+| **User auto-memory** | `~/.claude/projects/<this tree's path, slashes as dashes>/memory/` | ❌ | ❌ |
 
 ## What goes where
 
