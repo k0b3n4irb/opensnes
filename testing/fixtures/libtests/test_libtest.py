@@ -245,7 +245,10 @@ CASES = [
     ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 38]))),
     # vramQueueCost: bytes + 96 an entry (300 for 8 + 0 + 4 bytes, 320 for
     # a 16x16 frame), 0 after a flush, $FFFF rather than a wrap three ways
-    ("r_vqc", 16, sum(w << (16 * i) for i, w in enumerate([300, 0, 320, 0xFFFF, 0, 0xFFFF, 0xFFFF, 0]))),
+    ("r_vqc", 16, sum(w << (16 * i) for i, w in enumerate([252, 0, 288, 0xFFFF, 0, 0xFFFF, 0xFFFF, 0]))),
+    # vramQueueFlushUntil: none before line 0, then the first of three, the
+    # two left moved to the head in order with their costs, then both
+    ("r_vqu", 16, sum(w << (16 * i) for i, w in enumerate([3, 2, 0x6610, 0x6600, 0x8000, 0x8058, 0, 0]))),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -344,6 +347,10 @@ VRAM_CASES = [
     # vramQueuePushSprite + flush: the two strips of a 16x16 frame
     (0xC800, bytes([0xA1])), (0xC83F, bytes([0xA2])),
     (0xCA00, bytes([0xB1])), (0xCA3F, bytes([0xB2])),
+    # vramQueueFlushUntil: word $6600 got the first entry, then the third
+    # (FIFO: the second push to an address lands last); $6610 the second
+    (0xCC00, bytes([0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90])),
+    (0xCC20, bytes([0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10])),
 ]
 
 

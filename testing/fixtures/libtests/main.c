@@ -50,8 +50,10 @@ u16 r_vq[4];
 /* vramQueuePushSprite: one 16x16 frame = two strips of 64 bytes */
 u16 r_vqs[8];
 static FAR u8 vq_sheet[576];
-/* vramQueueCost: bytes + 96 an entry, emptied by the flush, saturated */
+/* vramQueueCost: bytes + 80 an entry, emptied by the flush, saturated */
 u16 r_vqc[8];
+/* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
+u16 r_vqu[8];
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
 /* --- math vectors --- */
@@ -760,7 +762,7 @@ static void coverage_lot_b(void) {
     vramQueuePush(lotb_vram, 0x6300, 0, VRAM_QUEUE_ROW);
     vramQueuePush(lotb_vram + 8, 0x6240, 4, VRAM_QUEUE_COLUMN);
     r_vq[0] = vram_queue_count;             /* 3 */
-    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 96 = 300 */
+    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 80 = 252 */
     vramQueueFlush();
     r_vq[1] = vram_queue_count;             /* 0 */
     r_vqc[1] = vramQueueCost();             /* 0 */
@@ -772,7 +774,7 @@ static void coverage_lot_b(void) {
     vq_sheet[0] = 0xA1; vq_sheet[63] = 0xA2; vq_sheet[512] = 0xB1; vq_sheet[575] = 0xB2;
     r_vqs[0] = vramQueuePushSprite(vq_sheet, 0x6400, 16);      /* 1 */
     r_vqs[1] = vram_queue_count;                               /* 2 */
-    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 96) = 320 */
+    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 80) = 288 */
     r_vqs[2] = vram_queue_src[1] - vram_queue_src[0];          /* 512 */
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
@@ -805,6 +807,28 @@ static void coverage_lot_b(void) {
     vram_queue_count = 0;
     vramQueueFlush();
     r_vqc[7] = vramQueueCost();                                /* 0 */
+    /* vramQueueFlushUntil. The second entry is made dear by hand (its
+     * running cost past any VBlank), so the cut does not depend on the
+     * line the call lands on: the first entry goes, the second and third
+     * stay at the head in order, and the third, to the first one's
+     * address, reaches VRAM last. */
+    vramQueuePush(lotb_vram, 0x6600, 8, VRAM_QUEUE_ROW);       /* running cost 88 */
+    vram_queue_cost = 0x8000;
+    vramQueuePush(lotb_vram + 8, 0x6610, 8, VRAM_QUEUE_ROW);   /* $8058 */
+    vramQueuePush(lotb_vram + 16, 0x6600, 8, VRAM_QUEUE_ROW);  /* $80B0 */
+    r_vqu[0] = vramQueueFlushUntil(0);       /* line 0 is past: nothing sent, 3 left */
+    WaitForVBlank();
+    r_vqu[1] = vramQueueFlushUntil(262);     /* the first sent: 2 left */
+    r_vqu[2] = vram_queue_addr[0];           /* $6610 */
+    r_vqu[3] = vram_queue_addr[1];           /* $6600 */
+    r_vqu[4] = vram_queue_cum[0];            /* $8058 - 88 = $8000 */
+    r_vqu[5] = vramQueueCost();              /* $80B0 - 88 = $8058 */
+    vram_queue_cost = 176;
+    vram_queue_cum[0] = 88;
+    vram_queue_cum[1] = 176;
+    WaitForVBlank();
+    r_vqu[6] = vramQueueFlushUntil(262);     /* both sent: 0 left */
+    r_vqu[7] = vramQueueCost();              /* 0 */
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;

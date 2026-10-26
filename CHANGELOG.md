@@ -5,6 +5,18 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): `vramQueueFlushUntil(line)` sends the queued VRAM transfers
+  that end before a scanline and keeps the rest at the head of the queue,
+  in order, for the next VBlank. It reads the vertical counter once, turns
+  the lines left into a budget (165 bytes of `vramQueueCost()` a line) and
+  finds the cut by halving over the running cost each push now notes
+  (`vram_queue_cum`), so its cost does not grow with the queue
+  (`VRAM_QUEUE_UNTIL_COST`, 64 bytes). Outside the vertical blank it sends
+  nothing. Measured on luna with 48 entries of 128 bytes queued each frame:
+  `line` 262 sends 25 a frame and the last DMA byte lands on line 261 (258
+  with FastROM), 250 and 240 end on 249 and 239, PAL 312 sends all 48 by
+  line 286, no byte outside the blank. Asked by a game streaming many small
+  entries whose fixed budget left ten lines of each VBlank unused.
 - feat(lib,build): the VRAM queue's size is the project's:
   `VRAM_QUEUE_MAX := 64` in its Makefile (1 to 255, 32 by default, 10
   bytes of the C RAM band per entry). The library is built once, so the
@@ -81,6 +93,12 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- perf(lib): the VRAM queue's flush runs its loop with A 8-bit and X/Y
+  16-bit, the word registers through Y: 619 master cycles an entry beyond
+  its bytes instead of 670 (SlowROM; 560 with FastROM), libbench `vramq`
+  10,854 -> 10,576. `VRAM_QUEUE_ENTRY_COST` follows the measure: 80 instead
+  of 96, so `vramQueueCost()` reads 16 bytes less per entry. Each entry
+  takes 12 bytes of the C RAM band instead of 10 (the running cost).
 - build: `make clean-all` removes everything the tree regenerates (the
   benchmarks' builds, the fuzz corpus, the release zips, the generated docs,
   the tests' temporary files); the WLA-DX clean leaves its submodule as

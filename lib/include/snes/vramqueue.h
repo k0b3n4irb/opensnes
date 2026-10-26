@@ -25,10 +25,10 @@
  *
  * **What it buys is VBlank time, not time.** Noting an entry is a call
  * too, so in total the queue costs more than the dmaCopyVram() calls it
- * replaces: six 128-byte transfers measure 21,700 master cycles queued
- * against 16,600 called directly. But only 10,700 of the 21,700 fall in the
- * VBlank — 8 per byte plus about 770 per entry — where the six calls put
- * all 16,600 (`devtools/libbench`, rows `vramc` and `vramq`).
+ * replaces. But six 128-byte transfers called directly put 15,900 master
+ * cycles in the VBlank, and queued only 10,600 — 8 per byte plus about 740
+ * per entry, the call to the flush included (`devtools/libbench`, rows
+ * `vramc` and `vramq`).
  *
  * **The budget is yours to keep.** A VBlank is about 49,000 master cycles
  * and the NMI handler takes the first 5,000 to 8,000 of them. What does
@@ -49,9 +49,9 @@
  *
  * 32 unless the project's Makefile says otherwise (`VRAM_QUEUE_MAX := 64`,
  * 1 to 255): the build gives the C files this value and sizes the queue's
- * arrays to it (templates/vramqueue_ram.asm). Each entry takes 10 bytes of
+ * arrays to it (templates/vramqueue_ram.asm). Each entry takes 12 bytes of
  * the C RAM band ($0000-$1FFF). vramQueueFlush() sends every entry in one
- * call: the VBlank budget stays the game's (vramQueueCost()).
+ * call; vramQueueFlushUntil() sends what ends before a given scanline.
  */
 #ifndef VRAM_QUEUE_MAX
 #define VRAM_QUEUE_MAX     32
@@ -62,12 +62,13 @@
 /** @brief Step after each word: 32 words on (a column of a 32-wide tilemap) */
 #define VRAM_QUEUE_COLUMN  0x81
 
-/* The queue itself (vramqueue.asm): five arrays of words, one entry each. */
+/* The queue itself (vramqueue.asm): six arrays of words, one entry each. */
 extern u16 vram_queue_src[VRAM_QUEUE_MAX];
 extern u16 vram_queue_bank[VRAM_QUEUE_MAX];
 extern u16 vram_queue_addr[VRAM_QUEUE_MAX];
 extern u16 vram_queue_size[VRAM_QUEUE_MAX];
 extern u16 vram_queue_step[VRAM_QUEUE_MAX];
+extern u16 vram_queue_cum[VRAM_QUEUE_MAX];  /* vram_queue_cost up to each entry */
 extern u16 vram_queue_count;
 extern u16 vram_queue_cost;
 
@@ -77,17 +78,18 @@ extern u16 vram_queue_cost;
 /**
  * @brief What one entry costs the flush beyond its bytes, in bytes
  *
- * The flush spends about 8 master cycles per byte and 770 per entry;
- * 770 / 8 is 96 bytes' worth.
+ * The flush spends 8 master cycles per byte and, in its loop, 619 per entry
+ * (SlowROM; 560 with USE_FASTROM): 619 / 8 is 77 bytes' worth, rounded up.
  */
-#define VRAM_QUEUE_ENTRY_COST  96
+#define VRAM_QUEUE_ENTRY_COST  80
 
 /**
  * @brief VBlank cost of what is queued, in bytes: each entry's size plus
  *        VRAM_QUEUE_ENTRY_COST
  *
  * Kept by vramQueuePush() and vramQueuePushSprite(), set to 0 by
- * vramQueueFlush(); it stops at 0xFFFF rather than wrap. Multiply by 8 for
+ * vramQueueFlush(), to the cost of what is left by vramQueueFlushUntil();
+ * it stops at 0xFFFF rather than wrap. Multiply by 8 for
  * master cycles. A module that streams what is left of the VBlank checks it
  * against its own budget before each push:
  *
@@ -151,5 +153,44 @@ u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px);
  *          middle of a vramQueuePush(): the entry would be half written.
  */
 void vramQueueFlush(void);
+
+/**
+ * @brief Send the queued transfers that end before a scanline; keep the rest
+ *
+ * Reads the vertical counter once, turns the lines left before @p line
+ * into a budget (165 bytes of vramQueueCost() a line: 1324 master cycles,
+ * the DRAM refresh taken out), and sends the entries in queue order while
+ * their running cost fits. The first one that does not fit stops it: the
+ * entries left move to the head of the queue **in the same order** and go
+ * first at the next flush, so a VRAM address pushed twice still receives
+ * the second transfer last. Use it to fill every VBlank whatever the NMI
+ * took, and push beyond a safe budget.
+ *
+ * - The vertical blank ends after line 261 (NTSC) or 311 (PAL): pass 262
+ *   or 312 to use all of it, less to keep a margin. A blank begins at line
+ *   225, or 240 with overscan.
+ * - Outside the vertical blank (HVBJOY bit 7 clear) it sends nothing: a
+ *   flush called late, in a lag frame, does not write into active display.
+ *   In force blank use vramQueueFlush().
+ * - What is left stays queued: its sources are read at a later flush, so a
+ *   RAM buffer behind a kept entry must not change until then (ROM is
+ *   safe). vramQueueFree() counts the entries left as taken, and
+ *   vramQueueCost() is their cost.
+ * - The routine itself costs VRAM_QUEUE_UNTIL_COST bytes of the budget up
+ *   to its first transfer, whatever the queue's length (the cut is found
+ *   by halving). Moving what is left takes time after the blank, not in it.
+ * - It reads the H/V counter: a Super Scope or light-gun latch read later
+ *   in the same frame sees this one.
+ *
+ * @param line  Scanline by whose start the transfers must be over
+ * @return      Entries left in the queue
+ *
+ * @warning Not from an NMI callback while the main code may be in the
+ *          middle of a vramQueuePush().
+ */
+u16 vramQueueFlushUntil(u16 line);
+
+/** @brief Bytes of the budget vramQueueFlushUntil() spends before its first transfer */
+#define VRAM_QUEUE_UNTIL_COST  64
 
 #endif /* OPENSNES_VRAMQUEUE_H */

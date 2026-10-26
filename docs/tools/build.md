@@ -55,7 +55,7 @@ gives `res/jump.brr` and `res/jump.h`, and the build links the sample
 | `USE_SRAM` | `0` | `1` declares battery-backed save RAM and links the `sram` module |
 | `SRAM_SIZE` | `3` | Save RAM size as the header byte `$FFD8`: 1 KB << n, n = 1..7 (3 = 8 KB) |
 | `RAM_CODE_SIZE` | `0` | Bytes (1 to 16384) of a code window at the top of WRAM bank `$7E`, for code that runs from RAM (`RAM_CODE_SECTION`): stored in the top of ROM bank 1, copied by crt0 at boot. `0` = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, `gsuLaunch` wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with `SOUNDBANK_BANK := 2`. See the Super FX tutorial |
-| `VRAM_QUEUE_MAX` | `32` | Entries of the VRAM upload queue (`vramqueue` module, `snes/vramqueue.h`), 1 to 255: the build sizes the queue's arrays to it and gives C the same `VRAM_QUEUE_MAX`. 10 bytes of the C RAM band per entry; `vramQueueFlush()` still sends them all in one VBlank, whose budget stays the game's (`vramQueueCost()`) |
+| `VRAM_QUEUE_MAX` | `32` | Entries of the VRAM upload queue (`vramqueue` module, `snes/vramqueue.h`), 1 to 255: the build sizes the queue's arrays to it and gives C the same `VRAM_QUEUE_MAX`. 12 bytes of the C RAM band per entry; `vramQueueFlush()` sends them all, `vramQueueFlushUntil()` what ends before a given scanline |
 
 ## Coprocessors
 
