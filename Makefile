@@ -702,8 +702,13 @@ release: all
 	@# Debug information out (2026-10-25): the tools and the toolchain are
 	@# built with -g for the sanitizers and gdb, which made 72 of the 76 MB of
 	@# the v0.50.0 zip's content. -S removes the debug sections only (GNU and
-	@# Apple strip alike); the symbol table stays for a backtrace.
-	@$(STRIP) -S $(RELEASE_DIR)/opensnes/bin/*
+	@# Apple strip alike); the symbol table stays for a backtrace. On macOS
+	@# clang writes the debug information beside a program it compiles and
+	@# links in one step, as a <program>.dSYM folder: it goes, and strip is
+	@# given the files only (a folder stops Apple's strip, 2026-10-26).
+	@rm -rf $(RELEASE_DIR)/opensnes/bin/*.dSYM
+	@for f in $(RELEASE_DIR)/opensnes/bin/*; do \
+		[ -f "$$f" ] && { $(STRIP) -S "$$f" || exit 1; }; done; true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
 	@# The objects only: the build links lib/build/<flavour>/*.o and never
 	@# reads the .asm the compiler wrote on the way (about 200 files).

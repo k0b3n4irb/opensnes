@@ -50,6 +50,10 @@ All notable changes to OpenSNES are documented in this file.
   sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- ci: the Linux and macOS steps that build the release through `tee` fail
+  when `make` fails (`set -o pipefail`, as the Windows steps already had);
+  the macOS zip went missing on 2026-10-25 and only the smoke test after it
+  said so.
 - fix(build): `make clean` of the SDK cleans the examples again: it empties
   `lib/build` first, and the `LIB_MODULES` check stopped each example's clean
   there, so their objects and ROMs stayed. The check is skipped on `clean`.
@@ -70,7 +74,8 @@ All notable changes to OpenSNES are documented in this file.
 - build(release): the binaries of the release zip carry no debug
   information (`strip -S`): the Linux arm64 zip went from 30.6 MB to 8.4 MB
   (76.6 MB to 22.1 MB extracted). The tools behave the same; a source build
-  of the SDK keeps `-g`.
+  of the SDK keeps `-g`. On macOS the `.dSYM` folders clang writes beside a
+  program are left out of the zip too.
 - perf(compiler): a 32-bit add, sub, and, or, xor or copy may put its result
   in its operand's slot, so a u32 value a loop carries stays in place: a
   16.16 path loop with four u32 values lost the 16 copies it made at the end
