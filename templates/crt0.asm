@@ -42,6 +42,18 @@
 ; Include ROM header (memory map, vectors)
 .include "project_hdr.asm"
 
+; LoROM and HiROM address their code in a mirror (.BASE $80 in memmap.inc and
+; hdr.asm, .BASE $C0 for HiROM), the one FastROM speeds up. The vectors enter
+; in bank $00, so Start and NmiHandler jump to the mirror first: from then on
+; the program counter is the address of the labels, with or without FastROM
+; (a profile or a coverage set folds the PC onto those labels). SA-1 and
+; Super FX keep their code at bank $00 and need no jump.
+.ifndef SA1
+.ifndef SUPERFX
+.define CODE_IN_MIRROR
+.endif
+.endif
+
 ;------------------------------------------------------------------------------
 ; Compiler Imaginary Registers
 ;------------------------------------------------------------------------------
@@ -584,8 +596,8 @@ Start:
     clc
     xce
 
-.ifdef FASTROM
-    jml.l FastStart         ; Jump to bank $80 mirror for fast ROM access
+.ifdef CODE_IN_MIRROR
+    jml.l FastStart         ; Jump to the code's mirror ($80, or $C0 for HiROM)
 FastStart:
 .endif
 
@@ -1044,11 +1056,11 @@ CopyInitData:
 ; If NMI fires mid-sequence and touches $2180-$2183, the address/data will
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
-NmiHandler:
-.ifdef FASTROM
-    jml.l FastNmi           ; Jump to bank $80 mirror for fast ROM access
-FastNmi:
+NmiEntry:                   ; the vector's target, in bank $00
+.ifdef CODE_IN_MIRROR
+    jml.l NmiHandler        ; Jump to the code's mirror ($80, or $C0 for HiROM)
 .endif
+NmiHandler:                 ; where the handler runs: profiles name it here
     rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
     .ACCU 16
     .INDEX 16
@@ -2264,7 +2276,9 @@ tilemapFlushOn:
 ; The compiler generates data accesses using `lda.l $0000,x` which reads from
 ; bank $00. In both LoROM and HiROM modes, bank $00:$8000-$FFFF contains ROM.
 ; C code sections use SUPERFREE and will be placed in available ROM space.
-; No special BASE directive is needed since code stays in bank $00.
+; In LoROM their labels carry .BASE $80 (memmap.inc, hdr.asm): the code
+; runs from the mirror that FastROM speeds up, and `lda.l $0000,x` still
+; names bank $00, whose low 8 KB is the same WRAM.
 ;==============================================================================
 
 ;==============================================================================

@@ -46,7 +46,7 @@ gives `res/jump.brr` and `res/jump.h`, and the build links the sample
 | Variable | Default | What it does |
 |---|---|---|
 | `USE_HIROM` | `0` | `1` builds a HiROM cartridge (64 KB banks instead of 32 KB) |
-| `USE_FASTROM` | `0` | `1` marks the ROM as FastROM and runs the code from the fast mirror (~33 % more ROM bandwidth) |
+| `USE_FASTROM` | `0` | `1` marks the ROM as FastROM: the code, which a LoROM build always addresses in the `$80-$BF` mirror, is then read at 6 master cycles a byte instead of 8. Only the ROM reads speed up (RAM, registers and internal cycles do not): a loop of `vramQueuePush` calls and a flush measures 12 to 14 % faster. Super FX and SA-1 builds keep their own mapping |
 | `ROM_BANKS` | `8` | Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it |
 | `ASSET_TOML` | `*.toml`, `res/*.toml` and `res/*/*.toml` that name an `opensnes-*` tool | The assets' settings files the build converts before compiling (one `opensnes-<tool> <subcommand>` run per file, then `assets_gen.asm` gathers their `.incbin` fragments); see @ref tools_conventions |
 | `ROMSIZE` | from `ROM_BANKS` | The header's ROM size byte (`$FFD7`, 1 KB << n, rounded up to a power of two). Leave it computed |

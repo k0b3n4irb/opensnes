@@ -89,7 +89,7 @@ values) — required reading before porting any function from PVSnesLib.
 |-------------|:------:|-------|
 | **LoROM** | Stable | Default. Production-ready. |
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
-| **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
+| **FastROM** | Stable | Set `USE_FASTROM := 1`. ROM reads a third faster; code measured 12 to 14 % faster. |
 | **SA-1** | Experimental | C wrapper is minimal; the coprocessor runs `templates/sa1_boot.asm` unless an example brings its own `sa1_boot.asm`. SIWP/CIWP write-protect polarity settled against three references (see `KNOWN_LIMITATIONS.md`). |
 | **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by [luna](https://github.com/k0b3n4irb/luna)**, which detects and executes the GSU natively in the headless test harness. |
 

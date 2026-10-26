@@ -312,7 +312,7 @@ $(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 	@echo '.include "memmap.inc"' > $(BUILDDIR_SUPERFX)/$*.asm
 	@echo '' >> $(BUILDDIR_SUPERFX)/$*.asm
 	@cat $(BUILDDIR_SUPERFX)/$*.c.asm >> $(BUILDDIR_SUPERFX)/$*.asm
-	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SUPERFX)/$*.asm
+	@$(AS) -D SUPERFX $(ASFLAGS) $@ $(BUILDDIR_SUPERFX)/$*.asm
 
 # ASM compilation for SuperFX (core source/ + non-core contrib/)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SUPERFX)

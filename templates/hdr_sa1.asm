@@ -87,7 +87,7 @@
     COP EmptyHandler        ; Coprocessor interrupt
     BRK EmptyHandler        ; Break instruction
     ABORT EmptyHandler      ; Abort (not used on SNES)
-    NMI NmiHandler          ; VBlank interrupt
+    NMI NmiEntry            ; VBlank interrupt (crt0: jumps to NmiHandler)
     IRQ IrqHandler          ; Hardware IRQ (H/V timer, etc.)
 .ENDNATIVEVECTOR
 

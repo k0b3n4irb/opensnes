@@ -50,6 +50,21 @@ All notable changes to OpenSNES are documented in this file.
   sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- fix(runtime): `USE_FASTROM=1` speeds up the C code and the library, not
+  only the startup and the NMI entry. A LoROM build addressed its code in
+  bank $00, which reads ROM at 8 master cycles a byte whatever MEMSEL says:
+  a FastROM ROM spent the same cycles as a SlowROM one (21,441,818 against
+  21,441,786 over 60 frames of a queue benchmark). LoROM code is now
+  addressed in the $80-$BF mirror (`memmap.inc`, `hdr.asm`), where FastROM
+  applies; a SlowROM build reads it at the same speed as before, and every
+  example renders the same frames. With FastROM the benchmark runs 16 %
+  more loops, the VRAM queue's flush costs 560 master cycles an entry
+  instead of 670. Super FX and SA-1 builds keep their mapping (on a Super
+  FX cartridge $80-$BF:8000 is a second CPU ROM). The reset and NMI vectors
+  enter in bank $00 and jump to the mirror at once, FastROM or not
+  (`NmiEntry`, 4 bytes and 4 cycles a frame), so the program counter is
+  the address of the labels a profile folds it onto. A 24-bit pointer to
+  ROM in a LoROM build carries the bank byte $80 + n.
 - ci: the Linux and macOS steps that build the release through `tee` fail
   when `make` fails (`set -o pipefail`, as the Windows steps already had);
   the macOS zip went missing on 2026-10-25 and only the smoke test after it
