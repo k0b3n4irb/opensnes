@@ -1,6 +1,6 @@
 ---
 name: PVSnesLib example porting workflow + critical rules
-description: Hard-to-derive workflow for porting PVSnesLib examples to OpenSNES. Local PVSnesLib clone is at /home/kobenairb/workspace/pvsneslib. Bare-metal register writes preferred for HDMA / window / colormath effects. Watch for BG mode mismatch (Mode 1 4bpp vs Mode 0 2bpp).
+description: Hard-to-derive workflow for porting PVSnesLib examples to OpenSNES. Local PVSnesLib clone: `$PVSNESLIB_HOME` (here `~/workspace/pvsneslib`). Bare-metal register writes preferred for HDMA / window / colormath effects. Watch for BG mode mismatch (Mode 1 4bpp vs Mode 0 2bpp).
 type: project
 originSessionId: 7cf8aa6f-20b3-4e2f-81b4-25748e91b08f
 ---
@@ -14,7 +14,7 @@ the asset pipeline / register sequence diverged. The historical pattern
 is "I wrote a fresh asset" → port looks different from PVS → spend hours
 debugging the lib when the real fix is "copy the original asset bytes".
 
-**Local PVSnesLib clone**: `/home/kobenairb/workspace/pvsneslib`. Examples
+**Local PVSnesLib clone**: `~/workspace/pvsneslib` on this machine. Examples
 under `snes-examples/`. Set `PVSNESLIB_HOME` env var if a script wants
 it.
 

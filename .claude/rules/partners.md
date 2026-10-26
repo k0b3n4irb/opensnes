@@ -65,11 +65,11 @@ delivered into `~/workspace/partner-reports/opensnes/`, which no longer
 exists.
 
 **snes-rag's exchange folder** (on this machine): the `opensnes/` folder of
-snes-rag's partner notes, in its clone beside this one —
-`../snes-rag/.claude/notes/partners/opensnes/` today, and
-`../../snes-rag/.claude/notes/partners/opensnes/` from
-`~/workspace/sephiroth/sdk/opensnes` (the layout the owner chose on
-2026-10-25). Their `from_` reports land there, and **ours are always
+snes-rag's partner notes, in its clone two levels up —
+`../../snes-rag/.claude/notes/partners/opensnes/` from this tree, which
+lives at `sephiroth/sdk/opensnes` since 2026-10-26 (the layout the owner
+chose on 2026-10-25; snes-rag joins `sephiroth/` when the owner moves it,
+and sits at `../../../snes-rag/` until then). Their `from_` reports land there, and **ours are always
 delivered there** (owner instruction, 2026-10-02): write the `to_` file in
 the repo, then copy it into that folder. Check which `to_` files they
 already have first, so an outdated report is folded into the current one
