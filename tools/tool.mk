@@ -27,7 +27,13 @@ ifndef VERSION
 $(error tool.mk: set VERSION before including it)
 endif
 
-CC         ?= clang
+# clang unless the command line or the environment names another compiler.
+# `CC ?= clang` did nothing: make defines CC (as cc, which is gcc on Linux)
+# before any Makefile is read, so the tools were built with gcc while the
+# toolchain and the CI expected clang (2026-10-27).
+ifeq ($(origin CC),default)
+CC := clang
+endif
 DATESTRING := $(shell date +%Y%m%d)
 CFLAGS      = -g -Wall -Wextra -O2 -pedantic $(TOOL_CFLAGS) \
               -DTOOL_VERSION=\"$(VERSION)\" -DTOOL_BUILD_DATE=\"$(DATESTRING)\"

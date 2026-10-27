@@ -62,6 +62,12 @@ All notable changes to OpenSNES are documented in this file.
   sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- fix(tools): the `opensnes-*` tools are built with clang, as the
+  toolchain is: `CC ?= clang` in `tools/tool.mk` never applied, because
+  make defines `CC` before reading a Makefile, so they were built with the
+  host's `cc` (gcc on Linux), which warned on a clang pragma of
+  `cute_tiled.h` at every build. `CC=...` on the command line or in the
+  environment still wins.
 - fix(runtime): `USE_FASTROM=1` speeds up the C code and the library, not
   only the startup and the NMI entry. A LoROM build addressed its code in
   bank $00, which reads ROM at 8 master cycles a byte whatever MEMSEL says:
