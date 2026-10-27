@@ -108,6 +108,12 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- perf(runtime): `__mul16` (a 16-bit multiply the compiler cannot turn
+  into shifts) skips each partial product whose high byte is 0, so a
+  multiplier or multiplicand under 256 costs one or two hardware multiplies
+  instead of three: a loop of 6,400 products of mixed operands, 6,861,072
+  master cycles in the routine before, 5,132,050 after (-25 %), the same
+  sum.
 - perf(lib): the VRAM queue's flush runs its loop with A 8-bit and X/Y
   16-bit, the word registers through Y: 619 master cycles an entry beyond
   its bytes instead of 670 (SlowROM; 560 with FastROM), libbench `vramq`
