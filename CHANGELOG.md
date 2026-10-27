@@ -5,6 +5,15 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(build): a link that fails on a label of the library names the
+  module that holds it: `setMode is in the library module console: add
+  console to LIB_MODULES`, and for a sub-module, the module that brings it
+  in (`oamSet is in the library module sprite_oamset, which sprite brings
+  in: add sprite to LIB_MODULES`). wlalink says only "unknown label", and
+  `video.h`'s functions live in `console`, which its page did not say (it
+  does now). The library's build writes the index it reads,
+  `lib/build/<map>/symbols.txt` (`label module`), shipped in the release
+  zip; the hint uses `sed` only.
 - feat(lib): `vramQueueFlushUntil(line)` sends the queued VRAM transfers
   that end before a scanline and keeps the rest at the head of the queue,
   in order, for the next VBlank. It reads the vertical counter once, turns

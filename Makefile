@@ -423,7 +423,14 @@ test-project:
 			|| { echo "ERROR: a ROM the check refused stayed on disk"; exit 1; }; \
 	done
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
-	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, release and budget)"
+	@# A module left out of LIB_MODULES: the failed link names it.
+	@sed -i 's/^LIB_MODULES *:=.*/LIB_MODULES := dma/' $(TEST_PROJECT_DIR)/Makefile
+	@printf '#include <snes.h>\nint main(void) { setMode(BG_MODE1, 0); for (;;) {} return 0; }\n' > $(TEST_PROJECT_DIR)/main.c
+	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) > $(TEST_PROJECT_DIR)/link.log 2>&1; then \
+		echo "ERROR: a project without console linked setMode"; exit 1; fi
+	@grep -q 'setMode is in the library module console: add console to LIB_MODULES' $(TEST_PROJECT_DIR)/link.log \
+		|| { cat $(TEST_PROJECT_DIR)/link.log; echo "ERROR: the failed link did not name the console module"; exit 1; }
+	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, a missing module, release and budget)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage: fixtures
@@ -710,9 +717,10 @@ release: all
 	@for f in $(RELEASE_DIR)/opensnes/bin/*; do \
 		[ -f "$$f" ] && { $(STRIP) -S "$$f" || exit 1; }; done; true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@# The objects only: the build links lib/build/<flavour>/*.o and never
+	@# The objects and the label index only: the build links
+	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and never
 	@# reads the .asm the compiler wrote on the way (about 200 files).
-	@cd lib && find build -name '*.o' | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
+	@cd lib && find build \( -name '*.o' -o -name symbols.txt \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works

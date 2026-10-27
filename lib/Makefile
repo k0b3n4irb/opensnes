@@ -138,6 +138,29 @@ $(COMPILER_STAMP): FORCE_COMPILER_ID
 FORCE_COMPILER_ID:
 
 #------------------------------------------------------------------------------
+# The label index: which module defines each global label of a flavour
+# (2026-10-27). A project's link that fails on an unknown label reads it to
+# name the module missing from its LIB_MODULES (make/common.mk, link_hint),
+# where wlalink can only say "unknown label". One line per label:
+# `label module`. C modules give the labels of their compiled .c.asm, the
+# assembly modules those of their source; local (@), anonymous and
+# dotted labels (C statics) are left out.
+#------------------------------------------------------------------------------
+define LABEL_INDEX
+	@for f in $(1)/*.c.asm; do \
+		[ -f "$$f" ] || continue; m=$$(basename "$$f" .c.asm); \
+		sed -n "s/^\([A-Za-z][A-Za-z0-9_]*\):.*/\1 $$m/p" "$$f"; \
+	done > $(1)/symbols.txt.tmp
+	@for o in $(1)/*-asm.o; do \
+		[ -f "$$o" ] || continue; m=$$(basename "$$o" -asm.o); \
+		for s in $(SRCDIR)/$$m.asm $(CONTRIBDIR)/$$m.asm; do \
+			if [ -f "$$s" ]; then sed -n "s/^\([A-Za-z][A-Za-z0-9_]*\):.*/\1 $$m/p" "$$s"; fi; \
+		done; \
+	done >> $(1)/symbols.txt.tmp
+	@sort -u $(1)/symbols.txt.tmp > $(1)/symbols.txt && rm -f $(1)/symbols.txt.tmp
+endef
+
+#------------------------------------------------------------------------------
 # Main Target - Build All
 #------------------------------------------------------------------------------
 
@@ -217,8 +240,12 @@ $(BUILDDIR_SUPERFX)/audio_blob-asm.o: $(DRIVER_BIN)
 # LoROM Build
 #------------------------------------------------------------------------------
 
-lorom: $(OBJECTS_LOROM)
+lorom: $(OBJECTS_LOROM) $(BUILDDIR_LOROM)/symbols.txt
 	@echo "[DONE] LoROM library: $(BUILDDIR_LOROM)/"
+
+$(BUILDDIR_LOROM)/symbols.txt: $(OBJECTS_LOROM)
+	$(call LABEL_INDEX,$(BUILDDIR_LOROM))
+
 
 # C compilation for LoROM
 $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
@@ -245,8 +272,12 @@ $(BUILDDIR_LOROM):
 # HiROM Build
 #------------------------------------------------------------------------------
 
-hirom: $(OBJECTS_HIROM)
+hirom: $(OBJECTS_HIROM) $(BUILDDIR_HIROM)/symbols.txt
 	@echo "[DONE] HiROM library: $(BUILDDIR_HIROM)/"
+
+$(BUILDDIR_HIROM)/symbols.txt: $(OBJECTS_HIROM)
+	$(call LABEL_INDEX,$(BUILDDIR_HIROM))
+
 
 # C compilation for HiROM
 $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
@@ -273,8 +304,12 @@ $(BUILDDIR_HIROM):
 # SA-1 Build (same bank layout as LoROM, uses memmap_sa1.inc)
 #------------------------------------------------------------------------------
 
-sa1: $(OBJECTS_SA1)
+sa1: $(OBJECTS_SA1) $(BUILDDIR_SA1)/symbols.txt
 	@echo "[DONE] SA-1 library: $(BUILDDIR_SA1)/"
+
+$(BUILDDIR_SA1)/symbols.txt: $(OBJECTS_SA1)
+	$(call LABEL_INDEX,$(BUILDDIR_SA1))
+
 
 # C compilation for SA-1
 $(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
@@ -301,8 +336,12 @@ $(BUILDDIR_SA1):
 # SuperFX Build (LoROM-based, uses memmap.inc — same as standard LoROM)
 #------------------------------------------------------------------------------
 
-superfx: $(OBJECTS_SUPERFX)
+superfx: $(OBJECTS_SUPERFX) $(BUILDDIR_SUPERFX)/symbols.txt
 	@echo "[DONE] SuperFX library: $(BUILDDIR_SUPERFX)/"
+
+$(BUILDDIR_SUPERFX)/symbols.txt: $(OBJECTS_SUPERFX)
+	$(call LABEL_INDEX,$(BUILDDIR_SUPERFX))
+
 
 # C compilation for SuperFX
 $(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)

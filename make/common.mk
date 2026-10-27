@@ -733,9 +733,28 @@ else
 	@$(foreach obj,$(LINK_OBJS),echo "$(obj)" >> $@;)
 endif
 
+# A link that fails on a label the library defines names the module that
+# holds it (2026-10-27): wlalink says only "unknown label", and a project that
+# called setMode() without `console` in LIB_MODULES had to guess. The index
+# is written by the library's build ($(LIBDIR)/symbols.txt, `label module`).
+# A sub-module (sprite_oamset) is named by its parent: the module whose
+# name it starts with and whose _DEP_ line brings it in (sprite).
+_dep_vars = $(filter _DEP_%,$(.VARIABLES))
+_top_of   = $(or $(firstword $(foreach v,$(_dep_vars),$(if $(and $(filter $(1),$($(v))),$(filter $(patsubst _DEP_%,%,$(v))_%,$(1))),$(patsubst _DEP_%,%,$(v))))),$(1))
+_top_map  = $(foreach m,$(sort $(patsubst %-asm,%,$(basename $(notdir $(wildcard $(LIBDIR)/*.o))))),$(m)=$(call _top_of,$(m)))
+link_hint = for l in $$(sed -n 's/.*unknown label "\([A-Za-z_][A-Za-z0-9_]*\)".*/\1/p' $(1) | sort -u); do \
+		m=$$(sed -n "s/^$$l \(.*\)$$/\1/p" $(LIBDIR)/symbols.txt 2>/dev/null | head -n 1); \
+		[ -n "$$m" ] || continue; t=$$m; \
+		for p in $(_top_map); do [ "$${p%%=*}" = "$$m" ] && t=$${p\#*=}; done; \
+		if [ "$$t" = "$$m" ]; then echo "  $$l is in the library module $$m: add $$m to LIB_MODULES" >&2; \
+		else echo "  $$l is in the library module $$m, which $$t brings in: add $$t to LIB_MODULES" >&2; fi; \
+	done; true
+
 $(TARGET): linkfile
 	@echo "[LD] $@"
-	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@
+	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@ > $@.ldlog 2>&1 \
+		|| { cat $@.ldlog >&2; $(call link_hint,$@.ldlog); rm -f $@.ldlog; exit 1; }
+	@cat $@.ldlog; rm -f $@.ldlog
 ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
@@ -799,7 +818,7 @@ clean:
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm vramqueue_ram.o vramqueue_ram.wrap.asm
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
-	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
+	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) $(TARGET).ldlog .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
 		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .mtl .mtm .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
 	@rm -f $(GEN_HEADERS)

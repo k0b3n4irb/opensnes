@@ -39,7 +39,7 @@ gives `res/jump.brr` and `res/jump.h`, and the build links the sample
 | Variable | Default | What it does |
 |---|---|---|
 | `USE_LIB` | `0` | `1` links the OpenSNES library |
-| `LIB_MODULES` | `console` | The library modules to link. Each module's own dependencies are added for you; a name that matches no module is an error that lists the available ones. `USE_SRAM`, `USE_SNESMOD`, `USE_SUPERFX` and `USE_DSP1` add their module |
+| `LIB_MODULES` | `console` | The library modules to link. Each module's own dependencies are added for you; a name that matches no module is an error that lists the available ones. A link that fails because a module is missing names it (`setMode is in the library module console: add console to LIB_MODULES`). `USE_SRAM`, `USE_SNESMOD`, `USE_SUPERFX` and `USE_DSP1` add their module |
 
 ## Cartridge
 
