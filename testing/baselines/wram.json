@@ -112,8 +112,8 @@
     "rom_sha256": "a8a0bf3c9066078838cadebec367b51221949d712e0fd63549e5718d5b15d438"
   },
   "games_breakout": {
-    "stream": "07af7bd78a6c6a30ed3b18c8cf2d3d4504c194308d9650419ca8124b364c3f05",
-    "rom_sha256": "ad758c30fd7c8283558bda0295eb1d486d207c353cd92a9215821d8c2e7382d0"
+    "stream": "7f617fdea5eaa8b3111474af2a7bc712537130723437bbc58b1decbfaaa430d9",
+    "rom_sha256": "e85b314db1ae5b819c25fcc522d08ce40a308dd9d35bdd27a6d01960b8982265"
   },
   "games_rooftop_run": {
     "stream": "6f990118e4ac8e9db92facb629346de079ffafa589afc5b1dc4c10555ed01c06",

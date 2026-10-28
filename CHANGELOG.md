@@ -108,6 +108,13 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- feat(examples): `games/breakout`'s cabinet is steel with a channel of cyan
+  light. The top beam and the sides were a thin magenta line and a speaker
+  grille whose lit pixels were scattered and jagged at the bottom of the
+  screen; they are now a dark steel beam and wall with a cyan light channel
+  and a bracket every 16 pixels, drawn pixel by pixel in
+  `devtools/art_assets/breakout.py` (no picture of an existing game was
+  used). The tile numbering and the playfield are unchanged.
 - perf(runtime): `__mul16` (a 16-bit multiply the compiler cannot turn
   into shifts) skips each partial product whose high byte is 0, so a
   multiplier or multiplicand under 256 costs one or two hardware multiplies

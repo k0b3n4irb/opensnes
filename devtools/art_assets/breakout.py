@@ -6,9 +6,9 @@ drawn here in that layout:
 
 - tiles.png, 128 4bpp tiles in a 16x8 sheet, shared by BG1 (VRAM $1000) and
   the sprites' second name table, which reads the same words: 0 blank,
-  1 the cabinet's corner, 2-7 its top edge, 8 its sides (the right
-  ones are the left ones mirrored by the map), 9-12 a
-  speaker grille on the sides, 13-14 a brick (ui/brick.png, PixelLab: its
+  1 the cabinet's corner, 2-7 its top beam (six tiles that repeat without a
+  seam), 8-11 its side (four tiles that repeat without a seam, the right
+  side is the left one mirrored by the map), 12 unused, 13-14 a brick (ui/brick.png, PixelLab: its
   three greys become colours 13-15 of whichever BG palette the map entry
   names, one palette per brick colour; its top row is empty, the joint
   between two rows of bricks), 15-17 the
@@ -109,29 +109,63 @@ def brick(art: Path) -> list[list[int]]:
              for x in range(16)] for y in range(8)]
 
 
+# The cabinet's drawing alphabet, to CABINET's colour numbers: 0 the ink, 1-4 the steel from
+# dark to light, w a white glint, c / C the cyan of the light channel, t teal
+CAB_INDEX = {".": 0, "0": 1, "1": 2, "2": 3, "3": 4, "4": 5, "m": 6, "n": 7, "t": 8, "C": 9, "c": 11, "w": 12}
+
+
+def cabinet_wall() -> list[list[str]]:
+    """The cabinet's side, 8x32 (four tiles, meeting top to bottom): dark steel with a channel of
+    cyan light down its middle, and a bracket across it every 16 pixels. Drawn here."""
+    rows = []
+    for r in range(32):
+        k = r % 16
+        if k < 3:                                   # the bracket: a groove, a bevel, a glint
+            rows.append(["01111110", "04444320", "04wwww20"][k])
+        elif k == 3:
+            rows.append("02111120")
+        else:                                       # the channel, its two lights alternating
+            rows.append("0421cc20" if k % 2 else "0421Cc20")
+    g = [list(r) for r in rows]
+    for y in range(32):
+        if y % 16 in (1, 2):
+            g[y][2], g[y][5] = "4", "3"
+    return g
+
+
+def cabinet_beam() -> list[list[str]]:
+    """The cabinet's top beam, 48x8 (six tiles, meeting end to start): the same channel of light
+    along it, and a bracket every 16 pixels. Drawn here."""
+    g = [list(r) for r in ("0" * 48, "4" * 48, "3" * 48, "1" * 48, "cC" * 24, "c" * 48, "2" * 48, "0" * 48)]
+    lit = ["0", "4", "w", "3", "3", "2", "1", "0"]
+    plain = ["0", "4", "4", "3", "3", "2", "1", "0"]
+    for p in range(3):
+        for y in range(1, 7):
+            for x in range(p * 16, p * 16 + 4):
+                g[y][x] = lit[y] if x in (p * 16 + 1, p * 16 + 2) else plain[y]
+    return g
+
+
 def tiles(art: Path, font: dict[str, list[int]]) -> Image.Image:
     sheet = Image.new("P", (128, 64), 0)
     sheet.putpalette([v for c in palette() for v in c])
-    k = {".": 0, "0": 1, "1": 2, "2": 3, "3": 4, "4": 5, "m": 6, "n": 7, "t": 8, "g": 9}
-    # the top edge: a steel beam with a magenta neon tube; 2-6 and 7 are the
-    # same beam with a bolt at a different place, so the repeats do not show
-    beam = ["11111111", "22222222", "33333333", "44444444", "33333333", "mmmmmmmm", "nnnnnnnn", "mmmmmmmm"]
-    for n, bolt in zip(range(2, 8), (1, 6, 3, 0, 4, 2)):
-        rows = list(beam)
-        rows[2] = rows[2][:bolt] + "4" + rows[2][bolt + 1:]
-        _put(sheet, n, rows, k)
-    # the sides (the right one is the map's mirror of the left), and a
-    # speaker grille on them (9-12, then 9 again)
-    side = "12343mnm"
-    _put(sheet, 8, [side] * 8, k)
-    _put(sheet, 9, ["12443mnm"] * 8, k)
-    for n in (10, 11, 12):
-        _put(sheet, n, ["12443mnm", "1t443mnm", "12443mnm", "1g443mnm", "12443mnm", "1t443mnm", "12443mnm", "12443mnm"], k)
+    # the top beam (2-7) and the side (8-11); the right side is the left one mirrored by the map
+    beam, wall = cabinet_beam(), cabinet_wall()
+    for n in range(6):
+        for y in range(8):
+            for x in range(8):
+                sheet.putpixel((((2 + n) % 16) * 8 + x, y), CAB_INDEX[beam[y][n * 8 + x]])
+    for n in range(4):
+        for y in range(8):
+            for x in range(8):
+                sheet.putpixel((((8 + n) % 16) * 8 + x, (8 + n) // 16 * 8 + y), CAB_INDEX[wall[n * 8 + y][x]])
     # the corner: the beam above its diagonal, the side below it, rounded
-    corner = [[(beam[y][x] if x >= y else side[x]) for x in range(8)] for y in range(8)]
-    for x, y in ((0, 0), (1, 0), (0, 1)):
-        corner[y][x] = "."
-    _put(sheet, 1, ["".join(r) for r in corner], k)
+    for y in range(8):
+        for x in range(8):
+            v = CAB_INDEX[beam[y][x] if x >= y else wall[y][x]]
+            if (x, y) in ((0, 0), (1, 0), (0, 1)):
+                v = 0
+            sheet.putpixel((8 + x, y), v)
     # the brick, 16x8 in two tiles (13 its left half, 14 its right)
     for y, row in enumerate(brick(art)):
         for x, v in enumerate(row):
@@ -205,11 +239,9 @@ def bg1map() -> bytes:
     m[32 * 1 + 1] = 1
     m[32 * 1 + 22] = 1 | flip
     for x in range(2, 22):
-        m[32 * 1 + x] = 2 + (x * 7) % 6
+        m[32 * 1 + x] = 2 + (x - 2) % 6
     for y in range(2, 28):
-        tile = 8
-        if 23 <= y <= 27:
-            tile = (9, 10, 11, 12, 9)[y - 23]
+        tile = 8 + (y - 2) % 4
         m[32 * y + 1] = tile
         m[32 * y + 22] = tile | flip
 
