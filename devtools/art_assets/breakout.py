@@ -8,9 +8,9 @@ drawn here in that layout:
   the sprites' second name table, which reads the same words: 0 blank,
   1 the cabinet's corner, 2-7 its top beam (six tiles that repeat without a
   seam), 8-11 its side (four tiles that repeat without a seam, the right
-  side is the left one mirrored by the map), 12 unused, 13-14 a brick (ui/brick.png, PixelLab: its
-  three greys become colours 13-15 of whichever BG palette the map entry
-  names, one palette per brick colour; its top row is empty, the joint
+  side is the left one mirrored by the map), 12 unused, 13-14 a brick (its dark edge, body and
+  light are colours 13-15 and its glint colour 12 of whichever BG palette the
+  map entry names, one palette per brick colour; its top row is empty, the joint
   between two rows of bricks), 15-17 the
   paddle (left end, middle, right end; the middle drawn twice, the second
   mirrored), 18-19 its shadow, 20 the ball, 21 its shadow, 22-117 the font
@@ -55,7 +55,7 @@ BRICKS = [["#686088", "#b8b0d0", "#ffffff"], ["#803818", "#f0b050", "#fff0c0"],
           ["#681828", "#e03838", "#ffb0a0"], ["#205058", "#48a0a0", "#a8f0e8"]]
 # the sprites' palette 0 (CGRAM 128-143)
 OBJ = ["#000000", "#ffffff", "#080810", "#c0fcff", "#48d0e0", "#2890a8", "#e05090", "#8060a8",
-       "#403858", "#b8b0d0", "#f8a0d0"]
+       "#403858", "#b8b0d0", "#f8a0d0", "#686088", "#282438", "#d8d0f0", "#0a0e1a"]
 # BG3, one set per level: the board (1-3) and its shadow (5-7)
 LEVELS = [("#101830", "#182444", "#24345c"), ("#1c1030", "#281844", "#38205c"),
           ("#0c2024", "#103034", "#18444c"), ("#24101c", "#341828", "#4c2038"),
@@ -73,6 +73,8 @@ def palette() -> list[tuple]:
     for p, cols in enumerate(BRICKS):
         for i, c in enumerate(cols):
             pal[p * 16 + 13 + i] = hexrgb(c)
+        if p > 2:
+            pal[p * 16 + 12] = (255, 255, 255)      # the glint: 0 has the cabinet's white, 1 and 2 the fonts'
     for i, c in enumerate(OBJ):
         pal[128 + i] = hexrgb(c)
     # CGRAM 16-23 (BG3's palettes 4 and 5): the first level's set, which the
@@ -99,14 +101,14 @@ def _put(sheet: Image.Image, n: int, rows: list[str], key: dict[str, int]) -> No
             sheet.putpixel((x0 + x, y0 + y), key[ch])
 
 
-def brick(art: Path) -> list[list[int]]:
-    """The brick, 16x8 (ui/brick.png, 16x16 from PixelLab, the brick in its top half): its
-    three greys, dark to light, as colours 13-15; transparent as 0."""
-    im = Image.open(art / "ui" / "brick.png").convert("RGBA")
-    greys = sorted({im.getpixel((x, y))[:3] for y in range(8) for x in range(16) if im.getpixel((x, y))[3] >= 128}, key=sum)
-    assert len(greys) == 3, greys
-    return [[13 + greys.index(im.getpixel((x, y))[:3]) if im.getpixel((x, y))[3] >= 128 else 0
-             for x in range(16)] for y in range(8)]
+def brick() -> list[list[int]]:
+    """The brick, 16x8 in two tiles: an outline and a shade in the dark colour (13), a bevel in
+    the light one (15) on its top and left, a glint (12) and the body (14); its top row is
+    empty, the joint between two rows. Drawn here."""
+    rows = ["................", ".DDDDDDDDDDDDDD.", "DLLLLLLLLLLLLLLD", "DLWWBBBBBBBBBBBD",
+            "DLWBBBBBBBBBBBBD", "DLBBBBBBBBBBBBBD", "DBBBBBBBBBBBBBBD", ".DDDDDDDDDDDDDD."]
+    k = {".": 0, "D": 13, "B": 14, "L": 15, "W": 12}
+    return [[k[c] for c in r] for r in rows]
 
 
 # The cabinet's drawing alphabet, to CABINET's colour numbers: 0 the ink, 1-4 the steel from
@@ -167,18 +169,28 @@ def tiles(art: Path, font: dict[str, list[int]]) -> Image.Image:
                 v = 0
             sheet.putpixel((8 + x, y), v)
     # the brick, 16x8 in two tiles (13 its left half, 14 its right)
-    for y, row in enumerate(brick(art)):
+    for y, row in enumerate(brick()):
         for x, v in enumerate(row):
             sheet.putpixel(((13 + x // 8) % 16 * 8 + x % 8, (13 // 16) * 8 + y), v)
     # the paddle: cyan emitters at the ends, a violet body with a magenta stripe
-    o = {".": 0, "W": 1, "s": 2, "C": 3, "c": 4, "e": 5, "m": 6, "v": 7, "V": 8, "h": 9, "p": 10}
-    _put(sheet, 15, ["..eccchh", ".ecCCvhh", "ecCWCvvv", "ecWWCmpp", "ecCWCmmm", "ecCCCvvv", ".eccVVVV", "..eeVVVV"], o)
-    _put(sheet, 16, ["hhhhhhhh", "hhhhhhhh", "vvvvvvvv", "pppppppp", "mmmmmmmm", "vvvvvvvv", "VVVVVVVV", "VVVVVVVV"], o)
-    _put(sheet, 17, ["hhccce..", "hhvCCce.", "vvvCWCce", "ppmCWWce", "mmmCWCce", "vvvCCCce", "VVVVcce.", "VVVVee.."], o)
-    _put(sheet, 18, ["..ssssss", ".sssssss", "ssssssss", "ssssssss", "ssssssss", "ssssssss", ".sssssss", "..ssssss"], o)
-    _put(sheet, 19, ["ssssssss"] * 8, o)
-    _put(sheet, 20, ["..eeee..", ".ecCCce.", "ecCWWCce", "ecWWWWce", "ecWWWCce", "ecCWCCce", ".ecccce.", "..eeee.."], o)
-    _put(sheet, 21, ["..ssss..", ".ssssss.", "ssssssss", "ssssssss", "ssssssss", "ssssssss", ".ssssss.", "..ssss.."], o)
+    o = {".": 0, "W": 1, "s": 2, "C": 3, "c": 4, "e": 5, "m": 6, "v": 7, "V": 8, "h": 9, "p": 10,
+         "S": 11, "D": 12, "A": 13, "z": 14}
+    # the paddle, 32x8 from three tiles (15 its left end, 16 its middle, drawn once and
+    # mirrored by the second sprite, 17 its right end, the left one mirrored): a one-colour
+    # outline (s, the shadow's ink), the light from above (A to D down the body), a channel of
+    # cyan light along it and a magenta diode at each end, like the cabinet's
+    half = ["...sssssssssssss", "..sAAAAAAAAAAAAA", ".shhhhhhhhhhhhhh", ".shhpmCCCCCCCCCC",
+            ".sSSmmcccccccccc", ".sSSSSSSSSSSSSSS", "..sDDDDDDDDDDDDD", "...sssssssssssss"]
+    _put(sheet, 15, [r[:8] for r in half], o)
+    _put(sheet, 16, [r[8:] for r in half], o)
+    _put(sheet, 17, [r[:8][::-1] for r in half], o)
+    # the paddle's shadow: its silhouette in a colour close to the board's (z, 14), the right
+    # end being the left one flipped by its sprite
+    _put(sheet, 18, ["...zzzzz", "..zzzzzz", ".zzzzzzz", ".zzzzzzz", ".zzzzzzz", ".zzzzzzz", "..zzzzzz", "...zzzzz"], o)
+    _put(sheet, 19, ["zzzzzzzz"] * 8, o)
+    # the ball: an outline, the light from the top left, a shade at the bottom right
+    _put(sheet, 20, ["..ssss..", ".sCCcces", "sCWWcces", "sCWccces", "sccccees", "sccceees", ".seeees.", "..ssss.."], o)
+    _put(sheet, 21, ["..zzzz..", ".zzzzzz.", "zzzzzzzz", "zzzzzzzz", "zzzzzzzz", "zzzzzzzz", ".zzzzzz.", "..zzzz.."], o)
     # the font: the library's glyphs, a highlight on their top row, a shadow below right
     for code in range(33, 127):
         g = font.get(chr(code))

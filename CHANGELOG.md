@@ -108,6 +108,19 @@ All notable changes to OpenSNES are documented in this file.
   declares did not compile.
 
 ### Changed
+- feat(examples): `games/breakout`'s paddle, bricks and ball are redrawn
+  crisp, pixel by pixel in `devtools/art_assets/breakout.py`. The paddle is a
+  steel capsule: a one-colour outline, the light from above down the body, a
+  channel of cyan light along it and a magenta diode at each end, like the
+  cabinet's. A brick has an outline and a shade in its dark colour, a bevel
+  on its top and left, a glint and a body (the generated brick, a soft diagonal
+  glint on three tones with no outline, read blurred, and is gone with its
+  file `assets/neo-lumen/ui/brick.png`); the ball has an edge and a light from
+  its top left instead of a concentric halo. The sprites' palette gains three
+  steel tones and a shadow tone. The paddle's shadow follows its silhouette in
+  a colour close to the board's, and its right end is the left one flipped: the
+  right sprite of the shadow used the left tile unflipped, which left a square
+  step.
 - feat(examples): `games/breakout`'s cabinet is steel with a channel of cyan
   light. The top beam and the sides were a thin magenta line and a speaker
   grille whose lit pixels were scattered and jagged at the bottom of the

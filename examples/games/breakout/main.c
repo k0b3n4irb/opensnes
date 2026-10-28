@@ -360,11 +360,11 @@ static void draw_screen(void) {
     oamMemory[38] = 19;    /* tile 19 */
     oamMemory[39] = 0x51;
 
-    /* Sprite 10: Paddle shadow right */
+    /* Sprite 10: Paddle shadow right (the left end, H-flip) */
     oamMemory[40] = (u8)(px + 28);
     oamMemory[41] = 204;
     oamMemory[42] = 18;    /* tile 18 */
-    oamMemory[43] = 0x11;
+    oamMemory[43] = 0x51;
 
     oam_update_flag = 1;
 }
