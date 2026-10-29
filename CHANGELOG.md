@@ -71,6 +71,15 @@ All notable changes to OpenSNES are documented in this file.
   sprite sheets read 237 % of VRAM for about 50 KB resident.
 
 ### Fixed
+- fix(tools): `opensnes-sample inspect` sizes a looped WAV as `encode` writes
+  it. It counted the whole file (1,000 samples looped from 100 to 900: 567
+  bytes) where `encode --loop 100 900` writes 513, because what follows the
+  loop's end is left out, and a loop that is not a whole number of 16-sample
+  blocks is repeated or resampled. It now takes `--loop START END`, or the
+  loop of the `.wav.toml` beside the input, and runs the encoder's own
+  routine: 60 random loops gave the same bytes, loop offset and tuning as
+  `encode`. Its JSON for a WAV gains `loops`, `loop_offset` and
+  `tuning_x4096`.
 - fix(tools): the `opensnes-*` tools are built with clang, as the
   toolchain is: `CC ?= clang` in `tools/tool.mk` never applied, because
   make defines `CC` before reading a Makefile, so they were built with the

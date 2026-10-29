@@ -57,6 +57,21 @@ g.expect_outputs("encode --save writes the settings beside the input", ["encode"
 g.expect_stdout("encode --json", ["encode", "--json", *LOOP, "tone.wav"], golden="encode.json", copy=["tone.wav"])
 g.expect_stdout("inspect --json (wav, then its brr)", ["inspect", "--json", "tone.wav", "tone.brr"],
                 golden="inspect.json", copy=["tone.wav", "tone.brr"])
+# what a loop costs: inspect gives the figure encode writes (the data after the loop end is dropped)
+g.expect_stdout("inspect --json --loop 40 200 (the size encode writes)", ["inspect", "--json", *LOOP, "tone.wav"],
+                golden="inspect_loop.json", copy=["tone.wav"])
+
+
+def inspect_with_settings():
+    with tempfile.TemporaryDirectory() as td:
+        proc = g.run(["inspect", "--json", "tone.wav"], Path(td), copy=["tone.wav"], write={"tone.wav.toml": SETTINGS})
+        if g.failure(proc):
+            return [g.failure(proc)]
+        want = (g.golden / "inspect_loop.json").read_text(encoding="utf-8")
+        return [] if proc.stdout == want else ["inspect with tone.wav.toml differs from inspect --loop 40 200"]
+
+
+g.check("inspect tone.wav with tone.wav.toml (loop from the settings)", "same figures as --loop", inspect_with_settings)
 # refusals: the limit is named, nothing is written
 g.expect_refused("encode --loop 100 50 (out of range)", ["encode", "--loop", "100", "50", "tone.wav"],
                  copy=["tone.wav"], needles=["out of range"], nothing_written=["tone.brr", "tone.h"])
