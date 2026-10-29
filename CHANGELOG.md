@@ -4,6 +4,20 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.53.0] — 2026-10-29
+
+`USE_FASTROM=1` finally speeds up the code: a LoROM build addressed its C and
+library code in bank $00, which reads ROM at 8 master cycles whatever MEMSEL
+says, so a FastROM ROM spent the same cycles as a SlowROM one; the code is now
+addressed in the $80 mirror, and the queue benchmark runs 16 % more loops.
+The VRAM queue fills the VBlank to a line (`vramQueueFlushUntil`) and sends
+an entry for 619 master cycles instead of 670. A link that misses a library
+module names it, the asset tools are built with clang as the toolchain is,
+`opensnes-sample inspect` sizes a looped sample as `encode` writes it, and
+`__mul16` skips the products a zero byte makes empty. `games/breakout` gets a
+steel cabinet with a channel of cyan light, a steel paddle, crisp bricks and a
+ball, all drawn in the generator.
+
 ### Added
 - feat(build): a link that fails on a label of the library names the
   module that holds it: `setMode is in the library module console: add
@@ -27,7 +41,7 @@ All notable changes to OpenSNES are documented in this file.
   line 286, no byte outside the blank. Asked by a game streaming many small
   entries whose fixed budget left ten lines of each VBlank unused.
 - feat(lib,build): the VRAM queue's size is the project's:
-  `VRAM_QUEUE_MAX := 64` in its Makefile (1 to 255, 32 by default, 10
+  `VRAM_QUEUE_MAX := 64` in its Makefile (1 to 255, 32 by default, 12
   bytes of the C RAM band per entry). The library is built once, so the
   queue's arrays and a capacity word the library reads are assembled per
   project (`templates/vramqueue_ram.asm`), and C is given the same number.
@@ -151,8 +165,7 @@ All notable changes to OpenSNES are documented in this file.
   16-bit, the word registers through Y: 619 master cycles an entry beyond
   its bytes instead of 670 (SlowROM; 560 with FastROM), libbench `vramq`
   10,854 -> 10,576. `VRAM_QUEUE_ENTRY_COST` follows the measure: 80 instead
-  of 96, so `vramQueueCost()` reads 16 bytes less per entry. Each entry
-  takes 12 bytes of the C RAM band instead of 10 (the running cost).
+  of 96, so `vramQueueCost()` reads 16 bytes less per entry.
 - build: `make clean-all` removes everything the tree regenerates (the
   benchmarks' builds, the fuzz corpus, the release zips, the generated docs,
   the tests' temporary files); the WLA-DX clean leaves its submodule as
