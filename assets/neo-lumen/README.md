@@ -381,8 +381,9 @@ of cyan light), the brick (an outline and shade, a bevel, a glint and a body,
 colours 12-15 of whichever BG palette names it, eight colours in all), the
 paddle (a steel capsule with a channel of cyan light), the ball, their shadows,
 the lives icon, the library's 8x8 font with a highlight and a shadow, and
-BG3's circuit board in seven level colours. The colours are the city's, with
-a green and a red for two bricks.
+BG3's circuit board under the playfield only (the score panel keeps the
+backdrop), in seven level colours. The colours are the city's, saturated for
+the bricks so that they read at once, with a green, a red and a yellow.
 
 PixelLab was tried for the board too (`create-tiles-pro`, seeds 8201 and
 8202): on four colours its traces were darker than the board, which the

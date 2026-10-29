@@ -4,6 +4,16 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- feat(examples): `games/breakout` reads at a glance. The bricks have the
+  saturated colours of an arcade (silver, orange, pink, cyan, violet, green,
+  red and yellow, where the teal that most rows used sank into the night
+  blue), the circuit board under the playfield is a quiet texture (mostly
+  its small dots) and stops at the walls, so the score panel is the
+  backdrop's near-black, and the shadow under the bricks keeps 80 % of the
+  board's tone, not 60 %. Drawn in `devtools/art_assets/breakout.py`; the
+  tile numbering, the map's layout and the game's logic are unchanged.
+
 ## [0.53.0] — 2026-10-29
 
 `USE_FASTROM=1` finally speeds up the code: a LoROM build addressed its C and

@@ -222,10 +222,10 @@
     "rom_sha256": "f135bb23140c70f96747eea6d764e428b1afb9fdd4a4b01d9469250548d2bbe3"
   },
   "games_breakout": {
-    "fbhash": "e72e50b519241df5",
+    "fbhash": "14a3c621bae18788",
     "frames": 200,
     "luna_version": "v1.40.0",
-    "rom_sha256": "7dcff49d0af03fd96e3f180c639e4abcafab0dfdc25c13b737124f80e65b22be"
+    "rom_sha256": "9a29b0a9eea70dd3de79a38eb05e440fa17673bbe521c0874940eaa96559d329"
   },
   "games_rooftop_run": {
     "fbhash": "9689c900cb7436ab",

@@ -49,10 +49,10 @@ CABINET = ["#080810", "#101828", "#282438", "#403858", "#686088", "#b8b0d0", "#e
 # the font in palettes 1 (numbers) and 2 (SCORE): shadow, body, highlight
 FONTS = {1: ["#101828", "#f0b050", "#fff0c0"], 2: ["#101828", "#e05090", "#f8b0d8"]}
 # one brick colour per BG palette 0-7: dark edge (13), body (14), light (15)
-BRICKS = [["#686088", "#b8b0d0", "#ffffff"], ["#803818", "#f0b050", "#fff0c0"],
-          ["#702050", "#e05090", "#f8b0d8"], ["#185868", "#48d0e0", "#c0fcff"],
-          ["#402858", "#8060a8", "#c8b0f0"], ["#186038", "#40d070", "#c0ffd0"],
-          ["#681828", "#e03838", "#ffb0a0"], ["#205058", "#48a0a0", "#a8f0e8"]]
+BRICKS = [["#6a6a88", "#c8c8e0", "#ffffff"], ["#b05010", "#f89020", "#ffd070"],
+          ["#a02068", "#f050a8", "#ffa0d8"], ["#0870a0", "#18c8f0", "#a0f0ff"],
+          ["#503098", "#9068e0", "#d0b8ff"], ["#107028", "#28d048", "#a0ffb0"],
+          ["#a01020", "#f03038", "#ff9890"], ["#988008", "#f0d820", "#fff890"]]
 # the sprites' palette 0 (CGRAM 128-143)
 OBJ = ["#000000", "#ffffff", "#080810", "#c0fcff", "#48d0e0", "#2890a8", "#e05090", "#8060a8",
        "#403858", "#b8b0d0", "#f8a0d0", "#686088", "#282438", "#d8d0f0", "#0a0e1a"]
@@ -88,7 +88,7 @@ def palette() -> list[tuple]:
 def backpal() -> bytes:
     out = b""
     for cols in LEVELS:
-        shade = [tuple(v * 3 // 5 for v in hexrgb(c)) for c in cols]
+        shade = [tuple(v * 4 // 5 for v in hexrgb(c)) for c in cols]
         words = [0] + [bgr15(c) for c in cols] + [0] + [bgr15("#%02x%02x%02x" % s) for s in shade]
         out += struct.pack("<8H", *words)
     return out
@@ -274,12 +274,14 @@ def bg1map() -> bytes:
 
 
 def bg2map() -> bytes:
-    """The board: a 32x32 map of 16x16 cells, palette 4."""
+    """The board: a 32x32 map of 16x16 cells, palette 4, under the playfield only (cells 1-10 across,
+    tiles 2-21, from the beam down): the score panel keeps the backdrop. Most cells are the quiet one (two pairs of
+    dots on the board's colour), a few the cross and the outline, so the circuit is a texture."""
     rng = random.Random(21)
     m = [0] * 1024
-    for cy in range(16):
-        for cx in range(16):
-            c = rng.choice((0, 0, 1, 2))
+    for cy in range(1, 16):
+        for cx in range(1, 11):
+            c = rng.choice((2, 2, 2, 2, 2, 1, 1, 0))
             for q in range(4):
                 x, y = cx * 2 + (q & 1), cy * 2 + (q >> 1)
                 m[32 * y + x] = (1 + c * 4 + q) | 4 << 10
