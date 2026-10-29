@@ -65,7 +65,8 @@
 .EQU REG_BG2VOFS        $2110
 
 .DEFINE MAP_MAXROWS     256*2               ; Maximum number of rows in a map
-.DEFINE MAP_MAXMTILES   512                 ; Number of metatiles per map
+.DEFINE MAP_MAXMTILES   512                 ; sizes the tables below; the 10-bit
+                                            ; map entry indexes 1024 tiles of one word
 
 .DEFINE MAP_SCRLR_SCRL  128                 ; Screen position to begin scroll left & right
 .DEFINE MAP_SCRUP_SCRL  80                  ; Screen position to begin scroll up & down
@@ -87,7 +88,7 @@
 ;------------------------------------------------------------------------------
 
 .STRUCT metatiles_t
-topleft                 DSW MAP_MAXMTILES*4 ; a metatile is 4 8x8 pixels max
+topleft                 DSW MAP_MAXMTILES*4 ; one tilemap word per tile id; ids 0-1023 used
 .ENDST
 
 ;------------------------------------------------------------------------------

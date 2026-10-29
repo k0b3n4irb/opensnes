@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 075fa2cb03f026af20e403bce58d336cb1556d09 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 40839d81eeee52c7661d742f6da53261cc0b187f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | d337fd5767abf4f15e8bd0274eec25469755860b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | ad9fe6cf1aee3534f658cb3127c4225b2b90acea | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 48 patches since upstream merge-base 7051114
+### compiler/cproc — 49 patches since upstream merge-base 7051114
 
 ```
+d337fd5 expr: an address above `$FFFF` cast to a plain pointer is refused — `(u8 *)0x708040` kept its bank only at a constant index, `p[i]` went to bank $00; a `__far` or `const` pointee, a function pointer and a negative sentinel pass; the value of `(u8 *)(BASE + 0x40 * n)` is computed without folding the tree (STRUCTURAL_DEFECTS A10, 2026-10-25)
 075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
 b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
@@ -100,7 +101,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 135 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 137 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -112,6 +113,8 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+ad9fe6c w65816: a far u32 load whose one use is the next add is emitted inside it (the value goes from the table to the adc), and a multiply by a power of two lets its operand's dead high half stay dead — tab[i] with a u16 i no longer writes the widened index's high word; 62 -> 48 instructions; `QBE_NO_LOAD_ADD_FUSE=1`, `QBE_NO_MUL_HIGH_DEAD=1` (a second game, 2026-10-25)
+f259a21 w65816: a 32-bit add/sub/and/or/xor/copy result may take its operand's slot exactly (exact-or-disjoint partners, like a phi and its argument; not when the result leads to a load's or store's address, which the access may fold), and a constant $FFFF half of a Kl and is not emitted — a 16.16 loop's phi moves gone, 83 -> 62 instructions; `QBE_NO_KL_SHARE=1` (a second game, 2026-10-25)
 40839d8 w65816: an alloc of a run-time size is refused — it had a fixed 2-byte frame slot; a defence behind cproc's VLA refusal, for any other front end (audit 04-1, 2026-10-17)
 d1ad402 reassoc: the symbol of a union member, `add $u, 0`, folds like a bare one (a game built on the SDK, 2026-10-16)
 653b143 w65816: a far pointer walked by a loop kept in tcc__r9 for the whole loop — staged once before the header, its step written to tcc__r9, copied back on the way out when read after; `QBE_NO_PEEP_R9LOOP=1` (a game built on the SDK, 2026-10-16)

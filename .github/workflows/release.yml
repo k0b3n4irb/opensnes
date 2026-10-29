@@ -128,6 +128,7 @@ jobs:
       - name: Build release (Linux)
         if: matrix.name == 'linux'
         run: |
+          set -o pipefail
           export OPENSNES_HOME=$(pwd)
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
@@ -144,6 +145,7 @@ jobs:
       - name: Build release (macOS)
         if: matrix.name == 'darwin'
         run: |
+          set -o pipefail
           export OPENSNES_HOME=$(pwd)
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 

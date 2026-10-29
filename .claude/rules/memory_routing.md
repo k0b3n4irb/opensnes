@@ -10,7 +10,7 @@ versioned, shared, and survives clones. Migration completed 2026-05-10.
 | Bucket | Path | Versioned | Visible to contributors |
 |---|---|---|---|
 | **Project notes** | `.claude/notes/` (repo) | ✅ git | ✅ on clone |
-| **User auto-memory** | `~/.claude/projects/-home-kobenairb-workspace-opensnes/memory/` | ❌ | ❌ |
+| **User auto-memory** | `~/.claude/projects/<this tree's path, slashes as dashes>/memory/` | ❌ | ❌ |
 
 ## What goes where
 
@@ -25,6 +25,7 @@ versioned, shared, and survives clones. Migration completed 2026-05-10.
 | Structured project reviews | `.claude/notes/reviews/` | dated `YYYY-MM-DD_topic.md` |
 | Sub-project notes | `.claude/notes/projects/` | RPG project asset references |
 | Reports to / from luna and snes-rag | `.claude/notes/partners/<partner>/` | a capability request, the partner's reply, the open list of gaps (`.claude/rules/partners.md`) |
+| What concerns a game alone (never committed) | `.claude/notes/private/` (ignored by git) | the game's project note, its measurements, the SHA map of the 2026-10-17 rewrite |
 | **User-specific cross-project preferences** | `~/.claude/projects/.../memory/` | personal grep style, editor habits |
 
 ## Routing rule for new entries

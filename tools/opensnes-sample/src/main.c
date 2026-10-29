@@ -172,6 +172,13 @@ static int has_ext(const char *path, const char *ext)
     return lp > le && strcmp(path + lp - le, ext) == 0;
 }
 
+/* What a WAV costs is what `encode` writes for it: a loop drops what follows its end, and
+ * repeats or resamples a loop that is not a whole number of 16-sample blocks. The loop comes
+ * from --loop or from the settings beside the input, which `encode --save` wrote under [encode]. */
+static const cli_opt inspect_opts[] = {
+    { "loop", 0, CLI_INT2, "START END", "cost the sample as `encode --loop` would write it", NULL },
+};
+
 static int inspect_one(cli_ctx *ctx, const char *input)
 {
     if (has_ext(input, ".brr") || has_ext(input, ".BRR")) {
@@ -201,23 +208,53 @@ static int inspect_one(cli_ctx *ctx, const char *input)
         }
         return CLI_OK;
     }
-    wav_t w;
-    int rc = wav_read(ctx, input, &w);
+    /* the settings file is [encode]'s: read it as that subcommand's */
+    const cli_cmd *own = ctx->cmd;
+    for (int c = 0; c < ctx->tool->ncmds; c++)
+        if (strcmp(ctx->tool->cmds[c].name, "encode") == 0) ctx->cmd = &ctx->tool->cmds[c];
+    int rc = cli_load_settings(ctx, input);
+    ctx->cmd = own;
     if (rc != CLI_OK) return rc;
+
+    wav_t w;
+    rc = wav_read(ctx, input, &w);
+    if (rc != CLI_OK) return rc;
+
+    int loop_start = 0, loop_end = 0;
+    int has_loop = cli_int2(ctx, "loop", &loop_start, &loop_end);
+    if (has_loop && (loop_start < 0 || loop_end > w.count || loop_start >= loop_end)) {
+        cli_error(ctx, input, "--loop %d %d is out of range — the file has %d samples, START < END",
+                  loop_start, loop_end, w.count);
+        free(w.pcm);
+        return CLI_REFUSED;
+    }
+    int blocks = (w.count + 15) / 16, bytes = blocks * BRR_BLOCK, brr_loop = 0;
+    double tuning = 1.0;
+    if (has_loop) {                              /* the size `encode` writes, by the same encoder */
+        u8 *brr = NULL;
+        int brr_len = 0;
+        brr_encode(NULL, w.pcm, 1, w.count, loop_start, loop_end, 1, 0, &brr, &brr_len, &brr_loop, &tuning);
+        free(brr);
+        bytes = brr_len;
+        blocks = brr_len / BRR_BLOCK;
+    }
     free(w.pcm);
-    int blocks = (w.count + 15) / 16;
     if (ctx->json) {
         cli_json_object(ctx, NULL);
         cli_json_str(ctx, "input", input); cli_json_str(ctx, "kind", "wav");
         cli_json_int(ctx, "rate", w.rate); cli_json_int(ctx, "bits", w.bits);
         cli_json_int(ctx, "channels", w.channels); cli_json_int(ctx, "samples", w.count);
-        cli_json_int(ctx, "brr_blocks", blocks); cli_json_int(ctx, "aram_bytes", (long)blocks * BRR_BLOCK);
+        cli_json_int(ctx, "brr_blocks", blocks); cli_json_int(ctx, "aram_bytes", bytes);
+        cli_json_bool(ctx, "loops", has_loop);
+        cli_json_int(ctx, "loop_offset", brr_loop);
+        cli_json_int(ctx, "tuning_x4096", (int)(tuning * 4096.0 + 0.5));
         cli_json_bool(ctx, "above_dsp_rate", w.rate > DSP_RATE);
         cli_json_close(ctx);
     } else {
-        printf("%s: WAV, %d Hz, %d-bit, %s, %d samples (%.3f s) -> %d BRR blocks, %d bytes of ARAM%s\n",
+        printf("%s: WAV, %d Hz, %d-bit, %s, %d samples (%.3f s) -> %d BRR blocks, %d bytes of ARAM%s%s\n",
                input, w.rate, w.bits, w.channels == 1 ? "mono" : "stereo", w.count,
-               w.rate ? (double)w.count / w.rate : 0.0, blocks, blocks * BRR_BLOCK,
+               w.rate ? (double)w.count / w.rate : 0.0, blocks, bytes,
+               has_loop ? ", looping" : "",
                w.rate > DSP_RATE ? " (above 32 kHz: plays lower and slower)" : "");
     }
     return CLI_OK;
@@ -244,8 +281,8 @@ static int run_inspect(cli_ctx *ctx)
 static const cli_cmd cmds[] = {
     { "encode", "PCM WAV (8/16-bit, mono or stereo) -> .brr + .h beside it", encode_opts, CLI_N(encode_opts),
       "encode res/jump.wav --loop 40 200 --save", 1, run_encode },
-    { "inspect", "what a .wav or .brr holds and what it costs in ARAM", NULL, 0,
-      "inspect res/*.brr --json", 1, run_inspect },
+    { "inspect", "what a .wav or .brr holds and what it costs in ARAM", inspect_opts, CLI_N(inspect_opts),
+      "inspect res/*.brr --json; inspect res/hum.wav --loop 40 200", 1, run_inspect },
 };
 
 int main(int argc, char **argv)

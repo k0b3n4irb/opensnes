@@ -23,6 +23,7 @@ make tools              # Build the opensnes-* tools (tileset, sprite, music, ro
 make lib                # Build OpenSNES library (LoROM + HiROM + SA-1 + SuperFX)
 make examples           # Build all example ROMs
 make clean              # Clean all build artifacts
+make clean-all          # ...and everything else the tree regenerates (benchmarks, fuzz corpus, zips, docs)
 make clean && make      # Full rebuild (REQUIRED after compiler or runtime changes)
 ```
 

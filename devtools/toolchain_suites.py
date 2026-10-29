@@ -126,6 +126,9 @@ def run_qbe(expected_fail: set[str]) -> dict[str, bool]:
     env = dict(os.environ, bin=str(qbe))
     proc = subprocess.run(["sh", "tools/test.sh", "all"], cwd=qdir, env=env,
                           capture_output=True, text=True)
+    # test.sh works in /tmp/qbe.zzzz.* and never calls its own cleanup()
+    for leftover in Path("/tmp").glob("qbe.zzzz.*"):
+        leftover.unlink(missing_ok=True)
     results: dict[str, bool] = {}
     output: dict[str, list[str]] = {}
     current = None

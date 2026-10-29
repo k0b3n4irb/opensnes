@@ -98,7 +98,7 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
     const char *ms = spec->has_map ? map_size(spec->map_blocks_x, spec->map_blocks_y) : NULL;
     if (split) {
         fprintf(f, "/* a blob larger than one 32 KB bank is written in parts, one ASSET_SECTION each:\n"
-                   " * %s_tiles, %s_tiles_1, ... (each with _end) — load them with one dmaCopyVram per part */\n", name, name);
+                   " * %s_tiles, %s_tiles_1, ... (each with _end) — one dmaCopyVram per part, or %s_tiles_load() below for the tiles */\n", name, name, name);
         for (int i = 0; i < tiles_parts; i++)
             i == 0 ? fprintf(f, "extern const u8 %s_tiles[], %s_tiles_end[];\n", name, name)
                    : fprintf(f, "extern const u8 %s_tiles_%d[], %s_tiles_%d_end[];\n", name, i, name, i);
@@ -106,6 +106,17 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         for (int i = 0; spec->has_map && i < map_parts; i++)
             i == 0 ? fprintf(f, "extern const u8 %s_map[], %s_map_end[];\n", name, name)
                    : fprintf(f, "extern const u8 %s_map_%d[], %s_map_%d_end[];\n", name, i, name, i);
+        if (tiles_parts > 1) {
+            /* every part is one bank, 32768 bytes = 0x4000 words of VRAM, but the last */
+            fprintf(f, "\n/* every part of the tiles in one call: part n goes to vram + n * 0x4000 words, in force blank */\n"
+                       "#define %s_tiles_load(vram) do { \\\n", name);
+            for (int i = 0; i < tiles_parts; i++) {
+                char part[300];
+                i == 0 ? snprintf(part, sizeof part, "%s_tiles", name) : snprintf(part, sizeof part, "%s_tiles_%d", name, i);
+                fprintf(f, "    dmaCopyVram(%s, (u16)((vram) + 0x%04X), (u16)(%s_end - %s)); \\\n", part, i * 0x4000, part, part);
+            }
+            fprintf(f, "} while (0)\n");
+        }
     } else if (spec->lz) {
         fprintf(f, "/* LZ77-compressed tiles: lzssDecodeVram(%s_tiles, vram_addr); no asset bundle, bgLoad() would copy the compressed bytes */\n", name);
         fprintf(f, "extern const u8 %s_tiles[], %s_tiles_end[];\n", name, name);
@@ -137,6 +148,28 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
             fprintf(f, "/* larger than one 32 KB bank: written in parts of 32768 bytes; a column that\n"
                        " * crosses a part boundary is in two blocks */\n");
     }
+    if (spec->metatiles) {
+        char mpath[1100], up[256];
+        size_t k;
+        for (k = 0; name[k] && k < sizeof up - 1; k++) up[k] = (name[k] >= 'a' && name[k] <= 'z') ? (char)(name[k] - 32) : name[k];
+        up[k] = '\0';
+        fprintf(f, "\n/* 16x16 metatiles: %s_metatiles holds %d of them, four map entries each (top-left,\n"
+                   " * top-right, bottom-left, bottom-right; 8 bytes), %s_metamap one u16 metatile\n"
+                   " * number per 16x16 block of the picture, %d x %d, row after row. Identical blocks\n"
+                   " * share a metatile. The map entries carry tile, palette bank, priority and flips. */\n"
+                   "#define %s_METATILES %d\n#define %s_METAMAP_W %d\n#define %s_METAMAP_H %d\n",
+                name, spec->metatiles, name, spec->meta_w, spec->meta_h, up, spec->metatiles, up, spec->meta_w, up, spec->meta_h);
+        const char *whats[2] = { "metatiles", "metamap" }, *exts[2] = { ".mtl", ".mtm" };
+        for (int b = 0; b < 2; b++) {
+            snprintf(mpath, sizeof mpath, "%s%s", outbase, exts[b]);
+            int parts = parts_of(mpath);
+            for (int i = 0; i < parts; i++)
+                i == 0 ? fprintf(f, "extern const u8 %s_%s[], %s_%s_end[];\n", name, whats[b], name, whats[b])
+                       : fprintf(f, "extern const u8 %s_%s_%d[], %s_%s_%d_end[];\n", name, whats[b], i, name, whats[b], i);
+            if (parts > 1)
+                fprintf(f, "/* %s_%s is larger than one 32 KB bank: written in parts of 32768 bytes */\n", name, whats[b]);
+        }
+    }
     if (spec->has_meta)
         fprintf(f, "\n/* the metasprite table: #include \"%s_meta.inc\" once, in the file that draws it */\n", name);
     fprintf(f, "\n#endif\n");
@@ -154,6 +187,13 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         char cols_path[1100];
         snprintf(cols_path, sizeof cols_path, "%s.cmap", outbase);
         write_blob(f, name, "cols", cols_path);
+    }
+    if (spec->metatiles) {
+        char mpath[1100];
+        snprintf(mpath, sizeof mpath, "%s.mtl", outbase);
+        write_blob(f, name, "metatiles", mpath);
+        snprintf(mpath, sizeof mpath, "%s.mtm", outbase);
+        write_blob(f, name, "metamap", mpath);
     }
     fclose(f);
     return 0;

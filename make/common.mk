@@ -265,8 +265,19 @@ ifeq ($(USE_DSP1),1)
 LIB_MODULES += dsp1
 endif
 
+# The VRAM queue's capacity (snes/vramqueue.h): the library is built once,
+# so the queue's arrays are assembled per project (templates/vramqueue_ram.asm)
+# and C is told the same number. 10 bytes of the C RAM band per entry.
+VRAM_QUEUE_MAX ?= 32
+ifneq ($(filter vramqueue,$(LIB_MODULES)),)
+ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
+$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
+endif
+VRAMQ_OBJ := vramqueue_ram.o
+endif
+
 # Assembler flags
-ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := -D VRAM_QUEUE_MAX_VAL=$(VRAM_QUEUE_MAX) -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 0 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
 $(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 0 to 16384)
 endif
@@ -356,12 +367,17 @@ ifneq ($(USE_SUPERFX),1)
 $(error LIB_MODULES: `superfx` needs USE_SUPERFX=1 — its C half is in every lib flavour but its asm half (gsu_cfgr, gsuLaunch…) only in lib/build/superfx, so it cannot link elsewhere)
 endif
 endif
+# Not on `make clean`: the SDK's clean empties lib/build before the
+# examples, and the check stopped every example's clean there (2026-09-26 to
+# 2026-10-25, its objects and ROMs stayed).
+ifneq ($(MAKECMDGOALS),clean)
 _LIB_AVAILABLE = $(sort $(patsubst %-asm,%,$(basename $(notdir $(wildcard $(LIBDIR)/*.o)))))
 $(foreach mod,$(LIB_MODULES),$(if $(wildcard $(LIBDIR)/$(mod).o $(LIBDIR)/$(mod)-asm.o),,\
   $(error LIB_MODULES: no library module `$(mod)` in $(LIBDIR). Available: $(_LIB_AVAILABLE))))
 endif
+endif
 INCLUDES := -I$(OPENSNES)/lib/include -I.
-ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
+ALL_CFLAGS := $(INCLUDES) -DVRAM_QUEUE_MAX=$(VRAM_QUEUE_MAX) $(CFLAGS)
 
 #------------------------------------------------------------------------------
 # Assets by their settings file (2026-10-05, docs/tools/CONVENTIONS.md)
@@ -377,8 +393,10 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 # ASSET_SECTIONs, one per blob), assembled with the
 # project. The artist never opens this Makefile; a hand-written data.asm
 # keeps working for the projects that have one.
-# ASSET_TOML lists the files (default: *.toml and res/*.toml that name a tool).
-ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
+# ASSET_TOML lists the files (default: *.toml, res/*.toml and res/*/*.toml that
+# name a tool: a game with several levels keeps one folder per level under res/,
+# which the VRAM report of opensnes-rom counts as one scene each).
+ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml res/*/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
 ASSET_STAMPS := $(addsuffix .done,$(ASSET_TOML))
 # a level (opensnes-level) reads the .map its tileset's conversion wrote, and a
 # palette plan (opensnes-palette [plan]) the .pal files the pictures' conversions
@@ -387,8 +405,13 @@ LATE_STAMPS := $(addsuffix .done,$(foreach t,$(ASSET_TOML),$(if $(shell grep -l 
 ifneq ($(ASSET_TOML),)
 ASMSRC += assets_gen.asm
 endif
+# The tool's binary is a prerequisite too: a project built again after an SDK
+# update converts its assets with the new tool (a stamp older than the tool
+# kept the .inc the old one wrote, and a C file calling what the new one
+# declares failed to compile until `make clean`).
+asset_tool = $(wildcard $(addprefix $(OPENSNES)/bin/,$(addsuffix $(2),$(shell sed -n 's/^tool *= *"\([^"]*\)".*/\1/p' $(1) | head -1))))
 define ASSET_RULE
-$(1).done: $(1) $(wildcard $(basename $(1))) .opensnes_config
+$(1).done: $(1) $(wildcard $(basename $(1))) .opensnes_config $(call asset_tool,$(1),) $(call asset_tool,$(1),.exe)
 	@tool=$$$$(sed -n 's/^tool *= *"\([^"]*\)".*/\1/p' $(1) | head -1); \
 	 sub=$$$$(sed -n 's/^\[\([a-z_]*\)\].*/\1/p' $(1) | head -1); \
 	 asset=$(basename $(1)); [ -f "$$$$asset" ] || asset=$(1); \
@@ -599,12 +622,12 @@ upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes 
 # is a dependency file written by the preprocessor, which the cc65816
 # driver does not offer yet.
 _CSRC_DIRS := $(filter-out ./,$(sort $(dir $(CSRC))))
-LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc \
+LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc res/*/*.h res/*/*.inc \
                    $(foreach d,$(_CSRC_DIRS),$(d)*.h $(d)*.inc $(d)res/*.h $(d)res/*.inc))
 %.c.o: %.c $(GEN_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
-		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
+		clang $(CLANG_LINT_FLAGS) -DVRAM_QUEUE_MAX=$(VRAM_QUEUE_MAX) -I $(OPENSNES)/lib/include $< || \
 			{ $(call upgrade_hint,$<); echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1; }; \
 	fi
 endif
@@ -690,12 +713,17 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP) .opensnes_config
 # Linking
 #------------------------------------------------------------------------------
 
+# The VRAM queue's storage at the project's size (VRAM_QUEUE_MAX, above)
+vramqueue_ram.o: $(TEMPLATES)/vramqueue_ram.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] vramqueue_ram ($(VRAM_QUEUE_MAX) entries)"
+	$(call wrap_asm,$<,$@)
+
 # All objects in link order
 LINK_OBJS := crt0.o $(RUNTIME_OBJ) $(RAM_CODE_START_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
-LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
+LINK_OBJS += $(VRAMQ_OBJ) $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
 
 linkfile: $(LINK_OBJS) .opensnes_config
 	@echo "[objects]" > $@
@@ -705,9 +733,28 @@ else
 	@$(foreach obj,$(LINK_OBJS),echo "$(obj)" >> $@;)
 endif
 
+# A link that fails on a label the library defines names the module that
+# holds it (2026-10-27): wlalink says only "unknown label", and a project that
+# called setMode() without `console` in LIB_MODULES had to guess. The index
+# is written by the library's build ($(LIBDIR)/symbols.txt, `label module`).
+# A sub-module (sprite_oamset) is named by its parent: the module whose
+# name it starts with and whose _DEP_ line brings it in (sprite).
+_dep_vars = $(filter _DEP_%,$(.VARIABLES))
+_top_of   = $(or $(firstword $(foreach v,$(_dep_vars),$(if $(and $(filter $(1),$($(v))),$(filter $(patsubst _DEP_%,%,$(v))_%,$(1))),$(patsubst _DEP_%,%,$(v))))),$(1))
+_top_map  = $(foreach m,$(sort $(patsubst %-asm,%,$(basename $(notdir $(wildcard $(LIBDIR)/*.o))))),$(m)=$(call _top_of,$(m)))
+link_hint = for l in $$(sed -n 's/.*unknown label "\([A-Za-z_][A-Za-z0-9_]*\)".*/\1/p' $(1) | sort -u); do \
+		m=$$(sed -n "s/^$$l \(.*\)$$/\1/p" $(LIBDIR)/symbols.txt 2>/dev/null | head -n 1); \
+		[ -n "$$m" ] || continue; t=$$m; \
+		for p in $(_top_map); do [ "$${p%%=*}" = "$$m" ] && t=$${p\#*=}; done; \
+		if [ "$$t" = "$$m" ]; then echo "  $$l is in the library module $$m: add $$m to LIB_MODULES" >&2; \
+		else echo "  $$l is in the library module $$m, which $$t brings in: add $$t to LIB_MODULES" >&2; fi; \
+	done; true
+
 $(TARGET): linkfile
 	@echo "[LD] $@"
-	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@
+	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@ > $@.ldlog 2>&1 \
+		|| { cat $@.ldlog >&2; $(call link_hint,$@.ldlog); rm -f $@.ldlog; exit 1; }
+	@cat $@.ldlog; rm -f $@.ldlog
 ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
@@ -769,11 +816,11 @@ clean:
 	@rm -f data_init_start.o data_init_start.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
-	@rm -f data_init_end.o data_init_end.wrap.asm
+	@rm -f data_init_end.o data_init_end.wrap.asm vramqueue_ram.o vramqueue_ram.wrap.asm
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
-	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
+	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) $(TARGET).ldlog .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
-		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
+		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .mtl .mtm .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
 	@rm -f $(GEN_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)

@@ -13,6 +13,8 @@ typedef struct {
     int map_blocks_x, map_blocks_y;   /* the tilemap's size in entries, when has_map */
     int lz;                    /* the tiles are LZ77-compressed: no bundle, lzssDecodeVram at runtime */
     int has_cols;              /* <stem>.cmap exists: the map column after column, <name>_cols */
+    int metatiles;             /* <stem>.mtl / .mtm exist: this many 16x16 metatiles, */
+    int meta_w, meta_h;        /* and the metatile map is meta_w x meta_h of them */
 } incfile_spec;
 
 /* Writes <outbase>.inc and <outbase>_data.as for the asset named `name`

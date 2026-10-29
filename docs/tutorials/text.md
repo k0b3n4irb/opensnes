@@ -27,7 +27,7 @@ bank `$00` WRAM mirror below `$2000` (the compiler addresses C arrays there —
 see @ref tutorial_far_ram for why that band matters).
 
 Every writer in the module — `textPutChar`, `textPrint`, `textPrintAt`,
-`textPrintU16`, `textPrintHex`, `textClear`, `textClearRect` — sets
+`textPrintU16`, `textPrintS16`, `textPrintHex`, `textClear`, `textClearRect` — sets
 `tilemap_update_flag` on its way out. The NMI handler checks that flag at the
 top of each VBlank and, if set, DMAs the bytes written since the last VBlank to
 VRAM (step 2 of its execution order, right after the OAM DMA; see the cost
@@ -208,11 +208,14 @@ with `bgSetScroll`.
 
 ```c
 void textPrintU16(u16 value);
+void textPrintS16(s16 value);
 void textPrintHex(u16 value, u8 digits);
 ```
 
 `textPrintU16` prints 1–5 decimal digits at the cursor: most-significant first,
-no leading zeros, no padding, and a bare `0` for zero. `textPrintHex` prints
+no leading zeros, no padding, and a bare `0` for zero. `textPrintS16` prints a
+signed number the same way, with a `-` in front when it is negative (an `s16`
+handed to `textPrintU16` prints -52 as `65484`). `textPrintHex` prints
 `digits` uppercase hex digits (clamped to 4 internally), with **no** `0x`
 prefix — @ref examples_basics_aim_target adds its own:
 

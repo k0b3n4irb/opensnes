@@ -87,11 +87,17 @@ to a default in silence.
 
 ```sh
 opensnes-sample inspect res/jump.wav       # 32000 Hz, 16-bit, mono, 1840 samples (0.058 s) -> 115 BRR blocks, 1035 bytes of ARAM
+opensnes-sample inspect res/hum.wav --loop 40 200   # what encode --loop 40 200 would write
 opensnes-sample inspect res/*.brr --json   # one JSON object: bytes, blocks, loop, ARAM
 ```
 
 Nothing is converted or written; this is how you size a sound set against
-the 64 KB of audio RAM before recording more.
+the 64 KB of audio RAM before recording more. A WAV is sized as `encode`
+writes it: with a loop (from `--loop`, or from the `.wav.toml` beside it)
+what follows the loop's end is left out, and a loop that is not a whole
+number of 16-sample blocks is repeated or resampled, so the figure is the
+size of the `.brr`, not of the file. The JSON of a WAV gives `loops`,
+`loop_offset` and `tuning_x4096` next to `aram_bytes`, as `encode --json` does.
 
 ## Exit codes and messages
 

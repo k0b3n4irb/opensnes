@@ -29,7 +29,9 @@ CASES = [
     ("w2_0", 2, 0x2211,     2, "word"),  ("w2_2", 2, 0x4433,     2, "word"),
     ("l2_0", 4, 0x44332211, 2, "long"),
     ("fp2",  1, 0x44,       2, "param"), ("ph2",  1, 0x66,       2, "phi"),
-    ("hi2",  2, 0x0002,     2, "ptr-hi"),   # pointer VALUE carries bank → passes pre-A6
+    # pointer VALUE carries the bank the CPU sees: linker bank 2 in the $80
+    # mirror LoROM code and data are addressed in (templates/memmap.inc)
+    ("hi2",  2, 0x0082,     2, "ptr-hi"),
 ]
 # The A6 gap this matrix was built to track — far DEREF of bank-$02 data
 # (byte/word/param/phi; hi2 is the pointer VALUE, not a deref) — is now CLOSED

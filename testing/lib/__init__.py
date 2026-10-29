@@ -4,7 +4,7 @@
 `corpus`: the example ROMs and their keys.
 `probes`: run a ROM in luna and read it back (peek, assert_mem, dump_vram…).
 """
-from .luna import LUNA_VERSION, REPO_ROOT, TESTING, find_luna, firmware_dir  # noqa: F401
+from .luna import LUNA_VERSION, REPO_ROOT, TESTING, TMP_ROOT, find_luna, firmware_dir  # noqa: F401
 from .corpus import discover_example_roms, example_key  # noqa: F401
 from .probes import *  # noqa: F401,F403
 from .probes import (  # noqa: F401  (names the star import does not carry)

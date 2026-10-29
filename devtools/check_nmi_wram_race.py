@@ -75,7 +75,7 @@ PEA_LABEL_RE = re.compile(
     re.IGNORECASE,
 )
 JSL_NMISET_RE = re.compile(
-    r"^\s*jsl(?:\.[wlb])?\s+(nmiSet)\s*(?:;.*)?$",
+    r"^\s*jsl(?:\.[wlb])?\s+(nmiSet|nmiSetLag)\s*(?:;.*)?$",
     re.IGNORECASE,
 )
 

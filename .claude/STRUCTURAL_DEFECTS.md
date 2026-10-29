@@ -1342,7 +1342,28 @@ animTickMeta 1346 → 1108 (−18 %), const u8 walk ×32 7689 → 6832
 pointer-variable loads carry no pointee taint; corpus green on the
 frame-equal protocol; `make bench` re-baselined with the gain stated.
 
-#### A10. A plain pointer built from an address above `$FFFF` loses its bank in silence — OPEN 🟡 (noted 2026-10-24)
+#### A10. A plain pointer built from an address above `$FFFF` loses its bank in silence — RESOLVED 🟢 (noted 2026-10-24, refused 2026-10-25)
+
+> **Resolved (2026-10-25)**: cproc refuses the cast (`castexpr`, `expr.c`):
+> an integer constant expression whose value is above `$FFFF`, cast to a
+> pointer whose pointee is neither `__far` nor `const`, nor a function. The
+> value is computed by `constaddr`, which reads constants, enumerators,
+> integer casts and `+ - * | & ^ << >>` without folding the tree (cproc folds
+> at parse time only what a constant expression context asks for, so
+> `(u8 *)(SRAM_BASE + 0x40)` reaches the cast unfolded; `eval()` would fold
+> it in place and may emit data). It is an **error, not a warning**: cproc
+> has no warnings at all (the build's warnings come from the clang
+> `-fsyntax-only` pass, which defines `FAR` as nothing and cannot see the
+> case), and the `__far` assignment check is an error too. A negative value
+> (`(u8 *)-1`) is left alone as a sentinel. Pinned by
+> `devtools/compiler-tests/cases/negative/far_address_plain_pointer` (the old
+> compiler takes it and emits `sta.l $000000,x`), `negative/far_address_expr`
+> (base macro plus offset) and `cases/far_address_cast` (FAR, const, `$2100`,
+> `-1`, a sum below `$10000` compile; the two indexed accesses carry bank
+> $70). Corpus: zero refusals, every ROM byte-identical; the game: 22 C
+> files, no refusal, its assembly identical. Not covered: an address computed
+> at run time, a `static const` variable used as the base (not a constant
+> expression in C), and the `?:`, `/`, `%` operators.
 
 **Symptom**: `#define EDGE_TABLE ((u8 *)0x708040)` compiles without a word.
 At a constant index the store keeps the bank (`EDGE_TABLE[5] = v` →

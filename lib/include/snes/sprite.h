@@ -304,11 +304,9 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
- * @note **Performance**: the old framesize=158 cliff (≈3 calls/frame caused
- * jitter) was RESOLVED by an ASM rewrite — see KNOWN_LIMITATIONS.md
- * ("oamSet() framesize cliff — RESOLVED"). `oamSet()` is now cheap; use it
+ * @note **Performance**: `oamSet()` is written in assembly and is cheap; use it
  * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
- * (see "Fast Macro Sprite API" below) trim a little more overhead.
+ * (see "Fast Macro Sprite API" below) save the call itself.
  *
  * @note Any integer type works for the coordinates you keep on your side
  * (`u16`, `s16`, struct members or plain variables). Until 2026-09-21 this
@@ -865,7 +863,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
  *
  * Drop-in replacement for oamSet() that writes directly to oamMemory[].
  * Same parameters, same behavior, but compiles to direct memory writes
- * instead of a function call with framesize=158.
+ * instead of a call to oamSet().
  *
  * @param _id Sprite ID (0-127)
  * @param _x X position (0-511)

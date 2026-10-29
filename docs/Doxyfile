@@ -78,6 +78,7 @@ FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
 # check_doc_drift.py's IMAGE_PATH check fails the build if an example's
 # screenshot dir is missing here.
 IMAGE_PATH             = ../examples/audio/sfx_from_wav \
+                         ../examples/audio/snesmod_music \
                          ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
                          ../examples/basics/game_skeleton \

@@ -141,25 +141,26 @@
  * before setScreenOn().
  *
  * @param layer1map  Address of map data (format: u16 width, u16 height, u16 pad, then tile indices)
- * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles).
- *                   The engine copies the full 4096 bytes (512 × 8) from this
+ * @param layertiles Address of the tile definitions: one 16-bit tilemap
+ *                   entry per tile id of the map (opensnes-level's `.t16`),
+ *                   up to 1024. The engine copies 4096 bytes from this
  *                   address whatever the file's size — a 126-byte `.t16` is
  *                   followed in RAM by the ROM bytes that follow it. Entries
- *                   past the last defined metatile are therefore garbage; a
+ *                   past the last defined tile are therefore garbage; a
  *                   map must not reference them (opensnes-level never does).
  * @param tilesprop  Address of tile property data (collision types)
  *
  * @note Must be called during forced blank (screen off). The function
  *       writes directly to VRAM via DMA.
  *
- * @note Data placement: the three blobs may live in ANY bank — mapLoad
- * and the scroll runtime honour each far pointer's bank byte, so pinning
- * the map out of bank $00 (e.g. `.section ".rodata2" semifree bank 2`)
- * is the recommended layout for big maps. But that data is then for the
- * MAP ENGINE only: reading it directly from C (`mapdata[6]`, `*ptr`)
- * silently reads bank $00 instead (cc65816 near-pointer deref — see
- * KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use
- * mapGetMetaTile()/mapGetMetaTilesProp() — they are bank-safe.
+ * @note Data placement: the three blobs may live in any bank — mapLoad
+ * and the scroll runtime honour each far pointer's bank byte. The blobs
+ * opensnes-level writes are declared with ASSET_SECTION, which keeps them
+ * out of bank $00; a map written by hand in assembly is declared the
+ * same way. C may read the blobs through a `const` pointer, which is
+ * compiled as a far read; casting the `const` away is the one bank-blind
+ * read (KNOWN_LIMITATIONS.md). To read the map at a position in pixels,
+ * use mapGetMetaTile() and mapGetMetaTilesProp().
  */
 void mapLoad(const u8 *layer1map, const u8 *layertiles, const u8 *tilesprop);
 
@@ -223,7 +224,7 @@ u16 mapGetCameraY(void);
  *
  * @param xpos X coordinate in map pixels
  * @param ypos Y coordinate in map pixels
- * @return Metatile index (0-511)
+ * @return Tile id: the low 10 bits of the map entry, 0 to 1023.
  */
 u16 mapGetMetaTile(u16 xpos, u16 ypos);
 

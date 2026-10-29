@@ -8,8 +8,9 @@
  * gradient no 16-colour palette could hold. Each tile is 64 bytes
  * (8 bitplanes), so this tileset (770 tiles, 48 KB) is larger than a ROM
  * bank: the converter writes it in two parts, canal_tiles and canal_tiles_1,
- * and the linker places each where it has room. A C pointer carries its bank
- * byte, so dmaCopyVram() takes each part wherever it landed.
+ * and the linker places each where it has room. The generated
+ * canal_tiles_load() copies both with dmaCopyVram(), whose pointer carries
+ * the bank byte, so each part is taken wherever it landed.
  *
  * This began as the PVSnesLib "Mode3" example.
  *
@@ -33,7 +34,7 @@
 #include <snes.h>
 
 /** @brief The picture, converted by the build from res/canal.png (res/canal.png.toml). */
-#include "res/canal.inc"   /* generated: canal_tiles[] + canal_tiles_1[] (the 48 KB tileset in two bank-sized parts), canal_map[], canal_pal[] */
+#include "res/canal.inc"   /* generated: canal_tiles[] + canal_tiles_1[] (the 48 KB tileset in two bank-sized parts) and canal_tiles_load(), canal_map[], canal_pal[] */
 
 /** @brief VRAM word address of the tilemap, past the 770 tiles (770 x 32 words = $6040) */
 #define MAP_ADDR 0x7000
@@ -55,9 +56,10 @@ int main(void) {
     setScreenOff();
 
     /* The tile data is in two parts so the linker can place each in a bank
-     * with room; the pointer passed carries the bank byte. */
-    dmaCopyVram(canal_tiles,   0x0000, canal_tiles_end - canal_tiles);
-    dmaCopyVram(canal_tiles_1, 0x4000, canal_tiles_1_end - canal_tiles_1);
+     * with room; canal_tiles_load(), from the generated canal.inc, copies
+     * both: part n at 0x0000 + n * 0x4000 words, each pointer carrying its
+     * bank byte. */
+    canal_tiles_load(0x0000);
     dmaCopyVram(canal_map, MAP_ADDR, canal_map_end - canal_map);
     dmaCopyCGram(canal_pal, 0,       canal_pal_end - canal_pal);
 

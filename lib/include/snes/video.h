@@ -5,6 +5,10 @@
  * Low-level video functions for PPU control, palette management,
  * and screen modes.
  *
+ * The functions are in the `console` module (the default of `LIB_MODULES`):
+ * a project that lists its modules lists `console` with them. A link that
+ * misses one names the module ("setMode is in the library module console").
+ *
  * @author OpenSNES Team
  * @copyright MIT License
  */

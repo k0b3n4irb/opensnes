@@ -1,0 +1,12 @@
+# no phi moves before the back edge: the last thing the body does is n--
+in f: absent \tlda \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @while_cond
+in f: present \tdec a\n\tsta \d+,s\n\tjmp @while_cond
+# the identity half of `& 0x00FFFFFF` is not emitted, the high one is
+in f: absent and\.w #65535
+in f: present and\.w #255
+# y += tab[i] in place: the sum is stored where y was read
+in f: present \tadc (\d+),s\n\tsta \1,s
+# point 3: the table value goes to the adc, not through a slot
+in f: present \tlda\.l tab,x\n\tclc\n\tadc \d+,s\n\tsta \d+,s\n\tlda\.l tab\+2,x\n\tadc \d+,s
+# point 4: the u16 -> u32 index's high word is not written (no lda #0 in the loop body)
+in f: absent \tasl a\n\tsta \d+,s\n\tsta \d+,s\n\tlda\.w #0

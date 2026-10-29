@@ -233,18 +233,66 @@ int check_sa1_boot(cli_ctx *ctx, const sym_file *s, const char *rom)
 
 /* ------------------------------------------------------------- assets */
 
-static void scan_assets(const char *dir, check_results *r, int depth)
+typedef struct { long vram, colours; int files; } asset_sum;
+
+/* The top-level `vram = N` of a settings file (tools/common/cli.c reads it
+ * too, and refuses a bad value), or -1. */
+static long settings_vram(const char *path)
+{
+    FILE *f = fopen(path, "r");
+    if (!f) return -1;
+    char line[512];
+    long v = -1;
+    while (fgets(line, sizeof line, f)) {
+        char *p = line;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p == '[') break;                           /* the tables: the tool's */
+        if (strncmp(p, "vram", 4) != 0) continue;
+        p += 4;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p != '=') continue;
+        v = strtol(p + 1, NULL, 10);
+    }
+    fclose(f);
+    return v;
+}
+
+/* The assets under `dir`, recursively, but not under the folders of
+ * `scenes_root` (the scenes, counted one by one) when it is given. */
+static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, int depth)
 {
     DIR *d = opendir(dir);
     if (!d || depth > 16) { if (d) closedir(d); return; }
+    /* the assets of this folder whose settings say what they hold in VRAM
+     * (`vram = N`): their files count N once, not their size */
+    enum { MAXV = 128 };
+    char vstem[MAXV][256];
+    long vbytes[MAXV];
+    int vused[MAXV], nv = 0;
     struct dirent *e;
+    while ((e = readdir(d)) != NULL && nv < MAXV) {
+        size_t l = strlen(e->d_name);
+        if (l < 6 || strcmp(e->d_name + l - 5, ".toml") != 0) continue;
+        char path[2048];
+        snprintf(path, sizeof path, "%s/%s", dir, e->d_name);
+        long v = settings_vram(path);
+        if (v < 0) continue;
+        snprintf(vstem[nv], sizeof vstem[nv], "%.*s", (int)(l - 5), e->d_name);   /* obj.png.toml -> obj.png */
+        char *dot = strrchr(vstem[nv], '.');
+        if (dot) *dot = '\0';                                                   /* -> obj */
+        vbytes[nv] = v; vused[nv] = 0; nv++;
+    }
+    rewinddir(d);
     while ((e = readdir(d)) != NULL) {
         if (!strcmp(e->d_name, ".") || !strcmp(e->d_name, "..")) continue;
         char path[2048];
         snprintf(path, sizeof path, "%s/%s", dir, e->d_name);
         struct stat st;
         if (stat(path, &st) != 0) continue;
-        if (S_ISDIR(st.st_mode)) { scan_assets(path, r, depth + 1); continue; }
+        if (S_ISDIR(st.st_mode)) {
+            if (!scenes_root || strcmp(dir, scenes_root) != 0) scan_assets(path, scenes_root, a, depth + 1);
+            continue;
+        }
         if (!S_ISREG(st.st_mode)) continue;
         const char *dot = strrchr(e->d_name, '.');
         if (!dot) continue;
@@ -252,20 +300,59 @@ static void scan_assets(const char *dir, check_results *r, int depth)
         snprintf(ext, sizeof ext, "%s", dot);
         for (char *p = ext; *p; p++) *p = (char)tolower((unsigned char)*p);
         if (!strcmp(ext, ".pic") || !strcmp(ext, ".pc7") || !strcmp(ext, ".map") || !strcmp(ext, ".mp7")) {
-            r->asset_vram += (long)st.st_size; r->asset_files++;
+            int k = 0;
+            while (k < nv && !((size_t)(dot - e->d_name) == strlen(vstem[k]) && !strncmp(e->d_name, vstem[k], (size_t)(dot - e->d_name)))) k++;
+            if (k < nv) { if (!vused[k]) { vused[k] = 1; a->vram += vbytes[k]; } a->files++; continue; }
+            a->vram += (long)st.st_size; a->files++;
         } else if (!strcmp(ext, ".pal")) {
-            r->asset_colours += (long)st.st_size / 2; r->asset_files++;
+            a->colours += (long)st.st_size / 2; a->files++;
         }
     }
     closedir(d);
 }
 
+/* A game with several levels keeps one folder per level under res/ (the
+ * build converts the settings files of res/<level>): only one is in VRAM at a time, so the
+ * figure that matters is the heaviest folder plus what is shared (res/ and
+ * the project's own folder). Without such folders, the total, which says it
+ * is everything at once. */
 void report_assets(cli_ctx *ctx, const char *dir, check_results *r)
 {
-    scan_assets(dir, r, 0);
+    char res[2048];
+    snprintf(res, sizeof res, "%s/res", dir);
+    asset_sum shared = { 0, 0, 0 };
+    scan_assets(dir, res, &shared, 0);
+    r->asset_vram = shared.vram; r->asset_colours = shared.colours; r->asset_files = shared.files;
+    r->scene_vram = shared.vram; r->scene_colours = shared.colours;
+    DIR *d = opendir(res);
+    struct dirent *e;
+    while (d && (e = readdir(d)) != NULL) {
+        if (e->d_name[0] == '.') continue;
+        char path[4352];
+        snprintf(path, sizeof path, "%s/%s", res, e->d_name);
+        struct stat st;
+        if (stat(path, &st) != 0 || !S_ISDIR(st.st_mode)) continue;
+        asset_sum scene = { 0, 0, 0 };
+        scan_assets(path, NULL, &scene, 1);
+        if (!scene.files) continue;
+        r->asset_vram += scene.vram; r->asset_colours += scene.colours; r->asset_files += scene.files;
+        r->asset_scenes++;
+        if (shared.vram + scene.vram > r->scene_vram || r->asset_scenes == 1) {
+            r->scene_vram = shared.vram + scene.vram;
+            r->scene_colours = shared.colours + scene.colours;
+            snprintf(r->scene_name, sizeof r->scene_name, "res/%.200s", e->d_name);
+        }
+    }
+    if (d) closedir(d);
+    if (!r->asset_scenes) { r->scene_vram = r->asset_vram; r->scene_colours = r->asset_colours; }
     if (!r->asset_files || ctx->json || ctx->quiet) return;
     /* an inventory, not a gate: a streaming game legitimately ships more
-     * than fits at once (asset_budget.py --oneline) */
-    printf("[ASSETS] VRAM %.1fK/64K (%.0f%%) · CGRAM %ld/256 (%.0f%%)\n",
-           r->asset_vram / 1024.0, 100.0 * r->asset_vram / 65536.0, r->asset_colours, 100.0 * r->asset_colours / 256.0);
+     * than fits at once */
+    if (r->asset_scenes)
+        printf("[ASSETS] heaviest scene %s: VRAM %.1fK/64K (%.0f%%) · CGRAM %ld/256 (%.0f%%) — %d scenes, one per folder of res/, each counted with what res/ shares\n",
+               r->scene_name, r->scene_vram / 1024.0, 100.0 * r->scene_vram / 65536.0,
+               r->scene_colours, 100.0 * r->scene_colours / 256.0, r->asset_scenes);
+    else
+        printf("[ASSETS] VRAM %.1fK/64K (%.0f%%) · CGRAM %ld/256 (%.0f%%) — every asset together, not necessarily loaded at once\n",
+               r->asset_vram / 1024.0, 100.0 * r->asset_vram / 65536.0, r->asset_colours, 100.0 * r->asset_colours / 256.0);
 }

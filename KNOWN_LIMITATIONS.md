@@ -217,8 +217,10 @@ zeroed at boot. The qualifier rides on the type like `const`: passing a
 `FAR` pointer where a plain pointer is expected is a compile error, and
 `T FAR *` converts to `const T *` freely, so the DMA/HDMA/asset API takes
 `FAR` buffers as they are. Cost: `buf[i]` is cheaper than the bank-0 form,
-a pointer walk is within 4 %. Tutorial: `docs/tutorials/far_ram.md`. The
-one remaining silent path is an explicit cast that drops `FAR`.
+a pointer walk is within 4 %. Tutorial: `docs/tutorials/far_ram.md`. An
+address above `$FFFF` cast to a plain pointer (`(u8 *)0x708040`, Game Pak
+RAM) is a compile error that names `FAR`. The one remaining silent path is
+an explicit cast that drops `FAR` from a pointer.
 
 **Mitigation for the plain band (checked at link time):**
 the templates' memory maps reserve `$00:0000-$1FFF` for C RAM, and

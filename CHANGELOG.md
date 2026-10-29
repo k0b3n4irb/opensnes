@@ -4,6 +4,197 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.53.0] — 2026-10-29
+
+`USE_FASTROM=1` finally speeds up the code: a LoROM build addressed its C and
+library code in bank $00, which reads ROM at 8 master cycles whatever MEMSEL
+says, so a FastROM ROM spent the same cycles as a SlowROM one; the code is now
+addressed in the $80 mirror, and the queue benchmark runs 16 % more loops.
+The VRAM queue fills the VBlank to a line (`vramQueueFlushUntil`) and sends
+an entry for 619 master cycles instead of 670. A link that misses a library
+module names it, the asset tools are built with clang as the toolchain is,
+`opensnes-sample inspect` sizes a looped sample as `encode` writes it, and
+`__mul16` skips the products a zero byte makes empty. `games/breakout` gets a
+steel cabinet with a channel of cyan light, a steel paddle, crisp bricks and a
+ball, all drawn in the generator.
+
+### Added
+- feat(build): a link that fails on a label of the library names the
+  module that holds it: `setMode is in the library module console: add
+  console to LIB_MODULES`, and for a sub-module, the module that brings it
+  in (`oamSet is in the library module sprite_oamset, which sprite brings
+  in: add sprite to LIB_MODULES`). wlalink says only "unknown label", and
+  `video.h`'s functions live in `console`, which its page did not say (it
+  does now). The library's build writes the index it reads,
+  `lib/build/<map>/symbols.txt` (`label module`), shipped in the release
+  zip; the hint uses `sed` only.
+- feat(lib): `vramQueueFlushUntil(line)` sends the queued VRAM transfers
+  that end before a scanline and keeps the rest at the head of the queue,
+  in order, for the next VBlank. It reads the vertical counter once, turns
+  the lines left into a budget (165 bytes of `vramQueueCost()` a line) and
+  finds the cut by halving over the running cost each push now notes
+  (`vram_queue_cum`), so its cost does not grow with the queue
+  (`VRAM_QUEUE_UNTIL_COST`, 64 bytes). Outside the vertical blank it sends
+  nothing. Measured on luna with 48 entries of 128 bytes queued each frame:
+  `line` 262 sends 25 a frame and the last DMA byte lands on line 261 (258
+  with FastROM), 250 and 240 end on 249 and 239, PAL 312 sends all 48 by
+  line 286, no byte outside the blank. Asked by a game streaming many small
+  entries whose fixed budget left ten lines of each VBlank unused.
+- feat(lib,build): the VRAM queue's size is the project's:
+  `VRAM_QUEUE_MAX := 64` in its Makefile (1 to 255, 32 by default, 12
+  bytes of the C RAM band per entry). The library is built once, so the
+  queue's arrays and a capacity word the library reads are assembled per
+  project (`templates/vramqueue_ram.asm`), and C is given the same number.
+  A game's animated screen needs about 40 tile uploads a frame and was
+  capped at 32.
+- feat(lib,runtime): `nmiSetLag()` registers a callback the NMI handler runs
+  on lag frames, which skip the library's VBlank work and the `nmiSet()`
+  callback. Registered with both, a function runs every frame whatever the
+  game's load (asked by a second game). Its stricter rules are on the
+  header. While none is set, a lag frame costs one flag test.
+- feat(lib): `textPrintS16()` prints a signed number, `-` first when it is
+  negative. An `s16` handed to `textPrintU16()` printed -52 as `65484`.
+- feat(lib): a call with a constant VRAM address the register cannot hold
+  is a build error: `bgSetGfxPtr()`, `bgInitTileSet()` and
+  `bgInitTileSetData()` want a multiple of 0x1000 words, `bgSetMapPtr()` a
+  multiple of 0x400 (the registers keep `vramAddr >> 12` and `>> 10`, and
+  tiles put at 0x0400 were read from 0x0000 without a word). The check is
+  clang's, in the syntax pass every C file goes through
+  (`OPENSNES_CHECK_ARGS`, `snes/types.h`); an address known only at run
+  time is not checked, and the code is unchanged.
+- feat(tools): a tileset larger than one 32 KB bank, written in parts, comes
+  with `<name>_tiles_load(vram)` in its `.inc`, which copies every part;
+  a caller that loaded `<name>_tiles` alone got the first 32 KB. mode2 and
+  mode3 use it (ROMs unchanged).
+- feat(tools): `opensnes-tileset convert --metatiles 16` cuts a level into
+  16x16 metatiles: `<stem>.mtl` holds the distinct ones, four map entries
+  each, and `<stem>.mtm` one metatile number per block, without padding;
+  the `.inc` declares both and defines their count and the map's size. A
+  game drew its level from a 2 KB-padded `.map` turned into a table by hand.
+- feat(build,tools): the settings files of `res/<folder>/` are converted
+  too, and `opensnes-rom` counts each folder of `res/` as a scene: the
+  VRAM and CGRAM line gives the heaviest scene with what `res/` shares,
+  where it added up every level (a game read 298 % of VRAM with five levels
+  that are never loaded together). Without such folders the total says it
+  is everything at once.
+- feat(tools): an asset's settings file may say `vram = N` before its table,
+  the bytes it holds in VRAM at once: `opensnes-rom` counts N for its scene
+  instead of its files' size (0 for a sprite sheet streamed through a
+  cache, the cache's size on one sheet). The tools keep the key on
+  `--save`; a value outside 0..65536 is refused. A game's level with its
+  sprite sheets read 237 % of VRAM for about 50 KB resident.
+
+### Fixed
+- fix(tools): `opensnes-sample inspect` sizes a looped WAV as `encode` writes
+  it. It counted the whole file (1,000 samples looped from 100 to 900: 567
+  bytes) where `encode --loop 100 900` writes 513, because what follows the
+  loop's end is left out, and a loop that is not a whole number of 16-sample
+  blocks is repeated or resampled. It now takes `--loop START END`, or the
+  loop of the `.wav.toml` beside the input, and runs the encoder's own
+  routine: 60 random loops gave the same bytes, loop offset and tuning as
+  `encode`. Its JSON for a WAV gains `loops`, `loop_offset` and
+  `tuning_x4096`.
+- docs(lib): `audio.h` gave the samples' room with an echo as 58,112 bytes
+  (delay 2) and 47,872 (delay 7); the code and a ROM give 58,368 and 48,128
+  (`$FF00` minus 2 KB a unit of delay, minus `$0B00`). Reported by a
+  project's own audio budget.
+- fix(tools): the `opensnes-*` tools are built with clang, as the
+  toolchain is: `CC ?= clang` in `tools/tool.mk` never applied, because
+  make defines `CC` before reading a Makefile, so they were built with the
+  host's `cc` (gcc on Linux), which warned on a clang pragma of
+  `cute_tiled.h` at every build. `CC=...` on the command line or in the
+  environment still wins.
+- fix(runtime): `USE_FASTROM=1` speeds up the C code and the library, not
+  only the startup and the NMI entry. A LoROM build addressed its code in
+  bank $00, which reads ROM at 8 master cycles a byte whatever MEMSEL says:
+  a FastROM ROM spent the same cycles as a SlowROM one (21,441,818 against
+  21,441,786 over 60 frames of a queue benchmark). LoROM code is now
+  addressed in the $80-$BF mirror (`memmap.inc`, `hdr.asm`), where FastROM
+  applies; a SlowROM build reads it at the same speed as before, and every
+  example renders the same frames. With FastROM the benchmark runs 16 %
+  more loops, the VRAM queue's flush costs 560 master cycles an entry
+  instead of 670. Super FX and SA-1 builds keep their mapping (on a Super
+  FX cartridge $80-$BF:8000 is a second CPU ROM). The reset and NMI vectors
+  enter in bank $00 and jump to the mirror at once, FastROM or not
+  (`NmiEntry`, 4 bytes and 4 cycles a frame), so the program counter is
+  the address of the labels a profile folds it onto. A 24-bit pointer to
+  ROM in a LoROM build carries the bank byte $80 + n.
+- ci: the Linux and macOS steps that build the release through `tee` fail
+  when `make` fails (`set -o pipefail`, as the Windows steps already had);
+  the macOS zip went missing on 2026-10-25 and only the smoke test after it
+  said so.
+- fix(build): `make clean` of the SDK cleans the examples again: it empties
+  `lib/build` first, and the `LIB_MODULES` check stopped each example's clean
+  there, so their objects and ROMs stayed. The check is skipped on `clean`.
+- fix(tools): `opensnes-rom check` follows the callbacks given to
+  `nmiSetLag()` when it looks for a WRAM data port write reachable from the
+  NMI, as it does for `nmiSet()`'s; it let one through.
+- fix(build): an asset is converted again when its `opensnes-*` tool is
+  newer than its stamp. After an SDK update, a project kept the `.inc` the
+  old tool wrote until `make clean`, and a C file calling what the new one
+  declares did not compile.
+
+### Changed
+- feat(examples): `games/breakout`'s paddle, bricks and ball are redrawn
+  crisp, pixel by pixel in `devtools/art_assets/breakout.py`. The paddle is a
+  steel capsule: a one-colour outline, the light from above down the body, a
+  channel of cyan light along it and a magenta diode at each end, like the
+  cabinet's. A brick has an outline and a shade in its dark colour, a bevel
+  on its top and left, a glint and a body (the generated brick, a soft diagonal
+  glint on three tones with no outline, read blurred, and is gone with its
+  file `assets/neo-lumen/ui/brick.png`); the ball has an edge and a light from
+  its top left instead of a concentric halo. The sprites' palette gains three
+  steel tones and a shadow tone. The paddle's shadow follows its silhouette in
+  a colour close to the board's, and its right end is the left one flipped: the
+  right sprite of the shadow used the left tile unflipped, which left a square
+  step.
+- feat(examples): `games/breakout`'s cabinet is steel with a channel of cyan
+  light. The top beam and the sides were a thin magenta line and a speaker
+  grille whose lit pixels were scattered and jagged at the bottom of the
+  screen; they are now a dark steel beam and wall with a cyan light channel
+  and a bracket every 16 pixels, drawn pixel by pixel in
+  `devtools/art_assets/breakout.py` (no picture of an existing game was
+  used). The tile numbering and the playfield are unchanged.
+- perf(runtime): `__mul16` (a 16-bit multiply the compiler cannot turn
+  into shifts) skips each partial product whose high byte is 0, so a
+  multiplier or multiplicand under 256 costs one or two hardware multiplies
+  instead of three: a loop of 6,400 products of mixed operands, 6,861,072
+  master cycles in the routine before, 5,132,050 after (-25 %), the same
+  sum.
+- perf(lib): the VRAM queue's flush runs its loop with A 8-bit and X/Y
+  16-bit, the word registers through Y: 619 master cycles an entry beyond
+  its bytes instead of 670 (SlowROM; 560 with FastROM), libbench `vramq`
+  10,854 -> 10,576. `VRAM_QUEUE_ENTRY_COST` follows the measure: 80 instead
+  of 96, so `vramQueueCost()` reads 16 bytes less per entry.
+- build: `make clean-all` removes everything the tree regenerates (the
+  benchmarks' builds, the fuzz corpus, the release zips, the generated docs,
+  the tests' temporary files); the WLA-DX clean leaves its submodule as
+  checked out (43 MB of CMake output stayed); `bin/` holds hard links to the
+  tools and the toolchain instead of second copies.
+- build(release): the binaries of the release zip carry no debug
+  information (`strip -S`): the Linux arm64 zip went from 30.6 MB to 8.4 MB
+  (76.6 MB to 22.1 MB extracted). The tools behave the same; a source build
+  of the SDK keeps `-g`. On macOS the `.dSYM` folders clang writes beside a
+  program are left out of the zip too.
+- perf(compiler): a 32-bit add, sub, and, or, xor or copy may put its result
+  in its operand's slot, so a u32 value a loop carries stays in place: a
+  16.16 path loop with four u32 values lost the 16 copies it made at the end
+  of every iteration, 83 instructions down to 62 (a second game's case).
+  A `& 0x00FFFFFF` no longer emits `and #$FFFF` on the low word. Twelve
+  examples' ROMs change; every one shows the same frames.
+- perf(compiler): a u32 read from a table goes straight to the add that
+  uses it, without a stop in a stack slot, and `tab[i]` with a u16 `i` no
+  longer writes the high word of the widened index: the same loop, 62 to
+  48 instructions. Eighteen examples' ROMs change, with the same frames.
+- docs(lib): the `oamSet()` and `oamSetFast()` notes no longer cite the
+  "framesize=158" cost of a version long gone.
+- feat(compiler): an integer constant above `$FFFF` cast to a plain pointer
+  is refused (`(u8 *)0x708040`): such a pointer kept its bank only at a
+  constant index, and `p[i]` read and wrote bank $00 without a word. The
+  message names the fix, a `FAR` or `const` pointee; casts to those, to an
+  address of bank $00's range and to a function pointer compile as before.
+  The code the compiler emits does not change.
+
 ## [0.52.0] — 2026-10-24
 
 The examples are ours. Every picture, sprite, tile, sample and module they

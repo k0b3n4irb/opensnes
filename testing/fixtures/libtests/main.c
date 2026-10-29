@@ -50,8 +50,11 @@ u16 r_vq[4];
 /* vramQueuePushSprite: one 16x16 frame = two strips of 64 bytes */
 u16 r_vqs[8];
 static FAR u8 vq_sheet[576];
-/* vramQueueCost: bytes + 96 an entry, emptied by the flush, saturated */
+/* vramQueueCost: bytes + 80 an entry, emptied by the flush, saturated */
 u16 r_vqc[8];
+/* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
+u16 r_vqu[8];
+u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -759,11 +762,11 @@ static void coverage_lot_b(void) {
     vramQueuePush(lotb_vram, 0x6300, 0, VRAM_QUEUE_ROW);
     vramQueuePush(lotb_vram + 8, 0x6240, 4, VRAM_QUEUE_COLUMN);
     r_vq[0] = vram_queue_count;             /* 3 */
-    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 96 = 300 */
+    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 80 = 252 */
     vramQueueFlush();
     r_vq[1] = vram_queue_count;             /* 0 */
     r_vqc[1] = vramQueueCost();             /* 0 */
-    r_vq[2] = vramQueueFree();              /* 32 */
+    r_vq[2] = vramQueueFree();              /* 40: VRAM_QUEUE_MAX of this fixture's Makefile */
     vramQueueFlush();                       /* empty: returns at once */
     r_vq[3] = 0x0A51;
     /* a 16x16 frame: strips at sheet + 0 and + 512, to VRAM words $6400 and
@@ -771,16 +774,23 @@ static void coverage_lot_b(void) {
     vq_sheet[0] = 0xA1; vq_sheet[63] = 0xA2; vq_sheet[512] = 0xB1; vq_sheet[575] = 0xB2;
     r_vqs[0] = vramQueuePushSprite(vq_sheet, 0x6400, 16);      /* 1 */
     r_vqs[1] = vram_queue_count;                               /* 2 */
-    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 96) = 320 */
+    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 80) = 288 */
     r_vqs[2] = vram_queue_src[1] - vram_queue_src[0];          /* 512 */
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
     vramQueueFlush();
     r_vqs[5] = vramQueuePushSprite(vq_sheet, 0x6400, 4);       /* under 8 pixels: 0 */
-    vram_queue_count = 30;
+    vram_queue_count = VRAM_QUEUE_MAX - 2;
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
-    r_vqs[7] = vram_queue_count;                               /* still 30: nothing noted */
+    r_vqs[7] = vram_queue_count;                               /* still 38: nothing noted */
     vram_queue_count = 0;
+    /* the capacity the library reads (vram_queue_max, the project's) is the
+     * one C was given: pushes until one is refused */
+    r_vqcap = 0;
+    while (vramQueuePush(lotb_vram, 0x6200, 8, VRAM_QUEUE_ROW) && r_vqcap < 300)
+        r_vqcap++;                                             /* 40 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
     /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
      * by a sprite's strips; a count emptied by hand, then a flush, clears it */
     vram_queue_cost = 0xFF00;
@@ -797,6 +807,28 @@ static void coverage_lot_b(void) {
     vram_queue_count = 0;
     vramQueueFlush();
     r_vqc[7] = vramQueueCost();                                /* 0 */
+    /* vramQueueFlushUntil. The second entry is made dear by hand (its
+     * running cost past any VBlank), so the cut does not depend on the
+     * line the call lands on: the first entry goes, the second and third
+     * stay at the head in order, and the third, to the first one's
+     * address, reaches VRAM last. */
+    vramQueuePush(lotb_vram, 0x6600, 8, VRAM_QUEUE_ROW);       /* running cost 88 */
+    vram_queue_cost = 0x8000;
+    vramQueuePush(lotb_vram + 8, 0x6610, 8, VRAM_QUEUE_ROW);   /* $8058 */
+    vramQueuePush(lotb_vram + 16, 0x6600, 8, VRAM_QUEUE_ROW);  /* $80B0 */
+    r_vqu[0] = vramQueueFlushUntil(0);       /* line 0 is past: nothing sent, 3 left */
+    WaitForVBlank();
+    r_vqu[1] = vramQueueFlushUntil(262);     /* the first sent: 2 left */
+    r_vqu[2] = vram_queue_addr[0];           /* $6610 */
+    r_vqu[3] = vram_queue_addr[1];           /* $6600 */
+    r_vqu[4] = vram_queue_cum[0];            /* $8058 - 88 = $8000 */
+    r_vqu[5] = vramQueueCost();              /* $80B0 - 88 = $8058 */
+    vram_queue_cost = 176;
+    vram_queue_cum[0] = 88;
+    vram_queue_cum[1] = 176;
+    WaitForVBlank();
+    r_vqu[6] = vramQueueFlushUntil(262);     /* both sent: 0 left */
+    r_vqu[7] = vramQueueCost();              /* 0 */
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;
@@ -1308,18 +1340,22 @@ static void part_div32(void) {
     }
 }
 
-/* textPrintU16 (2026-10-11, digits by subtraction): the characters that
- * land in the text buffer, and where the cursor stops. */
+/* textPrintU16 (2026-10-11, digits by subtraction) and textPrintS16
+ * (2026-10-25): the characters that land in the text buffer, and where the
+ * cursor stops. */
 u16 r_pu16_bad;     /* numbers printed wrong -> 0 */
-u16 r_pu16_n;       /* numbers printed -> 14 */
+u16 r_pu16_n;       /* numbers printed -> 19 */
 extern u8 tilemapBuffer[];
-static void chk_pu16(u16 v, const char *want) {
+static void chk_print(u16 v, u8 sgn, const char *want) {
     u16 k;
     u16 bad = 0;
     textSetPos(0, 20);
     textPrint("          ");
     textSetPos(0, 20);
-    textPrintU16(v);
+    if (sgn)
+        textPrintS16((s16)v);
+    else
+        textPrintU16(v);
     for (k = 0; want[k]; k++) {
         u16 cell = tilemapBuffer[(20 * 32 + k) * 2] | ((u16)tilemapBuffer[(20 * 32 + k) * 2 + 1] << 8);
         if ((cell & 0x03FF) != (u16)(text_config.font_tile - 32 + (u8)want[k])) bad = 1;
@@ -1328,6 +1364,8 @@ static void chk_pu16(u16 v, const char *want) {
     r_pu16_bad += bad;
     r_pu16_n++;
 }
+static void chk_pu16(u16 v, const char *want) { chk_print(v, 0, want); }
+static void chk_ps16(s16 v, const char *want) { chk_print((u16)v, 1, want); }
 static void part_pu16(void) {
     r_pu16_bad = 0;
     r_pu16_n = 0;
@@ -1336,6 +1374,8 @@ static void part_pu16(void) {
     chk_pu16(1000, "1000"); chk_pu16(9999, "9999");   chk_pu16(10000, "10000");
     chk_pu16(10001, "10001"); chk_pu16(30000, "30000"); chk_pu16(40005, "40005");
     chk_pu16(65535, "65535"); chk_pu16(60090, "60090");
+    chk_ps16(0, "0");       chk_ps16(52, "52");       chk_ps16(-52, "-52");
+    chk_ps16(32767, "32767"); chk_ps16(-32768, "-32768");
 }
 
 /* textPrint runs (2026-10-11, asm_textRun): a run that reaches the last
@@ -1428,6 +1468,32 @@ static void test_glyph_blit(void)
     r_glyph_ok = ok;
 }
 
+/* nmiSetLag (2026-10-25): four NMIs the main thread does not wait for are
+ * four lag frames, and the lag callback runs on each; cleared, it runs on
+ * none. */
+u16 r_lagcb_lags;   /* lag frames counted by the NMI handler -> 4 */
+u16 r_lagcb_calls;  /* lag callback calls over the same frames -> 4 */
+u16 r_lagcb_after;  /* calls once cleared, over two more lag frames -> 0 */
+static u16 lagcb_n;
+extern volatile u16 lag_frame_counter;
+static void lag_tick(void) { lagcb_n++; }
+static void part_lagcb(void) {
+    u16 lag0, f0;
+    nmiSetLag(lag_tick);
+    f0 = frame_count;
+    while (frame_count == f0) { }          /* start on a frame boundary (a lag frame too) */
+    lagcb_n = 0;
+    lag0 = lag_frame_counter;
+    f0 = frame_count;
+    while ((u16)(frame_count - f0) < 4) { }
+    r_lagcb_lags = (u16)(lag_frame_counter - lag0);
+    r_lagcb_calls = lagcb_n;
+    nmiSetLag(0);
+    f0 = frame_count;
+    while ((u16)(frame_count - f0) < 2) { }
+    r_lagcb_after = (u16)(lagcb_n - r_lagcb_calls);
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1507,6 +1573,7 @@ int main(void) {
     part_div32();
     part_pu16();
     part_trun();
+    part_lagcb();
 
 
     coverage_bank_bytes();

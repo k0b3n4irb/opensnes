@@ -142,6 +142,7 @@ jobs:
       - name: Build & Release OpenSNES for Linux
         if: matrix.name == 'linux'
         run: |
+          set -o pipefail
           export OPENSNES_HOME=$(pwd)
           make release TOOLCHAIN_WERROR=1 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
@@ -159,6 +160,7 @@ jobs:
       - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'
         run: |
+          set -o pipefail
           export OPENSNES_HOME=$(pwd)
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
@@ -250,6 +252,7 @@ jobs:
       - name: Build starter project (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
+          set -o pipefail
           echo "=== Building starter ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make -C starter OPENSNES="$PWD" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
@@ -257,6 +260,7 @@ jobs:
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
+          set -o pipefail
           echo "=== Building starter ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make -C starter OPENSNES="$PWD" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
@@ -459,5 +463,5 @@ jobs:
           name: luna-test artifacts
           path: |
             testing/baselines/
-            /tmp/luna-test-actual/
-            /tmp/luna-test-corpus/
+            /tmp/opensnes-tests/luna-test-actual/
+            /tmp/opensnes-tests/luna-test-corpus/

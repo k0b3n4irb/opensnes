@@ -88,7 +88,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
-| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
+| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `lzssDecodeVram` | `lzss` | |
@@ -136,7 +136,7 @@ its header.
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |
 | `input.h` | `mouseInit`, `mouseIsConnected`, `mouseGetX`, `mouseGetY`, `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseSetSensitivity`, `mouseGetSensitivity` | [input: the mouse](tutorials/input.md) |
 | `input.h` | `scopeInit`, `scopeIsConnected`, `scopeGetX`, `scopeGetY`, `scopeGetRawX`, `scopeGetRawY`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeButtonsRepeat`, `scopeSetHoldDelay`, `scopeSetRepeatDelay`, `scopeSinceShot` | [input: the Super Scope](tutorials/input.md) |
-| `interrupt.h` | `nmiSet`, `nmiClear`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
+| `interrupt.h` | `nmiSet`, `nmiClear`, `nmiSetLag`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
 | `math.h` | `easeInQuad`, `easeOutQuad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
 | `snesmod.h` | `snesmodGetPosition`, `snesmodFlush` | [audio: following the music](tutorials/audio.md) |

@@ -348,7 +348,7 @@ u8 audioGetSampleInfo(u8 id, AudioSample *info);
  *   echo;
  * - at the **echo ring** once audioSetEcho() has been called: the ring
  *   takes the top of the memory under $FF00, 2,048 bytes per unit of
- *   delay — 58,112 bytes of samples with a delay of 2, 47,872 with the
+ *   delay — 58,368 bytes of samples with a delay of 2, 48,128 with the
  *   longest, 7. audioSetEcho() answers AUDIO_ERR_NO_MEMORY when samples
  *   already loaded reach into the ring it is asked for, so a game that
  *   wants an echo calls audioSetEcho() before loading, or picks a delay

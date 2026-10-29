@@ -220,12 +220,17 @@ the frame the game **notes** each transfer; in VBlank one assembly routine
 
 /* during the frame */
 if (!vramQueuePush(frame_tiles, 0x0000, 128, VRAM_QUEUE_ROW)) {
-    /* 32 entries are waiting: keep this one for the next frame */
+    /* the queue is full: keep this one for the next frame */
 }
 
 WaitForVBlank();
 vramQueueFlush();          /* first thing in VBlank */
 ```
+
+The queue holds 32 entries; a project that needs more says so in its
+Makefile, `VRAM_QUEUE_MAX := 64` (1 to 255, 10 bytes of the C RAM band
+each). The VBlank does not grow with it: `vramQueueCost()` says what the
+entries waiting will take.
 
 `VRAM_QUEUE_COLUMN` steps 32 words after each word, for a column of a
 32-wide tilemap.
@@ -239,13 +244,13 @@ not all fit.
 Be clear about what it buys. Six 128-byte transfers, measured
 (`devtools/libbench`):
 
-| | Whole cost | Of which in VBlank |
-|---|---:|---:|
-| six `dmaCopyVram()` calls | 16,600 | 16,600 |
-| six `vramQueuePush()` and one `vramQueueFlush()` | 21,700 | 10,700 |
+| | In VBlank |
+|---|---:|
+| six `dmaCopyVram()` calls | 15,900 |
+| six `vramQueuePush()` (before the VBlank), one `vramQueueFlush()` | 10,600 |
 
-The queue costs **more** in total — noting an entry is a call too — and a
-third **less** in VBlank. Use it when the VBlank is what you are short of;
+The queue costs **more** in total — noting an entry is a call too, made
+during the frame — and a third **less** in VBlank. Use it when the VBlank is what you are short of;
 for one or two uploads, or in force blank, call `dmaCopyVram()`.
 
 The budget stays yours: what does not fit in the VBlank lands in active
@@ -254,8 +259,8 @@ display and is ignored by the PPU, with no error.
 When several modules fill the queue — a status bar, a message box, then
 the sprite frames — the last one needs to know what the others already
 took. `vramQueueCost()` says it: the bytes queued plus
-`VRAM_QUEUE_ENTRY_COST` (96) for each entry, the flush's cost per entry
-expressed in bytes. Multiply by 8 for master cycles. The flush sets it
+`VRAM_QUEUE_ENTRY_COST` (80) for each entry, the flush's cost per entry
+expressed in bytes (619 master cycles in SlowROM, rounded up). Multiply by 8 for master cycles. The flush sets it
 back to 0.
 
 ```c
@@ -269,6 +274,31 @@ while (next < wanted
 
 The queue does not refuse an entry past a budget: which module gives way
 is the game's choice, and the order in which they push is not.
+
+### Filling the VBlank to a line
+
+A fixed budget has to be safe for the latest the flush may start, so most
+frames leave lines unused. `vramQueueFlushUntil(line)` reads the vertical
+counter once, turns the lines left before `line` into bytes of
+`vramQueueCost()` (165 a line), and sends the entries in queue order while
+they fit. What does not fit stays at the head of the queue, in the same
+order, for the next VBlank: a VRAM address pushed twice still gets the
+second transfer last. It returns the entries left.
+
+```c
+WaitForVBlank();
+vramQueueFlushUntil(262);   /* NTSC: the blank ends after line 261; 312 in PAL */
+/* the game then pushes on top of what is left (vramQueueCost(), vramQueueFree()) */
+```
+
+- Outside the vertical blank it sends nothing, so a late call in a lag
+  frame does not write into active display. In force blank use
+  `vramQueueFlush()`.
+- A kept entry reads its source at a later flush: a RAM buffer behind it
+  must not change until then.
+- Measured on luna, 48 entries of 128 bytes queued each frame, `line` 262:
+  25 go per frame, the last DMA byte on line 261 (258 with `USE_FASTROM`),
+  none outside the blank.
 
 ## Lib API tour
 

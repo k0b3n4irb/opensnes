@@ -197,14 +197,11 @@ jobs:
     name: Doc render leaks (check_doc_render.py)
     runs-on: ubuntu-latest
     steps:
-      - name: Check out OpenSNES (with submodules)
-        # docs/doxygen-awesome-css is a submodule and the Doxyfile lists its
-        # stylesheets in HTML_EXTRA_STYLESHEET / HTML_EXTRA_FILES. Doxygen
-        # only warned about the missing files until WARN_AS_ERROR went on
-        # (gaps review P7) — now their absence fails the build, as it should.
+      - name: Check out OpenSNES
+        # The theme's files the Doxyfile lists are in the repository
+        # (docs/doxygen-awesome-css, a submodule until 2026-10-25); a missing
+        # one fails the build under WARN_AS_ERROR (gaps review P7).
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          submodules: true
 
       - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
         # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test

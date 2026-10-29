@@ -40,7 +40,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lib import REPO_ROOT, discover_example_roms, example_key, find_luna  # noqa: E402
+from lib import REPO_ROOT, TMP_ROOT, discover_example_roms, example_key, find_luna  # noqa: E402
 from luna_runner import capture_frames, load_manifest, missing_firmware  # noqa: E402
 
 
@@ -52,7 +52,7 @@ def main() -> int:
                     help="accept a match up to N frames away (boot-length shift)")
     ap.add_argument("--only", metavar="SUBSTR", help="restrict to example keys containing SUBSTR")
     ap.add_argument("--power-on", metavar="MODE", help="luna --power-on for both machines")
-    ap.add_argument("--screenshot-dir", metavar="DIR", default="/tmp/luna-diff",
+    ap.add_argument("--screenshot-dir", metavar="DIR", default=str(TMP_ROOT / "luna-diff"),
                     help="where luna writes frame_<F>_a/b.png for every DIFF frame")
     args = ap.parse_args()
 

@@ -1,2 +1,6 @@
 env QBE_NO_PEEP_FLOW=1
-in keep: present \tadc\.w #2\n\tsta\.b tcc__lf\+\d+\n\tasl a\n\tsta\.b tcc__lf\+\d+\n\ttax
+# Since 2026-10-25 the multiply by the element size of an index whose high
+# word is dead is computed in A and handed to X without a store
+# (is_pow2_mul): of the two stores the flow pass removes, the one of the
+# index sum is left here, with the pass off.
+in keep: present \tadc\.w #2\n\tsta\.b tcc__lf\+\d+\n\tasl a\n\ttax

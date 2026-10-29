@@ -108,7 +108,10 @@ tcc_mul16:
     ; --- a_lo * b_hi --- WRMPYA still holds a_lo: anomie-regs, "$4202
     ; will not be altered by this process, thus a new value may be written
     ; to $4203 to perform another multiplication without resetting $4202".
+    ; A high byte of 0 makes the product 0: skipped (2026-10-27), which is
+    ; the case of every multiplier under 256, a count or a small size.
     lda 8,s             ; b_hi (multiplier high byte)
+    beq @no_bhi
     sta $4203           ; WRMPYB
 
     nop
@@ -127,8 +130,11 @@ tcc_mul16:
     sep #$20
     .ACCU 8
 
-    ; --- a_hi * b_lo ---
+@no_bhi:
+    .ACCU 8
+    ; --- a_hi * b_lo --- skipped too when a_hi is 0
     lda 6,s             ; a_hi (multiplicand high byte)
+    beq @no_ahi
     sta $4202           ; WRMPYA
     lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB
@@ -144,6 +150,14 @@ tcc_mul16:
     clc
     adc tcc__r2         ; Final result in A (returned to caller)
 
+    plp
+    rtl
+
+@no_ahi:
+    .ACCU 8
+    rep #$20
+    .ACCU 16
+    lda tcc__r2         ; the result is the products made so far
     plp
     rtl
 

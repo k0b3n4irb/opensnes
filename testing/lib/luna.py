@@ -20,6 +20,10 @@ REPO_ROOT = TESTING.parent
 # Single source of truth for the pin: testing/luna.version (what
 # scripts/install-luna.sh downloads). A version bump touches that one file.
 LUNA_VERSION = (TESTING / "luna.version").read_text(encoding="utf-8").strip()
+# Where the harness writes what it keeps between two steps of a run (PNGs of
+# a failed capture, profiles, WRAM traces). One root, so that `make clean-tmp`
+# (the last step of `make tests`) removes everything a run left behind.
+TMP_ROOT = Path(os.environ.get("OPENSNES_TMP") or "/tmp/opensnes-tests")
 
 
 def find_luna() -> str:

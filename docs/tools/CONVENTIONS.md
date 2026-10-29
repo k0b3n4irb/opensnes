@@ -101,15 +101,23 @@ rule, two spellings: an asset with one source is named after its source
 (`hero.png.toml`), an asset with several is named after its product
 (`soundbank.toml`).
 
+One more key may sit before the table, `vram = N`: the bytes this asset
+holds in VRAM at once, when that is not its size (0 for a sprite sheet the
+game streams through a cache, the cache's size on one of them). The tools
+keep it on `--save` and ignore it otherwise; `opensnes-rom` counts it in its
+VRAM line (@ref tools_opensnes_rom).
+
 The first key is always `tool`: the build system's one generic rule reads
 it to know which tool converts the file. **That rule exists** (`make/common.mk`,
-`ASSET_TOML`): every `*.toml` and `res/*.toml` that names an `opensnes-*`
-tool is converted before the first C or ASM object (the tool's subcommand
+`ASSET_TOML`): every `*.toml`, `res/*.toml` and `res/*/*.toml` that names
+an `opensnes-*` tool is converted before the first C or ASM object (the tool's subcommand
 is the file's one table), and every `<stem>_data.as` the tools write is
 included by `assets_gen.asm` and assembled with the project. A fragment
 carries one `ASSET_SECTION` per blob (tiles, map, palette, sample), so the
 linker places each where it fits; a blob above 32 KB, the size of a bank,
-is cut in parts (`<name>_tiles`, `<name>_tiles_1`, …, each with `_end`). A project with settings files has no
+is cut in parts (`<name>_tiles`, `<name>_tiles_1`, …, each with `_end`); for tiles, the `.inc`
+also defines `<name>_tiles_load(vram)`, which copies every part, part *n* at `vram + n * 0x4000`
+words. A project with settings files has no
 hand-written `data.asm` and no conversion rule in its Makefile: the
 `starter/` is built this way. The rest is one table named after
 the subcommand, keys spelled exactly as the long options (`--size` is

@@ -173,6 +173,16 @@ void textPrintAt(u8 x, u8 y, const char *str);
 void textPrintU16(u16 value);
 
 /**
+ * @brief Print a signed integer: a minus sign when negative, then the digits
+ *
+ * -52 prints "-52", 0 prints "0", -32768 prints "-32768". Same cost as
+ * textPrintU16(), plus one character when negative.
+ *
+ * @param value Number to print
+ */
+void textPrintS16(s16 value);
+
+/**
  * @brief Print an unsigned integer in hexadecimal
  *
  * @param value Number to print
@@ -199,7 +209,7 @@ void textClearRect(u8 x, u8 y, u8 w, u8 h);
  * @brief Request tilemap DMA transfer to VRAM (rarely needed).
  *
  * As of chantier T.4 every text writer (`textPutChar`, `textPrint`,
- * `textPrintAt`, `textPrintU16`, `textPrintHex`, `textClear`,
+ * `textPrintAt`, `textPrintU16`, `textPrintS16`, `textPrintHex`, `textClear`,
  * `textClearRect`) sets the dirty flag itself, so the NMI handler
  * always flushes the tilemap on the next VBlank without an explicit
  * call.

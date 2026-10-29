@@ -86,6 +86,55 @@ static int write_column_major(cli_ctx *ctx, const char *in, const char *outbase,
     return CLI_OK;
 }
 
+/* --metatiles 16: the picture as a table of 16x16 metatiles. Each 16x16 block
+ * of the picture is four map entries (the 8x8 conversion's, with --offset,
+ * --priority and the flips in them); the distinct quadruples, in order of
+ * first appearance, are <stem>.mtl (TL, TR, BL, BR, u16 each), and <stem>.mtm
+ * holds, for each block row after row, the number of its metatile. Identical
+ * blocks share one. No .map is written: a level is drawn from the two. */
+static int write_metatiles(cli_ctx *ctx, const char *in, const char *outbase, const unsigned short *map,
+                           int cols, int rows, int offset, int prio, int *count)
+{
+    int mw = cols / 2, mh = rows / 2;
+    unsigned short *table = malloc((size_t)mw * mh * 8), *mmap = malloc((size_t)mw * mh * 2);
+    if (!table || !mmap) { free(table); free(mmap); cli_error(ctx, in, "out of memory"); return CLI_IO; }
+    int n = 0;
+    for (int by = 0; by < mh; by++)
+        for (int bx = 0; bx < mw; bx++) {
+            unsigned short q[4];
+            const int at[4] = { (2 * by) * cols + 2 * bx, (2 * by) * cols + 2 * bx + 1,
+                                (2 * by + 1) * cols + 2 * bx, (2 * by + 1) * cols + 2 * bx + 1 };
+            for (int k = 0; k < 4; k++) {
+                if ((map[at[k]] & 0x03FF) + offset > 0x03FF) {   /* the check map_save makes */
+                    free(table); free(mmap);
+                    cli_error(ctx, in, "tile %d + --offset %d exceeds 1023 (the 10-bit tile field)", map[at[k]] & 0x03FF, offset);
+                    return CLI_REFUSED;
+                }
+                q[k] = (unsigned short)(map[at[k]] + offset + (prio << PRIORITY_OFS));
+            }
+            int m = 0;
+            while (m < n && memcmp(table + m * 4, q, sizeof q)) m++;
+            if (m == n) { memcpy(table + n * 4, q, sizeof q); n++; }
+            mmap[by * mw + bx] = (unsigned short)m;
+        }
+    char path[1100];
+    const char *exts[2] = { ".mtl", ".mtm" };
+    const unsigned short *blobs[2] = { table, mmap };
+    long words[2] = { (long)n * 4, (long)mw * mh };
+    for (int b = 0; b < 2; b++) {
+        snprintf(path, sizeof path, "%s%s", outbase, exts[b]);
+        FILE *f = fopen(path, "wb");
+        int ok = f != NULL;
+        for (long k = 0; ok && k < words[b]; k++)
+            ok = fputc(blobs[b][k] & 0xFF, f) != EOF && fputc(blobs[b][k] >> 8, f) != EOF;
+        if (f && fclose(f) != 0) ok = 0;
+        if (!ok) { free(table); free(mmap); cli_error(ctx, in, "cannot write %s", path); return CLI_IO; }
+    }
+    free(table); free(mmap);
+    *count = n;
+    return CLI_OK;
+}
+
 static const cli_opt convert_opts[] = {
     { "size", 0, CLI_INT, "N", "the block in pixels: 8 (a BG tile) or 16", "8" },
     { "bpp", 0, CLI_INT, "N", "bits per pixel: 2 (4 colours, Mode 0), 4 (16), 8 (256, Modes 3/4/7)", "4" },
@@ -104,6 +153,7 @@ static const cli_opt convert_opts[] = {
     { "pack", 0, CLI_FLAG, NULL, "packed-pixel tiles (what --mode 7 implies)", NULL },
     { "round", 0, CLI_FLAG, NULL, "round each colour to the SNES's 5-bit channels instead of truncating it (the nearest colour the hardware shows)", NULL },
     { "no-palette", 0, CLI_FLAG, NULL, "do not write the .pal", NULL },
+    { "metatiles", 0, CLI_INT, "N", "also cut the picture into N x N metatiles (16): <stem>.mtl, the distinct ones as four map entries each, and <stem>.mtm, one metatile number per block; no .map", NULL },
     { "column-major", 0, CLI_FLAG, NULL, "also write <stem>.cmap, the same map column after column (<name>_cols): a column of a scrolling map is then one block", NULL },
     CLI_OPT_OUT,
     CLI_OPT_SAVE,
@@ -133,6 +183,13 @@ static int convert_one(cli_ctx *ctx, const char *in)
     if (entry < 0 || entry > 7) { cli_error(ctx, in, "--palette-entry %d: 0 to 7", entry); return CLI_REFUSED; }
     if (offset < 0 || offset > 2047) { cli_error(ctx, in, "--offset %d: 0 to 2047", offset); return CLI_REFUSED; }
     int colmajor = cli_has(ctx, "column-major");
+    int metatiles = cli_has(ctx, "metatiles") ? cli_int(ctx, "metatiles", 0) : 0;
+    if (cli_has(ctx, "metatiles")) {
+        if (metatiles != 16) { cli_error(ctx, in, "--metatiles %d: 16 (four 8x8 tiles)", metatiles); return CLI_REFUSED; }
+        if (size != 8) { cli_error(ctx, in, "--metatiles with --size %d: metatiles are made of 8x8 tiles", size); return CLI_REFUSED; }
+        if (mode != 1 || pack) { cli_error(ctx, in, "--metatiles with --mode %d: a metatile is four entries of a Mode 0-4 map", mode); return CLI_REFUSED; }
+        if (pages || colmajor) { cli_error(ctx, in, "--metatiles with --%s: the metatile map replaces the map", pages ? "pages" : "column-major"); return CLI_REFUSED; }
+    }
     if (colmajor && pack) { cli_error(ctx, in, "--column-major with Mode 7: a Mode 7 map has one byte per entry and is not written by columns"); return CLI_REFUSED; }
     if (colmajor && pages) { cli_error(ctx, in, "--column-major with --pages: a map in 32x32 pages is not row after row, there is no column order of it"); return CLI_REFUSED; }
     if (rearrange && (ncolors == 128 || ncolors == 256)) {
@@ -165,7 +222,19 @@ static int convert_one(cli_ctx *ctx, const char *in)
         free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
         return CLI_REFUSED;
     }
-    map_save(outbase, map, mode, map_blksx, blksy, offset, prio, true);
+    int nmeta = 0;
+    if (metatiles) {
+        if (w % 16 || h % 16) {
+            cli_error(ctx, in, "--metatiles 16 on a %dx%d picture: its width and height must be multiples of 16", w, h);
+            free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+            return CLI_REFUSED;
+        }
+        if ((rc = write_metatiles(ctx, in, outbase, map, blksx, blksy, offset, prio, &nmeta)) != CLI_OK) {
+            free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+            return rc;
+        }
+    } else
+        map_save(outbase, map, mode, map_blksx, blksy, offset, prio, true);
     if (colmajor && write_column_major(ctx, in, outbase, map_blksx, blksy) != CLI_OK) {
         free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
         return CLI_IO;
@@ -179,7 +248,8 @@ static int convert_one(cli_ctx *ctx, const char *in)
     char ident[256], generator[64], err[160];
     cli_ident(in, ident, sizeof ident);
     snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
-    incfile_spec spec = { generator, bpp, savepal, 1, 0, mode == 7, map_blksx, blksy, cli_has(ctx, "lz"), colmajor };
+    incfile_spec spec = { generator, bpp, savepal, !metatiles, 0, mode == 7, map_blksx, blksy, cli_has(ctx, "lz"), colmajor,
+                          nmeta, blksx / 2, blksy / 2 };
     if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
@@ -192,9 +262,10 @@ static int convert_one(cli_ctx *ctx, const char *in)
         cli_json_object(ctx, "picture"); cli_json_int(ctx, "width", w); cli_json_int(ctx, "height", h);
         cli_json_int(ctx, "block", size); cli_json_int(ctx, "blocks_x", blksx); cli_json_int(ctx, "blocks_y", blksy); cli_json_close(ctx);
         cli_json_array(ctx, "outputs");
-        const char *exts[] = { pack ? ".pc7" : ".pic", pack ? ".mp7" : ".map", ".inc", "_data.as", savepal ? ".pal" : NULL, colmajor ? ".cmap" : NULL };
-        const char *kinds[] = { "tiles", "map", "header", "asm", "palette", "map_by_columns" };
-        for (int i = 0; i < 6; i++) {
+        const char *exts[] = { pack ? ".pc7" : ".pic", metatiles ? NULL : pack ? ".mp7" : ".map", ".inc", "_data.as", savepal ? ".pal" : NULL,
+                               colmajor ? ".cmap" : NULL, metatiles ? ".mtl" : NULL, metatiles ? ".mtm" : NULL };
+        const char *kinds[] = { "tiles", "map", "header", "asm", "palette", "map_by_columns", "metatiles", "metatile_map" };
+        for (int i = 0; i < 8; i++) {
             if (!exts[i]) continue;
             char path[1100]; snprintf(path, sizeof path, "%s%s", outbase, exts[i]);
             cli_json_object(ctx, NULL); cli_json_str(ctx, "path", path); cli_json_str(ctx, "kind", kinds[i]); cli_json_close(ctx);
@@ -204,10 +275,15 @@ static int convert_one(cli_ctx *ctx, const char *in)
         cli_json_int(ctx, "bpp", bpp); cli_json_int(ctx, "mode", mode);
         cli_json_int(ctx, "vram_tiles_bytes", vram_tiles); cli_json_int(ctx, "vram_map_bytes", vram_map);
         cli_json_int(ctx, "palette_colors", savepal ? colors : 0);
+        if (metatiles) cli_json_int(ctx, "metatiles", nmeta);
         cli_json_close(ctx);
     } else if (!ctx->quiet) {
-        printf("%s: %s -> %s.%s + .%s (%d tiles, %ld + %ld bytes of VRAM at %d bpp, mode %d%s)\n", ctx->tool->name, in, outbase,
-               pack ? "pc7" : "pic", pack ? "mp7" : "map", nbtiles, vram_tiles, vram_map, bpp, mode, savepal ? ", .pal" : "");
+        if (metatiles)
+            printf("%s: %s -> %s.pic + .mtl + .mtm (%d tiles, %d metatiles of 16x16 for %dx%d blocks, %ld bytes of VRAM at %d bpp%s)\n", ctx->tool->name, in, outbase,
+                   nbtiles, nmeta, blksx / 2, blksy / 2, vram_tiles, bpp, savepal ? ", .pal" : "");
+        else
+            printf("%s: %s -> %s.%s + .%s (%d tiles, %ld + %ld bytes of VRAM at %d bpp, mode %d%s)\n", ctx->tool->name, in, outbase,
+                   pack ? "pc7" : "pic", pack ? "mp7" : "map", nbtiles, vram_tiles, vram_map, bpp, mode, savepal ? ", .pal" : "");
     }
     return CLI_OK;
 }

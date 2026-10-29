@@ -232,6 +232,16 @@ void textPrintU16(u16 value) {
     textPrint(buf);
 }
 
+void textPrintS16(s16 value) {
+    if (value < 0) {
+        textPutChar('-');
+        /* in u16: the magnitude of -32768 is 32768, which s16 cannot hold */
+        textPrintU16((u16)(0u - (u16)value));
+    } else {
+        textPrintU16((u16)value);
+    }
+}
+
 void textPrintHex(u16 value, u8 digits) {
     /* RAM, not const: lib C modules carry no ROM const data (a spilled
      * .rodata section reads as garbage from bank $01+ — symmap ratchet). */

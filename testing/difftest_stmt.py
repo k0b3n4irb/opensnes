@@ -1305,7 +1305,10 @@ def reduce_case(case: Case, luna: str, name: str) -> Case:
 
 def run_seed(seed, luna: str, keep: bool):
     if seed == "pinned":
-        return run_pinned(luna)
+        res = run_pinned(luna)
+        if res[1] == 0 and not keep:
+            shutil.rmtree(D.WORK / "stmt_pinned", ignore_errors=True)
+        return res
     cases = make_cases(seed)
     name = f"stmt_{seed}"
     res = verdicts(cases, name, luna)
@@ -1320,15 +1323,19 @@ def run_seed(seed, luna: str, keep: bool):
             msgs += ["    " + ln for ln in c_prog(small.P, 0, small.label, small.expected)[0].splitlines()]
             msgs.append("    call: " + c_prog(small.P, 0, small.label, small.expected)[1])
             msgs += probe_case(small, luna, name + "_probe")
-    if not msgs and not keep:
-        shutil.rmtree(D.WORK / name, ignore_errors=True)
+    if not keep:
+        # the reduction's and the probe's projects are scratch: what they found is in msgs
+        for scratch in D.WORK.glob(name + "_*"):
+            shutil.rmtree(scratch, ignore_errors=True)
+        if not msgs:
+            shutil.rmtree(D.WORK / name, ignore_errors=True)
     return seed, (1 if msgs else 0), msgs
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--seeds", help="e.g. 5 or 1,2,9 or 100-163 (default: the gate seeds)")
-    ap.add_argument("--keep", action="store_true", help="keep the generated projects of passing seeds")
+    ap.add_argument("--keep", action="store_true", help="keep the generated projects of passing seeds, and the reduction's and probe's projects of failing ones")
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
     ap.add_argument("--cc", help="path of another cc65816 to test (e.g. one built before a change)")
     args = ap.parse_args()

@@ -14,7 +14,7 @@ for whoever merges, releases and bumps.
 | `k0b3n4irb/qbe` | code generator fork with the 65816 backend (`compiler/qbe`) | `git://c9x.me/qbe.git` |
 | `k0b3n4irb/wla-dx` | assembler/linker fork (`compiler/wla-dx`) | `https://github.com/vhelin/wla-dx.git` |
 | `k0b3n4irb/luna` | the emulator the tests run on (a pinned release binary, not a submodule) | — |
-| `jothepro/doxygen-awesome-css` | documentation theme (`docs/doxygen-awesome-css`) | — |
+| `jothepro/doxygen-awesome-css` | documentation theme: six files copied into `docs/doxygen-awesome-css` (version in its README) | — |
 
 Merging and releasing need write access to `opensnes` and to the three
 forks: a compiler fix is a commit on the fork's branch named in

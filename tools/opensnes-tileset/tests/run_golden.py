@@ -67,6 +67,7 @@ def column_major():
 
 
 g.check("convert wide.png --column-major: the .cmap is the .map by columns, declared as wide_cols", "transposition checked independently", column_major())
+
 g.expect_refused("convert --column-major --mode 7 (one byte per entry)", ["convert", "--mode", "7", "--bpp", "8", "--column-major", "bg.png"],
                  copy=["bg.png"], needles=["--column-major with Mode 7"])
 g.expect_refused("convert --column-major --pages (not row after row)", ["convert", "--colors", "16", "--pages", "--column-major", "bg.png"],
@@ -146,6 +147,157 @@ def _indexed_png(rows, ncol=16, palette=None):
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, 3, 0, 0, 0))
             + chunk(b"PLTE", plte) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
 
+
+def split_load():
+    """A tileset larger than one 32 KB bank is written in parts; the .inc
+    declares each and gives <stem>_tiles_load(vram), one dmaCopyVram per part,
+    part n at vram + n * 0x4000 words. 576 distinct 8bpp tiles: 36 864 bytes,
+    two parts."""
+    def run():
+        T = 24
+        rows = [[0] * (T * 8) for _ in range(T * 8)]
+        for ty in range(T):
+            for tx in range(T):
+                k = ty * T + tx
+                for y in range(8):
+                    for x in range(8):
+                        rows[ty * 8 + y][tx * 8 + x] = (x * 3 + y * 11 + 1) & 0xFF
+                rows[ty * 8][tx * 8] = k & 0xFF
+                rows[ty * 8][tx * 8 + 1] = k >> 8
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "big.png").write_bytes(_indexed_png(rows, ncol=256))
+            proc = g.run(["convert", "-q", "--bpp", "8", "--colors", "256", "big.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            inc = (work / "big.inc").read_text()
+            asm = (work / "big_data.as").read_text()
+        errs = []
+        for needle, where, text in (("extern const u8 big_tiles_1[], big_tiles_1_end[];", "big.inc", inc),
+                                    ("#define big_tiles_load(vram) do {", "big.inc", inc),
+                                    ("dmaCopyVram(big_tiles, (u16)((vram) + 0x0000), (u16)(big_tiles_end - big_tiles));", "big.inc", inc),
+                                    ("dmaCopyVram(big_tiles_1, (u16)((vram) + 0x4000), (u16)(big_tiles_1_end - big_tiles_1));", "big.inc", inc),
+                                    ('ASSET_SECTION "big_tiles_1"', "big_data.as", asm)):
+            if needle not in text:
+                errs.append(f"{where} lacks {needle!r}")
+        if "big_tiles_2" in inc:
+            errs.append("big.inc declares a third part for 36 864 bytes")
+        return errs
+    return run
+
+
+g.check("convert a 36 KB tileset: two parts, and big_tiles_load() loads both", "the .inc read for each part", split_load())
+
+
+def metatiles_16():
+    """--metatiles 16: a 64x48 picture of 4x3 blocks drawn from four 16x16
+    patterns (one used three times, one the mirror of another). The .mtm names
+    one metatile per block, identical blocks share one, and every pixel decodes
+    through .mtm -> .mtl -> .pic -> .pal to the source's colour."""
+    def run():
+        def pattern(p, x, y):
+            return [(x * 5 + y * 3) % 15 + 1, (x ^ y) % 7 + 8, (x // 4 + y // 4) % 2 * 9 + 2, 0][p] if p < 3 \
+                else ((15 - x) * 5 + y * 3) % 15 + 1          # 3: pattern 0 mirrored
+        layout = [[0, 1, 0, 2], [3, 0, 1, 1], [2, 2, 0, 3]]
+        W, H = 4, 3
+        rows = [[pattern(layout[y // 16][x // 16], x % 16, y % 16) for x in range(W * 16)] for y in range(H * 16)]
+        palette = [((i * 53) % 256, (i * 97) % 256, (i * 29) % 256) for i in range(16)]
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "lvl.png").write_bytes(_indexed_png(rows, ncol=16, palette=palette))
+            proc = g.run(["convert", "-q", "--colors", "16", "--flip", "--metatiles", "16", "lvl.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            pic = (work / "lvl.pic").read_bytes()
+            palb = (work / "lvl.pal").read_bytes()
+            mtl = (work / "lvl.mtl").read_bytes()
+            mtm = (work / "lvl.mtm").read_bytes()
+            inc = (work / "lvl.inc").read_text()
+            asm = (work / "lvl_data.as").read_text()
+            has_map = (work / "lvl.map").exists()
+        errs = []
+        cols = [struct.unpack_from("<H", palb, i * 2)[0] for i in range(len(palb) // 2)]
+        meta = [struct.unpack_from("<4H", mtl, i * 8) for i in range(len(mtl) // 8)]
+        mm = [struct.unpack_from("<H", mtm, i * 2)[0] for i in range(len(mtm) // 2)]
+        if len(mm) != W * H:
+            errs.append(f"lvl.mtm holds {len(mm)} entries, {W * H} expected (no padding)")
+            return errs
+        if len(meta) != 4:
+            errs.append(f"{len(meta)} metatiles for 4 distinct blocks")
+        for by in range(H):
+            for bx in range(W):
+                for oy in range(H):
+                    for ox in range(W):
+                        same = layout[by][bx] == layout[oy][ox]
+                        if same != (mm[by * W + bx] == mm[oy * W + ox]):
+                            errs.append(f"blocks ({bx},{by}) and ({ox},{oy}) {'differ' if same else 'share a metatile'} in the .mtm")
+        if has_map:
+            errs.append("lvl.map written: the metatile map replaces it")
+
+        def rgb(c):
+            return ((c & 31) << 3, ((c >> 5) & 31) << 3, ((c >> 10) & 31) << 3)
+
+        def tile(n):
+            t = pic[n * 32:(n + 1) * 32]
+            return [[(((t[y * 2] >> (7 - x)) & 1) | (((t[y * 2 + 1] >> (7 - x)) & 1) << 1)
+                      | (((t[16 + y * 2] >> (7 - x)) & 1) << 2) | (((t[16 + y * 2 + 1] >> (7 - x)) & 1) << 3))
+                     for x in range(8)] for y in range(8)]
+        bad = 0
+        for y in range(H * 16):
+            for x in range(W * 16):
+                q = meta[mm[(y // 16) * W + x // 16]] if mm[(y // 16) * W + x // 16] < len(meta) else (0, 0, 0, 0)
+                e = q[((y % 16) // 8) * 2 + (x % 16) // 8]
+                tn, pb, hf, vf = e & 0x3FF, (e >> 10) & 7, (e >> 14) & 1, (e >> 15) & 1
+                ty, tx = y % 8, x % 8
+                idx = tile(tn)[7 - ty if vf else ty][7 - tx if hf else tx]
+                src = rows[y][x]
+                if idx == 0 and src == 0:
+                    continue
+                if rgb(cols[pb * 16 + idx]) != tuple((v >> 3) << 3 for v in palette[src]):
+                    bad += 1
+        if bad:
+            errs.append(f"{bad} pixel(s) decode through the metatiles to a colour that is not the source's")
+        for needle in ("#define LVL_METATILES 4", "#define LVL_METAMAP_W 4", "#define LVL_METAMAP_H 3",
+                       "extern const u8 lvl_metatiles[], lvl_metatiles_end[];", "extern const u8 lvl_metamap[], lvl_metamap_end[];"):
+            if needle not in inc:
+                errs.append(f"lvl.inc lacks {needle!r}")
+        for needle in ('ASSET_SECTION "lvl_metatiles"', 'ASSET_SECTION "lvl_metamap"'):
+            if needle not in asm:
+                errs.append(f"lvl_data.as lacks {needle!r}")
+        if "lvl_map" in inc or "lvl_map" in asm:
+            errs.append("lvl_map declared without a .map")
+        return errs
+    return run
+
+
+g.check("convert --metatiles 16: one metatile per distinct 16x16 block, every pixel decodes through them", "pixel oracle through .mtm/.mtl", metatiles_16())
+g.expect_refused("convert --metatiles 8", ["convert", "--metatiles", "8", "bg.png"], copy=["bg.png"], needles=["--metatiles 8: 16"])
+g.expect_refused("convert --metatiles 16 --mode 7", ["convert", "--metatiles", "16", "--mode", "7", "--bpp", "8", "bg.png"], copy=["bg.png"], needles=["a metatile is four entries"])
+g.expect_refused("convert --metatiles 16 --pages", ["convert", "--metatiles", "16", "--pages", "bg.png"], copy=["bg.png"], needles=["the metatile map replaces the map"])
+
+
+def vram_key():
+    """`vram = N` before the table is not the tool's: accepted, kept by
+    --save, and a value outside 0..65536 is refused."""
+    def run():
+        errs = []
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "bg.png.toml").write_text('tool = "opensnes-tileset"\nvram = 4096\n\n[convert]\ncolors = 16\n')
+            proc = g.run(["convert", "-q", "--save", "bg.png"], work, copy=["bg.png"])
+            if g.failure(proc):
+                return [g.failure(proc)]
+            if "vram = 4096" not in (work / "bg.png.toml").read_text():
+                errs.append("--save dropped `vram = 4096`")
+            (work / "bg.png.toml").write_text('tool = "opensnes-tileset"\nvram = 70000\n\n[convert]\n')
+            proc = g.run(["convert", "-q", "bg.png"], work)
+            if proc.returncode == 0 or "0 to 65536" not in proc.stderr:
+                errs.append("vram = 70000 not refused")
+        return errs
+    return run
+
+
+g.check("a settings file with vram = N (the scene count's, not the tool's)", "accepted, kept, bounded", vram_key())
 
 def blank_tile(first_blank, extra, mode5=False):
     """--blank: every cell of the map shows its own block, whether the picture

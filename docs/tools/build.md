@@ -39,22 +39,23 @@ gives `res/jump.brr` and `res/jump.h`, and the build links the sample
 | Variable | Default | What it does |
 |---|---|---|
 | `USE_LIB` | `0` | `1` links the OpenSNES library |
-| `LIB_MODULES` | `console` | The library modules to link. Each module's own dependencies are added for you; a name that matches no module is an error that lists the available ones. `USE_SRAM`, `USE_SNESMOD`, `USE_SUPERFX` and `USE_DSP1` add their module |
+| `LIB_MODULES` | `console` | The library modules to link. Each module's own dependencies are added for you; a name that matches no module is an error that lists the available ones. A link that fails because a module is missing names it (`setMode is in the library module console: add console to LIB_MODULES`). `USE_SRAM`, `USE_SNESMOD`, `USE_SUPERFX` and `USE_DSP1` add their module |
 
 ## Cartridge
 
 | Variable | Default | What it does |
 |---|---|---|
 | `USE_HIROM` | `0` | `1` builds a HiROM cartridge (64 KB banks instead of 32 KB) |
-| `USE_FASTROM` | `0` | `1` marks the ROM as FastROM and runs the code from the fast mirror (~33 % more ROM bandwidth) |
+| `USE_FASTROM` | `0` | `1` marks the ROM as FastROM: the code, which a LoROM build always addresses in the `$80-$BF` mirror, is then read at 6 master cycles a byte instead of 8. Only the ROM reads speed up (RAM, registers and internal cycles do not): a loop of `vramQueuePush` calls and a flush measures 12 to 14 % faster. Super FX and SA-1 builds keep their own mapping |
 | `ROM_BANKS` | `8` | Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it |
-| `ASSET_TOML` | `*.toml` and `res/*.toml` that name an `opensnes-*` tool | The assets' settings files the build converts before compiling (one `opensnes-<tool> <subcommand>` run per file, then `assets_gen.asm` gathers their `.incbin` fragments); see @ref tools_conventions |
+| `ASSET_TOML` | `*.toml`, `res/*.toml` and `res/*/*.toml` that name an `opensnes-*` tool | The assets' settings files the build converts before compiling (one `opensnes-<tool> <subcommand>` run per file, then `assets_gen.asm` gathers their `.incbin` fragments); see @ref tools_conventions |
 | `ROMSIZE` | from `ROM_BANKS` | The header's ROM size byte (`$FFD7`, 1 KB << n, rounded up to a power of two). Leave it computed |
 | `ASSET_BANKS_RANGE` | `ROM_BANKS - 1` down to 1 | Banks the linker may use for `ASSET_SECTION` data and C const data, highest first. Leave it computed |
 | `ROM_REGION` | `ntsc` | The region the header declares (`$FFD9`): `ntsc` = `$01` USA, `pal` = `$02` Europe, `jp` = `$00` Japan. A console runs at its own standard whatever the byte says (`isPAL()` reads the console); emulators, luna included, choose 50 or 60 Hz from it |
 | `USE_SRAM` | `0` | `1` declares battery-backed save RAM and links the `sram` module |
 | `SRAM_SIZE` | `3` | Save RAM size as the header byte `$FFD8`: 1 KB << n, n = 1..7 (3 = 8 KB) |
 | `RAM_CODE_SIZE` | `0` | Bytes (1 to 16384) of a code window at the top of WRAM bank `$7E`, for code that runs from RAM (`RAM_CODE_SECTION`): stored in the top of ROM bank 1, copied by crt0 at boot. `0` = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, `gsuLaunch` wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with `SOUNDBANK_BANK := 2`. See the Super FX tutorial |
+| `VRAM_QUEUE_MAX` | `32` | Entries of the VRAM upload queue (`vramqueue` module, `snes/vramqueue.h`), 1 to 255: the build sizes the queue's arrays to it and gives C the same `VRAM_QUEUE_MAX`. 12 bytes of the C RAM band per entry; `vramQueueFlush()` sends them all, `vramQueueFlushUntil()` what ends before a given scanline |
 
 ## Coprocessors
 
@@ -82,7 +83,7 @@ A cartridge carries one coprocessor: setting two of these is refused.
 
 A C object depends on every header of the library (`lib/include/snes.h`,
 `lib/include/snes/*.h`), on every header of the project (`*.h`, `*.inc`,
-`res/*.h`, `res/*.inc`, next to each C source), on the generated graphics
+`res/*.h`, `res/*.inc`, `res/*/*.h`, `res/*/*.inc`, next to each C source), on the generated graphics
 headers, on the memory map and on `.opensnes_config`; and, through a stamp
 that holds a checksum of `bin/cc65816`, `cproc-qbe` and `qbe`, on the
 compiler itself. So a header edited anywhere rebuilds every C file of the

@@ -47,7 +47,7 @@ fixed-point types: `fixed` (8.8) from `<snes/math.h>`, `fixed32` (16.16) from
 
 **Is there a `printf`?**
 Not in the core library, by design. Print to the screen with `textPrint`,
-`textPrintU16` and `textPrintHex`, or to the host with the debug channel while
+`textPrintU16`, `textPrintS16` and `textPrintHex`, or to the host with the debug channel while
 developing.
 
 **Does `volatile` work?**

@@ -70,7 +70,7 @@ sprite math often moves off the main CPU.
 The 65816 runs at 3.58 MHz (FastROM) or 2.68 MHz (slow), so a frame is only so
 many thousand cycles. When logic outgrows it, in rough order of reach-for:
 
-- **FastROM** — a near-free ~33% speedup for ROM-bound code (a build flag).
+- **FastROM** — a build flag: ROM reads at 6 master cycles instead of 8, so code runs 12 to 14 % faster on the SDK's queue benchmark (only the reads from ROM speed up).
 - **In a loop that runs for every entity, compute in 16 bits.** What
   costs with an 8-bit type is arithmetic and comparison (the accumulator's
   width is switched and the result masked each time) and `s8` (a sign

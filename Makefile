@@ -46,6 +46,8 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
+# The host's strip(1), for the release zip; another toolchain sets its own.
+STRIP ?= strip
 
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
@@ -75,8 +77,16 @@ else
     RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
 endif
 
+# Where the test harness and the user-project test write what they keep
+# between two steps (testing/lib/luna.py reads the same variable). One root, so
+# that `make clean-tmp` removes what a run left behind; `make tests` calls it
+# once everything has passed, and keeps it all when a step fails (the
+# messages point into it).
+OPENSNES_TMP ?= /tmp/opensnes-tests
+export OPENSNES_TMP
+
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -93,7 +103,15 @@ clean:
 	$(MAKE) -C $(TOOLS_PATH) clean
 	$(MAKE) -C $(LIB_PATH) clean
 	$(MAKE) -C $(EXAMPLES_PATH) clean
-	-rm -rf bin/
+	-rm -rf bin/ build/difftest/
+
+# Everything the tree regenerates, not only the build: the benchmarks'
+# builds (build/), the fuzz corpus and harnesses, the release zips, the
+# generated documentation and the tests' temporary files. What is left is
+# the sources and the pinned luna (testing/bin/).
+clean-all: clean clean-tmp clean-release
+	-$(MAKE) -s -C tools/fuzz clean
+	-rm -rf build/ docs/build/
 
 install: compiler tools lib cli
 	$(MAKE) -C $(COMPILER_PATH) install
@@ -196,6 +214,7 @@ test-devtools:
 	@python3 devtools/test_check_nmi_wram_race.py
 	@python3 devtools/symmap/test_symmap.py
 	@python3 devtools/test_asset_budget.py
+	@python3 devtools/test_header_arg_checks.py
 	@cd testing && python3 -m unittest -q test_harness
 
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
@@ -293,7 +312,18 @@ tests: test-compiler
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
+	@$(MAKE) -s clean-tmp
 	@echo "ALL CHECKS PASSED (luna)"
+
+# What the tests leave in the temporary directory: $(OPENSNES_TMP), the files
+# of QBE's suite that it never removes, and the pass markers of earlier days
+# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh; today's
+# stays, the pre-commit hook reads it).
+clean-tmp:
+	@rm -rf $(OPENSNES_TMP)
+	@rm -f /tmp/qbe.zzzz.*
+	@for f in /tmp/opensnes_tests_passed_*; do \
+		[ -e "$$f" ] && [ "$$f" != /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d) ] && rm -f "$$f"; done; true
 
 # The VBlank time budget on its own (gaps review R4): the same gate `make
 # tests` runs, handy while tuning the NMI handler. `--report` prints the
@@ -362,7 +392,7 @@ test-pal:
 # contributor runs must include everything CI runs. The deliberately wrong
 # assert must make `make test` exit non-zero. The sed is done in Python so
 # the target behaves the same on macOS (BSD sed) and Linux.
-TEST_PROJECT_DIR ?= /tmp/opensnes_test_project
+TEST_PROJECT_DIR ?= $(OPENSNES_TMP)/opensnes_test_project
 test-project:
 	@rm -rf $(TEST_PROJECT_DIR)
 	@OPENSNES_HOME=$(CURDIR) bin/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
@@ -393,7 +423,14 @@ test-project:
 			|| { echo "ERROR: a ROM the check refused stayed on disk"; exit 1; }; \
 	done
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
-	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, release and budget)"
+	@# A module left out of LIB_MODULES: the failed link names it.
+	@sed -i 's/^LIB_MODULES *:=.*/LIB_MODULES := dma/' $(TEST_PROJECT_DIR)/Makefile
+	@printf '#include <snes.h>\nint main(void) { setMode(BG_MODE1, 0); for (;;) {} return 0; }\n' > $(TEST_PROJECT_DIR)/main.c
+	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) > $(TEST_PROJECT_DIR)/link.log 2>&1; then \
+		echo "ERROR: a project without console linked setMode"; exit 1; fi
+	@grep -q 'setMode is in the library module console: add console to LIB_MODULES' $(TEST_PROJECT_DIR)/link.log \
+		|| { cat $(TEST_PROJECT_DIR)/link.log; echo "ERROR: the failed link did not name the console module"; exit 1; }
+	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, a missing module, release and budget)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage: fixtures
@@ -650,7 +687,7 @@ docs:
 	@echo "========================================="
 
 # The P7 gate: the same build with warnings as errors, run by the doc-render
-# job on Linux with the pinned Doxygen and the CSS submodule checked out.
+# job on Linux with the pinned Doxygen.
 docs-strict: DOXY_STRICT := 1
 docs-strict: docs
 
@@ -669,10 +706,21 @@ release: all
 	@mkdir -p $(RELEASE_DIR)/opensnes/make
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
+	@# Debug information out (2026-10-25): the tools and the toolchain are
+	@# built with -g for the sanitizers and gdb, which made 72 of the 76 MB of
+	@# the v0.50.0 zip's content. -S removes the debug sections only (GNU and
+	@# Apple strip alike); the symbol table stays for a backtrace. On macOS
+	@# clang writes the debug information beside a program it compiles and
+	@# links in one step, as a <program>.dSYM folder: it goes, and strip is
+	@# given the files only (a folder stops Apple's strip, 2026-10-26).
+	@rm -rf $(RELEASE_DIR)/opensnes/bin/*.dSYM
+	@for f in $(RELEASE_DIR)/opensnes/bin/*; do \
+		[ -f "$$f" ] && { $(STRIP) -S "$$f" || exit 1; }; done; true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@# The objects only: the build links lib/build/<flavour>/*.o and never
+	@# The objects and the label index only: the build links
+	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and never
 	@# reads the .asm the compiler wrote on the way (about 200 files).
-	@cd lib && find build -name '*.o' | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
+	@cd lib && find build \( -name '*.o' -o -name symbols.txt \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
@@ -791,6 +839,7 @@ help:
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
 	@echo "  clean     - Clean all build artifacts"
+	@echo "  clean-all - clean, plus the benchmarks' builds, the fuzz corpus, the release zips, the generated docs and the tests' temp files"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
@@ -799,6 +848,7 @@ help:
 	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  check-clean-export - Build every example from a clean export of HEAD, as CI does"
+	@echo "  clean-tmp - Remove what the tests left in \$$OPENSNES_TMP (default /tmp/opensnes-tests); make tests ends with it"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
