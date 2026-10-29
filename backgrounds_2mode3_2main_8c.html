@@ -140,7 +140,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 3 full-color (256-color, 8bpp) background. </p>
-<p>Displays a 256-color background using Mode 3, the highest color-depth tiled mode on the SNES: a city canal at night, 253 colours, its haze a gradient no 16-colour palette could hold. Each tile is 64 bytes (8 bitplanes), so this tileset (770 tiles, 48 KB) is larger than a ROM bank: the converter writes it in two parts, canal_tiles and canal_tiles_1, and the linker places each where it has room. A C pointer carries its bank byte, so <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> takes each part wherever it landed.</p>
+<p>Displays a 256-color background using Mode 3, the highest color-depth tiled mode on the SNES: a city canal at night, 253 colours, its haze a gradient no 16-colour palette could hold. Each tile is 64 bytes (8 bitplanes), so this tileset (770 tiles, 48 KB) is larger than a ROM bank: the converter writes it in two parts, canal_tiles and canal_tiles_1, and the linker places each where it has room. The generated canal_tiles_load() copies both with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>, whose pointer carries the bank byte, so each part is taken wherever it landed.</p>
 <p>This began as the PVSnesLib "Mode3" example.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Mode 3: BG1 at 8bpp (256 colors from the whole CGRAM), BG2 at 4bpp</li>

@@ -151,12 +151,12 @@ Functions</h2></td></tr>
 <p>This began as the PVSnesLib "Mode1" and "Mode1LZ77" examples.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Mode 1: BG1/BG2 are 4bpp (16 colors each), BG3 is 2bpp (4 colors)</li>
-<li><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a> for combined tile + palette loading with VRAM address configuration</li>
+<li><a class="el" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet()</a> for combined tile + palette loading with VRAM address configuration</li>
 <li><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> for tilemap data transfer to a separate VRAM region</li>
 <li>VRAM layout: tiles at $0000, the decompressed copy at $4000, tilemap at $7800 (each region in its own range)</li>
 <li>Force blank (setScreenOff) during VRAM setup to avoid mid-frame writes</li>
 <li>LZ77-compressed tiles: <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> decodes from ROM into VRAM</li>
-<li><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a>: a background's character base is one register, switched at any time</li>
+<li><a class="el" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr()</a>: a background's character base is one register, switched at any time</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -232,7 +232,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Entry point &ndash; load a 4bpp tileset and display a static Mode 1 image. </p>
-<p>Demonstrates the typed asset bundle: tileset, palette, tilemap, color depth and map size all travel together in a single <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>. A single <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> does the same work as a manual <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr</a></span> + <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet</a></span> + <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> triple, with the color-mode / size pairing locked at declaration time.</p>
+<p>Demonstrates the typed asset bundle: tileset, palette, tilemap, color depth and map size all travel together in a single <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>. A single <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> does the same work as a manual <span class="tt"><a class="el" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></span> + <span class="tt"><a class="el" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></span> + <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> triple, with the color-mode / size pairing locked at declaration time.</p>
 <p>The picture has 883 distinct tiles (28 KB at 4bpp), and the VRAM holds it twice, so the layout is tight: the plain tiles at $0000, the decompressed copy at $4000 (a character base is a multiple of $1000 words), and the tilemap after both at $7800.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
 

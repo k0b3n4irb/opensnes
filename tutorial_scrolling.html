@@ -159,7 +159,7 @@ Basic BG Scrolling</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* ... load tiles, palettes, tilemap ... */</span></div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
+<div class="line">    <a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"> </div>
@@ -173,12 +173,12 @@ Basic BG Scrolling</h2>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
-<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
+<div class="ttc" id="abackground_8h_html_a7562c524ad6c4c62897ad159bf12b2c6"><div class="ttname"><a href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
-<div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
+<div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:39</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga11724b6748ce0954e9b43819263537fc"><div class="ttname"><a href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a></div><div class="ttdeci">#define SC_32x32</div><div class="ttdef"><b>Definition</b> background.h:36</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:443</div></div>
@@ -209,7 +209,7 @@ D-PAD Controlled Scrolling</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* ... load tiles, palettes, tilemap ... */</span></div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#gace76b0c992e2cba05f6da76f9825720a">SC_64x64</a>);</div>
+<div class="line">    <a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#gace76b0c992e2cba05f6da76f9825720a">SC_64x64</a>);</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"> </div>
@@ -285,7 +285,7 @@ HDMA Parallax (Per-Scanline Scroll)</h3>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* ... load tiles, palette, tilemap ... */</span></div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a>);</div>
+<div class="line">    <a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a>);</div>
 <div class="line">    <a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>

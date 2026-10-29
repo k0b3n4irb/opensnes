@@ -376,7 +376,7 @@ Why These Modules?</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span> for tilemap uploads, <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> for palette, OAM DMA  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr()</a></span> for configuring BG1/BG3 tilemap addresses  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr()</a></span> for configuring BG1/BG3 tilemap addresses  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone">Joypad buffers — though Breakout reads <span class="tt"><a class="el" href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[0]</span> directly  </td></tr>
 </table>
@@ -416,7 +416,7 @@ Files</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">The far RAM buffers, string constants, the map and colour binaries  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/tiles.png</span>  </td><td class="markdownTableBodyNone">BG1 and sprite tiles (cabinet, bricks, paddle, ball, shadows, font, lives icon); its palette is the whole CGRAM. The brick is PixelLab's (<span class="tt">assets/neo-lumen/ui/brick.png</span>), the rest drawn by <span class="tt">devtools/art_assets/breakout.py</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/tiles.png</span>  </td><td class="markdownTableBodyNone">BG1 and sprite tiles (cabinet, bricks, paddle, ball, shadows, font, lives icon); its palette is the whole CGRAM. All of it is drawn by <span class="tt">devtools/art_assets/breakout.py</span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">res/back.png</span>  </td><td class="markdownTableBodyNone">BG3's circuit board (2bpp)  </td></tr>
 <tr class="markdownTableRowOdd">

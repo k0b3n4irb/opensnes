@@ -152,6 +152,8 @@ Macros</h2></td></tr>
 <tr class="memdesc:ga3acffbd305ee72dcd4593c0d8af64a4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get minimum of two values.  <br /></td></tr>
 <tr class="memitem:ga070d2ce7b6bb7e5c05602aa8c308d0c4" id="r_ga070d2ce7b6bb7e5c05602aa8c308d0c4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>&#160;&#160;&#160;((void*)0)</td></tr>
 <tr class="memdesc:ga070d2ce7b6bb7e5c05602aa8c308d0c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Null pointer constant.  <br /></td></tr>
+<tr class="memitem:a83c542a181cfca79715f3b281f48e272" id="r_a83c542a181cfca79715f3b281f48e272"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>(cond,  msg)</td></tr>
+<tr class="memdesc:a83c542a181cfca79715f3b281f48e272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refuse a call whose constant argument the hardware cannot take.  <br /></td></tr>
 <tr class="memitem:a7e4a0ea7cc4892fdf814a6e0a7f841f0" id="r_a7e4a0ea7cc4892fdf814a6e0a7f841f0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7e4a0ea7cc4892fdf814a6e0a7f841f0">OPENSNES_DEPRECATED</a>(msg)</td></tr>
 <tr class="memdesc:a7e4a0ea7cc4892fdf814a6e0a7f841f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark a public function as deprecated, with its replacement.  <br /></td></tr>
 <tr class="memitem:ga2b7f5fd96b29a2a70327ee4bae8bb232" id="r_ga2b7f5fd96b29a2a70327ee4bae8bb232"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__volatile__types.html#ga2b7f5fd96b29a2a70327ee4bae8bb232">RAM_CODE</a>&#160;&#160;&#160;/* host compilers (the clang syntax lint) */</td></tr>
@@ -196,6 +198,30 @@ Attribution</h2>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a83c542a181cfca79715f3b281f48e272" name="a83c542a181cfca79715f3b281f48e272"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83c542a181cfca79715f3b281f48e272">&#9670;&#160;</a></span>OPENSNES_CHECK_ARGS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OPENSNES_CHECK_ARGS</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>cond</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>msg</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Refuse a call whose constant argument the hardware cannot take. </p>
+<p>In the clang pre-pass of every C file (make/common.mk), a call whose arguments make <span class="tt">cond</span> true at compile time is an error that says <span class="tt">msg</span>; a call with a run-time argument is not checked. cproc never sees it. Example: <a class="el" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr()</a> refuses a VRAM address that is not a multiple of 0x1000 words, which the register would drop in silence. </p>
+
+</div>
+</div>
 <a id="a7e4a0ea7cc4892fdf814a6e0a7f841f0" name="a7e4a0ea7cc4892fdf814a6e0a7f841f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7e4a0ea7cc4892fdf814a6e0a7f841f0">&#9670;&#160;</a></span>OPENSNES_DEPRECATED</h2>
 

@@ -1,5 +1,11 @@
 var NAVTREEINDEX5 =
 {
+"group__snesmod__module.html#gac745fbd1f90f590dcff56693b67494f1":[1,20,0],
+"group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358":[1,20,1],
+"group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2":[1,20,4],
+"group__snesmod__pitch.html":[1,23],
+"group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7":[1,23,2],
+"group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa":[1,23,0],
 "group__snesmod__pitch.html#gaa08379e80b0a877625abda4ddb176378":[1,23,1],
 "group__snesmod__process.html":[1,26],
 "group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7":[1,26,1],
@@ -172,6 +178,7 @@ var NAVTREEINDEX5 =
 "interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928":[3,0,2,0,0,15,6],
 "interrupt_8h.html#a7824431e7a255f980b881a0e29773a1a":[3,0,2,0,0,15,4],
 "interrupt_8h.html#a947b19bbddfaa5c9b41960ba1027bae9":[3,0,2,0,0,15,1],
+"interrupt_8h.html#a97190a6ce1065e4d7077b9621c7f1221":[3,0,2,0,0,15,11],
 "interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9":[3,0,2,0,0,15,7],
 "interrupt_8h.html#aa38e3794779028b8480958ff866d102b":[3,0,2,0,0,15,2],
 "interrupt_8h.html#aaece8b46f8a1058e500a960282748b8e":[3,0,2,0,0,15,0],
@@ -242,12 +249,5 @@ var NAVTREEINDEX5 =
 "map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444":[3,0,2,0,0,17,3],
 "map_8h.html#a9079bd5db5c4cbacb3e5f9092a0e9cbe":[3,0,2,0,0,17,15],
 "map_8h.html#a912cfae6ccf6375f3c2831d65646c76b":[3,0,2,0,0,17,6],
-"map_8h.html#aa36598a0b40be791f4845574e0c5db1f":[3,0,2,0,0,17,29],
-"map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30":[3,0,2,0,0,17,7],
-"map_8h.html#aab4c8cebd89d6e8b2a68e709784829d5":[3,0,2,0,0,17,0],
-"map_8h.html#ab9c13fbe07aac09e69bc677fe3f0fcaa":[3,0,2,0,0,17,1],
-"map_8h.html#ac0824c3b9bd01205245b0c57e256e852":[3,0,2,0,0,17,17],
-"map_8h.html#ac81f5707084136f68205fdadcfda52a7":[3,0,2,0,0,17,14],
-"map_8h.html#ac833e2572ce808bac75d10df2817df03":[3,0,2,0,0,17,27],
-"map_8h.html#ad36b80734e14117314d2ec683f552969":[3,0,2,0,0,17,12]
+"map_8h.html#aa36598a0b40be791f4845574e0c5db1f":[3,0,2,0,0,17,29]
 };

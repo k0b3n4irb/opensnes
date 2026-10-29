@@ -1,5 +1,11 @@
 var NAVTREEINDEX1 =
 {
+"dir_682fc3e8c3c8a47b1239c96b09b97ae1.html":[3,0,1,12],
+"dir_6b17615a765730034c6961a55152114f.html":[3,0,1,0,3],
+"dir_73eeb5547b39d97bc3ac59f165437536.html":[3,0,1,0,0],
+"dir_77f859cec237841463e52fc18a97adcf.html":[3,0,1,0],
+"dir_799e5ff613eee8f881f50db81391cba4.html":[3,0,1,6],
+"dir_7a8803ae0e11996cd326264644e16450.html":[3,0,1,11],
 "dir_7b7ada537a323c558359e7762138078d.html":[3,0,1,10,0],
 "dir_7de179c4d7723b25ee3a9c02d9555b38.html":[3,0,1,8,0],
 "dir_8255dfd51ee4c46f21051355523b5d1f.html":[3,0,1,14],
@@ -243,11 +249,5 @@ var NAVTREEINDEX1 =
 "examples_fundamentals.html#why-this-tier-exists":[1],
 "examples_fundamentals_text_glyphs.html":[0,1,7],
 "examples_fundamentals_text_glyphs.html":[0,2,2],
-"examples_fundamentals_text_glyphs.html":[0,45,6,0],
-"examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf":[1,3,0],
-"examples_fundamentals_text_glyphs.html#autotoc_md2-drawing-letters-in-hex":[1,3,1],
-"examples_fundamentals_text_glyphs.html#autotoc_md3-setting-up-the-ppu":[1,3,2],
-"examples_fundamentals_text_glyphs.html#autotoc_md4-uploading-tiles-to-vram":[1,3,3],
-"examples_fundamentals_text_glyphs.html#autotoc_md5-three-colors-six-bytes":[1,3,4],
-"examples_fundamentals_text_glyphs.html#autotoc_md6-spelling-the-message":[1,3,5]
+"examples_fundamentals_text_glyphs.html":[0,45,6,0]
 };

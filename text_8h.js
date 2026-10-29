@@ -17,6 +17,7 @@ var text_8h =
     [ "textPrint", "text_8h.html#ae2b623eed527810c71528f6b898bff3e", null ],
     [ "textPrintAt", "text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc", null ],
     [ "textPrintHex", "text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab", null ],
+    [ "textPrintS16", "text_8h.html#a23f9b3d2b505e3189c30cfaa976be1ee", null ],
     [ "textPrintU16", "text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4", null ],
     [ "textPutChar", "text_8h.html#acd3f984c3d3308883e2729a50db16413", null ],
     [ "textSetPos", "text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0", null ],

@@ -5,7 +5,8 @@ var searchData=
   ['videosetoverscan_2',['videoSetOverscan',['../video_8h.html#a8f0c88465ed48927d9f21656e404a96f',1,'video.h']]],
   ['videosetpseudohires_3',['videoSetPseudoHires',['../video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73',1,'video.h']]],
   ['vramqueueflush_4',['vramQueueFlush',['../vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234',1,'vramqueue.h']]],
-  ['vramqueuepush_5',['vramQueuePush',['../vramqueue_8h.html#ade39bb80a8d7cf72a11075c930410086',1,'vramqueue.h']]],
-  ['vramqueuepushsprite_6',['vramQueuePushSprite',['../vramqueue_8h.html#a910d5040c609176a6d5518da95567518',1,'vramqueue.h']]],
-  ['vtimer_5firq_7',['vtimer_irq',['../chips_2superfx__3d_2main_8c.html#aaced606d15114e57daf910271b6f2800',1,'main.c']]]
+  ['vramqueueflushuntil_5',['vramQueueFlushUntil',['../vramqueue_8h.html#a66aa4f3ecc260342ce2284c32b2878b1',1,'vramqueue.h']]],
+  ['vramqueuepush_6',['vramQueuePush',['../vramqueue_8h.html#ade39bb80a8d7cf72a11075c930410086',1,'vramqueue.h']]],
+  ['vramqueuepushsprite_7',['vramQueuePushSprite',['../vramqueue_8h.html#a910d5040c609176a6d5518da95567518',1,'vramqueue.h']]],
+  ['vtimer_5firq_8',['vtimer_irq',['../chips_2superfx__3d_2main_8c.html#aaced606d15114e57daf910271b6f2800',1,'main.c']]]
 ];

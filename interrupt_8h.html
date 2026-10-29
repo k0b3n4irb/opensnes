@@ -159,6 +159,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a4a0a4690d2c70b58584eed95377325a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the VBlank callback.  <br /></td></tr>
 <tr class="memitem:a54a7e26f751984f6f3241ed2d2c5eda7" id="r_a54a7e26f751984f6f3241ed2d2c5eda7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7">nmiSet</a> (<a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a> callback)</td></tr>
 <tr class="memdesc:a54a7e26f751984f6f3241ed2d2c5eda7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a VBlank callback function.  <br /></td></tr>
+<tr class="memitem:a97190a6ce1065e4d7077b9621c7f1221" id="r_a97190a6ce1065e4d7077b9621c7f1221"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a97190a6ce1065e4d7077b9621c7f1221">nmiSetLag</a> (<a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a> callback)</td></tr>
+<tr class="memdesc:a97190a6ce1065e4d7077b9621c7f1221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a callback for lag frames.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Interrupt Handling. </p>
@@ -424,6 +426,44 @@ Callback runs with interrupts disabled </dd>
 <dd>
 The callback may live in any ROM bank: the bank is taken from the function pointer. (This note said "must be in bank 0" until 2026-09-20; that was only ever true of irqSet, fixed the same day.)</dd></dl>
 <dl class="section user"><dt>What the callback may call</dt><dd>The callback runs with the direct page on its own copy of the compiler's scratch registers (<span class="tt">tcc__r0</span>..<span class="tt">tcc__r10</span>), so C code and every library routine that reaches them direct-page-relative, as the compiler does, are isolated from the interrupted main thread; plain <span class="tt">*</span>, <span class="tt">/</span> and <span class="tt">%</span> take a software path there (<span class="tt">in_nmi_ctx</span>). What is NOT callback-safe, and says so in its own header: the hardware-multiplier users <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a></span>, <span class="tt"><a class="el" href="math_8h.html#ae34cfd84f2c85f3ad0d03ae9fd61a332" title="Linear interpolation.">fixLerp()</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin()</a></span>/<span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos()</a></span>; every DSP-1 call (a port protocol); <span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont()</a></span>/<span class="tt"><a class="el" href="text_8h.html#a21a39509cc61fba3c98500627619baf0" title="Load font as 4bpp tiles for Mode 1 BGs.">textLoadFont4bpp()</a></span> (DMA registers written with the callback's data bank); the WRAM data port (<span class="tt">$2180</span>). Until 2026-10-05 <span class="tt"><a class="el" href="object_8h.html#aefe003a2fb685e0f08d4b5f35ef0257c" title="Test collision between two objects.">objCollidObj()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a></span>, <span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp()</a></span>, <span class="tt"><a class="el" href="profile_8h.html#a5e46903fa24e1c3b20d101e9d4bddde6" title="Start a color-bar profiling section.">profileColorStart()</a></span>, <span class="tt"><a class="el" href="dsp1_8h.html#af14660034a8e2f3a7a33516e48f1ba16" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1SetCamera()</a></span> and <span class="tt"><a class="el" href="dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster()</a></span> reached the scratch registers with absolute or long addressing, which wrote the main thread's copy through the <span class="tt">$7E</span> mirror; they are direct-page-relative now (library audit l.21). </dd></dl>
+
+</div>
+</div>
+<a id="a97190a6ce1065e4d7077b9621c7f1221" name="a97190a6ce1065e4d7077b9621c7f1221"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97190a6ce1065e4d7077b9621c7f1221">&#9670;&#160;</a></span>nmiSetLag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nmiSetLag </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a></td>          <td class="paramname"><span class="paramname"><em>callback</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Register a callback for lag frames. </p>
+<p>A lag frame is a VBlank that arrives while the main loop is still computing (it has not called <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>): the library then skips its VBlank work and the <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback, and runs this one instead. Something that must happen every frame whatever the game's load (a palette fade, a raster effect's table swap, a timer the player sees) registers the same function with both:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="#a54a7e26f751984f6f3241ed2d2c5eda7">nmiSet</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a7092327bc3fb03fed9cc0246e335ce7f">tick</a>);       <span class="comment">// the frames the main thread waited for</span></div>
+<div class="line"><a class="code hl_function" href="#a97190a6ce1065e4d7077b9621c7f1221">nmiSetLag</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a7092327bc3fb03fed9cc0246e335ce7f">tick</a>);    <span class="comment">// and the others</span></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a7092327bc3fb03fed9cc0246e335ce7f"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a7092327bc3fb03fed9cc0246e335ce7f">tick</a></div><div class="ttdeci">static u16 tick</div><div class="ttdoc">Frames since boot, for the walk and the hover.</div><div class="ttdef"><b>Definition</b> main.c:102</div></div>
+<div class="ttc" id="ainterrupt_8h_html_a97190a6ce1065e4d7077b9621c7f1221"><div class="ttname"><a href="#a97190a6ce1065e4d7077b9621c7f1221">nmiSetLag</a></div><div class="ttdeci">void nmiSetLag(VBlankCallback callback)</div><div class="ttdoc">Register a callback for lag frames.</div></div>
+</div><!-- fragment --><p>Cost: none while no lag callback is set (a flag tested on lag frames); the call itself, as <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a>'s, when one is.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>Function to call on lag frames, or NULL to stop</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>The main thread was interrupted at any instruction, not waiting: everything <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> forbids, and also<ul>
+<li>read only data the main thread has finished writing (a buffer it swaps, a value it writes in one instruction);</li>
+<li>no DMA on a channel the main thread uses: every library DMA helper uses channel 0, and the library's own VBlank uploads channel 7; write the registers of a channel of your own;</li>
+<li>no OAM upload: the main thread may be halfway through the sprite table (oamMemory). </li>
+</ul>
+</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The library's VBlank work (OAM, text, scroll, joypads) does not run on a lag frame, with or without this callback. </dd></dl>
 
 </div>
 </div>

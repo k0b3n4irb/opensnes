@@ -137,7 +137,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a7124f044ed12d1073cafd7192a00d09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM (PVSnesLib compatible).  <br /></td></tr>
 <tr class="memitem:a50a418c73f494651a1be98404d753c21" id="r_a50a418c73f494651a1be98404d753c21"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a50a418c73f494651a1be98404d753c21">dmaCopyOam</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a50a418c73f494651a1be98404d753c21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM data (PVSnesLib compatible).  <br /></td></tr>
-<tr class="memitem:a428ee7d96f20485046c89d95f8719ca5" id="r_a428ee7d96f20485046c89d95f8719ca5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memitem:a428ee7d96f20485046c89d95f8719ca5" id="r_a428ee7d96f20485046c89d95f8719ca5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a428ee7d96f20485046c89d95f8719ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM (PVSnesLib compatible).  <br /></td></tr>
 <tr class="memitem:a9a9ce9e607d6aa14f3dfeb40fad3c3eb" id="r_a9a9ce9e607d6aa14f3dfeb40fad3c3eb"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9a9ce9e607d6aa14f3dfeb40fad3c3eb">dmaCopyVramMode7</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilemapSize, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tiles, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilesSize)</td></tr>
 <tr class="memdesc:a9a9ce9e607d6aa14f3dfeb40fad3c3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load Mode 7 interleaved data to VRAM.  <br /></td></tr>
@@ -295,7 +295,7 @@ Banks</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Source address (can be ROM or RAM) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>Destination word address in VRAM </td></tr>
+    <tr><td class="paramname"><a class="el" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>Destination word address in VRAM </td></tr>
     <tr><td class="paramname">size</td><td>Number of bytes to copy</td></tr>
   </table>
   </dd>

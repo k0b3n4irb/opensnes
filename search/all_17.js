@@ -113,7 +113,7 @@ var searchData=
   ['limitations_110',['Known Limitations',['../known_limitations.html',1,'documentation']]],
   ['limits_111',['Limits',['../string_8h.html#limits',1,'Limits'],['../sprite_8h.html#snes-sprite-limits',1,'SNES Sprite Limits']]],
   ['limits_112',['Per-line limits',['../hardware_ppu.html#per-line-limits',1,'']]],
-  ['line_113',['3. OAM — 128 sprites, but far fewer per line',['../craft_planning.html#autotoc_md3-oam--128-sprites-but-far-fewer-per-line',1,'']]],
+  ['line_113',['line',['../craft_planning.html#autotoc_md3-oam--128-sprites-but-far-fewer-per-line',1,'3. OAM — 128 sprites, but far fewer per line'],['../tutorial_dma.html#filling-the-vblank-to-a-line',1,'Filling the VBlank to a line']]],
   ['line_20—_20examples_20mode7_20perspective_5frotate_114',['Full Mode 7 matrix per line — &lt;span class=&quot;tt&quot;&gt;examples/mode7/perspective_rotate&lt;/span&gt;',['../tutorial_hdma.html#full-mode-7-matrix-per-line--examplesmode7perspective_rotate',1,'']]],
   ['line_20budget_3a_2032_115',['The sprite-per-line budget: 32',['../craft_frame_budget.html#the-sprite-per-line-budget-32',1,'']]],
   ['line_20is_20drawn_116',['Where the line is drawn',['../stability.html#where-the-line-is-drawn',1,'']]],

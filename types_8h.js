@@ -12,6 +12,7 @@ var types_8h =
     [ "MAX", "group__macros.html#gafa99ec4acc4ecb2dc3c2d05da15d0e3f", null ],
     [ "MIN", "group__macros.html#ga3acffbd305ee72dcd4593c0d8af64a4f", null ],
     [ "NULL", "group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4", null ],
+    [ "OPENSNES_CHECK_ARGS", "types_8h.html#a83c542a181cfca79715f3b281f48e272", null ],
     [ "OPENSNES_DEPRECATED", "types_8h.html#a7e4a0ea7cc4892fdf814a6e0a7f841f0", null ],
     [ "RAM_CODE", "group__volatile__types.html#ga2b7f5fd96b29a2a70327ee4bae8bb232", null ],
     [ "TRUE", "group__bool__type.html#gaa8cecfc5c5c054d2875c03e77b7be15d", null ],

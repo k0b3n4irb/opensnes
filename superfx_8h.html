@@ -188,7 +188,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Launch GSU program and wait for completion (WRAM-safe).  <br /></td></tr>
 <tr class="memitem:a54c1329e34940920937be4e71bce9d99" id="r_a54c1329e34940920937be4e71bce9d99"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a> (const void *program)</td></tr>
 <tr class="memdesc:a54c1329e34940920937be4e71bce9d99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the library where the GSU program lives.  <br /></td></tr>
-<tr class="memitem:a1fd575a6b7ae455fdf3ca7205b221f50" id="r_a1fd575a6b7ae455fdf3ca7205b221f50"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
+<tr class="memitem:a1fd575a6b7ae455fdf3ca7205b221f50" id="r_a1fd575a6b7ae455fdf3ca7205b221f50"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>)</td></tr>
 <tr class="memdesc:a1fd575a6b7ae455fdf3ca7205b221f50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup column-major tilemap for SuperFX PLOT framebuffer.  <br /></td></tr>
 <tr class="memitem:ae7a88cd0ea3830d8a308cf5c0ca8b00a" id="r_ae7a88cd0ea3830d8a308cf5c0ca8b00a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae7a88cd0ea3830d8a308cf5c0ca8b00a">gsuSetupHdmaBlanking</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> topBlank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> bottomBlank)</td></tr>
 <tr class="memdesc:ae7a88cd0ea3830d8a308cf5c0ca8b00a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup HDMA screen blanking for DMA bandwidth.  <br /></td></tr>
@@ -1282,7 +1282,7 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
 <p>Setup column-major tilemap for SuperFX PLOT framebuffer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address for tilemap (typically 0x4000)</td></tr>
+    <tr><td class="paramname"><a class="el" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM word address for tilemap (typically 0x4000)</td></tr>
   </table>
   </dd>
 </dl>

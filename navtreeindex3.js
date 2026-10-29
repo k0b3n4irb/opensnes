@@ -1,5 +1,11 @@
 var NAVTREEINDEX3 =
 {
+"examples_text_print_string.html#snes-concepts-35":[7,1],
+"examples_text_print_string.html#snes-concepts-35":[17,1],
+"examples_text_print_string.html#what-youll-learn-23":[7,0],
+"examples_text_print_string.html#what-youll-learn-23":[17,0],
+"examples_transitions.html":[0,45,16],
+"examples_transitions.html#the-idea-in-one-screen-8":[1],
 "examples_transitions.html#the-ladder-10":[0],
 "examples_transitions_fading.html":[0,1,18],
 "examples_transitions_fading.html":[0,2,34],
@@ -243,11 +249,5 @@ var NAVTREEINDEX3 =
 "group__audio__init.html":[1,15],
 "group__audio__init.html#ga4149a6d84a9f9c0368e3657f65c1dd52":[1,15,1],
 "group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd":[1,15,0],
-"group__audio__legacy.html":[1,18],
-"group__audio__legacy.html#ga0ae7d151c8df1d90190e4c2a9af81cfe":[1,18,0],
-"group__audio__legacy.html#ga90ff78c34a0e95e1c269f41db67d0dd7":[1,18,2],
-"group__audio__legacy.html#gad19204f9e934017dead96542f848d0f6":[1,18,1],
-"group__audio__playback.html":[1,24],
-"group__audio__playback.html#ga08d3a1cc8f2e0e4bd9da475bc6e2afc9":[1,24,3],
-"group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f":[1,24,4]
+"group__audio__legacy.html":[1,18]
 };

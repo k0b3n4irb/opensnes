@@ -139,7 +139,7 @@ Macros</h2></td></tr>
 <tr class="memitem:ga2d3be2477b25908777377bc78d00d07d" id="r_ga2d3be2477b25908777377bc78d00d07d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__bg__size.html#ga2d3be2477b25908777377bc78d00d07d">BG_MAP_32x64</a>&#160;&#160;&#160;2</td></tr>
 <tr class="memitem:ga97363366540ca9c8f3063b9602b190d4" id="r_ga97363366540ca9c8f3063b9602b190d4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__bg__size.html#ga97363366540ca9c8f3063b9602b190d4">BG_MAP_64x32</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:ga4fd01b0f07c15f48232902829af7db9a" id="r_ga4fd01b0f07c15f48232902829af7db9a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__bg__size.html#ga4fd01b0f07c15f48232902829af7db9a">BG_MAP_64x64</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memitem:a3e0cf515ae8b6a6f7ce1895c6d12b9f4" id="r_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(vramAddr,  fillTile,  sizeBytes)</td></tr>
+<tr class="memitem:a3e0cf515ae8b6a6f7ce1895c6d12b9f4" id="r_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>,  fillTile,  sizeBytes)</td></tr>
 <tr class="memdesc:a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a tilemap region in VRAM with a single tile entry.  <br /></td></tr>
 <tr class="memitem:ga11724b6748ce0954e9b43819263537fc" id="r_ga11724b6748ce0954e9b43819263537fc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>&#160;&#160;&#160;<a class="el" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></td></tr>
 <tr class="memitem:gaeaa1585b5a34aea00df0224fdcc4a5ab" id="r_gaeaa1585b5a34aea00df0224fdcc4a5ab"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__bg__size.html#gaeaa1585b5a34aea00df0224fdcc4a5ab">SC_32x64</a>&#160;&#160;&#160;<a class="el" href="group__bg__size.html#ga2d3be2477b25908777377bc78d00d07d">BG_MAP_32x64</a></td></tr>
@@ -154,20 +154,29 @@ Functions</h2></td></tr>
 <tr class="memdesc:a455adfa84072ba5e3c4b048eb4441846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current vertical scroll position (from shadow).  <br /></td></tr>
 <tr class="memitem:ad7b7a6656164a31988d31feb574572a6" id="r_ad7b7a6656164a31988d31feb574572a6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad7b7a6656164a31988d31feb574572a6">bgInit</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg)</td></tr>
 <tr class="memdesc:ad7b7a6656164a31988d31feb574572a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize background layer to defaults.  <br /></td></tr>
-<tr class="memitem:aa5997825b35bb8c02b746ae83ca86e39" id="r_aa5997825b35bb8c02b746ae83ca86e39"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bgNumber, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> paletteEntry, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> paletteSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> colorMode, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
-<tr class="memdesc:aa5997825b35bb8c02b746ae83ca86e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize tileset with tiles and palette.  <br /></td></tr>
-<tr class="memitem:a1bb367b6ff962b9ef7552e39ef70ca80" id="r_a1bb367b6ff962b9ef7552e39ef70ca80"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1bb367b6ff962b9ef7552e39ef70ca80">bgInitTileSetData</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bgNumber, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
-<tr class="memdesc:a1bb367b6ff962b9ef7552e39ef70ca80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load tile graphics only (no palette).  <br /></td></tr>
-<tr class="memitem:a80e3887b5a1a50ba4985e4270ed6673d" id="r_a80e3887b5a1a50ba4985e4270ed6673d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
-<tr class="memdesc:a80e3887b5a1a50ba4985e4270ed6673d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tile graphics address.  <br /></td></tr>
-<tr class="memitem:a196c1345cc8194b1dd3ae1d8d1287924" id="r_a196c1345cc8194b1dd3ae1d8d1287924"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mapSize)</td></tr>
-<tr class="memdesc:a196c1345cc8194b1dd3ae1d8d1287924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tilemap address and size.  <br /></td></tr>
+<tr class="memitem:ab79023044951bdf6dcab5a94403825e4" id="r_ab79023044951bdf6dcab5a94403825e4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab79023044951bdf6dcab5a94403825e4">bgInitTileSet</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a>, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> paletteEntry, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> paletteSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> colorMode, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>((<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x0FFF) !=0</td></tr>
+<tr class="memdesc:ab79023044951bdf6dcab5a94403825e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize tileset with tiles and palette.  <br /></td></tr>
+<tr class="memitem:a6a9b36b5d6bd66b043bb5e775f9802ed" id="r_a6a9b36b5d6bd66b043bb5e775f9802ed"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6a9b36b5d6bd66b043bb5e775f9802ed">bgInitTileSetData</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a>, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>(<a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a> !=0xFF &amp;&amp;(<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x0FFF) !=0</td></tr>
+<tr class="memdesc:a6a9b36b5d6bd66b043bb5e775f9802ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load tile graphics only (no palette).  <br /></td></tr>
+<tr class="memitem:a2530cc08688a3c5bbe949b17f9e7a2aa" id="r_a2530cc08688a3c5bbe949b17f9e7a2aa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2530cc08688a3c5bbe949b17f9e7a2aa">bgSetGfxPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>((<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x0FFF) !=0</td></tr>
+<tr class="memdesc:a2530cc08688a3c5bbe949b17f9e7a2aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tile graphics address.  <br /></td></tr>
+<tr class="memitem:ab0fc2f727fd9cee4e4fb56c4c4950560" id="r_ab0fc2f727fd9cee4e4fb56c4c4950560"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab0fc2f727fd9cee4e4fb56c4c4950560">bgSetMapPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mapSize) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>((<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x03FF) !=0</td></tr>
+<tr class="memdesc:ab0fc2f727fd9cee4e4fb56c4c4950560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tilemap address and size.  <br /></td></tr>
 <tr class="memitem:a9bf45b3dbc30dec36aeb592b58b120f4" id="r_a9bf45b3dbc30dec36aeb592b58b120f4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
 <tr class="memdesc:a9bf45b3dbc30dec36aeb592b58b120f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background scroll position.  <br /></td></tr>
 <tr class="memitem:a255b7012c710513afe464505ec420d3c" id="r_a255b7012c710513afe464505ec420d3c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a255b7012c710513afe464505ec420d3c">bgSetScrollX</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x)</td></tr>
 <tr class="memdesc:a255b7012c710513afe464505ec420d3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set horizontal scroll only.  <br /></td></tr>
 <tr class="memitem:a1fcd01a63d5efa74df2394d1374588b6" id="r_a1fcd01a63d5efa74df2394d1374588b6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1fcd01a63d5efa74df2394d1374588b6">bgSetScrollY</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
 <tr class="memdesc:a1fcd01a63d5efa74df2394d1374588b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set vertical scroll only.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a044c746ddf6e28c3e6c56e08c2570369" id="r_a044c746ddf6e28c3e6c56e08c2570369"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></td></tr>
+<tr class="memitem:a4a97fbf5131c05b45ba8ed791440d5d2" id="r_a4a97fbf5131c05b45ba8ed791440d5d2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4a97fbf5131c05b45ba8ed791440d5d2">bgInitTileSetData</a></td></tr>
+<tr class="memitem:a219e6986a886a886eb420f879fea8029" id="r_a219e6986a886a886eb420f879fea8029"><td class="memItemLeft">void or&#160;</td><td class="memItemRight"><a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a></td></tr>
+<tr class="memitem:a802df79274cbe778da9c013a4f538c72" id="r_a802df79274cbe778da9c013a4f538c72"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></td></tr>
+<tr class="memitem:a7562c524ad6c4c62897ad159bf12b2c6" id="r_a7562c524ad6c4c62897ad159bf12b2c6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></td></tr>
+<tr class="memitem:ab281851bdfe178b2a5fac4b747d4a501" id="r_ab281851bdfe178b2a5fac4b747d4a501"><td class="memItemLeft">BGnSC keeps&#160;</td><td class="memItemRight"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Background Layer Management. </p>
@@ -187,7 +196,7 @@ Overview</h2>
         <tr>
           <td class="memname">#define bgClearTilemap</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>, </td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -201,7 +210,8 @@ Overview</h2>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e">dmaFillVRAM</a>((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(fillTile), (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(vramAddr), (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(sizeBytes))</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e">dmaFillVRAM</a>((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(fillTile), (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_variable" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>), (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(sizeBytes))</div>
+<div class="ttc" id="abackground_8h_html_ab281851bdfe178b2a5fac4b747d4a501"><div class="ttname"><a href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></div><div class="ttdeci">BGnSC keeps vramAddr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
 <div class="ttc" id="adma_8h_html_afcc5b9f47bd12569f7d51adb0acdfa0e"><div class="ttname"><a href="dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e">dmaFillVRAM</a></div><div class="ttdeci">void dmaFillVRAM(u16 value, u16 dest, u16 size)</div><div class="ttdoc">Set VRAM to a value.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment -->
@@ -209,7 +219,7 @@ Overview</h2>
 <p>Clears or fills a background tilemap. Thin wrapper around <a class="el" href="dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e" title="Set VRAM to a value.">dmaFillVRAM()</a> with tilemap-focused naming.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address of the tilemap </td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM word address of the tilemap </td></tr>
     <tr><td class="paramname">fillTile</td><td>Tile entry to fill with (includes palette/priority bits) </td></tr>
     <tr><td class="paramname">sizeBytes</td><td>Size of the tilemap in bytes (e.g., 2048 for 32x32)</td></tr>
   </table>
@@ -220,7 +230,7 @@ Overview</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fill with a specific tile entry (palette 2, tile 5)</span></div>
 <div class="line"><a class="code hl_define" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(0x0400, 0x1005, 2048);</div>
-<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:231</div></div>
+<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:239</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -303,11 +313,14 @@ Overview</h2>
 
 </div>
 </div>
-<a id="aa5997825b35bb8c02b746ae83ca86e39" name="aa5997825b35bb8c02b746ae83ca86e39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5997825b35bb8c02b746ae83ca86e39">&#9670;&#160;</a></span>bgInitTileSet()</h2>
+<a id="ab79023044951bdf6dcab5a94403825e4" name="ab79023044951bdf6dcab5a94403825e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab79023044951bdf6dcab5a94403825e4">&#9670;&#160;</a></span>bgInitTileSet()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void bgInitTileSet </td>
@@ -347,40 +360,48 @@ Overview</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;) &amp;</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Initialize tileset with tiles and palette. </p>
 <p>Loads tile graphics to VRAM and palette to CGRAM, and configures the background's tile graphics pointer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">bgNumber</td><td>Background number (0-3) </td></tr>
+    <tr><td class="paramname"><a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a></td><td>Background number (0-3) </td></tr>
     <tr><td class="paramname">tileSource</td><td>Address of tile graphics data </td></tr>
     <tr><td class="paramname">tilePalette</td><td>Address of palette data </td></tr>
     <tr><td class="paramname">paletteEntry</td><td>Palette slot (0-7 for 16-color, 0 for 256-color) </td></tr>
     <tr><td class="paramname">tileSize</td><td>Size of tile data in bytes </td></tr>
     <tr><td class="paramname">paletteSize</td><td>Size of palette data in bytes </td></tr>
     <tr><td class="paramname">colorMode</td><td>Color mode (BG_4COLORS, BG_16COLORS, BG_256COLORS) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM WORD address for tiles, a multiple of 0x1000 words (see <a class="el" href="#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a>)</td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM WORD address for tiles, a multiple of 0x1000 words (see <a class="el" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr()</a>)</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> tiles[], tiles_end[];</div>
 <div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>[];</div>
-<div class="line"><a class="code hl_function" href="#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0, tiles_end - tiles, 32, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
-<div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
+<div class="line"><a class="code hl_variable" href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0, tiles_end - tiles, 32, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
+<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:203</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="atext_2pixel__text_2main_8c_html_aed41e53efdee92d24f64b3bae717c207"><div class="ttname"><a href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></div><div class="ttdeci">static const u8 palette[]</div><div class="ttdef"><b>Definition</b> main.c:83</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a1bb367b6ff962b9ef7552e39ef70ca80" name="a1bb367b6ff962b9ef7552e39ef70ca80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bb367b6ff962b9ef7552e39ef70ca80">&#9670;&#160;</a></span>bgInitTileSetData()</h2>
+<a id="a6a9b36b5d6bd66b043bb5e775f9802ed" name="a6a9b36b5d6bd66b043bb5e775f9802ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a9b36b5d6bd66b043bb5e775f9802ed">&#9670;&#160;</a></span>bgInitTileSetData()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void bgInitTileSetData </td>
@@ -400,29 +421,37 @@ Overview</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;) &amp;</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Load tile graphics only (no palette). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">bgNumber</td><td>Background number (0-3, or 0xFF to skip gfx pointer setup) </td></tr>
+    <tr><td class="paramname"><a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a></td><td>Background number (0-3, or 0xFF to skip gfx pointer setup) </td></tr>
     <tr><td class="paramname">tileSource</td><td>Address of tile graphics data </td></tr>
     <tr><td class="paramname">tileSize</td><td>Size of tile data in bytes </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM address for tiles </td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM address for tiles </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a80e3887b5a1a50ba4985e4270ed6673d" name="a80e3887b5a1a50ba4985e4270ed6673d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80e3887b5a1a50ba4985e4270ed6673d">&#9670;&#160;</a></span>bgSetGfxPtr()</h2>
+<a id="a2530cc08688a3c5bbe949b17f9e7a2aa" name="a2530cc08688a3c5bbe949b17f9e7a2aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2530cc08688a3c5bbe949b17f9e7a2aa">&#9670;&#160;</a></span>bgSetGfxPtr()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void bgSetGfxPtr </td>
@@ -432,9 +461,14 @@ Overview</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vramAddr</em></span>&#160;) &amp;</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Set background tile graphics address. </p>
@@ -442,22 +476,25 @@ Overview</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bg</td><td>Background number (0-3) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM WORD address, a multiple of 0x1000 words (the register holds <span class="tt">vramAddr &gt;&gt; 12</span>; lower bits are dropped silently). Said "multiple of 0x2000" until 2026-09-20 — that is the same step counted in bytes.</td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM WORD address, a multiple of 0x1000 words (the register holds <span class="tt"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &gt;&gt; 12</span>; lower bits are dropped silently). Said "multiple of 0x2000" until 2026-09-20 — that is the same step counted in bytes.</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="comment">// Set BG1 tiles at VRAM $2000</span></div>
-<div class="line"><a class="code hl_function" href="#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a>(0, 0x2000);</div>
-<div class="ttc" id="abackground_8h_html_a80e3887b5a1a50ba4985e4270ed6673d"><div class="ttname"><a href="#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr(u8 bg, u16 vramAddr)</div><div class="ttdoc">Set background tile graphics address.</div></div>
+<div class="line"><a class="code hl_variable" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a>(0, 0x2000);</div>
+<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:163</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>BG1/BG2 share one register, BG3/BG4 share another. Setting one does not affect the other in the pair. </dd></dl>
 
 </div>
 </div>
-<a id="a196c1345cc8194b1dd3ae1d8d1287924" name="a196c1345cc8194b1dd3ae1d8d1287924"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a196c1345cc8194b1dd3ae1d8d1287924">&#9670;&#160;</a></span>bgSetMapPtr()</h2>
+<a id="ab0fc2f727fd9cee4e4fb56c4c4950560" name="ab0fc2f727fd9cee4e4fb56c4c4950560"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0fc2f727fd9cee4e4fb56c4c4950560">&#9670;&#160;</a></span>bgSetMapPtr()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void bgSetMapPtr </td>
@@ -472,9 +509,14 @@ Overview</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>mapSize</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>mapSize</em></span>&#160;) &amp;</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Set background tilemap address and size. </p>
@@ -482,17 +524,17 @@ Overview</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bg</td><td>Background number (0-3) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address, a multiple of 0x400 words (2 KB of VRAM): BGnSC holds the base in those units (until 2026-10-04 this line said "1KB aligned") </td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM word address, a multiple of 0x400 words (2 KB of VRAM): BGnSC holds the base in those units (until 2026-10-04 this line said "1KB aligned") </td></tr>
     <tr><td class="paramname">mapSize</td><td>Map size (BG_MAP_32x32, BG_MAP_64x32, BG_MAP_32x64, or BG_MAP_64x64)</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="comment">// Set BG1 tilemap at VRAM $0000, 32x32 size</span></div>
-<div class="line"><a class="code hl_function" href="#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
+<div class="line"><a class="code hl_variable" href="#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set BG2 tilemap at VRAM $0800, 64x32 size</span></div>
-<div class="line"><a class="code hl_function" href="#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x0800, <a class="code hl_define" href="group__bg__size.html#ga97363366540ca9c8f3063b9602b190d4">BG_MAP_64x32</a>);</div>
-<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
+<div class="line"><a class="code hl_variable" href="#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(1, 0x0800, <a class="code hl_define" href="group__bg__size.html#ga97363366540ca9c8f3063b9602b190d4">BG_MAP_64x32</a>);</div>
+<div class="ttc" id="abackground_8h_html_a7562c524ad6c4c62897ad159bf12b2c6"><div class="ttname"><a href="#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga97363366540ca9c8f3063b9602b190d4"><div class="ttname"><a href="group__bg__size.html#ga97363366540ca9c8f3063b9602b190d4">BG_MAP_64x32</a></div><div class="ttdeci">#define BG_MAP_64x32</div><div class="ttdef"><b>Definition</b> background.h:31</div></div>
 </div><!-- fragment --> 
@@ -597,6 +639,91 @@ Overview</h2>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a044c746ddf6e28c3e6c56e08c2570369" name="a044c746ddf6e28c3e6c56e08c2570369"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a044c746ddf6e28c3e6c56e08c2570369">&#9670;&#160;</a></span>bgInitTileSet</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void bgInitTileSet</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4a97fbf5131c05b45ba8ed791440d5d2" name="a4a97fbf5131c05b45ba8ed791440d5d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a97fbf5131c05b45ba8ed791440d5d2">&#9670;&#160;</a></span>bgInitTileSetData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void bgInitTileSetData</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a219e6986a886a886eb420f879fea8029" name="a219e6986a886a886eb420f879fea8029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a219e6986a886a886eb420f879fea8029">&#9670;&#160;</a></span>bgNumber</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void or bgNumber</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a802df79274cbe778da9c013a4f538c72" name="a802df79274cbe778da9c013a4f538c72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a802df79274cbe778da9c013a4f538c72">&#9670;&#160;</a></span>bgSetGfxPtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void bgSetGfxPtr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7562c524ad6c4c62897ad159bf12b2c6" name="a7562c524ad6c4c62897ad159bf12b2c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7562c524ad6c4c62897ad159bf12b2c6">&#9670;&#160;</a></span>bgSetMapPtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void bgSetMapPtr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab281851bdfe178b2a5fac4b747d4a501" name="ab281851bdfe178b2a5fac4b747d4a501"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab281851bdfe178b2a5fac4b747d4a501">&#9670;&#160;</a></span>vramAddr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">BG12NBA BG34NBA keep vramAddr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

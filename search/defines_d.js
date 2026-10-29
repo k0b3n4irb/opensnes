@@ -42,12 +42,13 @@ var searchData=
   ['obj_5fsprite8_39',['OBJ_SPRITE8',['../sprite_8h.html#aabc9778e950220ff7adbac8a01faa148',1,'sprite.h']]],
   ['obj_5fvram_40',['OBJ_VRAM',['../basics_2aim__target_2main_8c.html#a69f9f237baac2ee247f14425602af76e',1,'OBJ_VRAM:&#160;main.c'],['../input_2controller_2main_8c.html#a69f9f237baac2ee247f14425602af76e',1,'OBJ_VRAM:&#160;main.c'],['../memory_2save__game_2main_8c.html#a69f9f237baac2ee247f14425602af76e',1,'OBJ_VRAM:&#160;main.c'],['../mode7_2dsp1__ground_2main_8c.html#a69f9f237baac2ee247f14425602af76e',1,'OBJ_VRAM:&#160;main.c']]],
   ['objsel_41',['OBJSEL',['../sprite_8h.html#a7ad237518b773199a39686500d459ced',1,'sprite.h']]],
-  ['opensnes_5fdeprecated_42',['OPENSNES_DEPRECATED',['../types_8h.html#a7e4a0ea7cc4892fdf814a6e0a7f841f0',1,'types.h']]],
-  ['opensnes_5fversion_5fmajor_43',['OPENSNES_VERSION_MAJOR',['../snes_8h.html#a52dcd00f96e302db0233afedf45d42d3',1,'snes.h']]],
-  ['opensnes_5fversion_5fminor_44',['OPENSNES_VERSION_MINOR',['../snes_8h.html#ac7010da4aff784c937f4eb21b9aff806',1,'snes.h']]],
-  ['opensnes_5fversion_5fpatch_45',['OPENSNES_VERSION_PATCH',['../snes_8h.html#af2660331ece9bb304cf9068ce6f4972a',1,'snes.h']]],
-  ['opensnes_5fversion_5fstring_46',['OPENSNES_VERSION_STRING',['../snes_8h.html#a409c167562806a982baffc275742c677',1,'snes.h']]],
-  ['opt_5fbg1_47',['OPT_BG1',['../backgrounds_2mode2_2main_8c.html#a4f77942e69b1c22fe6c7952fc351f1a5',1,'main.c']]],
-  ['opt_5fvertical_48',['OPT_VERTICAL',['../backgrounds_2mode2_2main_8c.html#afcfec0aff12d36d2e738f6a51baa29a3',1,'main.c']]],
-  ['orb_5fy_49',['ORB_Y',['../mode7_2extbg_2main_8c.html#ab885c7da314c00473e322d9ef4361859',1,'main.c']]]
+  ['opensnes_5fcheck_5fargs_42',['OPENSNES_CHECK_ARGS',['../types_8h.html#a83c542a181cfca79715f3b281f48e272',1,'types.h']]],
+  ['opensnes_5fdeprecated_43',['OPENSNES_DEPRECATED',['../types_8h.html#a7e4a0ea7cc4892fdf814a6e0a7f841f0',1,'types.h']]],
+  ['opensnes_5fversion_5fmajor_44',['OPENSNES_VERSION_MAJOR',['../snes_8h.html#a52dcd00f96e302db0233afedf45d42d3',1,'snes.h']]],
+  ['opensnes_5fversion_5fminor_45',['OPENSNES_VERSION_MINOR',['../snes_8h.html#ac7010da4aff784c937f4eb21b9aff806',1,'snes.h']]],
+  ['opensnes_5fversion_5fpatch_46',['OPENSNES_VERSION_PATCH',['../snes_8h.html#af2660331ece9bb304cf9068ce6f4972a',1,'snes.h']]],
+  ['opensnes_5fversion_5fstring_47',['OPENSNES_VERSION_STRING',['../snes_8h.html#a409c167562806a982baffc275742c677',1,'snes.h']]],
+  ['opt_5fbg1_48',['OPT_BG1',['../backgrounds_2mode2_2main_8c.html#a4f77942e69b1c22fe6c7952fc351f1a5',1,'main.c']]],
+  ['opt_5fvertical_49',['OPT_VERTICAL',['../backgrounds_2mode2_2main_8c.html#afcfec0aff12d36d2e738f6a51baa29a3',1,'main.c']]],
+  ['orb_5fy_50',['ORB_Y',['../mode7_2extbg_2main_8c.html#ab885c7da314c00473e322d9ef4361859',1,'main.c']]]
 ];

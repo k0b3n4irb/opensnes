@@ -174,7 +174,7 @@ The same tiles, compressed</h3>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a>(street_lz_tiles, 0x4000);</div>
 <div class="ttc" id="alzss_8h_html_a98bf298dae04c21afcd57da9f2f92104"><div class="ttname"><a href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a></div><div class="ttdeci">void lzssDecodeVram(const u8 *source, u16 address)</div><div class="ttdoc">Decompress LZ77 data directly to VRAM.</div></div>
-</div><!-- fragment --><p>and A / B switch BG1's character base between the two copies (<span class="tt">bgSetGfxPtr(0, 0x4000)</span> or <span class="tt">0x0000</span>) — one register, at any time. With <span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> the <span class="tt">.inc</span> declares the arrays only, no <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>: <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> would copy the compressed bytes. Two thirds of the ROM for one call at load time. A painting compresses less than a flat logo: LZ77 saves on repeats, and almost every tile of this picture is a little different (a 2592-byte logo went to 652 bytes, a quarter).</p>
+</div><!-- fragment --><p>and A / B switch BG1's character base between the two copies (<span class="tt"><a class="el" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr(0, 0x4000)</a></span> or <span class="tt">0x0000</span>) — one register, at any time. With <span class="tt">lz = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> the <span class="tt">.inc</span> declares the arrays only, no <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>: <span class="tt"><a class="el" href="asset_8h.html#ae343c31cebce930550ed056a6caa9876" title="Load a full background bundle: tiles, palette and tilemap in one call. (The BG_LOAD macro this used t...">bgLoad()</a></span> would copy the compressed bytes. Two thirds of the ROM for one call at load time. A painting compresses less than a flat logo: LZ77 saves on repeats, and almost every tile of this picture is a little different (a 2592-byte logo went to 652 bytes, a quarter).</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="code-type"></a>
 Code Type</h2>
@@ -183,7 +183,7 @@ Code Type</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Component  </th><th class="markdownTableHeadNone">Type  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Background setup  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr</a></span>, <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet</a></span>)  </td></tr>
+<td class="markdownTableBodyNone">Background setup  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></span>, <span class="tt"><a class="el" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Tilemap loading  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span>)  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -222,22 +222,22 @@ Basic Setup</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-configure-video-mode"></a>
 1. Configure Video Mode</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);  <span class="comment">/* Mode 1, no special options */</span></div>
-<div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
+<div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:39</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md2-set-up-background"></a>
 2. Set Up Background</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Tilemap at VRAM $1000, 32x32 tiles */</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x1000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
+<div class="line"><a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x1000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load tiles and palette */</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0,</div>
+<div class="line"><a class="code hl_variable" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0,</div>
 <div class="line">              tiles_size, palette_size,</div>
 <div class="line">              <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x4000);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load tilemap */</span></div>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a>, 0x1000, tilemap_size);</div>
-<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
-<div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
+<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:203</div></div>
+<div class="ttc" id="abackground_8h_html_a7562c524ad6c4c62897ad159bf12b2c6"><div class="ttname"><a href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
 <div class="ttc" id="acolor_2hicolor__1792_2main_8c_html_a0f3022f9764c547f3d14e6646b2b6f99"><div class="ttname"><a href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a></div><div class="ttdeci">static u16 tilemap[896]</div><div class="ttdoc">Generated 32x28 tilemap (krom&#39;s fixed pattern — see buildTilemap).</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
@@ -311,8 +311,8 @@ Files</h2>
 Exercises</h2>
 <h3 class="doxsection"><a class="anchor" id="exercise-1-add-a-second-layer"></a>
 Exercise 1: Add a Second Layer</h3>
-<p>Enable BG2 with a different tileset: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x1800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, tiles_bg2, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 1, ...);</div>
+<p>Enable BG2 with a different tileset: </p><div class="fragment"><div class="line"><a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(1, 0x1800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
+<div class="line"><a class="code hl_variable" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a>(1, tiles_bg2, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 1, ...);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;</div>
 <div class="ttc" id="agroup__reg__const_html_gaae76565c377b5604fdbfa058ca79b433"><div class="ttname"><a href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a></div><div class="ttdeci">#define TM_BG2</div><div class="ttdef"><b>Definition</b> registers.h:444</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-2-change-palette"></a>
@@ -328,7 +328,7 @@ Exercise 3: Tile Flip</h3>
 <div class="line">tilemap_entry = tile_num | (1 &lt;&lt; 14);</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-4-add-priority"></a>
 Exercise 4: Add Priority</h3>
-<p>Use BG3 for a status bar that appears over BG1: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(2, 0x2000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
+<p>Use BG3 for a status bar that appears over BG1: </p><div class="fragment"><div class="line"><a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(2, 0x2000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"><span class="comment">/* Set BG3 priority higher in tilemap entries */</span></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="technical-notes"></a>

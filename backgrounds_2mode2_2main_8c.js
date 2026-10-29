@@ -5,7 +5,6 @@ var backgrounds_2mode2_2main_8c =
     [ "OPT_BG1", "backgrounds_2mode2_2main_8c.html#a4f77942e69b1c22fe6c7952fc351f1a5", null ],
     [ "OPT_VERTICAL", "backgrounds_2mode2_2main_8c.html#afcfec0aff12d36d2e738f6a51baa29a3", null ],
     [ "SCENE_CHR", "backgrounds_2mode2_2main_8c.html#abea29d7846da106123deca37009c3e2e", null ],
-    [ "SCENE_CHR_1", "backgrounds_2mode2_2main_8c.html#a87e3462d1c8883c1a3f322cce062b10d", null ],
     [ "loadScene", "backgrounds_2mode2_2main_8c.html#af6648ecfe899a46e1bfd210ffebdd34a", null ],
     [ "main", "backgrounds_2mode2_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "in_mode4", "backgrounds_2mode2_2main_8c.html#af975bc47ca944be1ff80c06c0ffade28", null ],

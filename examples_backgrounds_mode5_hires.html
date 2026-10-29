@@ -157,9 +157,9 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">TM / TS  </td><td class="markdownTableBodyNone"><span class="tt">$01</span> / <span class="tt">$01</span>  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a></span>+<span class="tt"><a class="el" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe" title="Enable layers on the sub screen.">setSubScreen</a></span>) — verified  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">BG1SC  </td><td class="markdownTableBodyNone">map word $4000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr</a></span>), 32×64 (krom: 64×32 — his page is wider, ours taller)  </td></tr>
+<td class="markdownTableBodyNone">BG1SC  </td><td class="markdownTableBodyNone">map word $4000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></span>), 32×64 (krom: 64×32 — his page is wider, ours taller)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">BG12NBA  </td><td class="markdownTableBodyNone">tiles word $8000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr</a></span>) — verified  </td></tr>
+<td class="markdownTableBodyNone">BG12NBA  </td><td class="markdownTableBodyNone">tiles word $8000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></span>) — verified  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="validation-notes"></a>
 Validation notes</h2>
@@ -185,7 +185,7 @@ Assets</h2>
 <p>CC0, like the rest of the Néo-Lumen assets (<span class="tt">assets/neo-lumen/README.md</span>).</p>
 <h2 class="doxsection"><a class="anchor" id="further-mode-5-without-interlace-512-x-256"></a>
 Further: Mode 5 without interlace (512 x 256)</h2>
-<p>The plain Mode 5 picture is this program minus <span class="tt"><a class="el" href="video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c" title="Enable/disable screen interlace (SETINI bit 0).">videoSetInterlace()</a></span>: 512 pixels wide at 256 lines, 16x8 tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the right), loaded with <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a></span> at 4 bpp for BG1 and 2 bpp for BG2. The same two traps apply — the layer shows through main AND sub screen, and the VRAM budget doubles (24 KB of interleaved tiles for one screen). </p>
+<p>The plain Mode 5 picture is this program minus <span class="tt"><a class="el" href="video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c" title="Enable/disable screen interlace (SETINI bit 0).">videoSetInterlace()</a></span>: 512 pixels wide at 256 lines, 16x8 tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the right), loaded with <span class="tt"><a class="el" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet()</a></span> at 4 bpp for BG1 and 2 bpp for BG2. The same two traps apply — the layer shows through main AND sub screen, and the VRAM budget doubles (24 KB of interleaved tiles for one screen). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

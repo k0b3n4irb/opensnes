@@ -16,11 +16,17 @@ var background_8h =
     [ "bgGetScrollX", "background_8h.html#ad4d4460f82883d16f9a5704d75b76aaf", null ],
     [ "bgGetScrollY", "background_8h.html#a455adfa84072ba5e3c4b048eb4441846", null ],
     [ "bgInit", "background_8h.html#ad7b7a6656164a31988d31feb574572a6", null ],
-    [ "bgInitTileSet", "background_8h.html#aa5997825b35bb8c02b746ae83ca86e39", null ],
-    [ "bgInitTileSetData", "background_8h.html#a1bb367b6ff962b9ef7552e39ef70ca80", null ],
-    [ "bgSetGfxPtr", "background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d", null ],
-    [ "bgSetMapPtr", "background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924", null ],
+    [ "bgInitTileSet", "background_8h.html#ab79023044951bdf6dcab5a94403825e4", null ],
+    [ "bgInitTileSetData", "background_8h.html#a6a9b36b5d6bd66b043bb5e775f9802ed", null ],
+    [ "bgSetGfxPtr", "background_8h.html#a2530cc08688a3c5bbe949b17f9e7a2aa", null ],
+    [ "bgSetMapPtr", "background_8h.html#ab0fc2f727fd9cee4e4fb56c4c4950560", null ],
     [ "bgSetScroll", "background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4", null ],
     [ "bgSetScrollX", "background_8h.html#a255b7012c710513afe464505ec420d3c", null ],
-    [ "bgSetScrollY", "background_8h.html#a1fcd01a63d5efa74df2394d1374588b6", null ]
+    [ "bgSetScrollY", "background_8h.html#a1fcd01a63d5efa74df2394d1374588b6", null ],
+    [ "bgInitTileSet", "background_8h.html#a044c746ddf6e28c3e6c56e08c2570369", null ],
+    [ "bgInitTileSetData", "background_8h.html#a4a97fbf5131c05b45ba8ed791440d5d2", null ],
+    [ "bgNumber", "background_8h.html#a219e6986a886a886eb420f879fea8029", null ],
+    [ "bgSetGfxPtr", "background_8h.html#a802df79274cbe778da9c013a4f538c72", null ],
+    [ "bgSetMapPtr", "background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6", null ],
+    [ "vramAddr", "background_8h.html#ab281851bdfe178b2a5fac4b747d4a501", null ]
 ];

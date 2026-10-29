@@ -669,11 +669,11 @@ $43x5-$43x6 - DASxL/H (Transfer Size)</h4>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="dma-example"></a>
 DMA Example</h3>
 <div class="fragment"><div class="line"><span class="comment">// DMA 2048 bytes to VRAM at $0000</span></div>
-<div class="line"><span class="keywordtype">void</span> dmaToVRAM(<span class="keyword">const</span> <span class="keywordtype">void</span>* src, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size) {</div>
+<div class="line"><span class="keywordtype">void</span> dmaToVRAM(<span class="keyword">const</span> <span class="keywordtype">void</span>* src, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size) {</div>
 <div class="line">    <span class="comment">// Set VRAM address</span></div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a> = 0x80;</div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a> = vramAddr &amp; 0xFF;</div>
-<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a> = vramAddr &gt;&gt; 8;</div>
+<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a> = <a class="code hl_variable" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp; 0xFF;</div>
+<div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a> = <a class="code hl_variable" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &gt;&gt; 8;</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Configure DMA channel 0</span></div>
 <div class="line">    <a class="code hl_define" href="group__dma__regs.html#ga608d0640a578e25194c6d6c551f2fb55">REG_DMAP</a>(0) = 0x01;           <span class="comment">// Mode 1 (2-register)</span></div>
@@ -687,6 +687,7 @@ DMA Example</h3>
 <div class="line">    <span class="comment">// Start DMA</span></div>
 <div class="line">    <a class="code hl_define" href="group__cpu__regs.html#gabccd357db38cf6e7528e807b8692ef0f">REG_MDMAEN</a> = 0x01;</div>
 <div class="line">}</div>
+<div class="ttc" id="abackground_8h_html_ab281851bdfe178b2a5fac4b747d4a501"><div class="ttname"><a href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></div><div class="ttdeci">BGnSC keeps vramAddr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
 <div class="ttc" id="agroup__types_html_ga10e94b422ef0c20dcdec20d31a1f5049"><div class="ttname"><a href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a></div><div class="ttdeci">unsigned int u32</div><div class="ttdoc">32-bit unsigned integer (0 to 4294967295)</div><div class="ttdef"><b>Definition</b> types.h:90</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="joypad-registers"></a>

@@ -1,5 +1,11 @@
 var NAVTREEINDEX2 =
 {
+"examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf":[1,3,0],
+"examples_fundamentals_text_glyphs.html#autotoc_md2-drawing-letters-in-hex":[1,3,1],
+"examples_fundamentals_text_glyphs.html#autotoc_md3-setting-up-the-ppu":[1,3,2],
+"examples_fundamentals_text_glyphs.html#autotoc_md4-uploading-tiles-to-vram":[1,3,3],
+"examples_fundamentals_text_glyphs.html#autotoc_md5-three-colors-six-bytes":[1,3,4],
+"examples_fundamentals_text_glyphs.html#autotoc_md6-spelling-the-message":[1,3,5],
 "examples_fundamentals_text_glyphs.html#autotoc_md7-lights-on":[1,3,6],
 "examples_fundamentals_text_glyphs.html#build--run-13":[1,2],
 "examples_fundamentals_text_glyphs.html#controls-8":[1,0],
@@ -243,11 +249,5 @@ var NAVTREEINDEX2 =
 "examples_text_print_string.html#modules-used-52":[7,3],
 "examples_text_print_string.html#modules-used-52":[17,3],
 "examples_text_print_string.html#next-rung":[7,4],
-"examples_text_print_string.html#next-rung":[17,4],
-"examples_text_print_string.html#snes-concepts-35":[7,1],
-"examples_text_print_string.html#snes-concepts-35":[17,1],
-"examples_text_print_string.html#what-youll-learn-23":[7,0],
-"examples_text_print_string.html#what-youll-learn-23":[17,0],
-"examples_transitions.html":[0,45,16],
-"examples_transitions.html#the-idea-in-one-screen-8":[1]
+"examples_text_print_string.html#next-rung":[17,4]
 };

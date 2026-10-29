@@ -163,8 +163,9 @@ Settings beside the asset</h2>
 <h2 class="doxsection"><a class="anchor" id="inspect-5"></a>
 Inspect</h2>
 <div class="fragment"><div class="line">opensnes-sample inspect res/jump.wav       # 32000 Hz, 16-bit, mono, 1840 samples (0.058 s) -&gt; 115 BRR blocks, 1035 bytes of ARAM</div>
+<div class="line">opensnes-sample inspect res/hum.wav --loop 40 200   # what encode --loop 40 200 would write</div>
 <div class="line">opensnes-sample inspect res/*.brr --json   # one JSON object: bytes, blocks, loop, ARAM</div>
-</div><!-- fragment --><p>Nothing is converted or written; this is how you size a sound set against the 64 KB of audio RAM before recording more.</p>
+</div><!-- fragment --><p>Nothing is converted or written; this is how you size a sound set against the 64 KB of audio RAM before recording more. A WAV is sized as <span class="tt">encode</span> writes it: with a loop (from <span class="tt">--loop</span>, or from the <span class="tt">.wav.toml</span> beside it) what follows the loop's end is left out, and a loop that is not a whole number of 16-sample blocks is repeated or resampled, so the figure is the size of the <span class="tt">.brr</span>, not of the file. The JSON of a WAV gives <span class="tt">loops</span>, <span class="tt">loop_offset</span> and <span class="tt">tuning_x4096</span> next to <span class="tt">aram_bytes</span>, as <span class="tt">encode --json</span> does.</p>
 <h2 class="doxsection"><a class="anchor" id="exit-codes-and-messages-1"></a>
 Exit codes and messages</h2>
 <p>0 done; 1 the input was refused and the message names the limit (<span class="tt">--loop

@@ -1,5 +1,11 @@
 var NAVTREEINDEX4 =
 {
+"group__audio__legacy.html#ga0ae7d151c8df1d90190e4c2a9af81cfe":[1,18,0],
+"group__audio__legacy.html#ga90ff78c34a0e95e1c269f41db67d0dd7":[1,18,2],
+"group__audio__legacy.html#gad19204f9e934017dead96542f848d0f6":[1,18,1],
+"group__audio__playback.html":[1,24],
+"group__audio__playback.html#ga08d3a1cc8f2e0e4bd9da475bc6e2afc9":[1,24,3],
+"group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f":[1,24,4],
 "group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1":[1,24,1],
 "group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020":[1,24,2],
 "group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff":[1,24,0],
@@ -243,11 +249,5 @@ var NAVTREEINDEX4 =
 "group__snesmod__module.html":[1,20],
 "group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038":[1,20,5],
 "group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1":[1,20,3],
-"group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d":[1,20,2],
-"group__snesmod__module.html#gac745fbd1f90f590dcff56693b67494f1":[1,20,0],
-"group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358":[1,20,1],
-"group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2":[1,20,4],
-"group__snesmod__pitch.html":[1,23],
-"group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7":[1,23,2],
-"group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa":[1,23,0]
+"group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d":[1,20,2]
 };

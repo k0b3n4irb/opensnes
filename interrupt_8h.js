@@ -10,5 +10,6 @@ var interrupt_8h =
     [ "irqSetHTimer", "interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9", null ],
     [ "irqSetVTimer", "interrupt_8h.html#a1579b3231b62226f9bf5ba4077660409", null ],
     [ "nmiClear", "interrupt_8h.html#a4a0a4690d2c70b58584eed95377325a1", null ],
-    [ "nmiSet", "interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7", null ]
+    [ "nmiSet", "interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7", null ],
+    [ "nmiSetLag", "interrupt_8h.html#a97190a6ce1065e4d7077b9621c7f1221", null ]
 ];

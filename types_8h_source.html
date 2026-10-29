@@ -245,8 +245,14 @@ $(function(){initNavTree('types_8h_source.html','',''); });
 <div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment"> *============================================================================*/</span></div>
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span></div>
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno"><a class="line" href="types_8h.html#a7e4a0ea7cc4892fdf814a6e0a7f841f0">  320</a></span><span class="preprocessor">#define OPENSNES_DEPRECATED(msg) __attribute__((deprecated(msg)))</span></div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span> </div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_TYPES_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span></div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="preprocessor">#ifdef __clang__</span></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="preprocessor">#define OPENSNES_CHECK_ARGS(cond, msg) __attribute__((diagnose_if(cond, msg, &quot;error&quot;)))</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno"><a class="line" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">  334</a></span><span class="preprocessor">#define OPENSNES_CHECK_ARGS(cond, msg)</span></div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_TYPES_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agroup__bool__type_html_ga97a80ca1602ebf2303258971a2c938e2"><div class="ttname"><a href="group__bool__type.html#ga97a80ca1602ebf2303258971a2c938e2">bool</a></div><div class="ttdeci">unsigned char bool</div><div class="ttdef"><b>Definition</b> types.h:190</div></div>
 <div class="ttc" id="agroup__func__ptr_html_ga5fe554ddab29fbcd75e14e38ee89724f"><div class="ttname"><a href="group__func__ptr.html#ga5fe554ddab29fbcd75e14e38ee89724f">VoidFn</a></div><div class="ttdeci">void(* VoidFn)(void)</div><div class="ttdoc">Void function taking no arguments (the generic name; a header that wants to say what the function is ...</div><div class="ttdef"><b>Definition</b> types.h:299</div></div>
 <div class="ttc" id="agroup__types_html_ga0ce6887c26c1c49ad3be5710dd42bfd6"><div class="ttname"><a href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6">s32</a></div><div class="ttdeci">signed int s32</div><div class="ttdoc">32-bit signed integer (-2147483648 to 2147483647)</div><div class="ttdef"><b>Definition</b> types.h:79</div></div>
