@@ -80,6 +80,10 @@ All notable changes to OpenSNES are documented in this file.
   routine: 60 random loops gave the same bytes, loop offset and tuning as
   `encode`. Its JSON for a WAV gains `loops`, `loop_offset` and
   `tuning_x4096`.
+- docs(lib): `audio.h` gave the samples' room with an echo as 58,112 bytes
+  (delay 2) and 47,872 (delay 7); the code and a ROM give 58,368 and 48,128
+  (`$FF00` minus 2 KB a unit of delay, minus `$0B00`). Reported by a
+  project's own audio budget.
 - fix(tools): the `opensnes-*` tools are built with clang, as the
   toolchain is: `CC ?= clang` in `tools/tool.mk` never applied, because
   make defines `CC` before reading a Makefile, so they were built with the
