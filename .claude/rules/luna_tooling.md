@@ -1,3 +1,10 @@
+---
+paths:
+  - "testing/**"
+  - "devtools/**"
+  - "scripts/**"
+---
+
 # Luna-First: internal scripts are transitory (Auto-loaded)
 
 CRITICAL, load-bearing convention (owner decision, 2026-08-05):

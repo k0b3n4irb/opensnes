@@ -1,3 +1,9 @@
+---
+paths:
+  - "docs/**"
+  - "KNOWN_LIMITATIONS.md"
+---
+
 # Hardware Claims Under Arbitration (Auto-loaded)
 
 CRITICAL: every **new hardware claim** written into `docs/` or

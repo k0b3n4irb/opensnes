@@ -1,3 +1,11 @@
+---
+paths:
+  - "templates/**"
+  - "make/**"
+  - "lib/source/**"
+  - "compiler/**"
+---
+
 # Bank $00 ROM Budget (Auto-loaded)
 
 ## What is true since 2026-10-10: a full bank $00 is not a failure
