@@ -45,11 +45,11 @@ and the CHANGELOG.
 
 ## Waiting
 
-- luna: its answer to `partners/luna/2026-10-30_to_luna_profile-mirror-fold.md`
-  (`profile` folds a bank-$00 PC — the vectors' `jml` in `NmiEntry` — onto
-  the last RAM label, because every ROM label is `80:xxxx`; asked: fold the
-  mirror, never credit a ROM PC to a RAM label). The kit's thread is closed
-  (markers gone from its profile; its 39 PCs were `$00:8000-$824D`, this).
+- luna shipped the profile fold the same day (`a38ff57` on its `develop`:
+  a ROM PC takes its mirror's label, never a RAM label; replayed here with
+  its stable binary: `NmiEntry` 200, `oamQueueEntry` gone —
+  `partners/luna/2026-10-30_to_luna_profile-mirror-fold_reply.md`). To
+  replay at the pin bump that carries it. The kit's thread is closed.
 - A tool that reads the compiler output: confirm it names the callee of an
   inlined block on its earlier case.
 - The first game: remove its fade workaround, replay its sound test.
