@@ -30,6 +30,15 @@ All notable changes to OpenSNES are documented in this file.
   (65535 x 65535, a zero, 256 x 256, a high half on either side, both set).
 - docs(examples): the fade table of `transitions/fading` read 15, 45 and 90
   frames for speeds 1, 3 and 6; they are 16, 48 and 96.
+- fix(tools): `opensnes-rom check` removes wlalink's RAM-usage markers
+  (`RAM_USAGE_SLOT_*_START` / `_END`) from the `.sym` once it has read it.
+  The linker writes them as bank-$00 labels whatever their bank
+  (`$7E:2000` comes out as `00:2000`), so a profiler that folds PCs onto the
+  nearest label credits code to them: on a game, `luna profile` put 1,177
+  instructions and 39 PCs under `RAM_USAGE_SLOT_2_BANK_126_START`. The
+  checks read the RAM figures from `[ramsections]` and nothing else read the
+  markers; `--keep-ram-markers` leaves the file as linked. A `.sym` without
+  them is not rewritten. Asked by the porting kit, which reads the profile.
 
 ### Changed
 - feat(compiler): the label of an inlined block names the callee:

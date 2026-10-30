@@ -41,6 +41,7 @@ static const cli_opt check_opts[] = {
     { "no-bank-reads", 0, CLI_FLAG, NULL, "skip the bank-blind read guard", NULL },
     { "no-nmi-race", 0, CLI_FLAG, NULL, "skip the NMI / WRAM-port race lint", NULL },
     { "no-assets", 0, CLI_FLAG, NULL, "skip the asset inventory line", NULL },
+    { "keep-ram-markers", 0, CLI_FLAG, NULL, "leave wlalink's RAM_USAGE_SLOT_* rows in the .sym (a profiler folding PCs onto labels takes them for code)", NULL },
 };
 
 static int run_check(cli_ctx *ctx)
@@ -69,6 +70,13 @@ static int run_check(cli_ctx *ctx)
     if (!cli_has(ctx, "no-nmi-race")) r.nmirace = check_nmi_race(ctx, dir);
     if (!cli_has(ctx, "no-assets")) report_assets(ctx, dir, &r);
     sym_free(&s);
+    /* wlalink's RAM-usage markers are of no use once the checks have read
+     * the .sym (every current one has a [ramsections] block), and they
+     * mislead whoever folds PCs onto labels: luna profile credited code to
+     * RAM_USAGE_SLOT_2_BANK_126_START, written 00:2000. The .sym the
+     * emulator reads is the one beside the ROM, so it is cleaned here. */
+    if (!cli_has(ctx, "keep-ram-markers") && sym_strip_ram_markers(sym_path, why, sizeof why) < 0)
+        cli_warn(ctx, sym_path, "could not remove the RAM_USAGE_SLOT_* rows: %s", why);
 
     int failed = r.bank0 == 1 || r.ram == 1 || r.datainit == 1 || r.bankreads == 1 || r.nmirace == 1
               || r.sa1boot == 1;

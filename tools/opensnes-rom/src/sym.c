@@ -171,3 +171,45 @@ static const sym_label *find_in(const sym_label *arr, size_t n, const char *name
 
 const sym_label *sym_find(const sym_file *s, const char *name) { return find_in(s->labels, s->nlabels, name); }
 const sym_label *sym_find_def(const sym_file *s, const char *name) { return find_in(s->defs, s->ndefs, name); }
+
+int sym_strip_ram_markers(const char *path, char *why, size_t why_len)
+{
+    FILE *in = fopen(path, "r");
+    if (!in) { snprintf(why, why_len, "cannot open"); return -1; }
+    char tmp[1100];
+    snprintf(tmp, sizeof tmp, "%s.tmp", path);
+    FILE *out = fopen(tmp, "w");
+    if (!out) { fclose(in); snprintf(why, why_len, "cannot write beside it"); return -1; }
+    char line[4096];
+    int removed = 0, in_labels = 0, at_line_start = 1, ok = 1;
+    while (fgets(line, sizeof line, in)) {
+        size_t n = strlen(line);
+        int starts_line = at_line_start;
+        at_line_start = n > 0 && line[n - 1] == '\n';
+        if (starts_line) {
+            const char *p = line;
+            while (isspace((unsigned char)*p)) p++;
+            if (*p == '[') in_labels = strncmp(p, "[labels]", 8) == 0;
+            else if (in_labels && strlen(p) > 8 && p[2] == ':' && isspace((unsigned char)p[7])) {
+                const char *name = p + 7;
+                while (isspace((unsigned char)*name)) name++;
+                if (strncmp(name, "RAM_USAGE_SLOT_", 15) == 0) {
+                    removed++;
+                    /* skip the rest of an over-long row too */
+                    while (!at_line_start && fgets(line, sizeof line, in)) {
+                        n = strlen(line);
+                        at_line_start = n > 0 && line[n - 1] == '\n';
+                    }
+                    continue;
+                }
+            }
+        }
+        if (fputs(line, out) == EOF) { ok = 0; break; }
+    }
+    fclose(in);
+    if (fclose(out) != 0) ok = 0;
+    if (!ok) { remove(tmp); snprintf(why, why_len, "write failed"); return -1; }
+    if (removed == 0) { remove(tmp); return 0; }
+    if (rename(tmp, path) != 0) { remove(tmp); snprintf(why, why_len, "cannot replace it"); return -1; }
+    return removed;
+}

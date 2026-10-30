@@ -155,5 +155,42 @@ def declared_vram():
 g.check("check with vram = N in settings files (a cache, a streamed sheet)", "the declared bytes, once", declared_vram)
 g.expect_stdout("budget good.sfc (ROM by bank, RAM, video)", ["budget", "good.sfc"], golden="budget.txt", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_stdout("budget --json good.sfc", ["budget", "--json", "good.sfc"], golden="budget.json", copy=["good.sfc", "good.sym", "good.c.asm"])
+
+
+def ram_markers():
+    """wlalink writes its RAM-usage markers as bank-$00 labels whatever their
+    bank (RAM_USAGE_SLOT_2_BANK_126_START at $7E:2000 comes out 00:2000), and a
+    profiler folding PCs onto the nearest label credits code to them. The
+    check removes those rows from the .sym once it has read it, and only
+    them: the rest of the file is byte for byte what it was. --keep-ram-markers
+    leaves the file alone. A .sym without them is not rewritten."""
+    import tempfile
+    errs = []
+    good = (g.fixtures / "good.sym").read_text()
+    markers = ("00:0000 RAM_USAGE_SLOT_1_BANK_0_START\n00:051f RAM_USAGE_SLOT_1_BANK_0_END\n"
+               "00:2000 RAM_USAGE_SLOT_2_BANK_126_START\n00:2fff RAM_USAGE_SLOT_2_BANK_126_END\n")
+    marked = good.replace("[definitions]", markers + "[definitions]")
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["check", "--no-nmi-race", "marked.sym"], work, ["good.c.asm"], write={"marked.sym": marked})
+        if proc.returncode != 0:
+            errs.append(f"check exited {proc.returncode} on the marked .sym")
+        after = (work / "marked.sym").read_text()
+        if after != good:
+            errs.append("the .sym is not good.sym once the four marker rows are removed")
+        if (work / "marked.sym.tmp").exists():
+            errs.append("the temporary file was left behind")
+        proc = g.run(["check", "--no-nmi-race", "--keep-ram-markers", "kept.sym"], work, write={"kept.sym": marked})
+        if (work / "kept.sym").read_text() != marked:
+            errs.append("--keep-ram-markers did not keep the rows")
+        before = (work / "good.sym").write_text(good) and None
+        st = (work / "good.sym").stat().st_mtime_ns
+        g.run(["check", "--no-nmi-race", "good.sym"], work)
+        if (work / "good.sym").stat().st_mtime_ns != st:
+            errs.append("a .sym without markers was rewritten")
+    return errs
+
+
+g.check("check marked.sym (wlalink's RAM_USAGE_SLOT_* rows)", "removed from the .sym, nothing else touched", ram_markers)
 g.expect_refused("check missing.sym", ["check", "missing.sym"], needles=["cannot open"])
 sys.exit(g.report())
