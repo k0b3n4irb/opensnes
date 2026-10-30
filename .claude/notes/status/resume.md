@@ -22,7 +22,7 @@ and the CHANGELOG.
 
 ## Waiting
 
-- The kit: confirm `expliquer` names the callee on its 2026-10-13 case.
+- A tool that reads the compiler output: confirm it names the callee of an inlined block on its earlier case.
 - The first game: remove its fade workaround, replay its sound test.
 - The second game: measure its step with the short multiply, send the reduced
   per-object loop (40 to 100 word-array entries) so instructions per
