@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-10-29)
+# Where the work stands (resume note, 2026-10-30)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -8,32 +8,33 @@ and the CHANGELOG.
 
 - **v0.53.0 is released** (tag on `main` at `ca31aa92`, GitHub Release with
   its five files, the site rebuilt from `main`). `develop` = `origin/develop`
-  = `cfe348d4`, CI green. No worktree, no stash, nothing local, nothing
-  running.
-- Landed since 0.52.0, all published in 0.53.0:
-  - FastROM: LoROM code addressed in the $80 mirror, so `USE_FASTROM=1`
-    speeds up C and the library;
-  - VRAM queue: `vramQueueFlushUntil(line)`, flush loop at 619 master
-    cycles an entry, `VRAM_QUEUE_ENTRY_COST` 80, 12 bytes of RAM an entry;
-  - tools built with clang; a failed link names the missing `LIB_MODULES`
-    module; `__mul16` skips empty partial products; `opensnes-sample
-    inspect` sizes a looped WAV as `encode` writes it; `audio.h`'s echo
-    figures corrected (58,368 and 48,128);
-  - `games/breakout`: steel cabinet, paddle, bricks and ball redrawn.
-- Since the release, on `develop` only (goes in 0.54.0): `cfe348d4`,
-  `games/breakout` made legible (saturated bricks, quiet board, black score
-  panel, softer shadows).
-- The two games built on this tree tried each delivery and report green.
-
-## In progress
-
-Nothing.
+  = `f7f11dfe`. The main tree was rebuilt clean at that commit (60/60 ROMs
+  alive); the worktree `../opensnes-requests` and its branch `wip/requests`
+  are merged and can go.
+- Since the release, on `develop` only (goes in 0.54.0):
+  - `cfe348d4` `games/breakout` made legible;
+  - `7a36d45c` the label of an inlined block names the callee
+    (`inl<N>_<callee>.<index>.<block>`; QBE fork at `b8d9155`, PINS updated);
+  - `f7f11dfe` `fadeStart` / `fadeStep` / `fadeRunning` (a fade that does not
+    hold the program) and a short path in `tcc_mul32` (both high words zero:
+    -51 % for u16 x u16 -> u32, +2.5 % when a high half is set).
+- The three neighbours were told "on develop at f7f11dfe, rebuild".
 
 ## Waiting
 
-Nothing for the owner. OpenSNES works reactive (owner, 2026-10-29): it
-answers the games, luna and the porting tools, and starts no chantier of
-its own.
+- The kit: confirm `expliquer` names the callee on its 2026-10-13 case.
+- The first game: remove its fade workaround, replay its sound test.
+- The second game: measure its step with the short multiply, send the reduced
+  per-object loop (40 to 100 word-array entries) so instructions per
+  iteration can be counted.
+- The first game's fixed-slot sprite engine: later, from the case given in
+  SDK terms; an autonomous example is ours to write first; nothing of the
+  game is committed.
+
+## In progress
+
+Nothing. OpenSNES works reactive (owner, 2026-10-29): it answers the games,
+luna and the porting tools, and starts no chantier of its own.
 
 ## Possible next work (none chosen)
 
