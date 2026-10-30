@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- feat(compiler): the label of an inlined block names the callee:
+  `@inl51_userInput.3.if_false.536` where it read `@inl51.if_false.536`
+  (the splice's number, the callee, the block's index in it, then the block's
+  own name). A symbol map, a profile or a tool that follows a divergent write
+  names the routine that was spliced in, not only its number. What makes a
+  label unique leads it, so a deep chain of names cut at 80 characters
+  cannot merge two blocks. The code is unchanged: the 60 ROMs of the corpus
+  are byte-identical before and after, and `libbench`'s per-symbol cycles are
+  the same under their new names.
+### Changed
 - feat(examples): `games/breakout` reads at a glance. The bricks have the
   saturated colours of an arcade (silver, orange, pink, cyan, violet, green,
   red and yellow, where the teal that most rows used sank into the night
