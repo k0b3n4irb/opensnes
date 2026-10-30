@@ -45,9 +45,11 @@ and the CHANGELOG.
 
 ## Waiting
 
-- The kit: its answer on the range of the 39 PCs credited to the marker
-  (code in RAM, or a ROM PC folded wrong?) and that `profil` names no
-  `RAM_USAGE_SLOT_*` on its case any more — then the thread closes.
+- luna: its answer to `partners/luna/2026-10-30_to_luna_profile-mirror-fold.md`
+  (`profile` folds a bank-$00 PC — the vectors' `jml` in `NmiEntry` — onto
+  the last RAM label, because every ROM label is `80:xxxx`; asked: fold the
+  mirror, never credit a ROM PC to a RAM label). The kit's thread is closed
+  (markers gone from its profile; its 39 PCs were `$00:8000-$824D`, this).
 - A tool that reads the compiler output: confirm it names the callee of an
   inlined block on its earlier case.
 - The first game: remove its fade workaround, replay its sound test.
