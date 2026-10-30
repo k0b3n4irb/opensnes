@@ -205,6 +205,7 @@ frames = 180
 
 [asserts]
 fbhash = ""                       # the frame's hash; `make test-update` fills it
+wdm_empty = true                  # no SNES_ASSERT fired (an assert is a WDM; luna counts them)
 
 [[checkpoint]]
 at_frame = 180
@@ -218,6 +219,9 @@ player_y = 96
 rom = "../game.sfc"
 frames = 150
 input = "30:0x100,90:0"           # "frame:buttons_hex" (RIGHT = 0x100), until frame 90
+
+[asserts]
+wdm_empty = true                  # no SNES_ASSERT fired while walking
 
 [[checkpoint]]
 at_frame = 150

@@ -7,6 +7,7 @@ frames = 180                      # run until PPU frame 180, then judge
 
 [asserts]
 fbhash = "940346ed556af718"       # the frame's hash; `make test-update` rewrites it after a change
+wdm_empty = true                  # no SNES_ASSERT fired (an assert is a WDM; luna counts them)
 
 # WRAM values at the end, by the name the variable has in your C. If two
 # sources define a static of the same name, luna asks which one:

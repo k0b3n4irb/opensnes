@@ -4,6 +4,9 @@ rom = "../game.sfc"
 frames = 150
 input = "30:0x100,90:0"
 
+[asserts]
+wdm_empty = true                  # no SNES_ASSERT fired while walking
+
 [[checkpoint]]
 at_frame = 150
 [checkpoint.values]

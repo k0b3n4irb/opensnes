@@ -41,6 +41,11 @@ All notable changes to OpenSNES are documented in this file.
   them is not rewritten. Asked by the porting kit, which reads the profile.
 
 ### Changed
+- feat(build): the starter's two tests assert `wdm_empty = true`: a
+  `SNES_ASSERT` that fires (a WDM, which luna counts) fails `make test` from
+  the first project on, where before only the picture and the WRAM values
+  were judged. Asked by the porting kit, whose projects' manifests had never
+  set it. A project that wants an assert to pass removes the line.
 - feat(compiler): the label of an inlined block names the callee:
   `@inl51_userInput.3.if_false.536` where it read `@inl51.if_false.536`
   (the splice's number, the callee, the block's index in it, then the block's
