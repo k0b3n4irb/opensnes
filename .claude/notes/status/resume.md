@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-10-30)
+# Where the work stands (resume note, 2026-10-30, evening)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -7,34 +7,56 @@ and the CHANGELOG.
 ## State
 
 - **v0.53.0 is released** (tag on `main` at `ca31aa92`, GitHub Release with
-  its five files, the site rebuilt from `main`). `develop` = `origin/develop`
-  = `f7f11dfe`. The main tree was rebuilt clean at that commit (60/60 ROMs
-  alive); the worktree `../opensnes-requests` and its branch `wip/requests`
-  are merged and can go.
+  its five files, the site rebuilt from `main`). The worktree
+  `../opensnes-requests` and its branch `wip/requests` are merged and can go.
 - Since the release, on `develop` only (goes in 0.54.0):
   - `cfe348d4` `games/breakout` made legible;
-  - `7a36d45c` the label of an inlined block names the callee
-    (`inl<N>_<callee>.<index>.<block>`; QBE fork at `b8d9155`, PINS updated);
-  - `f7f11dfe` `fadeStart` / `fadeStep` / `fadeRunning` (a fade that does not
-    hold the program) and a short path in `tcc_mul32` (both high words zero:
-    -51 % for u16 x u16 -> u32, +2.5 % when a high half is set).
-- The three neighbours were told "on develop at f7f11dfe, rebuild".
+  - `7a36d45c` the label of an inlined block names the callee;
+  - `f7f11dfe` `fadeStart` / `fadeStep` / `fadeRunning` and a short path in
+    `tcc_mul32` (the second game measured it: no gain for it, its u16
+    products were gone before; closed);
+  - `4dca0011` `opensnes-rom check` removes wlalink's `RAM_USAGE_SLOT_*` rows
+    from the `.sym` (asked by the porting kit, whose profile reading they
+    misled; `--keep-ram-markers` keeps them). Suite green on the stripped
+    corpus.
+  - the tech note `per_object_loop_codegen.md` and A11 of
+    `STRUCTURAL_DEFECTS.md` (the backend never indexes with Y).
+- The neighbours were told "on develop at f7f11dfe, rebuild"; the kit's
+  lot is announced in its thread (a relink is enough: the tool, not the lib).
+
+## Promised, dated
+
+- **2026-10-31 (Friday)**: the measurement owed to the first game — an
+  autonomous case (18 sprites 32x32 at fixed VRAM slots, 130 synthetic
+  frames of 512 bytes, one tick per two frames, changes of the shape of its
+  distribution: mean 4, p90 10, bursts of 18; 5 frames per VBlank) measured
+  on luna against the dynamic engine plus the VRAM queue
+  (`vramQueueFlushUntil`). Then a yes or a no on a fixed-slot sprite module
+  (0.54 if yes), in its thread. Its question still open: are its ≈ 130
+  instructions per sprite the "frame changed?" decision plus the queueing,
+  without the send?
+- **2026-11-02 (Monday)**: the compiler lot "per-object loop" for the second
+  game, in a worktree: the five wastes of
+  `.claude/notes/tech/per_object_loop_codegen.md` (phi copies, dead
+  temporary store, load scheduling, reload around `ldx`), from 70 to about
+  55 instructions per iteration on the reduced case; measured on that case
+  before and after (instructions on the common path, luna cycles over 64
+  entries), difftest hunts, corpus A/B. Announced to the game at delivery.
 
 ## Waiting
 
-- A tool that reads the compiler output: confirm it names the callee of an inlined block on its earlier case.
+- The kit: its answer on the range of the 39 PCs credited to the marker
+  (code in RAM, or a ROM PC folded wrong?) and that `profil` names no
+  `RAM_USAGE_SLOT_*` on its case any more — then the thread closes.
+- A tool that reads the compiler output: confirm it names the callee of an
+  inlined block on its earlier case.
 - The first game: remove its fade workaround, replay its sound test.
-- The second game: measure its step with the short multiply, send the reduced
-  per-object loop (40 to 100 word-array entries) so instructions per
-  iteration can be counted.
-- The first game's fixed-slot sprite engine: later, from the case given in
-  SDK terms; an autonomous example is ours to write first; nothing of the
-  game is committed.
 
 ## In progress
 
-Nothing. OpenSNES works reactive (owner, 2026-10-29): it answers the games,
-luna and the porting tools, and starts no chantier of its own.
+Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
+answers the games, luna and the porting tools, and starts no chantier of
+its own; the two dated items above answer requests.
 
 ## Possible next work (none chosen)
 
