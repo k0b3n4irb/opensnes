@@ -13,13 +13,16 @@
  * @par SNES Concepts
  * - INIDISP ($2100) brightness levels 0-15; brightness 0 is not force blank
  * - MOSAIC ($2106): block size in bits 7-4, the BG layers it applies to in bits 3-0
- * - fadeOut() / fadeIn(): one brightness step every `speed` frames
+ * - fadeOut() / fadeIn(): one brightness step every `speed` frames, the program held meanwhile
+ * - fadeStart() / fadeStep(): the same fade, a step per frame, the loop free
  * - mosaicSetLayers() / mosaicFadeOut() / mosaicFadeIn() / mosaicDisable()
  * - Sprites are never mosaicked: only background layers are
  *
  * @par What to Observe
  * - Press any button to advance to the next transition
  * - Fast fade out and in (1 frame per step), then 3 frames per step, then 6
+ *   (the 6-frame fades do not hold the program: the loop counts its frames
+ *   in `fade_ticks` while they run)
  * - Then the mosaic: the picture breaks into growing blocks, then sharpens again
  * - The cycle repeats
  *
@@ -50,6 +53,9 @@
  * Each iteration calls WaitForVBlank() to yield CPU time and synchronize
  * with the display refresh.
  */
+/** @brief Frames the main loop ran during the non-blocking fades (96 a fade at 6 frames per step). */
+u16 fade_ticks;
+
 static void wait_for_key(void) {
     while (padHeld(0) != 0) WaitForVBlank();
     while (padHeld(0) == 0) WaitForVBlank();
@@ -139,13 +145,25 @@ int main(void) {
         WaitForVBlank();
         wait_for_key();
 
-        /* Very slow fade out (6 frames per step) */
-        fadeOut(6);
+        /* Very slow fade out (6 frames per step), without holding the program:
+         * fadeStart() writes the first level, then the loop goes on a frame at a
+         * time and fadeStep() makes the others. What a game does each frame (its
+         * sound driver, its animation) takes the place of `fade_ticks++`. */
+        fade_ticks = 0;
+        fadeStart(FADE_OUT, 6);
+        do {
+            WaitForVBlank();
+            fade_ticks++;
+        } while (fadeStep());
         WaitForVBlank();
         wait_for_key();
 
-        /* Very slow fade in */
-        fadeIn(6);
+        /* Very slow fade in, the same way */
+        fadeStart(FADE_IN, 6);
+        do {
+            WaitForVBlank();
+            fade_ticks++;
+        } while (fadeStep());
         WaitForVBlank();
         wait_for_key();
 

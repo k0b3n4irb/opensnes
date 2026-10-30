@@ -69,7 +69,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| fade in or out | `fadeIn`, `fadeOut` | `console` | [transitions/fading](../examples/transitions/fading/) |
+| fade in or out | `fadeIn`, `fadeOut` (the program waits), `fadeStart` + `fadeStep` (a step per frame, the loop free) | `console` | [transitions/fading](../examples/transitions/fading/) |
 | blend two layers | `colormath*` | `colormath` | [color/transparency](../examples/color/transparency/) |
 | mask part of the screen | `windowSet*` | `window` | [windows/window](../examples/windows/window/) |
 | change a register mid-frame | `hdmaSetup`, `hdmaEnableMask` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |

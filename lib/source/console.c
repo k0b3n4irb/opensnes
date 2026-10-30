@@ -162,6 +162,55 @@ void fadeIn(u8 speed) {
     }
 }
 
+/* The non-blocking fade (fadeStart / fadeStep): the same 16 levels and the
+ * same wait of `speed` frames after each as fadeOut() / fadeIn(), the frames
+ * left to the caller's loop. fade_step counts the levels written (1 to 16:
+ * 16 is the last level, whose wait is still to be served). */
+static u8 fade_active;
+static u8 fade_dir;
+static u8 fade_speed;
+static u8 fade_wait;
+static u8 fade_step;
+
+static u8 fade_level(u8 step) {
+    return (u8)(fade_dir == FADE_OUT ? 15 - step : step);
+}
+
+void fadeStart(u8 direction, u8 speed) {
+    fade_dir = direction;
+    fade_speed = speed;
+    fade_step = 1;
+    fade_wait = speed;
+    /* speed 0 waits for nothing: the end level at once, no fade to run */
+    if (speed == 0) {
+        fade_active = 0;
+        setBrightness(fade_level(15));
+        return;
+    }
+    fade_active = 1;
+    setBrightness(fade_level(0));
+}
+
+u8 fadeStep(void) {
+    if (!fade_active) {
+        return 0;
+    }
+    if (--fade_wait == 0) {
+        if (fade_step == 16) {
+            fade_active = 0;
+            return 0;
+        }
+        setBrightness(fade_level(fade_step));
+        fade_step++;
+        fade_wait = fade_speed;
+    }
+    return 1;
+}
+
+u8 fadeRunning(void) {
+    return fade_active;
+}
+
 u8 getBrightness(void) {
     return console_brightness;
 }

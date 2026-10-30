@@ -190,6 +190,57 @@ void fadeOut(u8 speed);
  */
 void fadeIn(u8 speed);
 
+/** @brief fadeStart() direction: from full brightness down to black */
+#define FADE_OUT 0
+/** @brief fadeStart() direction: from black up to full brightness */
+#define FADE_IN  1
+
+/**
+ * @brief Start a fade that does not hold the program: the frames are yours
+ *
+ * fadeOut() and fadeIn() wait `16 x speed` frames inside the call, and
+ * nothing else runs meanwhile: no sound driver, no animation, no input. This
+ * does the same fade a step per frame, so the main loop keeps going:
+ *
+ * @code
+ * fadeStart(FADE_OUT, 3);
+ * do {
+ *     WaitForVBlank();
+ *     soundUpdate();           // whatever the loop does each frame
+ * } while (fadeStep());
+ * @endcode
+ *
+ * It writes the first level (15 for FADE_OUT, 0 for FADE_IN) and returns;
+ * @ref fadeStep makes each of the 15 others. The fade lasts as long as
+ * the blocking one: `16 x speed` frames, so `fadeStep()` returns 0 on the
+ * call that comes `16 x speed` frames after `fadeStart()`.
+ * `speed` 0 writes the end level at once, and `fadeStep()` returns 0. One
+ * fade runs at a time: a new `fadeStart()` replaces the one under way. Under
+ * forced blank the brightness writes are skipped, as for @ref fadeOut.
+ *
+ * @param direction FADE_OUT or FADE_IN
+ * @param speed     VBlank frames between two levels
+ */
+void fadeStart(u8 direction, u8 speed);
+
+/**
+ * @brief Advance the fade started by fadeStart(), one call a frame
+ *
+ * Call it once per frame, after WaitForVBlank(). It counts the frames of
+ * the wait between two levels and writes the next level when they are
+ * over.
+ *
+ * @return 1 while the fade runs (the call that writes the last level
+ *         included), 0 once it is over, or when none was started
+ */
+u8 fadeStep(void);
+
+/**
+ * @brief Is a fade started by fadeStart() still running?
+ * @return 1 until the call of fadeStep() that returns 0, then 0
+ */
+u8 fadeRunning(void);
+
 /**
  * @brief Get current brightness
  *

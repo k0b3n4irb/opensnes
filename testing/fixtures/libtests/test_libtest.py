@@ -49,6 +49,10 @@ CASES = [
     ("r_div_zero", 2, 0),
     ("r_mod_zero", 2, 0),
     ("r_mul",      2, 5535),
+    # tcc_mul32: two u16 take the short path (4 partial products), a high half on either side all ten
+    # the non-blocking fade: running, first level, 16 x speed - 1 steps, over, last level, speed 0, level 5
+    ("r_fade",    16, 0x50000000f00000000001f000f0001),
+    ("r_mul32",   32, 0x5a6c02410110000010000000100000001d4c00001000000000000fffe0001),
     ("r_sdiv_cast", 2, 0xFD9C),  # (s16)-30000/(s16)49 — signed div through casts (#114)
     ("r_nmi_mul",  2, 17243),  # 123*673 & 0xFFFF, computed in the nmiSet callback (#113)
     ("r_nmi_div",  2, 4714),   # 33000/7 in the callback — 8-bit-divisor (hardware) path pre-fix

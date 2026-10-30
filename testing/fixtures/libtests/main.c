@@ -63,6 +63,17 @@ u16 r_div_max;  /* div16(65535, 1)  -> 65535 (worst case of the old O(quotient) 
 u16 r_div_zero; /* div16(42, 0)     -> 0 (documented contract) */
 u16 r_mod_zero; /* mod16(42, 0)     -> 0 (documented contract) */
 u16 r_mul;      /* mul16(123, 45)   -> 5535 */
+/* 32-bit products (tcc_mul32): two u16 (both high words zero, the short path),
+ * then a u32 with a high half on either side (all ten partial products).
+ * volatile operands: nothing is folded by the compiler. */
+volatile u32 mu_a, mu_b;
+u32 r_mul32[8];   /* 65535*65535, 0*1234, 256*256, 40000*3, 65536*1, 1*65536, 70000*70000, 123456*3 */
+/* the non-blocking fade (fadeStart / fadeStep / fadeRunning), brightness read from its shadow:
+ * [0] running after fadeStart(FADE_OUT, 2) -> 1, [1] its first level -> 15,
+ * [2] calls of fadeStep() that return 1 -> 31 (16 x 2 - 1), [3] running after -> 0,
+ * [4] the last level -> 0, [5] fadeStart(FADE_IN, 0) -> 15 at once, [6] its fadeStep() -> 0,
+ * [7] brightness after 5 calls of fadeStep() of fadeStart(FADE_IN, 1) -> 5 */
+u16 r_fade[8];
 u16 r_sqrt;     /* sqrt16(144)      -> 12 */
 
 /* --- fixed-point vectors (gaps review L2b, 2026-09-14): fixMul, fixDiv,
@@ -959,6 +970,35 @@ static void part_math_anim(void) {
     r_div_zero = div16(42, 0);
     r_mod_zero = mod16(42, 0);
     r_mul      = mul16(123, 45);
+    mu_a = 65535UL;  mu_b = 65535UL;  r_mul32[0] = mu_a * mu_b;   /* 0xFFFE0001 */
+    mu_a = 0UL;      mu_b = 1234UL;   r_mul32[1] = mu_a * mu_b;   /* 0 */
+    mu_a = 256UL;    mu_b = 256UL;    r_mul32[2] = mu_a * mu_b;   /* 0x00010000 */
+    mu_a = 40000UL;  mu_b = 3UL;      r_mul32[3] = mu_a * mu_b;   /* 0x0001D4C0 */
+    mu_a = 65536UL;  mu_b = 1UL;      r_mul32[4] = mu_a * mu_b;   /* a_hi set */
+    mu_a = 1UL;      mu_b = 65536UL;  r_mul32[5] = mu_a * mu_b;   /* b_hi set */
+    mu_a = 70000UL;  mu_b = 70000UL;  r_mul32[6] = mu_a * mu_b;   /* both high words set, low 32 bits */
+    mu_a = 123456UL; mu_b = 3UL;      r_mul32[7] = mu_a * mu_b;   /* a_hi set, b_hi zero */
+    {
+        u16 n = 0, k;
+        fadeStart(FADE_OUT, 2);
+        r_fade[0] = fadeRunning();
+        r_fade[1] = getBrightness();
+        while (fadeStep()) {
+            n++;
+        }
+        r_fade[2] = n;
+        r_fade[3] = fadeRunning();
+        r_fade[4] = getBrightness();
+        fadeStart(FADE_IN, 0);
+        r_fade[5] = getBrightness();
+        r_fade[6] = fadeStep();
+        fadeStart(FADE_IN, 1);
+        for (k = 0; k < 5; k++) {
+            fadeStep();
+        }
+        r_fade[7] = getBrightness();
+        setBrightness(15);
+    }
     r_sqrt     = sqrt16(144);
     r_sdiv_cast = (u16)((s16)-30000 / (s16)(sdiv_op | 1));
 

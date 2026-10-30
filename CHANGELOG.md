@@ -4,6 +4,33 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(lib): a fade that does not hold the program. `fadeOut()` and `fadeIn()`
+  wait `16 x speed` frames inside the call: nothing else runs meanwhile, so
+  a sound driver a game advances from its main loop is silent for the whole
+  fade and catches up after it. `fadeStart(FADE_OUT | FADE_IN, speed)` writes
+  the first level and returns, `fadeStep()` is called once a frame after
+  `WaitForVBlank()` and returns 1 while the fade runs, 0 on the frame the
+  blocking fade would have returned; `fadeRunning()` says whether one is
+  under way. The same 16 levels, the same `16 x speed` frames, the same
+  brightness at every frame: the two 6-frame fades of `transitions/fading`
+  are non-blocking and its manifest, which pins the blocking fades' brightness
+  frame by frame, still passes unchanged, with `fade_ticks` (one tick per
+  frame of the fade) reading 96. 5 bytes of RAM, and the code is linked only
+  if called. The blocking calls stay.
+- perf(runtime): `__mul32` has a short path when both high words are 0, which
+  is every `(u32)a * b` of two `u16`: its four products of the low halves
+  are the whole answer, and it returns after them instead of making the six
+  others (ten 8x8 hardware products in all). Measured on luna over 1,600
+  products, the sum checked against the host's: two `u16`, 6,485,200 master
+  cycles before and 3,148,702 after (-51 %, 4,053 to 1,968 a product); with a
+  high half set, 6,485,280 and 6,649,066 (+2.5 %, 102 cycles for the test): the
+  short path pays from one product in twenty. No API: C that multiplies two
+  `u16` into 32 bits takes it as it is. `libtests` pins eight products
+  (65535 x 65535, a zero, 256 x 256, a high half on either side, both set).
+- docs(examples): the fade table of `transitions/fading` read 15, 45 and 90
+  frames for speeds 1, 3 and 6; they are 16, 48 and 96.
+
 ### Changed
 - feat(compiler): the label of an inlined block names the callee:
   `@inl51_userInput.3.if_false.536` where it read `@inl51.if_false.536`
@@ -14,7 +41,6 @@ All notable changes to OpenSNES are documented in this file.
   cannot merge two blocks. The code is unchanged: the 60 ROMs of the corpus
   are byte-identical before and after, and `libbench`'s per-symbol cycles are
   the same under their new names.
-### Changed
 - feat(examples): `games/breakout` reads at a glance. The bricks have the
   saturated colours of an arcade (silver, orange, pink, cyan, violet, green,
   red and yellow, where the teal that most rows used sank into the night
