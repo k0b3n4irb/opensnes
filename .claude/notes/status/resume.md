@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-10-30, evening)
+# Where the work stands (resume note, 2026-10-31)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -26,15 +26,6 @@ and the CHANGELOG.
 
 ## Promised, dated
 
-- **2026-10-31 (Friday)**: the measurement owed to the first game — an
-  autonomous case (18 sprites 32x32 at fixed VRAM slots, 130 synthetic
-  frames of 512 bytes, one tick per two frames, changes of the shape of its
-  distribution: mean 4, p90 10, bursts of 18; 5 frames per VBlank) measured
-  on luna against the dynamic engine plus the VRAM queue
-  (`vramQueueFlushUntil`). Then a yes or a no on a fixed-slot sprite module
-  (0.54 if yes), in its thread. Its question still open: are its ≈ 130
-  instructions per sprite the "frame changed?" decision plus the queueing,
-  without the send?
 - **2026-11-02 (Monday)**: the compiler lot "per-object loop" for the second
   game, in a worktree: the five wastes of
   `.claude/notes/tech/per_object_loop_codegen.md` (phi copies, dead
@@ -42,6 +33,19 @@ and the CHANGELOG.
   55 instructions per iteration on the reduced case; measured on that case
   before and after (instructions on the common path, luna cycles over 64
   entries), difftest hunts, corpus A/B. Announced to the game at delivery.
+
+## Done 2026-10-31
+
+- The measurement owed to the first game: no fixed-slot module, a saving of
+  9,489 cycles a frame does not pay for one (`devtools/slotbench`, `make
+  bench-slots`, `.claude/notes/tech/fixed_slot_sprites.md`). Answered in its
+  thread; it closes it.
+- Found by the same bench, **open, nothing fixed**: the dynamic engine's NMI
+  hook has no budget and loses OAM at 7 frames in a VBlank, and a 17th sprite
+  reads past its tables (`silent_defects_log.md`). The fix changes
+  `MAXSPRTRF` or the hook's order, so it needs its own lot and a Class B
+  validation; no one has asked for it yet, the first game does not use the
+  dynamic engine.
 
 ## Waiting
 
