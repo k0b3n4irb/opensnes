@@ -1,7 +1,6 @@
 # The per-object loop: what cc65816 generates, what is too much (2026-10-30)
 
-A game built on the SDK sent (exchange thread of 2026-10-30, in the
-owner's private `echanges` repository) the reduced, autonomous case below:
+A game built on the SDK sent (2026-10-30) the reduced, autonomous case below:
 the loop that places N sprites in the OAM shadow every frame (a structure of
 word arrays, N = 64; 25 to 70 entries per frame in play). It is the first
 item of that game's critical path. Nothing of the game is in this file: the
