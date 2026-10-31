@@ -24,18 +24,12 @@ and the CHANGELOG.
 - The neighbours were told "on develop at f7f11dfe, rebuild"; the kit's
   lot is announced in its thread (a relink is enough: the tool, not the lib).
 
-## Promised, dated
-
-- **2026-11-02 (Monday)**: the compiler lot "per-object loop" for the second
-  game, in a worktree: the five wastes of
-  `.claude/notes/tech/per_object_loop_codegen.md` (phi copies, dead
-  temporary store, load scheduling, reload around `ldx`), from 70 to about
-  55 instructions per iteration on the reduced case; measured on that case
-  before and after (instructions on the common path, luna cycles over 64
-  entries), difftest hunts, corpus A/B. Announced to the game at delivery.
-
 ## Done 2026-10-31
 
+- The compiler lot "per-object loop", delivered ahead of its date: 64.2 to
+  55.2 instructions and -14.7 % cycles an entry on the second game's reduced
+  case (`.claude/notes/tech/per_object_loop_codegen.md`), announced in its
+  thread; it closes it. What is left of that loop is A11 (Y never indexes).
 - The measurement owed to the first game: no fixed-slot module, a saving of
   9,489 cycles a frame does not pay for one (`devtools/slotbench`, `make
   bench-slots`, `.claude/notes/tech/fixed_slot_sprites.md`). Answered in its

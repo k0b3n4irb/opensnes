@@ -1,0 +1,7 @@
+# The twin of per_object_loop: each mechanism off, the old shape back.
+env QBE_NO_SINK_LOAD=1
+env QBE_NO_PEEP_SLOTDEAD=1
+env QBE_NO_COPY_SHARE=1
+in place: present lda\.w py,x\n\tsta\.b tcc__lf\+\d+\n\tlda\.b tcc__lf
+in place: present lda\.w big,x\n\tsta\.b tcc__lf
+in place: present jmp @if_false

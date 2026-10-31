@@ -77,7 +77,21 @@ jmp` to `lda i / cmp.b lf / bcs`, the subtraction from eight instructions to
 recomputed; `try_fuse_bytepair_store` fuses the two bytes of ONE value, not
 two values) against 10 for `(u8)sx | (sy << 8)`.
 
-### What is the compiler's (the lot "per-object loop", opens 2026-11-02)
+### Delivered (2026-10-31)
+
+Measured with `luna profile` on the case with its locals, 64 entries, 60
+calls: **64.2 to 55.2 instructions an entry, 1,940 to 1,656 master cycles**
+(-14.7 %). Without the locals: 70.1 to 61.1, 2,167 to 1,883. Waste 1 and 2 went
+together: the copy of `id` took the slot `w`'s phi needed. Waste 4 went by
+moving the load past the first test (`sinkload`), which also saves it on the
+way off screen; 3 and 5 by `peephole_slotdead` and the reload rule. Mechanisms:
+`.claude/rules/compiler.md`. Row 6 below is what is left, and A11 holds it.
+
+What it found: `world_sprites` boots one frame earlier and its picture
+baseline moved (A/B 60/60 at +-8); three audio hashes moved by phase (MATCH, at
+most 0.62 %).
+
+### What was the compiler's (the lot "per-object loop")
 
 | # | Waste | Instructions |
 |---|---|---|
@@ -111,6 +125,6 @@ bin/cc65816 boucle_objets.c -o boucle_objets.asm    # the piece in the thread
 # → if_false.10 → logic_right.11 → if_false.14 → if_false.17 → for_cont.5
 ```
 
-A luna measurement of the loop alone needs a small ROM calling `place_all`
-64 times from `main` with `n = 64`: `luna profile --from-frame 2 --sym` folds
-the cycles on `place_all`. To write with the lot.
+A luna measurement of the loop alone is a small ROM calling `place_all` once
+a frame with `n = 64`: `luna profile --from-frame 10 --until-frame 70 --sym
+m.sym m.sfc`, the rows `place_all*` summed, over 60 calls of 64 entries.

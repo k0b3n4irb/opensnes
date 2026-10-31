@@ -5,6 +5,17 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- perf(compiler): a loop over an array of objects, measured on a reduced case
+  (64 entries, a word of structure-of-arrays per field, a priority added, two
+  screen tests, two words written): 64.2 to 55.2 instructions an entry and
+  1,940 to 1,656 master cycles (-14.7 %) on luna. An extension that only adds
+  a high half nobody reads shares the slot of what it copies, which also lets
+  a value chosen by a branch keep one slot (no copy on the path past the `or`);
+  a load needed on one way out of a block goes down that way
+  (`sy = py[i]` read after the test on `sx`, not before it); a store to a
+  direct-page slot that nothing reads again goes; a reload across an `ldx`
+  goes. No source to change. `QBE_NO_COPY_SHARE`, `QBE_NO_SINK_LOAD` and
+  `QBE_NO_PEEP_SLOTDEAD` turn each off.
 - feat(lib): a fade that does not hold the program. `fadeOut()` and `fadeIn()`
   wait `16 x speed` frames inside the call: nothing else runs meanwhile, so
   a sound driver a game advances from its main loop is silent for the whole
