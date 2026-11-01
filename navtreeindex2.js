@@ -1,5 +1,10 @@
 var NAVTREEINDEX2 =
 {
+"examples_fundamentals.html#example-roms-7":[0],
+"examples_fundamentals.html#why-this-tier-exists":[1],
+"examples_fundamentals_text_glyphs.html":[0,1,7],
+"examples_fundamentals_text_glyphs.html":[0,2,2],
+"examples_fundamentals_text_glyphs.html":[0,45,6,0],
 "examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf":[1,3,0],
 "examples_fundamentals_text_glyphs.html#autotoc_md2-drawing-letters-in-hex":[1,3,1],
 "examples_fundamentals_text_glyphs.html#autotoc_md3-setting-up-the-ppu":[1,3,2],
@@ -244,10 +249,5 @@ var NAVTREEINDEX2 =
 "examples_text_print_string.html":[0,1,0],
 "examples_text_print_string.html":[0,2,0],
 "examples_text_print_string.html":[0,45,15,1],
-"examples_text_print_string.html#how-to-build-15":[7,2],
-"examples_text_print_string.html#how-to-build-15":[17,2],
-"examples_text_print_string.html#modules-used-52":[7,3],
-"examples_text_print_string.html#modules-used-52":[17,3],
-"examples_text_print_string.html#next-rung":[7,4],
-"examples_text_print_string.html#next-rung":[17,4]
+"examples_text_print_string.html#how-to-build-15":[7,2]
 };

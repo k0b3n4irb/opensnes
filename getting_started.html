@@ -258,6 +258,7 @@ Test Your Game</h3>
 <div class="line"> </div>
 <div class="line">[asserts]</div>
 <div class="line">fbhash = &quot;&quot;                       # the frame&#39;s hash; `make test-update` fills it</div>
+<div class="line">wdm_empty = true                  # no SNES_ASSERT fired (an assert is a WDM; luna counts them)</div>
 <div class="line"> </div>
 <div class="line">[[checkpoint]]</div>
 <div class="line">at_frame = 180</div>
@@ -268,6 +269,9 @@ Test Your Game</h3>
 <div class="line">rom = &quot;../game.sfc&quot;</div>
 <div class="line">frames = 150</div>
 <div class="line">input = &quot;30:0x100,90:0&quot;           # &quot;frame:buttons_hex&quot; (RIGHT = 0x100), until frame 90</div>
+<div class="line"> </div>
+<div class="line">[asserts]</div>
+<div class="line">wdm_empty = true                  # no SNES_ASSERT fired while walking</div>
 <div class="line"> </div>
 <div class="line">[[checkpoint]]</div>
 <div class="line">at_frame = 150</div>

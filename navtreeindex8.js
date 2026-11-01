@@ -1,5 +1,13 @@
 var NAVTREEINDEX8 =
 {
+"structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb":[2,0,13,0],
+"structMetaspriteStyle.html":[2,0,14],
+"structMetaspriteStyle.html#a12d42ffd162b5d64da1a8137b325c126":[2,0,14,2],
+"structMetaspriteStyle.html#a13e4c6e5650afb3aafd899f3824a76cc":[2,0,14,1],
+"structMetaspriteStyle.html#a4a306762518645a64601e9823d30c35c":[2,0,14,3],
+"structMetaspriteStyle.html#a7cd37bd420f06790a47dbf280bba3740":[2,0,14,5],
+"structMetaspriteStyle.html#ac3393229659a2403bf38dcde2fe7fb75":[2,0,14,0],
+"structMetaspriteStyle.html#aebc58d53953c6e45bfed9a1f9f0dff53":[2,0,14,4],
 "structNpc.html":[2,0,15],
 "structOamDynamicConfig.html":[2,0,16],
 "structOamDynamicConfig.html#a35d9be87b911f19ad2755521f5e38e0c":[2,0,16,3],
@@ -241,13 +249,5 @@ var NAVTREEINDEX8 =
 "tools_opensnes_tileset.html":[0,7,0],
 "tools_opensnes_tileset.html#convert-1":[9,0],
 "tools_opensnes_tileset.html#from-gfx4snes":[9,3],
-"tools_opensnes_tileset.html#inspect-8":[9,1],
-"tools_opensnes_tileset.html#settings-beside-the-asset-4":[9,2],
-"topics.html":[1],
-"transitions_2fading_2main_8c.html":[1,11,57],
-"transitions_2fading_2vram__map_8h.html":[3,0,1,16,0,1],
-"transitions_2fading_2vram__map_8h.html#aac6bdb9f6545d1755dbfb4946bb1d842":[3,0,1,16,0,1,0],
-"transitions_2fading_2vram__map_8h.html#aec9dcf2ea648f7c52b3593d354a663a3":[3,0,1,16,0,1,1],
-"transitions_2fading_2vram__map_8h_source.html":[3,0,1,16,0,1],
-"troubleshooting.html":[0,3]
+"tools_opensnes_tileset.html#inspect-8":[9,1]
 };

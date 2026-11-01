@@ -56,6 +56,7 @@ var sprite_8h =
     [ "oamGetX", "sprite_8h.html#a62e381f1a35cb07ba8152b88f6e28b1a", null ],
     [ "oamGetY", "sprite_8h.html#ab511e77163a9427c2818d4187825b27c", null ],
     [ "oamHide", "sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279", null ],
+    [ "oamHideRange", "sprite_8h.html#a725bbf51c93000ddf3a3935400a4ac6d", null ],
     [ "oamInit", "sprite_8h.html#a0ab1cfd8e05842654a0e146b83d62664", null ],
     [ "oamInitGfxSet", "sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c", null ],
     [ "oamMetaDrawDyn", "sprite_8h.html#ae4d4517a682025275d57356f692e2548", null ],

@@ -166,7 +166,7 @@ Controls</h2>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-brightness-inidisp-2100"></a>
 1. Brightness: INIDISP ($2100)</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(1);   <span class="comment">/* 15 -&gt; 0, one step per frame: a quarter of a second */</span></div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(1);   <span class="comment">/* 15 -&gt; 0, one step per frame: 16 frames, a quarter of a second */</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(3);    <span class="comment">/* 0 -&gt; 15, one step every 3 frames */</span></div>
 <div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
 <div class="ttc" id="aconsole_8h_html_a6c68f9393684a2b251292a9e93891a02"><div class="ttname"><a href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a></div><div class="ttdeci">void fadeOut(u8 speed)</div><div class="ttdoc">Fade the screen from full brightness (15) down to black (0).</div></div>
@@ -175,12 +175,24 @@ How It Works</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Speed  </th><th class="markdownTableHeadNone">Frames per step  </th><th class="markdownTableHeadNone">Whole fade  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">15 frames, 0.25 s  </td></tr>
+<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">16 frames, 0.27 s  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">45 frames, 0.75 s  </td></tr>
+<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">48 frames, 0.8 s  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">90 frames, 1.5 s  </td></tr>
+<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">96 frames, 1.6 s  </td></tr>
 </table>
+<p><span class="tt"><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a></span> and <span class="tt"><a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a></span> hold the program for the whole fade: nothing else runs meanwhile, the sound driver of a game that advances it from its main loop included. For a fade that lets the loop go on, start it and give it one call a frame:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#af4257c9535801690b4c0f126418790d0">fadeStart</a>(<a class="code hl_define" href="console_8h.html#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a>, 6);          <span class="comment">/* writes level 15 and returns */</span></div>
+<div class="line"><span class="keywordflow">do</span> {</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
+<div class="line">    <a class="code hl_variable" href="transitions_2fading_2main_8c.html#a63841c3216f69104e4e8567339433190">fade_ticks</a>++;                <span class="comment">/* what the loop does each frame */</span></div>
+<div class="line">} <span class="keywordflow">while</span> (<a class="code hl_function" href="console_8h.html#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a>());            <span class="comment">/* 1 while it runs, 0 after 16 x 6 frames */</span></div>
+<div class="ttc" id="aconsole_8h_html_a99f3a1608e68fecae6e38b2ad64dfdd6"><div class="ttname"><a href="console_8h.html#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a></div><div class="ttdeci">u8 fadeStep(void)</div><div class="ttdoc">Advance the fade started by fadeStart(), one call a frame.</div></div>
+<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="aconsole_8h_html_ae77da5ad4cbc80c45959a539d739cfd3"><div class="ttname"><a href="console_8h.html#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a></div><div class="ttdeci">#define FADE_OUT</div><div class="ttdoc">fadeStart() direction: from full brightness down to black</div><div class="ttdef"><b>Definition</b> console.h:194</div></div>
+<div class="ttc" id="aconsole_8h_html_af4257c9535801690b4c0f126418790d0"><div class="ttname"><a href="console_8h.html#af4257c9535801690b4c0f126418790d0">fadeStart</a></div><div class="ttdeci">void fadeStart(u8 direction, u8 speed)</div><div class="ttdoc">Start a fade that does not hold the program: the frames are yours.</div></div>
+<div class="ttc" id="atransitions_2fading_2main_8c_html_a63841c3216f69104e4e8567339433190"><div class="ttname"><a href="transitions_2fading_2main_8c.html#a63841c3216f69104e4e8567339433190">fade_ticks</a></div><div class="ttdeci">u16 fade_ticks</div><div class="ttdoc">4bpp tile data for the background image.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
+</div><!-- fragment --><p>The two 6-frame fades of this example are these: <span class="tt"><a class="el" href="transitions_2fading_2main_8c.html#a63841c3216f69104e4e8567339433190" title="4bpp tile data for the background image.">fade_ticks</a></span> reads 96 after the first, one tick for every frame of the fade, and the brightness is the blocking fade's at every frame (<span class="tt">testing/manifests/transition_fading.toml</span> holds both).</p>
 <p><b>Brightness 0 is not force blank.</b> The screen is black but the PPU still draws, so VRAM is still closed outside VBlank. To load a new scene, fade out, then <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a></span>, load, <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> and fade in.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-mosaic-mosaic-2106"></a>
 2. Mosaic: MOSAIC ($2106)</h3>

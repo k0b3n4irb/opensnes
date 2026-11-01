@@ -53,15 +53,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "anim_8h.html",
-"dir_682fc3e8c3c8a47b1239c96b09b97ae1.html",
-"examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf",
-"examples_text_print_string.html#snes-concepts-35",
-"group__audio__legacy.html#ga0ae7d151c8df1d90190e4c2a9af81cfe",
-"group__snesmod__module.html#gac745fbd1f90f590dcff56693b67494f1",
-"map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30",
-"sa1_8h.html#a6abdaa6fce581157ad8a3324939803c1",
-"structNpc.html",
-"tutorial_animation.html"
+"dir_58aa4cebe2af14ef96cac3d5c6688de1.html",
+"examples_fundamentals.html#example-roms-7",
+"examples_text_print_string.html#how-to-build-15",
+"group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07",
+"group__snesmod__init.html",
+"map_8h.html#a7843ff58f7ae21834eee28a3cefbbd3a",
+"sa1_8h.html#a494dc2baecc868542dad0d07c8a5886c",
+"structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb",
+"tools_opensnes_tileset.html#settings-beside-the-asset-4"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

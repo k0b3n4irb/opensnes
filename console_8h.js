@@ -1,8 +1,13 @@
 var console_8h =
 [
+    [ "FADE_IN", "console_8h.html#a135b69f14519fe3a0a9e3f0d7ea60c25", null ],
+    [ "FADE_OUT", "console_8h.html#ae77da5ad4cbc80c45959a539d739cfd3", null ],
     [ "consoleInit", "console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1", null ],
     [ "fadeIn", "console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb", null ],
     [ "fadeOut", "console_8h.html#a6c68f9393684a2b251292a9e93891a02", null ],
+    [ "fadeRunning", "console_8h.html#a28d21438aabcde5191abd7c72e2aab9b", null ],
+    [ "fadeStart", "console_8h.html#af4257c9535801690b4c0f126418790d0", null ],
+    [ "fadeStep", "console_8h.html#a99f3a1608e68fecae6e38b2ad64dfdd6", null ],
     [ "getBrightness", "console_8h.html#a10a8dd24d5584e2cb833c5acfbf332c6", null ],
     [ "getFrameCount", "console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6", null ],
     [ "isInVBlank", "console_8h.html#a1bb80e4838ae89136bf886d0bc9ddfc2", null ],

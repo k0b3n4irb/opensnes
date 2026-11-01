@@ -1,5 +1,10 @@
 var NAVTREEINDEX1 =
 {
+"dir_58aa4cebe2af14ef96cac3d5c6688de1.html":[3,0,1,14,6],
+"dir_5a30104352ef4255dc24354b02eb2d20.html":[3,0,2,0],
+"dir_5ad18c73cdb577083b1efff2d7e8929b.html":[3,0,1,15,1],
+"dir_625983682e2ea858bb635bda77752bf9.html":[3,0,1,11,1],
+"dir_62e57f705e686d67671d9a75c8a42d16.html":[3,0,1,12,4],
 "dir_682fc3e8c3c8a47b1239c96b09b97ae1.html":[3,0,1,12],
 "dir_6b17615a765730034c6961a55152114f.html":[3,0,1,0,3],
 "dir_73eeb5547b39d97bc3ac59f165437536.html":[3,0,1,0,0],
@@ -244,10 +249,5 @@ var NAVTREEINDEX1 =
 "examples_demos_shmup.html":[0,1,43],
 "examples_demos_shmup.html":[0,2,55],
 "examples_demos_shmup.html":[0,45,5,2],
-"examples_fundamentals.html":[0,45,6],
-"examples_fundamentals.html#example-roms-7":[0],
-"examples_fundamentals.html#why-this-tier-exists":[1],
-"examples_fundamentals_text_glyphs.html":[0,1,7],
-"examples_fundamentals_text_glyphs.html":[0,2,2],
-"examples_fundamentals_text_glyphs.html":[0,45,6,0]
+"examples_fundamentals.html":[0,45,6]
 };

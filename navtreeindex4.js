@@ -1,5 +1,12 @@
 var NAVTREEINDEX4 =
 {
+"group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07":[1,10,3],
+"group__audio__echo.html#gac6dba35011e0371c1fef74f7a55ae20f":[1,10,4],
+"group__audio__echo.html#gaef5a3db0aa4adfc51fb2da4e6c9f1516":[1,10,2],
+"group__audio__init.html":[1,15],
+"group__audio__init.html#ga4149a6d84a9f9c0368e3657f65c1dd52":[1,15,1],
+"group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd":[1,15,0],
+"group__audio__legacy.html":[1,18],
 "group__audio__legacy.html#ga0ae7d151c8df1d90190e4c2a9af81cfe":[1,18,0],
 "group__audio__legacy.html#ga90ff78c34a0e95e1c269f41db67d0dd7":[1,18,2],
 "group__audio__legacy.html#gad19204f9e934017dead96542f848d0f6":[1,18,1],
@@ -242,12 +249,5 @@ var NAVTREEINDEX4 =
 "group__scope__input.html#gac2ec7014e3673e2ecc39dc6571cabed4":[1,30,10],
 "group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1":[1,30,13],
 "group__scope__input.html#gae815bd4531c5ddc8c70560e3ef25b2d8":[1,30,2],
-"group__scope__input.html#gafff7ec04ce6a6da475dfec0b78fe316d":[1,30,4],
-"group__snesmod__init.html":[1,16],
-"group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3":[1,16,1],
-"group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c":[1,16,0],
-"group__snesmod__module.html":[1,20],
-"group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038":[1,20,5],
-"group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1":[1,20,3],
-"group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d":[1,20,2]
+"group__scope__input.html#gafff7ec04ce6a6da475dfec0b78fe316d":[1,30,4]
 };

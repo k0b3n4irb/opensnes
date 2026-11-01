@@ -16,6 +16,7 @@ var vramqueue_8h =
     [ "vram_queue_cost", "vramqueue_8h.html#aa60c70a83627b2e80a32d3bc7ee6656d", null ],
     [ "vram_queue_count", "vramqueue_8h.html#a70aaa84c6d6707ffcf45ba53bd9768de", null ],
     [ "vram_queue_cum", "vramqueue_8h.html#a649192dab9f538414a6e601b2df45fe5", null ],
+    [ "vram_queue_refused", "vramqueue_8h.html#af6374d25743f3daf96c9a55d65eb615c", null ],
     [ "vram_queue_size", "vramqueue_8h.html#add4b248595d18586fbc43babee9f7416", null ],
     [ "vram_queue_src", "vramqueue_8h.html#a25d849788160a7c4c9dad7aa016c3520", null ],
     [ "vram_queue_step", "vramqueue_8h.html#a2ca399e6660c42575871371dc016f81d", null ]

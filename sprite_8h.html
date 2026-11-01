@@ -244,6 +244,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab511e77163a9427c2818d4187825b27c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read back a sprite's Y position.  <br /></td></tr>
 <tr class="memitem:ab3ca644deefaf56572cb0cb18e533279" id="r_ab3ca644deefaf56572cb0cb18e533279"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab3ca644deefaf56572cb0cb18e533279">oamHide</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id)</td></tr>
 <tr class="memdesc:ab3ca644deefaf56572cb0cb18e533279"><td class="mdescLeft">&#160;</td><td class="mdescRight">Park a sprite off screen.  <br /></td></tr>
+<tr class="memitem:a725bbf51c93000ddf3a3935400a4ac6d" id="r_a725bbf51c93000ddf3a3935400a4ac6d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a725bbf51c93000ddf3a3935400a4ac6d">oamHideRange</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> first, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> count)</td></tr>
+<tr class="memdesc:a725bbf51c93000ddf3a3935400a4ac6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Park a run of sprites off screen in one call.  <br /></td></tr>
 <tr class="memitem:a0ab1cfd8e05842654a0e146b83d62664" id="r_a0ab1cfd8e05842654a0e146b83d62664"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> name_base)</td></tr>
 <tr class="memdesc:a0ab1cfd8e05842654a0e146b83d62664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the sprite (OAM) system.  <br /></td></tr>
 <tr class="memitem:aadaab0bfc2df6de17aee9515212c290c" id="r_aadaab0bfc2df6de17aee9515212c290c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilePalette, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> paletteSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> paletteEntry, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="background_8h.html#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oamSize)</td></tr>
@@ -667,8 +669,8 @@ Attribution</h2>
 <div class="line">        oamMemory[_ext] &amp;= ~_xhi; \</div>
 <div class="line">    <a class="code hl_variable" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a> = 1; \</div>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
-<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:845</div></div>
-<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:857</div></div>
+<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:861</div></div>
+<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:873</div></div>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
 </div><!-- fragment -->
@@ -1299,14 +1301,14 @@ Attribution</h2>
 <div class="line"><a class="code hl_function" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a>(0, 100, 80, hero_frame0, &amp;<a class="code hl_variable" href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a>, 0);          <span class="comment">// facing right</span></div>
 <div class="line"><a class="code hl_function" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a>(0, 100, 80, hero_frame0, &amp;<a class="code hl_variable" href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a>, <a class="code hl_define" href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a>);  <span class="comment">// facing left</span></div>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:103</div></div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:578</div></div>
-<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:581</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:566</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:569</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:594</div></div>
+<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:597</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:582</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:585</div></div>
 <div class="ttc" id="asprite_8h_html_ad029b6c418d7e2b620009d54aec5cb0e"><div class="ttname"><a href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a></div><div class="ttdeci">u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame, const MetaspriteStyle *style, u8 flip)</div><div class="ttdoc">Draw one frame of a metasprite.</div></div>
 <div class="ttc" id="asprites_2aseprite__pipeline_2main_8c_html_ae5399d474914cf86e2e3470bca1cb5b9"><div class="ttname"><a href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a></div><div class="ttdeci">static const MetaspriteStyle hero_style</div><div class="ttdoc">Metasprite pointer table generated by opensnes-sprite sheet (res/hero.png.toml).</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
-<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:554</div></div>
-<div class="ttc" id="astructMetaspriteStyle_html"><div class="ttname"><a href="structMetaspriteStyle.html">MetaspriteStyle</a></div><div class="ttdoc">What stays the same from one frame of a metasprite to the next.</div><div class="ttdef"><b>Definition</b> sprite.h:595</div></div>
+<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:570</div></div>
+<div class="ttc" id="astructMetaspriteStyle_html"><div class="ttname"><a href="structMetaspriteStyle.html">MetaspriteStyle</a></div><div class="ttdoc">What stays the same from one frame of a metasprite to the next.</div><div class="ttdef"><b>Definition</b> sprite.h:611</div></div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
 
 </div>
@@ -1400,7 +1402,7 @@ Attribution</h2>
 <div class="line">    .sizeMode       = <a class="code hl_define" href="#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>,</div>
 <div class="line">};</div>
 <div class="line"><a class="code hl_function" href="#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a>(&amp;dyn);</div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:663</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:679</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1532,6 +1534,38 @@ Attribution</h2>
 <dl class="section see"><dt>See also</dt><dd>examples/demos/rpg — culls its villagers this way </dd>
 <dd>
 <a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+
+</div>
+</div>
+<a id="a725bbf51c93000ddf3a3935400a4ac6d" name="a725bbf51c93000ddf3a3935400a4ac6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a725bbf51c93000ddf3a3935400a4ac6d">&#9670;&#160;</a></span>oamHideRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void oamHideRange </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>first</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Park a run of sprites off screen in one call. </p>
+<p>Does to sprites <code class="param">first</code> to <code class="param">first</code> + <code class="param">count</code> - 1 what <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> does to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A scene that clears or parks many sprites a frame (a pool of effects, the sprites a screen no longer shows) pays about a quarter of what the same loop of <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> calls costs.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">first</td><td>First sprite ID (0-127); at 128 or more nothing is done </td></tr>
+    <tr><td class="paramname">count</td><td>How many; the run is cut at sprite 127, 0 does nothing</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> </dd></dl>
 
 </div>
 </div>

@@ -11,10 +11,12 @@ var searchData=
   ['anim_8',['anim',['../basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31',1,'main.c']]],
   ['anim_5ftick_9',['anim_tick',['../demos_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570',1,'main.c']]],
   ['attr_10',['attr',['../structOamWorldBatch.html#aa3d4c4f57bd32c02a1d634368956bce9',1,'OamWorldBatch::attr'],['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem::attr']]],
-  ['automatonnum_11',['automatonnum',['../automaton_8c.html#a80af5a121c24bef442479c351be853a4',1,'automaton.c']]],
-  ['automatonx_12',['automatonx',['../automaton_8c.html#a1b91bbe9dfd03bebd3ef44aaac1a9dda',1,'automaton.c']]],
-  ['automatony_13',['automatony',['../automaton_8c.html#a115f67803821666d5d42362b7ea1f341',1,'automaton.c']]],
-  ['avatar_5fx_14',['avatar_x',['../input_2controller_2main_8c.html#a2480366fc93e42c990a3975540ebe5b0',1,'main.c']]],
-  ['avatar_5fy_15',['avatar_y',['../input_2controller_2main_8c.html#ad1acdf7a4821b7d7a79926b3f74383c8',1,'main.c']]],
-  ['azs_16',['azs',['../structDsp1Camera.html#a52c4d5f4211b6cb13a6f2e4d6489ba40',1,'Dsp1Camera']]]
+  ['audio_5ferror_5fcount_11',['audio_error_count',['../group__audio__const.html#gae118be8d4fdddb69c0a256c13b860997',1,'audio.h']]],
+  ['audio_5ferror_5flast_12',['audio_error_last',['../group__audio__const.html#gaf98e8a56cd742fea4dfb4437364456bd',1,'audio.h']]],
+  ['automatonnum_13',['automatonnum',['../automaton_8c.html#a80af5a121c24bef442479c351be853a4',1,'automaton.c']]],
+  ['automatonx_14',['automatonx',['../automaton_8c.html#a1b91bbe9dfd03bebd3ef44aaac1a9dda',1,'automaton.c']]],
+  ['automatony_15',['automatony',['../automaton_8c.html#a115f67803821666d5d42362b7ea1f341',1,'automaton.c']]],
+  ['avatar_5fx_16',['avatar_x',['../input_2controller_2main_8c.html#a2480366fc93e42c990a3975540ebe5b0',1,'main.c']]],
+  ['avatar_5fy_17',['avatar_y',['../input_2controller_2main_8c.html#ad1acdf7a4821b7d7a79926b3f74383c8',1,'main.c']]],
+  ['azs_18',['azs',['../structDsp1Camera.html#a52c4d5f4211b6cb13a6f2e4d6489ba40',1,'Dsp1Camera']]]
 ];

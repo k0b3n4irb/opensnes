@@ -130,6 +130,13 @@ $(function(){initNavTree('console_8h.html','',''); });
 </div>
 <p><a href="console_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a135b69f14519fe3a0a9e3f0d7ea60c25" id="r_a135b69f14519fe3a0a9e3f0d7ea60c25"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a135b69f14519fe3a0a9e3f0d7ea60c25">FADE_IN</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a135b69f14519fe3a0a9e3f0d7ea60c25"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> direction: from black up to full brightness  <br /></td></tr>
+<tr class="memitem:ae77da5ad4cbc80c45959a539d739cfd3" id="r_ae77da5ad4cbc80c45959a539d739cfd3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:ae77da5ad4cbc80c45959a539d739cfd3"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> direction: from full brightness down to black  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aa4254c9de45f6aa2de26e8ea70dd96e1" id="r_aa4254c9de45f6aa2de26e8ea70dd96e1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a> (void)</td></tr>
@@ -138,6 +145,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:a54ab05fa0c4c26a7efb81e86d57661fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade the screen from black (0) up to full brightness (15).  <br /></td></tr>
 <tr class="memitem:a6c68f9393684a2b251292a9e93891a02" id="r_a6c68f9393684a2b251292a9e93891a02"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
 <tr class="memdesc:a6c68f9393684a2b251292a9e93891a02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade the screen from full brightness (15) down to black (0).  <br /></td></tr>
+<tr class="memitem:a28d21438aabcde5191abd7c72e2aab9b" id="r_a28d21438aabcde5191abd7c72e2aab9b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a28d21438aabcde5191abd7c72e2aab9b">fadeRunning</a> (void)</td></tr>
+<tr class="memdesc:a28d21438aabcde5191abd7c72e2aab9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is a fade started by <a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> still running?  <br /></td></tr>
+<tr class="memitem:af4257c9535801690b4c0f126418790d0" id="r_af4257c9535801690b4c0f126418790d0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af4257c9535801690b4c0f126418790d0">fadeStart</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> direction, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
+<tr class="memdesc:af4257c9535801690b4c0f126418790d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a fade that does not hold the program: the frames are yours.  <br /></td></tr>
+<tr class="memitem:a99f3a1608e68fecae6e38b2ad64dfdd6" id="r_a99f3a1608e68fecae6e38b2ad64dfdd6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a> (void)</td></tr>
+<tr class="memdesc:a99f3a1608e68fecae6e38b2ad64dfdd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advance the fade started by <a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a>, one call a frame.  <br /></td></tr>
 <tr class="memitem:a10a8dd24d5584e2cb833c5acfbf332c6" id="r_a10a8dd24d5584e2cb833c5acfbf332c6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a10a8dd24d5584e2cb833c5acfbf332c6">getBrightness</a> (void)</td></tr>
 <tr class="memdesc:a10a8dd24d5584e2cb833c5acfbf332c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current brightness.  <br /></td></tr>
 <tr class="memitem:a8fd1f41354b0d09ca258af07c1cb6fa6" id="r_a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a> (void)</td></tr>
@@ -196,7 +209,40 @@ Attribution</h2>
 </ul>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a135b69f14519fe3a0a9e3f0d7ea60c25" name="a135b69f14519fe3a0a9e3f0d7ea60c25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a135b69f14519fe3a0a9e3f0d7ea60c25">&#9670;&#160;</a></span>FADE_IN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FADE_IN&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> direction: from black up to full brightness </p>
+
+</div>
+</div>
+<a id="ae77da5ad4cbc80c45959a539d739cfd3" name="ae77da5ad4cbc80c45959a539d739cfd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae77da5ad4cbc80c45959a539d739cfd3">&#9670;&#160;</a></span>FADE_OUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FADE_OUT&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> direction: from full brightness down to black </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="aa4254c9de45f6aa2de26e8ea70dd96e1" name="aa4254c9de45f6aa2de26e8ea70dd96e1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa4254c9de45f6aa2de26e8ea70dd96e1">&#9670;&#160;</a></span>consoleInit()</h2>
 
@@ -306,6 +352,87 @@ Attribution</h2>
 </div><!-- fragment --> 
 </div>
 </div>
+<a id="a28d21438aabcde5191abd7c72e2aab9b" name="a28d21438aabcde5191abd7c72e2aab9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28d21438aabcde5191abd7c72e2aab9b">&#9670;&#160;</a></span>fadeRunning()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> fadeRunning </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is a fade started by <a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> still running? </p>
+<dl class="section return"><dt>Returns</dt><dd>1 until the call of <a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a> that returns 0, then 0 </dd></dl>
+
+</div>
+</div>
+<a id="af4257c9535801690b4c0f126418790d0" name="af4257c9535801690b4c0f126418790d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4257c9535801690b4c0f126418790d0">&#9670;&#160;</a></span>fadeStart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void fadeStart </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>direction</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>speed</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Start a fade that does not hold the program: the frames are yours. </p>
+<p><a class="el" href="#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a> and <a class="el" href="#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a> wait <span class="tt">16 x speed</span> frames inside the call, and nothing else runs meanwhile: no sound driver, no animation, no input. This does the same fade a step per frame, so the main loop keeps going:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="#af4257c9535801690b4c0f126418790d0">fadeStart</a>(<a class="code hl_define" href="#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a>, 3);</div>
+<div class="line"><span class="keywordflow">do</span> {</div>
+<div class="line">    <a class="code hl_function" href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
+<div class="line">    soundUpdate();           <span class="comment">// whatever the loop does each frame</span></div>
+<div class="line">} <span class="keywordflow">while</span> (<a class="code hl_function" href="#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a>());</div>
+<div class="ttc" id="aconsole_8h_html_a99f3a1608e68fecae6e38b2ad64dfdd6"><div class="ttname"><a href="#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a></div><div class="ttdeci">u8 fadeStep(void)</div><div class="ttdoc">Advance the fade started by fadeStart(), one call a frame.</div></div>
+<div class="ttc" id="aconsole_8h_html_ae77da5ad4cbc80c45959a539d739cfd3"><div class="ttname"><a href="#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a></div><div class="ttdeci">#define FADE_OUT</div><div class="ttdoc">fadeStart() direction: from full brightness down to black</div><div class="ttdef"><b>Definition</b> console.h:194</div></div>
+<div class="ttc" id="aconsole_8h_html_af4257c9535801690b4c0f126418790d0"><div class="ttname"><a href="#af4257c9535801690b4c0f126418790d0">fadeStart</a></div><div class="ttdeci">void fadeStart(u8 direction, u8 speed)</div><div class="ttdoc">Start a fade that does not hold the program: the frames are yours.</div></div>
+</div><!-- fragment --><p>It writes the first level (15 for FADE_OUT, 0 for FADE_IN) and returns; <a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="fadeStep">fadeStep</a> makes each of the 15 others. The fade lasts as long as the blocking one: <span class="tt">16 x speed</span> frames, so <span class="tt"><a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a></span> returns 0 on the call that comes <span class="tt">16 x speed</span> frames after <span class="tt"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a></span>. <span class="tt">speed</span> 0 writes the end level at once, and <span class="tt"><a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a></span> returns 0. One fade runs at a time: a new <span class="tt"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a></span> replaces the one under way. Under forced blank the brightness writes are skipped, as for <a class="el" href="#a6c68f9393684a2b251292a9e93891a02" title="fadeOut">fadeOut</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">direction</td><td>FADE_OUT or FADE_IN </td></tr>
+    <tr><td class="paramname">speed</td><td>VBlank frames between two levels </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a99f3a1608e68fecae6e38b2ad64dfdd6" name="a99f3a1608e68fecae6e38b2ad64dfdd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99f3a1608e68fecae6e38b2ad64dfdd6">&#9670;&#160;</a></span>fadeStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> fadeStep </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Advance the fade started by <a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a>, one call a frame. </p>
+<p>Call it once per frame, after <a class="el" href="#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>. It counts the frames of the wait between two levels and writes the next level when they are over.</p>
+<dl class="section return"><dt>Returns</dt><dd>1 while the fade runs (the call that writes the last level included), 0 once it is over, or when none was started </dd></dl>
+
+</div>
+</div>
 <a id="a10a8dd24d5584e2cb833c5acfbf332c6" name="a10a8dd24d5584e2cb833c5acfbf332c6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a10a8dd24d5584e2cb833c5acfbf332c6">&#9670;&#160;</a></span>getBrightness()</h2>
 
@@ -355,7 +482,7 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:269</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:320</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --> 
 </div>

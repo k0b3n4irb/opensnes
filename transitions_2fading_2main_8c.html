@@ -134,7 +134,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; cycles through the fades at three speeds, then the mosaic.  <br /></td></tr>
 <tr class="memitem:a77cebcad141a74189b9e975a8919d304" id="r_a77cebcad141a74189b9e975a8919d304"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a77cebcad141a74189b9e975a8919d304">wait_for_key</a> (void)</td></tr>
-<tr class="memdesc:a77cebcad141a74189b9e975a8919d304"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for the background image.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a63841c3216f69104e4e8567339433190" id="r_a63841c3216f69104e4e8567339433190"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a63841c3216f69104e4e8567339433190">fade_ticks</a></td></tr>
+<tr class="memdesc:a63841c3216f69104e4e8567339433190"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for the background image.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Screen transitions: brightness fades and the mosaic filter. </p>
@@ -142,14 +146,15 @@ Functions</h2></td></tr>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>INIDISP ($2100) brightness levels 0-15; brightness 0 is not force blank</li>
 <li>MOSAIC ($2106): block size in bits 7-4, the BG layers it applies to in bits 3-0</li>
-<li><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a> / <a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a>: one brightness step every <span class="tt">speed</span> frames</li>
+<li><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a> / <a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a>: one brightness step every <span class="tt">speed</span> frames, the program held meanwhile</li>
+<li><a class="el" href="console_8h.html#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> / <a class="el" href="console_8h.html#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a>: the same fade, a step per frame, the loop free</li>
 <li><a class="el" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df" title="Set the backgrounds the mosaic applies to — REPLACES the previous set.">mosaicSetLayers()</a> / <a class="el" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d" title="Animate mosaic fade out (clear -&gt; pixelated).">mosaicFadeOut()</a> / <a class="el" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e" title="Animate mosaic fade in (pixelated -&gt; clear).">mosaicFadeIn()</a> / <a class="el" href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0" title="Disable mosaic effect for all backgrounds.">mosaicDisable()</a></li>
 <li>Sprites are never mosaicked: only background layers are</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>Press any button to advance to the next transition</li>
-<li>Fast fade out and in (1 frame per step), then 3 frames per step, then 6</li>
+<li>Fast fade out and in (1 frame per step), then 3 frames per step, then 6 (the 6-frame fades do not hold the program: the loop counts its frames in <span class="tt"><a class="el" href="#a63841c3216f69104e4e8567339433190" title="4bpp tile data for the background image.">fade_ticks</a></span> while they run)</li>
 <li>Then the mosaic: the picture breaks into growing blocks, then sharpens again</li>
 <li>The cycle repeats</li>
 </ul>
@@ -201,11 +206,27 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a63841c3216f69104e4e8567339433190" name="a63841c3216f69104e4e8567339433190"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63841c3216f69104e4e8567339433190">&#9670;&#160;</a></span>fade_ticks</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> fade_ticks</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 <p>4bpp tile data for the background image. </p>
 <p>Tilemap data (32x32 tile grid) for the background image.</p>
 <p>15-bit BGR palette (up to 16 colors) for the background image.</p>
 <p>Block until the user presses a button (with debounce).</p>
-<p>First waits for all buttons to be released (if any are held), then waits for a new button press. This two-phase approach prevents the same press from being detected twice and ensures clean transition between fade steps. Each iteration calls <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> to yield CPU time and synchronize with the display refresh. </p>
+<p>First waits for all buttons to be released (if any are held), then waits for a new button press. This two-phase approach prevents the same press from being detected twice and ensures clean transition between fade steps. Each iteration calls <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> to yield CPU time and synchronize with the display refresh.</p>
+<p>Frames the main loop ran during the non-blocking fades (96 a fade at 6 frames per step). </p>
 
 </div>
 </div>

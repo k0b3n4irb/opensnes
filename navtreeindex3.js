@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"examples_text_print_string.html#how-to-build-15":[17,2],
+"examples_text_print_string.html#modules-used-52":[7,3],
+"examples_text_print_string.html#modules-used-52":[17,3],
+"examples_text_print_string.html#next-rung":[7,4],
+"examples_text_print_string.html#next-rung":[17,4],
 "examples_text_print_string.html#snes-concepts-35":[7,1],
 "examples_text_print_string.html#snes-concepts-35":[17,1],
 "examples_text_print_string.html#what-youll-learn-23":[7,0],
@@ -234,20 +239,15 @@ var NAVTREEINDEX3 =
 "group__audio__const.html#gad17616a886e4d3a9c6dd9b624cab5488":[1,2,7],
 "group__audio__const.html#gad20bcf962bd76dfdacd985212346681a":[1,2,9],
 "group__audio__const.html#gadad33d37466c3c62533ebea00b682fbf":[1,2,11],
+"group__audio__const.html#gae118be8d4fdddb69c0a256c13b860997":[1,2,35],
 "group__audio__const.html#gae5ffb90e18975b7fbb11c37a4b61df9c":[1,2,29],
 "group__audio__const.html#gae937ff313a454632fea964fc90d84608":[1,2,10],
 "group__audio__const.html#gae9bb3ea586bfdca22584da76e3aa8323":[1,2,15],
 "group__audio__const.html#gaeeb510e4436868d3acc07d8b4e2d02b6":[1,2,20],
 "group__audio__const.html#gaf88789411b028c6e668eb66a9c644b96":[1,2,18],
+"group__audio__const.html#gaf98e8a56cd742fea4dfb4437364456bd":[1,2,36],
 "group__audio__const.html#gafd4222ef52b1fd3efe4463fbb5e61dec":[1,2,28],
 "group__audio__echo.html":[1,10],
 "group__audio__echo.html#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c":[1,10,1],
-"group__audio__echo.html#ga9d4ca0a00107c3c5cdb4ef80cf75e875":[1,10,0],
-"group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07":[1,10,3],
-"group__audio__echo.html#gac6dba35011e0371c1fef74f7a55ae20f":[1,10,4],
-"group__audio__echo.html#gaef5a3db0aa4adfc51fb2da4e6c9f1516":[1,10,2],
-"group__audio__init.html":[1,15],
-"group__audio__init.html#ga4149a6d84a9f9c0368e3657f65c1dd52":[1,15,1],
-"group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd":[1,15,0],
-"group__audio__legacy.html":[1,18]
+"group__audio__echo.html#ga9d4ca0a00107c3c5cdb4ef80cf75e875":[1,10,0]
 };
