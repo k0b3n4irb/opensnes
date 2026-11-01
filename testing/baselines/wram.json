@@ -4,16 +4,16 @@
     "rom_sha256": "81037976cbe06bb41ca7affae349e13d8ce72f9e77a3927423e2231044340f03"
   },
   "audio_sfx_from_wav": {
-    "stream": "a3d8503cf8db9356a96303d75472c2d677aa31e2270c4d3f256b9c196740c089",
-    "rom_sha256": "edec960bd58765963ee72848cec380b287bd512ef90c33fd554b0ca17a08bc74"
+    "stream": "0f654f4ffcbce1baeb4c37eb95172066cbf21d6975b18f3baece4dc1f03f32f3",
+    "rom_sha256": "61f75369f22b78daba0b5c90ab48507d710f153579f96c51ff9770d91920056f"
   },
   "audio_snesmod_music": {
     "stream": "5689fc8402d6f4221135957cb13cada490ce4e4d02759e18b60f2e55a63ca6c8",
     "rom_sha256": "a805cc7b135c70e689dc0055127fe66267dbe4a851378c18ea23e9d320ccb7c6"
   },
   "audio_soundboard": {
-    "stream": "be0492e668c9bd3659b0b8fda53dfd70ae3d42ef28acc104bd49149fdee71344",
-    "rom_sha256": "8684cf06613f971e654e5480da1760f8f0c9c1d53ae4d037507becf9e9def2dc"
+    "stream": "6a84558453fea47f0269ad770620329fb7ec62ddec6e0973b8a438944c39598e",
+    "rom_sha256": "6c35097d9843c8ec0f1ef1dfc13547e1d66339a642aa9e6a87a3895eb0c5546c"
   },
   "audio_speech_synth": {
     "stream": "e8deb7f289fc85ab05980c1ca988f5f6d1cca259247943920aec214a43421121",
@@ -116,8 +116,8 @@
     "rom_sha256": "ea5c46832f7a1c71c00c1dc2f92b34da19477ca97bd5a993971fa2b6df2a05ec"
   },
   "games_rooftop_run": {
-    "stream": "0fe6f5d2f071c73e67e7ef2c698f6ccd695c1b672e1823c46882960128fe8409",
-    "rom_sha256": "d044d2a03a0e6ff0bb760fd1adaeea304362b2f2d0d2fef67206122f97f1eb16"
+    "stream": "f1a8e1671c60d8dcc527e8561875ce12f2c50e1fd20d365b41b88d89cf9803f6",
+    "rom_sha256": "aea7817f7a5e7483a61011706540e3529effb68d791ab0776af1ea796c5e8907"
   },
   "hdma_gradient_colors": {
     "stream": "8e439981d756f4dfab1c7a8c95652e93430c9eae58098f9972680dab57b81e90",

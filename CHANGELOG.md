@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): refusals that leave a trace. A library call that refuses its
+  work answered with a code the caller was free to drop, and nothing showed
+  it. Every `AUDIO_ERR_*` the audio module returns now bumps
+  `audio_error_count` and stores its code in `audio_error_last`; a
+  `vramQueuePush()` / `vramQueuePushSprite()` refused for want of room bumps
+  `vram_queue_refused` (2 bytes of the queue's RAM). A healthy run leaves
+  all three at 0; a luna test reads them from WRAM (`libtests`,
+  `libtests_aram`). The cost falls on the refusal path only. Not covered:
+  `dmaCopyVram()` with the screen on, which stays unchecked (the display
+  state cannot be read back from the PPU and a check would charge every call).
 - perf(compiler): a loop over an array of objects, measured on a reduced case
   (64 entries, a word of structure-of-arrays per field, a priority added, two
   screen tests, two words written): 64.2 to 55.2 instructions an entry and

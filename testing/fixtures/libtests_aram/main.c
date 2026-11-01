@@ -43,6 +43,9 @@ u16 s_cancel;        /* Begin(13) + one step, then audioUnloadSample  -> 0 */
 u16 s_free_cancel;   /* the memory came back: same count as before    -> 1 */
 u16 s_begin_after;   /* and another Begin is accepted                 -> 0 */
 
+u16 e_err_count;     /* audio_error_count after all of the above      -> 3 */
+u16 e_err_last;      /* audio_error_last: the latest was the busy set  -> 1 */
+
 u16 r_init;          /* audioInit()                                  -> 0 */
 u16 r_load;          /* the three loads, or'ed                       -> 0 */
 u16 r_free_full;     /* no echo: 0xFFC0 - 0xCB00                     -> 0x34C0 */
@@ -152,6 +155,12 @@ int main(void) {
     audioUnloadSample(16);
     e_set_again = audioSetEcho(1, 40, 20, 20);
     e_free_again = audioGetFreeMemory();
+
+    /* Three calls were refused above (the ring of 7, the second Begin, the
+     * busy set): none of them looked at the code except to store it, and
+     * the module counted them all the same. */
+    e_err_count = audio_error_count;
+    e_err_last = audio_error_last;
 
     r_done = 0xBEEF;
     while (1) {

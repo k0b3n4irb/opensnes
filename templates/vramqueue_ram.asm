@@ -18,6 +18,7 @@
     vram_queue_cum      dsb VRAM_QUEUE_MAX_VAL*2    ; vram_queue_cost up to this entry
     vram_queue_count    dsb 2                       ; entries waiting
     vram_queue_cost     dsb 2                       ; bytes + VRAM_QUEUE_ENTRY_COST each
+    vram_queue_refused  dsb 2                       ; pushes refused (queue full) since power-on
 .ENDS
 
 .SECTION ".rodata.vram_queue_max" SUPERFREE

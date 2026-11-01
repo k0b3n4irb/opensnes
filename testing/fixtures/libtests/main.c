@@ -54,6 +54,7 @@ static FAR u8 vq_sheet[576];
 u16 r_vqc[8];
 /* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
 u16 r_vqu[8];
+u16 r_vqref[2];   /* vram_queue_refused since the sprite refusals: 2, then 3 after the full queue */
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
 /* --- math vectors --- */
@@ -790,16 +791,19 @@ static void coverage_lot_b(void) {
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
     vramQueueFlush();
+    vram_queue_refused = 0;                                    /* count from here */
     r_vqs[5] = vramQueuePushSprite(vq_sheet, 0x6400, 4);       /* under 8 pixels: 0 */
     vram_queue_count = VRAM_QUEUE_MAX - 2;
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
     r_vqs[7] = vram_queue_count;                               /* still 38: nothing noted */
     vram_queue_count = 0;
+    r_vqref[0] = vram_queue_refused;                           /* 2: too small, no room */
     /* the capacity the library reads (vram_queue_max, the project's) is the
      * one C was given: pushes until one is refused */
     r_vqcap = 0;
     while (vramQueuePush(lotb_vram, 0x6200, 8, VRAM_QUEUE_ROW) && r_vqcap < 300)
         r_vqcap++;                                             /* 40 */
+    r_vqref[1] = vram_queue_refused;                           /* 3: the one past the capacity */
     vram_queue_count = 0;
     vram_queue_cost = 0;
     /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
