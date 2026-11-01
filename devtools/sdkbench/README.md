@@ -15,7 +15,7 @@ PVSNESLIB_HOME=… make bench-sdk UPDATE=1         # rewrite both committed file
 Two files are committed here:
 
 - `baseline.json` — the OpenSNES figures. CI runs `--check` against it and
-  fails on +5 % of cycles in total, +25 % on one workload, or a changed
+  fails on +2 % of cycles in total, +2 % on one workload (it was +5 % and +25 % until 2026-11-01: a drift of 1 to 3.6 % on seven workloads went through it), or a changed
   checksum. After a compiler change that moves the figures, `UPDATE=1` and
   say why in the commit.
 - `pvsneslib_reference.json` — PVSnesLib's figures, with the commit they

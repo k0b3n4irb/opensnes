@@ -335,6 +335,7 @@ vramQueuePush:
     lda.w vram_queue_count
     cmp.l vram_queue_max
     bcc +
+    inc.w vram_queue_refused
     lda.w #0
     rtl
 +   asl a
@@ -394,6 +395,7 @@ vramQueuePushSprite:
     beq +
     bcc +
 @no:
+    inc.w vram_queue_refused
     lda.w #0
     rtl
 +   lda 4,s             ; size_px

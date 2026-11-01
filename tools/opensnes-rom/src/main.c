@@ -41,6 +41,7 @@ static const cli_opt check_opts[] = {
     { "no-bank-reads", 0, CLI_FLAG, NULL, "skip the bank-blind read guard", NULL },
     { "no-nmi-race", 0, CLI_FLAG, NULL, "skip the NMI / WRAM-port race lint", NULL },
     { "no-assets", 0, CLI_FLAG, NULL, "skip the asset inventory line", NULL },
+    { "keep-ram-markers", 0, CLI_FLAG, NULL, "leave wlalink's RAM_USAGE_SLOT_* rows in the .sym (a profiler folding PCs onto labels takes them for code)", NULL },
 };
 
 static int run_check(cli_ctx *ctx)
@@ -69,6 +70,13 @@ static int run_check(cli_ctx *ctx)
     if (!cli_has(ctx, "no-nmi-race")) r.nmirace = check_nmi_race(ctx, dir);
     if (!cli_has(ctx, "no-assets")) report_assets(ctx, dir, &r);
     sym_free(&s);
+    /* wlalink's RAM-usage markers are of no use once the checks have read
+     * the .sym (every current one has a [ramsections] block), and they
+     * mislead whoever folds PCs onto labels: luna profile credited code to
+     * RAM_USAGE_SLOT_2_BANK_126_START, written 00:2000. The .sym the
+     * emulator reads is the one beside the ROM, so it is cleaned here. */
+    if (!cli_has(ctx, "keep-ram-markers") && sym_strip_ram_markers(sym_path, why, sizeof why) < 0)
+        cli_warn(ctx, sym_path, "could not remove the RAM_USAGE_SLOT_* rows: %s", why);
 
     int failed = r.bank0 == 1 || r.ram == 1 || r.datainit == 1 || r.bankreads == 1 || r.nmirace == 1
               || r.sa1boot == 1;
@@ -177,6 +185,44 @@ static void bar_line(const char *label, long used, long cap, const char *unit, c
     printf("  %-26s %7ld / %-7ld %-7s %3ld%%   %ld free%s%s\n", label, used, cap, unit, pct, cap - used, note ? "   " : "", note ? note : "");
 }
 
+/* SPC RAM (ARAM): the ROM cannot tell what the driver loads, so the modules
+ * of the project (res/, music/) are measured by `opensnes-music inspect`, one
+ * at a time as the driver loads them. The heaviest decides the budget. */
+typedef struct { int n; long used, free; char name[256]; } aram_fig;
+
+static void read_aram(aram_fig *f)
+{
+    memset(f, 0, sizeof *f);
+    if (g_nmusic <= 0) return;
+    const char *home = getenv("OPENSNES_HOME");
+    char cmd[MAXMUSIC * 2060 + 512];
+    int o = snprintf(cmd, sizeof cmd, "\"%s%sopensnes-music\" inspect --json", home ? home : "", home ? "/bin/" : "");
+    for (int i = 0; i < g_nmusic; i++) o += snprintf(cmd + o, sizeof cmd - (size_t)o, " \"%s\"", g_music[i]);
+#ifndef _WIN32
+    snprintf(cmd + o, sizeof cmd - (size_t)o, " 2>/dev/null");
+#endif
+    FILE *p = popen(cmd, "r");
+    if (!p) return;
+    static char out[65536];
+    size_t len = fread(out, 1, sizeof out - 1, p);
+    out[len] = '\0';
+    pclose(p);
+    for (char *m = strstr(out, "\"input\": \""); m; m = strstr(m + 1, "\"input\": \"")) {
+        char *nx = strstr(m + 1, "\"input\": \"");
+        char *u = strstr(m, "\"spc_ram_bytes\": "), *fr = strstr(m, "\"spc_ram_free\": ");
+        if (!u || !fr || (nx && (u > nx || fr > nx))) continue;
+        long used = atol(u + 17), fre = atol(fr + 16);
+        f->n++;
+        if (used > f->used) {
+            f->used = used; f->free = fre;
+            const char *s = m + 10;
+            size_t k = strcspn(s, "\"");
+            if (k >= sizeof f->name) k = sizeof f->name - 1;
+            memcpy(f->name, s, k); f->name[k] = '\0';
+        }
+    }
+}
+
 static int run_budget(cli_ctx *ctx)
 {
     const char *in = ctx->args[0];
@@ -226,6 +272,8 @@ static int run_budget(cli_ctx *ctx)
         used[b] += (long)s.sections[i].size;
         rom_used += (long)s.sections[i].size;
     }
+    aram_fig aram;
+    read_aram(&aram);
     int far_used_any = r.far_sections > 0;
     long far_cap = 0x10000 - 0x2000, far_free = far_used_any ? r.far_free : far_cap;
     long ram_cap = 0x2000;
@@ -255,6 +303,11 @@ static int run_budget(cli_ctx *ctx)
         cli_json_object(ctx, "cgram"); cli_json_int(ctx, "colours", 256); cli_json_int(ctx, "assets", r.asset_colours);
         if (r.asset_scenes) cli_json_int(ctx, "heaviest_scene_assets", r.scene_colours);
         cli_json_close(ctx);
+        if (aram.n) {
+            cli_json_object(ctx, "aram"); cli_json_int(ctx, "bytes", aram.used + aram.free); cli_json_int(ctx, "modules", aram.n);
+            cli_json_str(ctx, "heaviest_module", aram.name); cli_json_int(ctx, "used", aram.used); cli_json_int(ctx, "free", aram.free);
+            cli_json_close(ctx);
+        }
         cli_json_int(ctx, "save_ram_bytes", h.ram_bytes);
         cli_json_end(ctx);
     } else {
@@ -282,6 +335,11 @@ static int run_budget(cli_ctx *ctx)
             printf("Video (the assets of the project, if all were loaded at once)\n");
             bar_line("VRAM", r.asset_vram, 0x10000, "bytes", NULL);
             bar_line("CGRAM", r.asset_colours, 256, "colours", NULL);
+        }
+        if (aram.n) {
+            printf("Audio (SPC RAM, the heaviest of %d module%s: %s, one module loaded at a time; effects loaded beside it come out of the free part)\n",
+                   aram.n, aram.n == 1 ? "" : "s", aram.name);
+            bar_line("ARAM", aram.used, aram.used + aram.free, "bytes", NULL);
         }
     }
     sym_free(&s);

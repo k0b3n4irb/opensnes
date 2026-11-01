@@ -10,7 +10,7 @@
 # exchange and the tail, and the byte after the end, which no exchange may
 # have written.
 rom = "../fixtures/libtests/libtest.sfc"
-frames = 200
+frames = 260
 
 [asserts.values]
 r_audio_load770 = { eq = 0, width = 2 }

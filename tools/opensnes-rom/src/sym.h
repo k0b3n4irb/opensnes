@@ -32,4 +32,11 @@ const sym_label *sym_find(const sym_file *s, const char *name);       /* a label
 const sym_label *sym_find_def(const sym_file *s, const char *name);   /* a definition */
 int  sym_rom_bank(int bank);                                          /* the folding */
 
+/* Rewrite the file without wlalink's RAM_USAGE_SLOT_* rows of [labels]: the
+ * linker's RAM-usage markers, printed as bank-$00 labels whatever their bank
+ * ($7E:2000 comes out as 00:2000), which a profiler folding PCs onto the
+ * nearest label takes for code. Returns the rows removed (0: the file is
+ * left as it is), or -1 with the reason in why[]. */
+int  sym_strip_ram_markers(const char *path, char *why, size_t why_len);
+
 #endif

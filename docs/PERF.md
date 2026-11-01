@@ -105,21 +105,23 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,852 | -18.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,742 | -14.7 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,356 | -30.8 % |
-| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,978 | -19.8 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,475 | -5.7 % |
-| `oamsize` | the size of 32 sprites | 48,744 | 28,886 | -40.7 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,866 | -0.2 % |
-| `text` | 20 characters printed and shown | 84,678 | 17,438 | -79.4 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,407 | -46.2 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,891 | -58.3 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,747 | -75.5 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,435 | 9,742 | -14.8 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,544 | 27,356 | -30.8 % |
+| `oamset` | `oamSet` on 32 sprites | 81,074 | 64,978 | -19.9 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,059 | 42,475 | -5.7 % |
+| `oamsize` | the size of 32 sprites | 48,741 | 28,886 | -40.7 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,899 | 17,866 | -0.2 % |
+| `text` | 20 characters printed and shown | 82,796 | 17,366 | -79.0 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 167,840 | 91,387 | -45.6 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,336 | 53,414 | -58.7 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 31,741 | -75.5 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,916 | -8.5 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,576 | -39.2 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,309 | -73.4 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,311 | -73.4 % |
+| `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,586 | -44.6 % |
+| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,824 | -82.2 % |
 
-OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
+OpenSNES costs no more than PVSnesLib on **16 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library

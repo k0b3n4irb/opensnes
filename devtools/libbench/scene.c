@@ -31,9 +31,6 @@ u16 done;
 void bench_nop(void) { }
 
 static u8 payload[2048];
-#if PVS
-extern char tilfont, palfont;
-#endif
 
 void row_pad(void) {
     u16 r, i;
@@ -102,6 +99,40 @@ void row_oamxy(void) {
 #endif
 #endif
         }
+    }
+}
+
+/* Sprites parked off screen: one call each, then the range in one call.
+ * PVSnesLib has no per-sprite park that is not a visibility flag and no
+ * range call but oamClear(first, count), which does the same job. */
+void row_hideeach(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSetVisible(i << 2, OBJ_HIDE);
+#else
+            oamHide(i);
+#endif
+#endif
+        }
+    }
+}
+
+void row_hiderange(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(0, 32);
+#else
+        oamHideRange(0, 32);
+#endif
+#endif
     }
 }
 
@@ -381,10 +412,9 @@ void row_frame(void) {
 
 int main(void) {
 #if PVS
-    consoleSetTextMapPtr(0x6800);
-    consoleSetTextGfxPtr(0x3000);
-    consoleSetTextOffset(0x0100);
-    consoleInitText(0, 16 * 2, &tilfont, &palfont);
+    /* PVSnesLib 4.6 carries its font in the library (map $6800, gfx $3000,
+     * offset 0); 4.5 needed the example's own tilfont/palfont. */
+    consoleInitDefaultText(0);
     bgSetGfxPtr(0, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_32x32);
     setMode(BG_MODE1, 0);
@@ -417,6 +447,10 @@ int main(void) {
     row_vramq();
 #elif ROW == 13
     row_worldo();
+#elif ROW == 14
+    row_hideeach();
+#elif ROW == 15
+    row_hiderange();
 #endif
     done = 0x600D;
     while (1) {

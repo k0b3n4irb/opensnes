@@ -43,7 +43,7 @@ mosaic in, and again.
 ### 1. Brightness: INIDISP ($2100)
 
 ```c
-fadeOut(1);   /* 15 -> 0, one step per frame: a quarter of a second */
+fadeOut(1);   /* 15 -> 0, one step per frame: 16 frames, a quarter of a second */
 fadeIn(3);    /* 0 -> 15, one step every 3 frames */
 ```
 
@@ -53,9 +53,27 @@ the brightness once every `speed` frames:
 
 | Speed | Frames per step | Whole fade |
 |-------|-----------------|------------|
-| 1 | 1 | 15 frames, 0.25 s |
-| 3 | 3 | 45 frames, 0.75 s |
-| 6 | 6 | 90 frames, 1.5 s |
+| 1 | 1 | 16 frames, 0.27 s |
+| 3 | 3 | 48 frames, 0.8 s |
+| 6 | 6 | 96 frames, 1.6 s |
+
+`fadeOut()` and `fadeIn()` hold the program for the whole fade: nothing else
+runs meanwhile, the sound driver of a game that advances it from its main
+loop included. For a fade that lets the loop go on, start it and give it
+one call a frame:
+
+```c
+fadeStart(FADE_OUT, 6);          /* writes level 15 and returns */
+do {
+    WaitForVBlank();
+    fade_ticks++;                /* what the loop does each frame */
+} while (fadeStep());            /* 1 while it runs, 0 after 16 x 6 frames */
+```
+
+The two 6-frame fades of this example are these: `fade_ticks` reads 96 after
+the first, one tick for every frame of the fade, and the brightness is the
+blocking fade's at every frame (`testing/manifests/transition_fading.toml`
+holds both).
 
 **Brightness 0 is not force blank.** The screen is black but the PPU still
 draws, so VRAM is still closed outside VBlank. To load a new scene, fade out,

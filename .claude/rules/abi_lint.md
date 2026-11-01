@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/*.asm"
+  - "devtools/**"
+---
+
 # ASM ABI Lint (Auto-loaded)
 
 CRITICAL: Hand-written ASM in `lib/source/*.asm` is verified at build

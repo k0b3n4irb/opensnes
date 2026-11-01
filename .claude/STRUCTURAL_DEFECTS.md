@@ -1396,6 +1396,41 @@ diagnostic on `(u8 *)0x708040` and none on `(u8 FAR *)0x708040` nor on
 `(u8 *)0x2100`; the corpus builds with zero new warnings; Class A A/B
 (`diff_corpus.py`) shows every example MATCH.
 
+#### A11. The backend never indexes with Y 🟡 (noted 2026-10-30, undated)
+
+**Symptom**: every indexed access the compiler emits goes through X: 0
+`,y`-indexed array accesses against 429 `,x` in the examples' `main.c.asm`
+(Y serves only the `[tcc__fp],y` far-frame accesses). A loop with two
+indices — the per-object loop a game sent as a reduced case
+(`.claude/notes/tech/per_object_loop_codegen.md`: `i*2` into word arrays and
+`id = 4*i` into the OAM shadow) — keeps both in direct-page temporaries and
+reloads X from one or the other at each use (`ldx.b lf+0 … ldx.b lf+4`),
+with three induction variables where a hand-written loop keeps X = i*2 and
+Y = id and increments both. On that loop: 70 instructions per iteration
+against 35 by hand, of which about 10 are this.
+
+**Root cause**: the w65816 backend's register model has one index register
+for isel and emit (`compiler/qbe/w65816/isel.c`, `emit.c`): an indexed
+address is always `,x`, so two live indices cannot both be in a register,
+and QBE's register allocator is never asked to assign Y.
+
+**Proposal**: Y as a second index register in the backend's register set,
+with isel choosing `,x` or `,y` per the allocation, and the induction
+variable strength reduction that makes it pay (`i*2` and `4*i` kept as
+registers incremented in `for_cont`). Everything that reads `[tcc__fp],y`
+must keep its Y use (the far frame).
+
+**Cost / risk**: multi-week backend chantier, Class A: separate worktree,
+full `make tests`, `difftest` / `difftest_stmt` hunts, corpus A/B
+(`diff_corpus.py`), `make bench` and the BENCHMARK page, every example
+MATCH. The risk is in every indexed access of every ROM.
+
+**Acceptance criteria**: the reduced loop of the tech note compiles to
+`,y` for one of its two indices and loses its third induction variable;
+`difftest` and `difftest_stmt` green over 2 000 seeds each; the corpus
+byte-different but MATCH frame for frame; the BENCHMARK total does not
+regress.
+
 #### B1. 16-bit pointer ABI in lib helpers — RESOLVED 🟢 (superseded by A6+A7 + #122 + #127)
 
 > **Status: RESOLVED, by a better path than the `*Bank`-variant plan

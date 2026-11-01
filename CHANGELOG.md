@@ -4,6 +4,110 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.54.0] — 2026-11-01
+
+The dynamic-sprite draw is 15.8 % cheaper, `budget` reports the SPC RAM of
+the heaviest module through `opensnes-music inspect`, and the sdkbench drift
+lot lands. Everything below is what `[Unreleased]` held.
+
+### Added
+- perf(lib): the three dynamic-sprite draw routines (`oamDynamic8Draw`,
+  `16Draw`, `32Draw`, behind `oamMetaDrawDyn` and `oamDynamicDraw`) write an
+  entry's X bit 8 and size bit in one read-modify-write of the OAM high table
+  (the `oammask` table now carries the clearing mask, the high-table index and
+  the large-size bit), no longer round-trip the carry through `php`/`plp`, and
+  look the tile up without `phx`/`plx` or three repeated size tests. The
+  dynamic metasprite scene went from 55,048 to 46,360 master cycles of work a
+  frame (-15.8 %) on luna. Same OAM, byte for byte: 544 bytes compared frame
+  by frame against the library before, over every size mode, with X at 300,
+  250, 270 and -5 so that the bit 8 path runs both ways.
+- perf(lib): `oamHideRange(first, count)` parks a run of sprites in one call,
+  and `oamHide()` is assembly. Measured on luna (`devtools/libbench`, rows
+  `hideeach` and `hiderange`, 32 sprites): one `oamHide()` 1,790 to 800 mclk
+  (-55 %; PVSnesLib's equivalent 1,443); the 32 in one `oamHideRange()` call
+  57,271 to 9,824 mclk (-83 %, 307 mclk a sprite). Same bytes as the loop it
+  replaces (tile, attributes and size untouched), checked against the
+  definition written out in `libtests`.
+- feat(lib): refusals that leave a trace. A library call that refuses its
+  work answered with a code the caller was free to drop, and nothing showed
+  it. Every `AUDIO_ERR_*` the audio module returns now bumps
+  `audio_error_count` and stores its code in `audio_error_last`; a
+  `vramQueuePush()` / `vramQueuePushSprite()` refused for want of room bumps
+  `vram_queue_refused` (2 bytes of the queue's RAM). A healthy run leaves
+  all three at 0; a luna test reads them from WRAM (`libtests`,
+  `libtests_aram`). The cost falls on the refusal path only. Not covered:
+  `dmaCopyVram()` with the screen on, which stays unchecked (the display
+  state cannot be read back from the PPU and a check would charge every call).
+- perf(compiler): a loop over an array of objects, measured on a reduced case
+  (64 entries, a word of structure-of-arrays per field, a priority added, two
+  screen tests, two words written): 64.2 to 55.2 instructions an entry and
+  1,940 to 1,656 master cycles (-14.7 %) on luna. An extension that only adds
+  a high half nobody reads shares the slot of what it copies, which also lets
+  a value chosen by a branch keep one slot (no copy on the path past the `or`);
+  a load needed on one way out of a block goes down that way
+  (`sy = py[i]` read after the test on `sx`, not before it); a store to a
+  direct-page slot that nothing reads again goes; a reload across an `ldx`
+  goes. No source to change. `QBE_NO_COPY_SHARE`, `QBE_NO_SINK_LOAD` and
+  `QBE_NO_PEEP_SLOTDEAD` turn each off.
+- feat(lib): a fade that does not hold the program. `fadeOut()` and `fadeIn()`
+  wait `16 x speed` frames inside the call: nothing else runs meanwhile, so
+  a sound driver a game advances from its main loop is silent for the whole
+  fade and catches up after it. `fadeStart(FADE_OUT | FADE_IN, speed)` writes
+  the first level and returns, `fadeStep()` is called once a frame after
+  `WaitForVBlank()` and returns 1 while the fade runs, 0 on the frame the
+  blocking fade would have returned; `fadeRunning()` says whether one is
+  under way. The same 16 levels, the same `16 x speed` frames, the same
+  brightness at every frame: the two 6-frame fades of `transitions/fading`
+  are non-blocking and its manifest, which pins the blocking fades' brightness
+  frame by frame, still passes unchanged, with `fade_ticks` (one tick per
+  frame of the fade) reading 96. 5 bytes of RAM, and the code is linked only
+  if called. The blocking calls stay.
+- perf(runtime): `__mul32` has a short path when both high words are 0, which
+  is every `(u32)a * b` of two `u16`: its four products of the low halves
+  are the whole answer, and it returns after them instead of making the six
+  others (ten 8x8 hardware products in all). Measured on luna over 1,600
+  products, the sum checked against the host's: two `u16`, 6,485,200 master
+  cycles before and 3,148,702 after (-51 %, 4,053 to 1,968 a product); with a
+  high half set, 6,485,280 and 6,649,066 (+2.5 %, 102 cycles for the test): the
+  short path pays from one product in twenty. No API: C that multiplies two
+  `u16` into 32 bits takes it as it is. `libtests` pins eight products
+  (65535 x 65535, a zero, 256 x 256, a high half on either side, both set).
+- docs(examples): the fade table of `transitions/fading` read 15, 45 and 90
+  frames for speeds 1, 3 and 6; they are 16, 48 and 96.
+- fix(tools): `opensnes-rom check` removes wlalink's RAM-usage markers
+  (`RAM_USAGE_SLOT_*_START` / `_END`) from the `.sym` once it has read it.
+  The linker writes them as bank-$00 labels whatever their bank
+  (`$7E:2000` comes out as `00:2000`), so a profiler that folds PCs onto the
+  nearest label credits code to them: on a game, `luna profile` put 1,177
+  instructions and 39 PCs under `RAM_USAGE_SLOT_2_BANK_126_START`. The
+  checks read the RAM figures from `[ramsections]` and nothing else read the
+  markers; `--keep-ram-markers` leaves the file as linked. A `.sym` without
+  them is not rewritten. Asked by the porting kit, which reads the profile.
+
+### Changed
+- feat(build): the starter's two tests assert `wdm_empty = true`: a
+  `SNES_ASSERT` that fires (a WDM, which luna counts) fails `make test` from
+  the first project on, where before only the picture and the WRAM values
+  were judged. Asked by the porting kit, whose projects' manifests had never
+  set it. A project that wants an assert to pass removes the line.
+- feat(compiler): the label of an inlined block names the callee:
+  `@inl51_userInput.3.if_false.536` where it read `@inl51.if_false.536`
+  (the splice's number, the callee, the block's index in it, then the block's
+  own name). A symbol map, a profile or a tool that follows a divergent write
+  names the routine that was spliced in, not only its number. What makes a
+  label unique leads it, so a deep chain of names cut at 80 characters
+  cannot merge two blocks. The code is unchanged: the 60 ROMs of the corpus
+  are byte-identical before and after, and `libbench`'s per-symbol cycles are
+  the same under their new names.
+- feat(examples): `games/breakout` reads at a glance. The bricks have the
+  saturated colours of an arcade (silver, orange, pink, cyan, violet, green,
+  red and yellow, where the teal that most rows used sank into the night
+  blue), the circuit board under the playfield is a quiet texture (mostly
+  its small dots) and stops at the walls, so the score panel is the
+  backdrop's near-black, and the shadow under the bricks keeps 80 % of the
+  board's tone, not 60 %. Drawn in `devtools/art_assets/breakout.py`; the
+  tile numbering, the map's layout and the game's logic are unchanged.
+
 ## [0.53.0] — 2026-10-29
 
 `USE_FASTROM=1` finally speeds up the code: a LoROM build addressed its C and

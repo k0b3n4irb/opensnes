@@ -1,0 +1,12 @@
+# A value chosen by a branch stays in its one slot: no copy on the way past
+# the `or`, so the branch is a plain `bne` over it (color_slots, word_copy).
+in place: absent jmp @if_false
+# The extended index shares the slot of the counter it extends.
+in place: absent lda\.b tcc__lf\+\d+\n\tsta\.b tcc__lf\+\d+\n\ttax
+# The value compared then stored from A is not kept in a slot as well
+# (peephole_slotdead).
+in place: present lda\.w big,x\n\tcmp\.w slot_big,x
+# py[] is read after the first test, where it is needed (sinkload): the
+# subtraction's result goes straight on to its test.
+in place: present sbc [^\n]+\n\tsta\.b tcc__lf\+\d+\n\tclc\n\tadc\.w #31
+in place: present @logic_right[^\n]*\n\tlda\.w py,x

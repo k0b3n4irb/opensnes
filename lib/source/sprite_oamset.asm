@@ -251,6 +251,164 @@ oamSet:
 .ENDS
 
 ;------------------------------------------------------------------------------
+; void oamHide(u16 id)
+;   4,s id
+;
+; Park one sprite: x low 1, y 240 (one word), bit 8 of x set; tile,
+; attributes and size bit untouched. Highest id -> oam_max_id, flag set.
+;------------------------------------------------------------------------------
+.SECTION ".text.oamHide" SUPERFREE
+
+oamHide:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 4,s             ; id
+    cmp.w #128
+    bcc +
+    rtl                 ; not a sprite: nothing is written
++   asl a
+    asl a
+    tax                 ; X = id * 4: the sprite's entry, and its row of oam_ext_tab
+    lda.w #$F001        ; y 240 over x 1
+    sta.w oamMemory,x
+    lda.l oam_ext_tab+2,x
+    tay                 ; Y = the sprite's byte of the high table
+    sep #$20
+    .ACCU 8
+    lda.l oam_ext_tab,x ; the mask that sets bit 8
+    sta.w oam_update_flag ; any non-zero value: a mask is never 0
+    ora.w oamMemory+512,y
+    sta.w oamMemory+512,y
+    lda 4,s             ; id (low byte: it is under 128)
+    cmp.w oam_max_id
+    bcc +
+    sta.w oam_max_id
++   rep #$20
+    .ACCU 16
+    rtl
+
+.ENDS
+
+;------------------------------------------------------------------------------
+; void oamHideRange(u16 first, u16 count)
+;   6,s first   4,s count
+;
+; oamHide() for count sprites from first: x low 1, y 240, bit 8 of x set,
+; tile, attributes and size bit untouched. The low table takes one word a
+; sprite (y 240 over x 1); the high table is filled a byte (four sprites) at
+; a time with $55 in the middle, and sprite by sprite at the two edges.
+; Clamped at 128. Highest id written -> oam_max_id, oam_update_flag set.
+; tcc__r9: end (exclusive), tcc__r9+2: end * 4, tcc__r10: byte index.
+;------------------------------------------------------------------------------
+.MACRO HIDE_ONE_XHI            ; Y = id; leaves A 16-bit
+    tya
+    asl a
+    asl a
+    tax                         ; X = id * 4: its row of oam_ext_tab
+    lda.l oam_ext_tab+2,x       ; the index of its byte in the high table
+    sta.b tcc__r10
+    lda.l oam_ext_tab,x         ; low byte: the mask that sets bit 8
+    sep #$20
+    .ACCU 8
+    ldx.b tcc__r10
+    ora.w oamMemory+512,x
+    sta.w oamMemory+512,x
+    rep #$20
+    .ACCU 16
+.ENDM
+
+.SECTION ".text.oamHideRange" SUPERFREE
+
+oamHideRange:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 6,s             ; first
+    cmp.w #128
+    bcc +
+    rtl                 ; not a sprite
++   tay                 ; Y = first
+    lda 4,s             ; count
+    bne +
+    rtl                 ; nothing to hide
++   clc
+    adc 6,s             ; end = first + count
+    cmp.w #129
+    bcc +
+    lda.w #128
++   sta.b tcc__r9       ; end
+    asl a
+    asl a
+    sta.b tcc__r9+2     ; end * 4
+    tya
+    asl a
+    asl a
+    tax                 ; X = first * 4
+    lda.w #$F001        ; y 240 over x 1
+@low:
+    sta.w oamMemory,x
+    inx
+    inx
+    inx
+    inx
+    cpx.b tcc__r9+2
+    bne @low
+@head:                  ; sprite by sprite up to a multiple of 4
+    tya
+    and.w #3
+    beq @mid
+    cpy.b tcc__r9
+    bcs @done
+    HIDE_ONE_XHI
+    iny
+    bra @head
+@mid:                   ; a whole byte: four sprites
+    tya
+    clc
+    adc.w #4
+    cmp.b tcc__r9
+    beq +
+    bcs @tail
++   tya
+    lsr a
+    lsr a
+    tax
+    sep #$20
+    .ACCU 8
+    lda.w oamMemory+512,x
+    ora.b #$55
+    sta.w oamMemory+512,x
+    rep #$20
+    .ACCU 16
+    tya
+    clc
+    adc.w #4
+    tay
+    bra @mid
+@tail:
+    cpy.b tcc__r9
+    bcs @done
+    HIDE_ONE_XHI
+    iny
+    bra @tail
+@done:
+    sep #$20
+    .ACCU 8
+    lda.b tcc__r9
+    dec a               ; highest id written
+    cmp.w oam_max_id
+    bcc +
+    sta.w oam_max_id
++   lda.b #1
+    sta.w oam_update_flag
+    rep #$20
+    .ACCU 16
+    rtl
+
+.ENDS
+
+;------------------------------------------------------------------------------
 ; void oamSetX(u16 id, u16 x)
 ;   6,s id   4,s x
 ;------------------------------------------------------------------------------

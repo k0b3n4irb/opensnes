@@ -25,6 +25,12 @@
 # force-blank shadow at 0 — a fadeOut that blanked the screen instead of
 # dimming it would make VRAM writable mid-fade and look identical.
 #
+# The two 6-frame fades are the non-blocking ones (fadeStart / fadeStep): they
+# keep the same brightness at the same frames as the blocking fades above,
+# which is the proof that they last as long, and `fade_ticks`, which the main
+# loop advances once a frame during them, reads 96 after the first (16 x 6).
+# The blocking fadeOut()/fadeIn() could not have counted a frame.
+#
 # The mosaic legs: mosaic_size / mosaic_bg_mask are the lib's shadow of
 # $2106 (the register is write-only; checked against the PPU on the day it
 # was written, the shadow pair 15/1 matched ppu.mosaic = $F1). The ramp is
@@ -108,6 +114,7 @@ at_frame = 400
 [checkpoint.values]
 console_brightness = { eq = 0, width = 1 }
 console_force_blanked = { eq = 0, width = 1 }
+fade_ticks = { eq = 96, width = 2 }        # the loop ran every frame of this non-blocking fade: 16 levels x 6
 
 [[checkpoint]]                 # fadeIn(6) complete: full brightness, mosaic still off
 at_frame = 520

@@ -1,3 +1,9 @@
+---
+paths:
+  - "CHANGELOG.md"
+  - "ROADMAP.md"
+---
+
 # Release Workflow (Auto-loaded)
 
 ## Branch model (see CONTRIBUTING.md for the full policy)

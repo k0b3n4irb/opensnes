@@ -1,3 +1,5 @@
+# the phi moves themselves are what this pins: the sweep of dead slots off
+env QBE_NO_PEEP_SLOTDEAD=1
 # Since 2026-10-16 a stored value copied to its slot further down is stored
 # there at once, and a counted loop tests at its end (see forward_store,
 # dec_loop): the case pins the phi moves themselves.

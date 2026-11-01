@@ -1,3 +1,10 @@
+---
+paths:
+  - "docs/**"
+  - "*.md"
+  - "lib/include/**"
+---
+
 # Doc Consistency Rules (Auto-loaded)
 
 CRITICAL: Three classes of doc/code drift have caused hard-to-trace problems

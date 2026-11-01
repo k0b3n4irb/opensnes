@@ -74,15 +74,15 @@ FIRMWARE_ONLY = HERE / "baselines" / "executed_only_with_firmware.txt"
 REPORT = HERE / "ROM_COVERAGE.md"
 MANIFESTS = HERE / "manifests"
 # Fixture ROMs profiled on top of the examples. The library fixture runs its
-# whole assertion path in ~90 frames (test_libtest.py's 3 M instructions end
-# at frame 90, the rest is WAI); 120 covers it with margin.
+# whole assertion path in ~200 frames (test_libtest.py's 5 M instructions end
+# there, the rest is WAI); 260 covers it with margin.
 # The compiler's runtime ROMs count too: debug_channel is the only executor
 # of the WDM / nocash channel (consoleNocashMessage, consoleMesenBreakpoint)
 # and asserts on it; the others run in ~1 M instructions (their tests' STEPS).
 FIXTURES_DIR = REPO_ROOT / "testing" / "fixtures"
 DSP1_FIXTURE = (FIXTURES_DIR / "libtests_dsp1" / "libtest_dsp1.sfc", "libtest_dsp1", 60)
 _RT = FIXTURES_DIR / "compiler"
-FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 120),
+FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 260),
             # the second fixture reaches r_done around frame 170 (SNESMOD upload first)
             (FIXTURES_DIR / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
             (FIXTURES_DIR / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),

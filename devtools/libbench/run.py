@@ -48,7 +48,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402  (wla_sym, git_head)
 
 WORK = REPO / "build" / "libbench"
-ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo"]
+ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange"]
 # what one repetition asks for, and how many calls that is
 WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "scroll": ("`bgSetScroll` on three backgrounds, ten times", 30),
@@ -62,6 +62,8 @@ WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "world": ("the same 19 sprites: `oamPlaceWorld` here, the C loop there", 19),
         "vramc": ("six 128-byte VRAM transfers, six `dmaCopyVram` calls", 6),
         "vramq": ("the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there", 6),
+        "hideeach": ("32 sprites parked off screen, one call each", 32),
+        "hiderange": ("the same 32 sprites in one call: `oamHideRange` here, `oamClear` there", 1),
         "worldo": ("the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there", 19)}
 REPS = 20
 FRAMES = 300
@@ -94,8 +96,12 @@ def build(sdk: str, row: int, calls: int, pvs):
         rom = d / "bench.sfc"
     else:
         skel = pvs / "snes-examples" / "hello_world"
+        # 4.5 shipped hdr.asm, data.asm and the font in the example; 4.6
+        # generates them at build time (AUTOHDR, built-in font). Copy the
+        # Makefile, and the others only when the example still has them.
         for name in ("Makefile", "hdr.asm", "data.asm", "pvsneslibfont.png"):
-            shutil.copy(skel / name, d / name)
+            if name == "Makefile" or ((skel / name).is_file() and not (skel / "pvsneslibfont.inc").exists()):
+                shutil.copy(skel / name, d / name)
         (d / "src").mkdir()
         shutil.copy(HERE / "scene.c", d / "src" / "hello_world.c")
         (d / "src" / "which.h").write_text(which)

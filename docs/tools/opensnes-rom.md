@@ -42,6 +42,15 @@ asset weight. `--no-bank-reads`, `--no-nmi-race`, `--no-assets` skip a
 check; `make/common.mk` maps `SKIP_BANKREAD_CHECK=1` and the others onto
 them.
 
+Once it has read the `.sym`, the check removes wlalink's RAM-usage markers
+from it (the `RAM_USAGE_SLOT_*_START` / `_END` rows of `[labels]`). The
+linker writes them as bank-$00 labels whatever their bank (`$7E:2000` comes
+out as `00:2000`), and a profiler that folds PCs onto the nearest label
+credits code to them: `luna profile` named `RAM_USAGE_SLOT_2_BANK_126_START`
+as a routine. The checks take the RAM figures from `[ramsections]`, so
+nothing reads the markers; `--keep-ram-markers` leaves the file as the
+linker wrote it.
+
 ## Inspect
 
 ```sh

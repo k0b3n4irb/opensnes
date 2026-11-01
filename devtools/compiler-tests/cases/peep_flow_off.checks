@@ -1,4 +1,5 @@
 env QBE_NO_PEEP_FLOW=1
+env QBE_NO_PEEP_SLOTDEAD=1
 # Since 2026-10-25 the multiply by the element size of an index whose high
 # word is dead is computed in A and handed to X without a store
 # (is_pow2_mul): of the two stores the flow pass removes, the one of the

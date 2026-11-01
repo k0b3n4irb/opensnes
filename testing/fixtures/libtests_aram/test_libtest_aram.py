@@ -37,6 +37,8 @@ CASES = [
     # the ring given back
     ("e_rel", 0), ("e_free_rel", 0xB0C5), ("e_load", 0), ("e_free_full", 0),
     ("e_enable", 0), ("e_set_busy", 1), ("e_set_again", 0), ("e_free_again", 0x2805),
+    # the refusals counted: the ring of 7, the second Begin, the busy set
+    ("e_err_count", 3), ("e_err_last", 1),
 ]
 
 

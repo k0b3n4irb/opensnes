@@ -13,7 +13,7 @@
       "peak": 23051
     },
     "fixtures/snesmod_music_large": {
-      "sha256": "7d17fcc8a8b5283ab0b206a3e89e5c0c24da88e1fe1f074e1aebadb6095e89ac",
+      "sha256": "134280de654f6eb211deded357a12deb2917a93dce6dd84edd84ce7148480a5e",
       "samples": 159936,
       "peak": 8269
     },
@@ -28,12 +28,12 @@
       "peak": 9939
     },
     "audio/snesmod_music": {
-      "sha256": "d817ec82b096f0c4f2ea8327f90dccdfcf5c7f95a627811b4fdfb85633ae720d",
+      "sha256": "c5712df8f97c3c762901cbbc4fbc4256c1552ffda026a20150729f9d8649abc2",
       "samples": 159936,
-      "peak": 12931
+      "peak": 13140
     },
     "audio/sfx_from_wav": {
-      "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",
+      "sha256": "e9bdac7f940fa9b996478d7477c36d91512c4acda8b3b8568c3b58ecd5d96c5f",
       "samples": 159936,
       "peak": 12192
     }

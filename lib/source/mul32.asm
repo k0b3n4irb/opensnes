@@ -77,7 +77,7 @@
 ;   A        = result low 16 bits
 ;   mul32_hi = result high 16 bits (caller reads this via `lda.l mul32_hi`)
 ;
-; Algorithm: 10 hardware 8x8 multiplies:
+; Algorithm: 10 hardware 8x8 multiplies, 4 when both high words are 0:
 ;   - 4 partial products of a_lo * b_lo (full 32-bit)
 ;   - 3 for low-16 of a_hi * b_lo (a_hi.hi * b_lo.hi past bit 31, skipped)
 ;   - 3 for low-16 of a_lo * b_hi
@@ -179,6 +179,18 @@ tcc_mul32:
     clc
     adc.w mul32_hi
     sta.w mul32_hi
+
+    ; Both high words zero: the 32-bit product is a_lo * b_lo, which is in
+    ; mul32_lo / mul32_hi already. That is every `(u32)a * b` of two u16: four
+    ; products instead of ten (a_hi, b_hi at 7,s and 11,s).
+    lda 7,s
+    ora 11,s
+    bne @cross
+    lda.w mul32_lo
+    plp
+    rtl
+@cross:
+    .ACCU 16
 
     ;------------------------------------------------------------------
     ; STEP 2: low-16 of a_hi * b_lo  ->  add to mul32_hi

@@ -39,7 +39,7 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 4_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
+STEPS = 5_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -49,6 +49,10 @@ CASES = [
     ("r_div_zero", 2, 0),
     ("r_mod_zero", 2, 0),
     ("r_mul",      2, 5535),
+    # tcc_mul32: two u16 take the short path (4 partial products), a high half on either side all ten
+    # the non-blocking fade: running, first level, 16 x speed - 1 steps, over, last level, speed 0, level 5
+    ("r_fade",    16, 0x50000000f00000000001f000f0001),
+    ("r_mul32",   32, 0x5a6c02410110000010000000100000001d4c00001000000000000fffe0001),
     ("r_sdiv_cast", 2, 0xFD9C),  # (s16)-30000/(s16)49 — signed div through casts (#114)
     ("r_nmi_mul",  2, 17243),  # 123*673 & 0xFFFF, computed in the nmiSet callback (#113)
     ("r_nmi_div",  2, 4714),   # 33000/7 in the callback — 8-bit-divisor (hardware) path pre-fix
@@ -220,6 +224,8 @@ CASES = [
         0, 0xFFFF, 1, (-ord("C")) & 0xFFFF, 0xE0,
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
     # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 240), an invalid id (0, 0)
+    # oamHideRange: the same bytes as a loop of oamHide in nine cases, then oam_max_id 127
+    ("r_hrange", 20, 127 << 144),
     ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 240, 0, 0x0A00]))),
     # the setters in assembly since 2026-10-09: x and size bits of four
     # neighbours, ids that are not sprites, the dirty flag, scroll of a layer
@@ -240,6 +246,7 @@ CASES = [
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
     ("r_vqcap", 2, 40),
+    ("r_vqref", 4, 2 | (3 << 16)),   # refusals counted, ignored return values or not
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit
     ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 38]))),

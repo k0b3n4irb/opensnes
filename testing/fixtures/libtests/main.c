@@ -54,6 +54,7 @@ static FAR u8 vq_sheet[576];
 u16 r_vqc[8];
 /* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
 u16 r_vqu[8];
+u16 r_vqref[2];   /* vram_queue_refused since the sprite refusals: 2, then 3 after the full queue */
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
 /* --- math vectors --- */
@@ -63,6 +64,17 @@ u16 r_div_max;  /* div16(65535, 1)  -> 65535 (worst case of the old O(quotient) 
 u16 r_div_zero; /* div16(42, 0)     -> 0 (documented contract) */
 u16 r_mod_zero; /* mod16(42, 0)     -> 0 (documented contract) */
 u16 r_mul;      /* mul16(123, 45)   -> 5535 */
+/* 32-bit products (tcc_mul32): two u16 (both high words zero, the short path),
+ * then a u32 with a high half on either side (all ten partial products).
+ * volatile operands: nothing is folded by the compiler. */
+volatile u32 mu_a, mu_b;
+u32 r_mul32[8];   /* 65535*65535, 0*1234, 256*256, 40000*3, 65536*1, 1*65536, 70000*70000, 123456*3 */
+/* the non-blocking fade (fadeStart / fadeStep / fadeRunning), brightness read from its shadow:
+ * [0] running after fadeStart(FADE_OUT, 2) -> 1, [1] its first level -> 15,
+ * [2] calls of fadeStep() that return 1 -> 31 (16 x 2 - 1), [3] running after -> 0,
+ * [4] the last level -> 0, [5] fadeStart(FADE_IN, 0) -> 15 at once, [6] its fadeStep() -> 0,
+ * [7] brightness after 5 calls of fadeStep() of fadeStart(FADE_IN, 1) -> 5 */
+u16 r_fade[8];
 u16 r_sqrt;     /* sqrt16(144)      -> 12 */
 
 /* --- fixed-point vectors (gaps review L2b, 2026-09-14): fixMul, fixDiv,
@@ -779,16 +791,19 @@ static void coverage_lot_b(void) {
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
     vramQueueFlush();
+    vram_queue_refused = 0;                                    /* count from here */
     r_vqs[5] = vramQueuePushSprite(vq_sheet, 0x6400, 4);       /* under 8 pixels: 0 */
     vram_queue_count = VRAM_QUEUE_MAX - 2;
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
     r_vqs[7] = vram_queue_count;                               /* still 38: nothing noted */
     vram_queue_count = 0;
+    r_vqref[0] = vram_queue_refused;                           /* 2: too small, no room */
     /* the capacity the library reads (vram_queue_max, the project's) is the
      * one C was given: pushes until one is refused */
     r_vqcap = 0;
     while (vramQueuePush(lotb_vram, 0x6200, 8, VRAM_QUEUE_ROW) && r_vqcap < 300)
         r_vqcap++;                                             /* 40 */
+    r_vqref[1] = vram_queue_refused;                           /* 3: the one past the capacity */
     vram_queue_count = 0;
     vram_queue_cost = 0;
     /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
@@ -959,6 +974,35 @@ static void part_math_anim(void) {
     r_div_zero = div16(42, 0);
     r_mod_zero = mod16(42, 0);
     r_mul      = mul16(123, 45);
+    mu_a = 65535UL;  mu_b = 65535UL;  r_mul32[0] = mu_a * mu_b;   /* 0xFFFE0001 */
+    mu_a = 0UL;      mu_b = 1234UL;   r_mul32[1] = mu_a * mu_b;   /* 0 */
+    mu_a = 256UL;    mu_b = 256UL;    r_mul32[2] = mu_a * mu_b;   /* 0x00010000 */
+    mu_a = 40000UL;  mu_b = 3UL;      r_mul32[3] = mu_a * mu_b;   /* 0x0001D4C0 */
+    mu_a = 65536UL;  mu_b = 1UL;      r_mul32[4] = mu_a * mu_b;   /* a_hi set */
+    mu_a = 1UL;      mu_b = 65536UL;  r_mul32[5] = mu_a * mu_b;   /* b_hi set */
+    mu_a = 70000UL;  mu_b = 70000UL;  r_mul32[6] = mu_a * mu_b;   /* both high words set, low 32 bits */
+    mu_a = 123456UL; mu_b = 3UL;      r_mul32[7] = mu_a * mu_b;   /* a_hi set, b_hi zero */
+    {
+        u16 n = 0, k;
+        fadeStart(FADE_OUT, 2);
+        r_fade[0] = fadeRunning();
+        r_fade[1] = getBrightness();
+        while (fadeStep()) {
+            n++;
+        }
+        r_fade[2] = n;
+        r_fade[3] = fadeRunning();
+        r_fade[4] = getBrightness();
+        fadeStart(FADE_IN, 0);
+        r_fade[5] = getBrightness();
+        r_fade[6] = fadeStep();
+        fadeStart(FADE_IN, 1);
+        for (k = 0; k < 5; k++) {
+            fadeStep();
+        }
+        r_fade[7] = getBrightness();
+        setBrightness(15);
+    }
     r_sqrt     = sqrt16(144);
     r_sdiv_cast = (u16)((s16)-30000 / (s16)(sdiv_op | 1));
 
@@ -1235,6 +1279,9 @@ static u8 s_near[16];
 u16 r_str[24];
 /* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
 u16 r_oamget[8];
+u16 r_hrange[10];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 9, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
+static FAR u8 hr_save[544];
+static FAR u8 hr_want[544];
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
@@ -1631,6 +1678,43 @@ int main(void) {
         r_oamget[5] = oamGetY(102);       /* 240 */
         r_oamget[6] = oamGetX(200);       /* invalid id: 0 */
         r_oamget[7] = 0x0A00 | oamGetY(200);  /* 0, and the block ran */
+        /* oamHideRange against the loop of oamHide it replaces, on a shadow
+         * with a pattern in every byte (sizes and ninth bits included): the
+         * same bytes everywhere, edges inside a byte of the high table
+         * (3+9, 5+3), whole bytes (4+8), the clamp at 128, one sprite, an id
+         * past the end, a count of 0. */
+        {
+            static const u8 hr_first[9] = {0, 3, 4, 5, 125, 127, 128, 10, 40};
+            static const u8 hr_count[9] = {1, 9, 8, 3, 10, 1, 5, 0, 32};
+            u8 c;
+            u16 j, k, last;
+            for (j = 0; j < 544; j++) hr_save[j] = oamMemory[j];
+            for (c = 0; c < 9; c++) {
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                last = hr_first[c] + hr_count[c];
+                if (last > 128) last = 128;
+                for (k = hr_first[c]; k < last; k++) {      /* the definition, written out */
+                    oamMemory[k << 2] = 1;
+                    oamMemory[(k << 2) + 1] = 240;
+                    oamMemory[512 + (k >> 2)] |= (u8)(1 << ((k & 3) << 1));
+                }
+                for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                for (k = hr_first[c]; k < last; k++) oamHide(k);   /* and oamHide() itself */
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_hrange[c] = k;
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                oamHideRange(hr_first[c], hr_count[c]);
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_hrange[c] += k;
+            }
+            oam_max_id = 0;
+            oamHideRange(120, 20);
+            r_hrange[9] = oam_max_id;
+            for (j = 0; j < 544; j++) oamMemory[j] = hr_save[j];
+        }
         /* the ninth x bit and the size bit of neighbours in one byte of the
          * high table (sprites 104-107) do not disturb each other */
         oamSetX(104, 300);

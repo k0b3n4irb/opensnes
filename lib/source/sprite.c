@@ -116,26 +116,12 @@ void oamSetTile(u16 id, u16 tile) {
     oam_update_flag = 1;
 }
 
-void oamHide(u16 id) {
-    if (id >= MAX_SPRITES) return;
-    /* Y=240 + X=257 (high bit set, low byte 1 = X -255) to hide off-screen.
-     * Y=240 alone wraps for sprites > 16px tall, and X=256 exactly is
-     * counted as X=0 by the PPU's range and time tests (anomie-regs,
-     * "Drawing the Sprites"): a hidden 32- or 64-pixel sprite then still
-     * spent a slot and tiles on lines 0-47 (until 2026-10-03). The dynamic
-     * engine always hid at 257.
-     */
-    oam_buffer[(id << 2) + 0] = 1;          /* X low = 1 -> X = -255 */
-    oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y; /* Y = 240 */
-
-    /* Set X high bit in extension table */
-    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u16 slot = id & 0x03;
-    oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
-
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
+/* oamHide() is assembly since 2026-11-01 (sprite_oamset.asm, with
+ * oamHideRange()): the C version cost 1,790 mclk a call against PVSnesLib's
+ * 1,443 (devtools/libbench, row hideeach). It hides at X = 257 and Y = 240:
+ * Y=240 alone wraps for sprites > 16px tall, and X=256 exactly is counted as
+ * X=0 by the PPU's range and time tests (anomie-regs, "Drawing the
+ * Sprites"). The dynamic engine always hid at 257. */
 
 /*============================================================================
  * OAM Update

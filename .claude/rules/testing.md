@@ -1,3 +1,14 @@
+---
+paths:
+  - "testing/**"
+  - "tests/**"
+  - "lib/**"
+  - "templates/**"
+  - "compiler/**"
+  - "make/**"
+  - "examples/**"
+---
+
 # Testing Workflow (Auto-loaded)
 
 IMPORTANT: Every change must pass this workflow before commit.

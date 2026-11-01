@@ -149,6 +149,19 @@
 #define AUDIO_ERR_NOT_LOADED    3   /**< Sample not loaded */
 #define AUDIO_ERR_TIMEOUT       4   /**< SPC communication timeout */
 
+/**
+ * @brief Refusals the audio module has answered since power-on
+ *
+ * Every AUDIO_ERR_* returned bumps this word and stores its code in
+ * @ref audio_error_last, whether or not the caller looks at the return
+ * value. A test reads both from WRAM (symbols `audio_error_count`,
+ * `audio_error_last`); a game can show them in a debug overlay. A healthy
+ * run leaves the count at 0. The counter wraps at 65536.
+ */
+extern u16 audio_error_count;
+/** @brief Code of the latest refusal (AUDIO_ERR_*), 0 if none yet */
+extern u8 audio_error_last;
+
 /** @} */
 
 /*============================================================================

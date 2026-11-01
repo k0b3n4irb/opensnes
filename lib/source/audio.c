@@ -135,6 +135,17 @@ extern u16 audio_stream_blocks(const u8 *data, u16 full, u16 tail);
  * Command primitive
  *============================================================================*/
 
+/* Every refusal goes through here, so that a caller who drops the return
+ * code still leaves a trace a test (or a debugger) can read. */
+u16 audio_error_count;          /**< refusals since power-on (wraps at 65536) */
+u8 audio_error_last;            /**< the code of the latest one (AUDIO_ERR_*) */
+
+static u8 audio_refuse(u8 code) {
+    audio_error_count++;
+    audio_error_last = code;
+    return code;
+}
+
 /* The command the driver has not acknowledged yet (0: none). */
 u8 audio_pending;               /* shared with audio_vset.asm */
 
@@ -155,7 +166,7 @@ static u8 cmd_wait(void) {
             return AUDIO_OK;
         }
     }
-    return AUDIO_ERR_TIMEOUT;
+    return AUDIO_ERR_TIMEOUT;   /* not counted here: audioSetEcho() retries this wait */
 }
 
 /**
@@ -175,7 +186,7 @@ static u8 cmd_post(u8 op, u8 p0, u16 p1) {
     u8 cmd;
 
     if (cmd_wait() != AUDIO_OK) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
     audio_seq = (u8)(audio_seq >= 3 ? 1 : audio_seq + 1);
     cmd = (u8)((audio_seq << 6) | op);
@@ -196,9 +207,12 @@ static u8 cmd_post(u8 op, u8 p0, u16 p1) {
  */
 static u8 cmd_send(u8 op, u8 p0, u16 p1) {
     if (cmd_post(op, p0, p1) != AUDIO_OK) {
-        return AUDIO_ERR_TIMEOUT;
+        return AUDIO_ERR_TIMEOUT;   /* cmd_post counted it */
     }
-    return cmd_wait();
+    if (cmd_wait() != AUDIO_OK) {
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
+    }
+    return AUDIO_OK;
 }
 
 /*============================================================================
@@ -231,7 +245,7 @@ u8 audioInit(void) {
     }
 
     if (apuWaitBoot() != 0) {
-        return AUDIO_ERR_TIMEOUT;   /* the IPL is not running: nothing to upload to */
+        return audio_refuse(AUDIO_ERR_TIMEOUT);   /* the IPL is not running: nothing to upload to */
     }
     apuUpload(audio_driver_blob, SPC_DRIVER_BASE,
               /* two labels of one asm section, not two objects */
@@ -244,7 +258,7 @@ u8 audioInit(void) {
         audio_ready = 1;
         return AUDIO_OK;
     }
-    return AUDIO_ERR_TIMEOUT;
+    return audio_refuse(AUDIO_ERR_TIMEOUT);
 }
 
 u8 audioIsReady(void) {
@@ -277,7 +291,7 @@ u8 audioGetVolume(void) {
 
 u8 audioStopVoice(u8 voice) {
     if (voice >= AUDIO_MAX_VOICES) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     return cmd_post(OP_KOFF, (u8)(1 << voice), 0);
 }
@@ -289,7 +303,7 @@ u8 audioStopAll(void) {
 u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
     u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     /* VxVOLL / VxVOLR are signed: a value of 128 or more is a negative
      * volume, which inverts the phase (anomie-sdsp). Clamp to the 0-127 the
@@ -309,7 +323,7 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
 u8 audioSetVoicePitch(u8 voice, u16 pitch) {
     u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     if (pitch > 0x3FFF) {
         pitch = 0x3FFF;        /* DSP pitch is 14-bit */
@@ -325,7 +339,7 @@ u8 audioSetVoicePitch(u8 voice, u16 pitch) {
 u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
     u8 adsr1, adsr2, err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     adsr1 = (u8)(0x80 | ((decay & 0x07) << 4) | (attack & 0x0F));
     adsr2 = (u8)(((sustain & 0x07) << 5) | (release & 0x1F));
@@ -339,7 +353,7 @@ u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
 u8 audioSetGain(u8 voice, u8 mode) {
     u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     /* driver also zeroes VxADSR1 so GAIN mode actually applies */
     err = cmd_post(OP_VGAIN, voice, mode);
@@ -367,7 +381,7 @@ static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
     tail = (u8)(size - full * 3);
     if (cmd_send(OP_LOAD_SIZE, tail, full) != AUDIO_OK ||
         cmd_send(OP_LOAD, 0, dst) != AUDIO_OK) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
 
     /* The stream, three bytes an exchange: data on IO1-IO3, then the
@@ -376,7 +390,7 @@ static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
      * compiled C cost 1,766 master cycles a byte on examples/audio/soundboard
      * (2026-10-10). */
     if (audio_stream_blocks(brrData, full, tail) != 0) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
 
     /* Epilogue (audio_driver.spc700.asm, load_done): every value one side
@@ -396,7 +410,7 @@ static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
         }
     }
     if (spin == ACK_SPIN_MAX) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
     APU_IO0 = 0;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
@@ -405,7 +419,7 @@ static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
         }
     }
     if (spin == ACK_SPIN_MAX) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
 
     return AUDIO_OK;
@@ -413,17 +427,17 @@ static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
 
 u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (id >= AUDIO_MAX_SAMPLES || id == step_id) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     if (!audio_ready) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
     if (size == 0 || (u16)(sample_ceil - sample_next_free) < size) {
-        return AUDIO_ERR_NO_MEMORY;
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
     }
     if (load_block(sample_next_free, brrData, size) != AUDIO_OK ||
         cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
 
     sample_mirror[id].spcAddress = sample_next_free;
@@ -437,13 +451,13 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
 
 u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (id >= AUDIO_MAX_SAMPLES || step_id != 0xFF) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     if (!audio_ready) {
-        return AUDIO_ERR_TIMEOUT;
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
     if (size < 3 || (u16)(sample_ceil - sample_next_free) < size) {
-        return AUDIO_ERR_NO_MEMORY;
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
     }
     /* The place is taken now, so a sample loaded meanwhile goes above it;
      * the slot stays "not loaded" until the last step. */
@@ -527,10 +541,10 @@ void audioUnloadSample(u8 id) {
 
 u8 audioGetSampleInfo(u8 id, AudioSample *info) {
     if (id >= AUDIO_MAX_SAMPLES || !info) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     if (!sample_mirror[id].flags) {
-        return AUDIO_ERR_NOT_LOADED;
+        return audio_refuse(AUDIO_ERR_NOT_LOADED);
     }
     /* Field-by-field on purpose: struct assignment is not lowered by
      * the w65816 backend yet (QBE blit — see the compiler issue; the
@@ -695,7 +709,7 @@ u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
      * gives the difference back to the sample area. */
     ring = (u16)(ECHO_RING_END - ((u16)delay << 11));
     if (sample_next_free > ring) {
-        return AUDIO_ERR_NO_MEMORY;
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
     }
     sample_ceil = ring;
     /* EFB rides the FIR command as tap index 8 (same signed-byte shape),
@@ -719,13 +733,13 @@ u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
             return AUDIO_OK;
         }
     }
-    return AUDIO_ERR_TIMEOUT;
+    return audio_refuse(AUDIO_ERR_TIMEOUT);
 }
 
 u8 audioSetEchoFilter(const s8 fir[8]) {
     u8 i, err;
     if (!fir) {
-        return AUDIO_ERR_INVALID_ID;
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
     for (i = 0; i < 8; i++) {
         err = cmd_post(OP_ECHO_FIR, i, (u16)(u8)fir[i]);

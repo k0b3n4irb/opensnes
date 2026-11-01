@@ -71,6 +71,10 @@ extern u16 vram_queue_step[VRAM_QUEUE_MAX];
 extern u16 vram_queue_cum[VRAM_QUEUE_MAX];  /* vram_queue_cost up to each entry */
 extern u16 vram_queue_count;
 extern u16 vram_queue_cost;
+/** @brief Pushes refused since power-on (queue full): 0 on a healthy run.
+ *  Counted whether or not the caller reads the return value; a test reads
+ *  it from WRAM. Wraps at 65536. */
+extern u16 vram_queue_refused;
 
 /** @brief Entries still free */
 #define vramQueueFree() (VRAM_QUEUE_MAX - vram_queue_count)
