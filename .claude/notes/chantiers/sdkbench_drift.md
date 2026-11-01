@@ -23,3 +23,5 @@ Pour l'ARAM, le ROM ne dit que la taille de la banque de sons (sections spc_* du
 (module + échantillons + écho) : le chiffre juste vient de `opensnes-music inspect`, à brancher dans `budget` plutôt que déduit du .sym.
 Pour l'OAM, rien de statique : mesure dynamique (luna, WRAM de la file OAM), donc à demander à luna, pas à inventer ici.
 Décision à prendre avant de coder : ARAM via `inspect` seulement (recommandé), OAM laissé à luna.
+
+Lot 1 (budget) livré 2026-11-01 (19bb2475) : `opensnes-rom budget` donne l'ARAM du module `.it` le plus lourd, via `opensnes-music inspect` (OPENSNES_HOME). L'OAM reste à luna (mesure dynamique), à lui demander si le jeu la réclame.
