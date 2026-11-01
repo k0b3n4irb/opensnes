@@ -102,6 +102,40 @@ void row_oamxy(void) {
     }
 }
 
+/* Sprites parked off screen: one call each, then the range in one call.
+ * PVSnesLib has no per-sprite park that is not a visibility flag and no
+ * range call but oamClear(first, count), which does the same job. */
+void row_hideeach(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSetVisible(i << 2, OBJ_HIDE);
+#else
+            oamHide(i);
+#endif
+#endif
+        }
+    }
+}
+
+void row_hiderange(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(0, 32);
+#else
+        oamHideRange(0, 32);
+#endif
+#endif
+    }
+}
+
 void row_oamsize(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
@@ -413,6 +447,10 @@ int main(void) {
     row_vramq();
 #elif ROW == 13
     row_worldo();
+#elif ROW == 14
+    row_hideeach();
+#elif ROW == 15
+    row_hiderange();
 #endif
     done = 0x600D;
     while (1) {

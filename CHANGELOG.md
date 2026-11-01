@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- perf(lib): `oamHideRange(first, count)` parks a run of sprites in one call,
+  and `oamHide()` is assembly. Measured on luna (`devtools/libbench`, rows
+  `hideeach` and `hiderange`, 32 sprites): one `oamHide()` 1,790 to 800 mclk
+  (-55 %; PVSnesLib's equivalent 1,443); the 32 in one `oamHideRange()` call
+  57,271 to 9,824 mclk (-83 %, 307 mclk a sprite). Same bytes as the loop it
+  replaces (tile, attributes and size untouched), checked against the
+  definition written out in `libtests`.
 - feat(lib): refusals that leave a trace. A library call that refuses its
   work answered with a code the caller was free to drop, and nothing showed
   it. Every `AUDIO_ERR_*` the audio module returns now bumps

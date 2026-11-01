@@ -39,7 +39,7 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 4_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
+STEPS = 5_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -224,6 +224,8 @@ CASES = [
         0, 0xFFFF, 1, (-ord("C")) & 0xFFFF, 0xE0,
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
     # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 240), an invalid id (0, 0)
+    # oamHideRange: the same bytes as a loop of oamHide in nine cases, then oam_max_id 127
+    ("r_hrange", 20, 127 << 144),
     ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 240, 0, 0x0A00]))),
     # the setters in assembly since 2026-10-09: x and size bits of four
     # neighbours, ids that are not sprites, the dirty flag, scroll of a layer

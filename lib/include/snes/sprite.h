@@ -501,6 +501,22 @@ void oamSetTile(u16 id, u16 tile);
 void oamHide(u16 id);
 
 /**
+ * @brief Park a run of sprites off screen in one call.
+ *
+ * Does to sprites @p first to @p first + @p count - 1 what oamHide() does
+ * to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A
+ * scene that clears or parks many sprites a frame (a pool of effects, the
+ * sprites a screen no longer shows) pays about a quarter of what the same
+ * loop of oamHide() calls costs.
+ *
+ * @param first First sprite ID (0-127); at 128 or more nothing is done
+ * @param count How many; the run is cut at sprite 127, 0 does nothing
+ *
+ * @see oamHide()
+ */
+void oamHideRange(u16 first, u16 count);
+
+/**
  * @brief Set sprite size (large/small)
  *
  * @param id Sprite ID (0-127)

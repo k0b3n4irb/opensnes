@@ -118,8 +118,10 @@ compilers.
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,916 | -8.5 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,576 | -39.2 % |
 | `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,311 | -73.4 % |
+| `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,586 | -44.6 % |
+| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,824 | -82.2 % |
 
-OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
+OpenSNES costs no more than PVSnesLib on **16 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library

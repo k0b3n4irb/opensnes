@@ -1279,6 +1279,9 @@ static u8 s_near[16];
 u16 r_str[24];
 /* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
 u16 r_oamget[8];
+u16 r_hrange[10];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 9, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
+static FAR u8 hr_save[544];
+static FAR u8 hr_want[544];
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
@@ -1675,6 +1678,43 @@ int main(void) {
         r_oamget[5] = oamGetY(102);       /* 240 */
         r_oamget[6] = oamGetX(200);       /* invalid id: 0 */
         r_oamget[7] = 0x0A00 | oamGetY(200);  /* 0, and the block ran */
+        /* oamHideRange against the loop of oamHide it replaces, on a shadow
+         * with a pattern in every byte (sizes and ninth bits included): the
+         * same bytes everywhere, edges inside a byte of the high table
+         * (3+9, 5+3), whole bytes (4+8), the clamp at 128, one sprite, an id
+         * past the end, a count of 0. */
+        {
+            static const u8 hr_first[9] = {0, 3, 4, 5, 125, 127, 128, 10, 40};
+            static const u8 hr_count[9] = {1, 9, 8, 3, 10, 1, 5, 0, 32};
+            u8 c;
+            u16 j, k, last;
+            for (j = 0; j < 544; j++) hr_save[j] = oamMemory[j];
+            for (c = 0; c < 9; c++) {
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                last = hr_first[c] + hr_count[c];
+                if (last > 128) last = 128;
+                for (k = hr_first[c]; k < last; k++) {      /* the definition, written out */
+                    oamMemory[k << 2] = 1;
+                    oamMemory[(k << 2) + 1] = 240;
+                    oamMemory[512 + (k >> 2)] |= (u8)(1 << ((k & 3) << 1));
+                }
+                for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                for (k = hr_first[c]; k < last; k++) oamHide(k);   /* and oamHide() itself */
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_hrange[c] = k;
+                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                oamHideRange(hr_first[c], hr_count[c]);
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_hrange[c] += k;
+            }
+            oam_max_id = 0;
+            oamHideRange(120, 20);
+            r_hrange[9] = oam_max_id;
+            for (j = 0; j < 544; j++) oamMemory[j] = hr_save[j];
+        }
         /* the ninth x bit and the size bit of neighbours in one byte of the
          * high table (sprites 104-107) do not disturb each other */
         oamSetX(104, 300);
