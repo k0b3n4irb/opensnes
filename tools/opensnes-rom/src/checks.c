@@ -259,6 +259,11 @@ static long settings_vram(const char *path)
 
 /* The assets under `dir`, recursively, but not under the folders of
  * `scenes_root` (the scenes, counted one by one) when it is given. */
+/* the Impulse Tracker modules met on the way: `budget` asks opensnes-music
+ * what each one costs in SPC RAM */
+char g_music[MAXMUSIC][2048];
+int g_nmusic;
+
 static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, int depth)
 {
     DIR *d = opendir(dir);
@@ -306,6 +311,8 @@ static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, 
             a->vram += (long)st.st_size; a->files++;
         } else if (!strcmp(ext, ".pal")) {
             a->colours += (long)st.st_size / 2; a->files++;
+        } else if (!strcmp(ext, ".it") && g_nmusic < MAXMUSIC) {
+            snprintf(g_music[g_nmusic++], sizeof g_music[0], "%s", path);
         }
     }
     closedir(d);
@@ -318,6 +325,7 @@ static void scan_assets(const char *dir, const char *scenes_root, asset_sum *a, 
  * is everything at once. */
 void report_assets(cli_ctx *ctx, const char *dir, check_results *r)
 {
+    g_nmusic = 0;
     char res[2048];
     snprintf(res, sizeof res, "%s/res", dir);
     asset_sum shared = { 0, 0, 0 };

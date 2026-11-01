@@ -24,6 +24,9 @@ int check_data_init(cli_ctx *ctx, const sym_file *s, const char *rom);
 int check_sa1_boot(cli_ctx *ctx, const sym_file *s, const char *rom);
 int check_bank_reads(cli_ctx *ctx, const sym_file *s, const char *dir);
 int check_nmi_race(cli_ctx *ctx, const char *dir);
+enum { MAXMUSIC = 64 };
+extern char g_music[MAXMUSIC][2048];
+extern int g_nmusic;
 void report_assets(cli_ctx *ctx, const char *dir, check_results *r);
 
 #endif

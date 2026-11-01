@@ -155,6 +155,10 @@ def declared_vram():
 g.check("check with vram = N in settings files (a cache, a streamed sheet)", "the declared bytes, once", declared_vram)
 g.expect_stdout("budget good.sfc (ROM by bank, RAM, video)", ["budget", "good.sfc"], golden="budget.txt", copy=["good.sfc", "good.sym", "good.c.asm"])
 g.expect_stdout("budget --json good.sfc", ["budget", "--json", "good.sfc"], golden="budget.json", copy=["good.sfc", "good.sym", "good.c.asm"])
+g.expect_stdout("budget good.sfc + a module (ARAM from opensnes-music inspect)", ["budget", "good.sfc"], golden="budget_aram.txt",
+                copy=["good.sfc", "good.sym", "good.c.asm", "theme.it"])
+g.expect_stdout("budget --json good.sfc + a module", ["budget", "--json", "good.sfc"], golden="budget_aram.json",
+                copy=["good.sfc", "good.sym", "good.c.asm", "theme.it"])
 
 
 def ram_markers():

@@ -28,6 +28,7 @@ The tool is `<repo>/bin/<name>`: run `make tools` first.
 from __future__ import annotations
 
 import filecmp
+import os
 import shutil
 import subprocess
 import sys
@@ -64,7 +65,8 @@ class Golden:
         work.mkdir(parents=True, exist_ok=True)
         self.stage(work, copy, write)
         return subprocess.run([str(self.tool), *argv], cwd=work, capture_output=True,
-                              text=True, timeout=self.timeout)
+                              text=True, timeout=self.timeout,
+                              env={**os.environ, "OPENSNES_HOME": str(self.repo)})
 
     @staticmethod
     def said(proc: subprocess.CompletedProcess) -> str:
