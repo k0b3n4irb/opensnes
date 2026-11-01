@@ -1029,6 +1029,17 @@ CopyInitData:
 ; NMI (VBlank) Handler
 ;==============================================================================
 
+.ifdef CODE_IN_MIRROR
+; The vector's target is a section of its own, addressed in bank $00 where the
+; program counter is when it runs: a profile or a coverage set folds the PC
+; onto the label that has its address, so the jump below is counted as
+; NmiEntry (it was counted against whatever label sat nearest in bank $00).
+.SECTION ".nmi_entry" SEMIFREE BASE $00
+NmiEntry:                   ; the vector's target, in bank $00
+    jml.l NmiHandler        ; Jump to the code's mirror ($80, or $C0 for HiROM)
+.ENDS
+.endif
+
 .SECTION ".nmi" SEMIFREE
 
 ;------------------------------------------------------------------------------
@@ -1056,9 +1067,8 @@ CopyInitData:
 ; If NMI fires mid-sequence and touches $2180-$2183, the address/data will
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
-NmiEntry:                   ; the vector's target, in bank $00
-.ifdef CODE_IN_MIRROR
-    jml.l NmiHandler        ; Jump to the code's mirror ($80, or $C0 for HiROM)
+.ifndef CODE_IN_MIRROR
+NmiEntry:                   ; SA-1 and Super FX: the handler is the vector's target
 .endif
 NmiHandler:                 ; where the handler runs: profiles name it here
     rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
