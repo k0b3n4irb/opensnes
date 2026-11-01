@@ -193,31 +193,31 @@ while it runs (bytes below the initial stack pointer).
 <!-- sdkbench:begin -->
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 1,137,028 | -72.9 % | 296 | 107 | -63.9 % | 31 | 23 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 790,208 | -69.8 % | 507 | 231 | -54.4 % | 43 | 25 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 2,203,644 | -78.0 % | 1174 | 399 | -66.0 % | 60 | 30 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 5,243,496 | -62.1 % | 983 | 405 | -58.8 % | 74 | 30 |
-| `mul` | 2304 multiplies of two variables | 6,389,830 | 4,358,600 | -31.8 % | 188 | 91 | -51.6 % | 34 | 29 |
-| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,243,024 | -75.1 % | 154 | 73 | -52.6 % | 34 | 28 |
-| `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,354,368 | -60.4 % | 594 | 289 | -51.3 % | 76 | 33 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 3,157,202 | -59.8 % | 605 | 307 | -49.3 % | 41 | 23 |
-| `calls` | recursive `fib(17)` | 5,041,934 | 2,561,730 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 911,554 | -66.2 % | 523 | 284 | -45.7 % | 34 | 23 |
-| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,342,978 | -51.2 % | 233 | 108 | -53.6 % | 34 | 23 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 1,323,922 | -53.7 % | 402 | 267 | -33.6 % | 37 | 23 |
-| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 813,208 | -72.1 % | 397 | 181 | -54.4 % | 33 | 23 |
-| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 1,997,894 | -62.0 % | 694 | 444 | -36.0 % | 39 | 44 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 2,991,200 | -66.2 % | 1098 | 489 | -55.5 % | 62 | 30 |
-| `copy` | word and byte copies as index loops | 4,485,144 | 1,006,290 | -77.6 % | 709 | 302 | -57.4 % | 31 | 23 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 1,734,876 | -43.7 % | 1156 | 749 | -35.2 % | 48 | 48 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 944,974 | -48.4 % | 392 | 270 | -31.1 % | 42 | 29 |
-| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,172,382 | -64.1 % | 831 | 350 | -57.9 % | 52 | 23 |
-| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,147,052 | -74.3 % | 1018 | 452 | -55.6 % | 61 | 29 |
-| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 12,947,774 | -65.8 % | 7722 | 3224 | -58.2 % | 93 | 56 |
-| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 4,644,986 | -59.1 % | 888 | 452 | -49.1 % | 94 | 71 |
-| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,854,318 | 55,691,046 | -58.7 % | 5132 | 2933 | -42.8 % | 84 | 63 |
-| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 58,359,746 | ours only | — | 3168 | | — | 62 |
-| **Total** | | **325,892,518** | **122,719,436** | **-62.3 %** | **25801** | **12464** | **-51.7 %** | | |
+| `sieve` | sieve of 1024 in a byte array | 4,198,808 | 1,166,232 | -72.2 % | 296 | 107 | -63.9 % | 31 | 23 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 792,608 | -69.8 % | 507 | 231 | -54.4 % | 43 | 36 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,454 | 2,272,996 | -77.3 % | 1174 | 400 | -65.9 % | 60 | 41 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,762 | 5,016,178 | -63.7 % | 983 | 401 | -59.2 % | 74 | 41 |
+| `mul` | 2304 multiplies of two variables | 6,389,950 | 3,343,258 | -47.7 % | 188 | 91 | -51.6 % | 34 | 29 |
+| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,787,672 | 2,243,748 | -74.5 % | 154 | 73 | -52.6 % | 34 | 28 |
+| `long` | 300 steps of a 32-bit generator and hash | 5,944,006 | 2,385,376 | -59.9 % | 594 | 289 | -51.3 % | 76 | 33 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,558 | 3,186,932 | -59.5 % | 605 | 307 | -49.3 % | 41 | 23 |
+| `calls` | recursive `fib(17)` | 5,041,974 | 2,562,518 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,292 | 940,658 | -65.1 % | 523 | 284 | -45.7 % | 34 | 23 |
+| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,124 | 1,343,372 | -51.2 % | 233 | 108 | -53.6 % | 34 | 23 |
+| `list` | a 64-node linked list walked 40 times | 2,858,638 | 1,324,896 | -53.7 % | 402 | 267 | -33.6 % | 37 | 23 |
+| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,926 | 842,314 | -71.1 % | 397 | 181 | -54.4 % | 33 | 23 |
+| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,636 | 2,029,842 | -61.4 % | 694 | 440 | -36.6 % | 39 | 44 |
+| `entities` | the 32 entities again, through a pointer | 8,851,278 | 3,025,144 | -65.8 % | 1098 | 489 | -55.5 % | 62 | 41 |
+| `copy` | word and byte copies as index loops | 4,485,180 | 1,009,834 | -77.5 % | 709 | 302 | -57.4 % | 34 | 29 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,148 | 1,547,512 | -49.8 % | 1156 | 743 | -35.7 % | 48 | 44 |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,138 | 945,308 | -48.4 % | 392 | 270 | -31.1 % | 42 | 29 |
+| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,371,286 | 4,828,896 | -66.4 % | 831 | 337 | -59.4 % | 52 | 28 |
+| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,805,026 | 7,132,054 | -74.3 % | 1018 | 448 | -56.0 % | 61 | 28 |
+| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,799,876 | 11,868,668 | -68.6 % | 7722 | 3154 | -59.2 % | 93 | 52 |
+| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,922 | 4,497,130 | -60.4 % | 888 | 401 | -54.8 % | 94 | 35 |
+| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,396,874 | 55,196,686 | -58.9 % | 5132 | 2915 | -43.2 % | 84 | 63 |
+| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 57,613,302 | ours only | — | 3150 | | — | 62 |
+| **Total** | | **325,169,900** | **119,502,160** | **-63.2 %** | **25801** | **12295** | **-52.3 %** | | |
 
 Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
 

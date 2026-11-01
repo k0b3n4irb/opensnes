@@ -31,9 +31,6 @@ u16 done;
 void bench_nop(void) { }
 
 static u8 payload[2048];
-#if PVS
-extern char tilfont, palfont;
-#endif
 
 void row_pad(void) {
     u16 r, i;
@@ -381,10 +378,9 @@ void row_frame(void) {
 
 int main(void) {
 #if PVS
-    consoleSetTextMapPtr(0x6800);
-    consoleSetTextGfxPtr(0x3000);
-    consoleSetTextOffset(0x0100);
-    consoleInitText(0, 16 * 2, &tilfont, &palfont);
+    /* PVSnesLib 4.6 carries its font in the library (map $6800, gfx $3000,
+     * offset 0); 4.5 needed the example's own tilfont/palfont. */
+    consoleInitDefaultText(0);
     bgSetGfxPtr(0, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_32x32);
     setMode(BG_MODE1, 0);

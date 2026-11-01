@@ -98,8 +98,12 @@ def prepare(sdk: str, k: int, pvs: Path) -> Path:
         # PVSnesLib's own hello_world is the skeleton: its header, its font
         # data and its Makefile, with our source in src/.
         skel = pvs / "snes-examples" / "hello_world"
+        # 4.5 shipped hdr.asm, data.asm and the font in the example; 4.6
+        # generates them at build time (AUTOHDR, built-in font). Copy the
+        # Makefile, and the others only when the example still has them.
         for name in ("Makefile", "hdr.asm", "data.asm", "pvsneslibfont.png"):
-            shutil.copy(skel / name, d / name)
+            if name == "Makefile" or ((skel / name).is_file() and not (skel / "pvsneslibfont.inc").exists()):
+                shutil.copy(skel / name, d / name)
         (d / "src").mkdir()
         shutil.copy(HERE / "workloads.c", d / "src" / "hello_world.c")
         (d / "src" / "which.h").write_text(which)
