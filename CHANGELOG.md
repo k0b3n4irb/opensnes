@@ -4,6 +4,12 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.54.0] — 2026-11-01
+
+The dynamic-sprite draw is 15.8 % cheaper, `budget` reports the SPC RAM of
+the heaviest module through `opensnes-music inspect`, and the sdkbench drift
+lot lands. Everything below is what `[Unreleased]` held.
+
 ### Added
 - perf(lib): the three dynamic-sprite draw routines (`oamDynamic8Draw`,
   `16Draw`, `32Draw`, behind `oamMetaDrawDyn` and `oamDynamicDraw`) write an
