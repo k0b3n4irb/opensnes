@@ -16,3 +16,10 @@ Lot 3 fait : dessin dynamique de métasprites, voir §9 du rapport (55 048 -> 46
 Piège : `testing/manifests/movement_platform_objects_enemies.toml` échantillonnait
 `insectx` en plein rappel (monde ou écran selon la phase), assoupli en `ge`.
 Lot suivant : rapport §6 ligne 4 (le moteur dynamique perd des transferts en rafale) ou 5 (NMI).
+
+Reprise 2026-11-01 (lot 1 du tri des demandes, budget) : état lu, rien codé.
+`opensnes-rom budget` (tools/opensnes-rom/src/main.c, run_budget) donne ROM par banque, RAM, FAR, VRAM/CGRAM des assets.
+Pour l'ARAM, le ROM ne dit que la taille de la banque de sons (sections spc_* du .sym), pas ce que le pilote charge
+(module + échantillons + écho) : le chiffre juste vient de `opensnes-music inspect`, à brancher dans `budget` plutôt que déduit du .sym.
+Pour l'OAM, rien de statique : mesure dynamique (luna, WRAM de la file OAM), donc à demander à luna, pas à inventer ici.
+Décision à prendre avant de coder : ARAM via `inspect` seulement (recommandé), OAM laissé à luna.
