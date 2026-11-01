@@ -2,7 +2,7 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 1166232,
+      "cycles": 1137496,
       "size": 107,
       "stack": 23,
       "res": 172
@@ -14,13 +14,13 @@
       "res": 12563
     },
     "physics": {
-      "cycles": 2272996,
+      "cycles": 2244260,
       "size": 400,
       "stack": 41,
       "res": 12530
     },
     "collide": {
-      "cycles": 5016178,
+      "cycles": 4987442,
       "size": 401,
       "stack": 41,
       "res": 162
@@ -44,7 +44,7 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 3186932,
+      "cycles": 3158196,
       "size": 307,
       "stack": 23,
       "res": 819
@@ -56,7 +56,7 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 940658,
+      "cycles": 911922,
       "size": 284,
       "stack": 23,
       "res": 9705
@@ -68,37 +68,37 @@
       "res": 2842
     },
     "list": {
-      "cycles": 1324896,
+      "cycles": 1296160,
       "size": 267,
       "stack": 23,
       "res": 17376
     },
     "tilemap": {
-      "cycles": 842314,
+      "cycles": 813578,
       "size": 181,
       "stack": 23,
       "res": 10608
     },
     "grid": {
-      "cycles": 2029842,
+      "cycles": 2001106,
       "size": 440,
       "stack": 44,
       "res": 40897
     },
     "entities": {
-      "cycles": 3025144,
+      "cycles": 2996408,
       "size": 489,
       "stack": 41,
       "res": 12530
     },
     "copy": {
-      "cycles": 1009834,
+      "cycles": 981098,
       "size": 302,
       "stack": 29,
       "res": 20921
     },
     "strings": {
-      "cycles": 1547512,
+      "cycles": 1518776,
       "size": 743,
       "stack": 44,
       "res": 65535
@@ -122,7 +122,7 @@
       "res": 29147
     },
     "depot": {
-      "cycles": 11868668,
+      "cycles": 11839932,
       "size": 3154,
       "stack": 52,
       "res": 54047
@@ -134,13 +134,13 @@
       "res": 54707
     },
     "farfill": {
-      "cycles": 55196686,
+      "cycles": 55167950,
       "size": 2915,
       "stack": 63,
       "res": 18907
     },
     "stepseq": {
-      "cycles": 57613302,
+      "cycles": 57584566,
       "size": 3150,
       "stack": 62,
       "res": 30034

@@ -32,8 +32,8 @@ OpenSNES figures and is what --check compares with (CI has no PVSnesLib).
 commit they were measured at; with PVSNESLIB_HOME set to a PVSnesLib tree
 built for this machine they are measured again instead of read.
 
---check fails when the total of the cycles grows by more than 5 %, or one
-workload by more than 25 %, or a checksum changes. Both ROMs are LoROM,
+--check fails when the total of the cycles grows by more than 2 %, or one
+workload by more than 2 %, or a checksum changes. Both ROMs are LoROM,
 SlowROM (each SDK's default).
 """
 from __future__ import annotations
@@ -349,11 +349,11 @@ def main() -> int:
         base = json.loads(BASELINE.read_text())["workloads"]
         tb = sum(base[n]["cycles"] for n in wanted)
         tn = sum(ours[n]["cycles"] for n in wanted)
-        if tn > tb * 1.05:
-            problems.append(f"total cycles {tb:,} -> {tn:,} ({100 * (tn - tb) / tb:+.1f} %, limit +5 %)")
+        if tn > tb * 1.02:
+            problems.append(f"total cycles {tb:,} -> {tn:,} ({100 * (tn - tb) / tb:+.1f} %, limit +2 %)")
         for n in wanted:
-            if ours[n]["cycles"] > base[n]["cycles"] * 1.25:
-                problems.append(f"{n}: cycles {base[n]['cycles']:,} -> {ours[n]['cycles']:,} (limit +25 %)")
+            if ours[n]["cycles"] > base[n]["cycles"] * 1.02:
+                problems.append(f"{n}: cycles {base[n]['cycles']:,} -> {ours[n]['cycles']:,} (limit +2 %)")
             if ours[n]["res"] != base[n]["res"]:
                 problems.append(f"{n}: checksum 0x{base[n]['res']:04X} -> 0x{ours[n]['res']:04X} — the workload computes something else")
 

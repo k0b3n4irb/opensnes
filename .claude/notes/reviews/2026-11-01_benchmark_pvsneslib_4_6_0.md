@@ -161,3 +161,45 @@ On the bits of the library that are called every frame in every game
 No audio cost against PVSnesLib (SNESMOD vs its driver), no PAL run, no
 compile-time or ROM-size-with-assets comparison, and the twins are ports.
 The suite is also blind to the CI gate's loose thresholds (point 3 above).
+
+## 8. The drift of seven workloads, bisected (lot 2, 2026-11-01)
+
+Method: a separate worktree, every commit between `2289f30b` (baseline of
+2026-10-18) and `0342f046` that touches `compiler/`, `lib/`, `templates/`,
+`make/` or `runtime/` (32 of them), `make clean && make compiler tools lib`,
+then `devtools/sdkbench/run.py` on the seven workloads. Clean builds take ten
+seconds; the whole scan took a few minutes. Use the pinned luna
+(`testing/bin/luna`): a worktree without it falls back to the luna on `PATH`,
+which attributed the cycles differently and showed no drift at all.
+
+| step | commit | effect |
+|---|---|---|
+| 1 | `04d907fb` nmiSetLag | +0.03 % everywhere (a few hundred cycles) |
+| 2 | `a061a2db` code in the `$80` mirror | **+28.8 k on every workload** (+0.9 % to +3.5 %): a measuring artefact, fixed |
+| 3 | `2f14bdd6` `__mul16` skips empty partial products | physics +4.2 k, grid +16.8 k, entities +4.2 k: a branch paid on operands whose high byte is not 0 |
+| 4 | `f7f11dfe` short path in `tcc_mul32` | long +30.3 k (+1.3 %): twelve cycles of test on every full 32-bit product |
+| 5 | `eeb6616e` per-object loop | physics +35.6 k (+1.6 %), grid −14.3 k: one `tax` became `ldx.b` (A was no longer known across the loop test) |
+
+**Step 2 is not a cost.** Every NMI now enters through `NmiEntry` in bank `$00`
+(`jml.l NmiHandler`, 32 master cycles a frame, 28,800 over 900 frames). The
+vector label sat at `$80:xxxx` while the program counter was `$00:xxxx`, so
+luna folded those cycles onto whatever symbol came before in bank `$00`:
+`_reserved_7e_mirror` in the baseline ROM, `tmap.workloads` in the workload ROM.
+The two did not cancel and each workload paid the NMI jump once more. `NmiEntry`
+is now a section of its own addressed at `BASE $00`, the profile counts it as
+`NmiEntry` in both ROMs and it cancels. The real cost is 32 mclk a frame (0.009 %
+of a frame) and it buys FastROM for the whole C code and library.
+
+**Steps 3 to 5 are kept.** Each is a data-dependent fast path or a heuristic
+that wins elsewhere (`mul` −23 %, `strings` −11 %, `grid` ends −1.6 % against
+10-18) and costs 0.1 to 1.8 % where the operands are always wide. Undoing them
+would lose more than it gives. Step 5 is the one with a lead: the loop test
+`lda S / cmp / bcc` leaves A = S, and the peephole no longer knows it at the
+target of the branch (`ldx.b S` instead of `tax`, +2 cycles an iteration); it is
+a Class A change for 1.6 % of one workload, not taken.
+
+After the fix the seven stand at (against 10-18): sieve +0.04 %, physics +1.8 %,
+long +1.3 %, switch +0.04 %, tilemap +0.05 %, grid +0.16 %, entities +0.17 %.
+
+**Gate.** `devtools/sdkbench/run.py --check` fails at **+2 %** in total and on any
+one workload (it was +5 % and +25 %). Baseline re-measured: total 119,128,592.

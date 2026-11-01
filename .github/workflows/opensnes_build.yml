@@ -444,7 +444,7 @@ jobs:
       - name: Measured workloads (luna)
         # The twenty workloads of devtools/sdkbench, OpenSNES side only
         # (CI has no PVSnesLib): master cycles on luna against the committed
-        # baseline.json. Fails on +5 % in total, +25 % on one workload, or a
+        # baseline.json. Fails on +2 % in total, +2 % on one workload, or a
         # changed checksum. The comparison with PVSnesLib is a local run
         # (`make bench-sdk` with PVSNESLIB_HOME), frozen in
         # pvsneslib_reference.json.
