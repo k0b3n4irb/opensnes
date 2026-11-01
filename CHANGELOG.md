@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- perf(lib): the three dynamic-sprite draw routines (`oamDynamic8Draw`,
+  `16Draw`, `32Draw`, behind `oamMetaDrawDyn` and `oamDynamicDraw`) write an
+  entry's X bit 8 and size bit in one read-modify-write of the OAM high table
+  (the `oammask` table now carries the clearing mask, the high-table index and
+  the large-size bit), no longer round-trip the carry through `php`/`plp`, and
+  look the tile up without `phx`/`plx` or three repeated size tests. The
+  dynamic metasprite scene went from 55,048 to 46,360 master cycles of work a
+  frame (-15.8 %) on luna. Same OAM, byte for byte: 544 bytes compared frame
+  by frame against the library before, over every size mode, with X at 300,
+  250, 270 and -5 so that the bit 8 path runs both ways.
 - perf(lib): `oamHideRange(first, count)` parks a run of sprites in one call,
   and `oamHide()` is assembly. Measured on luna (`devtools/libbench`, rows
   `hideeach` and `hiderange`, 32 sprites): one `oamHide()` 1,790 to 800 mclk

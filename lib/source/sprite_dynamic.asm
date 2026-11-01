@@ -146,43 +146,44 @@
 ;------------------------------------------------------------------------------
 ; oammask - 4 bytes per sprite entry (indexed by id*4)
 ;   Byte 0: X high bit set mask
-;   Byte 1: X high bit clear mask
-;   Byte 2: High table offset (512 + id/4)
-;   Byte 3: Padding
+;   Byte 1: mask that clears the X high bit AND the size bit of the sprite
+;           (until 2026-11-01 it cleared the X bit alone)
+;   Byte 2: High table byte index (id/4), to add to oamMemory+512
+;   Byte 3: size bit = large (the X bit shifted left once)
 ;------------------------------------------------------------------------------
 oammask:
-    .byte $01,$fe,$00,$00, $04,$fb,$00,$00, $10,$ef,$00,$00, $40,$bf,$00,$00
-    .byte $01,$fe,$01,$00, $04,$fb,$01,$00, $10,$ef,$01,$00, $40,$bf,$01,$00
-    .byte $01,$fe,$02,$00, $04,$fb,$02,$00, $10,$ef,$02,$00, $40,$bf,$02,$00
-    .byte $01,$fe,$03,$00, $04,$fb,$03,$00, $10,$ef,$03,$00, $40,$bf,$03,$00
-    .byte $01,$fe,$04,$00, $04,$fb,$04,$00, $10,$ef,$04,$00, $40,$bf,$04,$00
-    .byte $01,$fe,$05,$00, $04,$fb,$05,$00, $10,$ef,$05,$00, $40,$bf,$05,$00
-    .byte $01,$fe,$06,$00, $04,$fb,$06,$00, $10,$ef,$06,$00, $40,$bf,$06,$00
-    .byte $01,$fe,$07,$00, $04,$fb,$07,$00, $10,$ef,$07,$00, $40,$bf,$07,$00
-    .byte $01,$fe,$08,$00, $04,$fb,$08,$00, $10,$ef,$08,$00, $40,$bf,$08,$00
-    .byte $01,$fe,$09,$00, $04,$fb,$09,$00, $10,$ef,$09,$00, $40,$bf,$09,$00
-    .byte $01,$fe,$0a,$00, $04,$fb,$0a,$00, $10,$ef,$0a,$00, $40,$bf,$0a,$00
-    .byte $01,$fe,$0b,$00, $04,$fb,$0b,$00, $10,$ef,$0b,$00, $40,$bf,$0b,$00
-    .byte $01,$fe,$0c,$00, $04,$fb,$0c,$00, $10,$ef,$0c,$00, $40,$bf,$0c,$00
-    .byte $01,$fe,$0d,$00, $04,$fb,$0d,$00, $10,$ef,$0d,$00, $40,$bf,$0d,$00
-    .byte $01,$fe,$0e,$00, $04,$fb,$0e,$00, $10,$ef,$0e,$00, $40,$bf,$0e,$00
-    .byte $01,$fe,$0f,$00, $04,$fb,$0f,$00, $10,$ef,$0f,$00, $40,$bf,$0f,$00
-    .byte $01,$fe,$10,$00, $04,$fb,$10,$00, $10,$ef,$10,$00, $40,$bf,$10,$00
-    .byte $01,$fe,$11,$00, $04,$fb,$11,$00, $10,$ef,$11,$00, $40,$bf,$11,$00
-    .byte $01,$fe,$12,$00, $04,$fb,$12,$00, $10,$ef,$12,$00, $40,$bf,$12,$00
-    .byte $01,$fe,$13,$00, $04,$fb,$13,$00, $10,$ef,$13,$00, $40,$bf,$13,$00
-    .byte $01,$fe,$14,$00, $04,$fb,$14,$00, $10,$ef,$14,$00, $40,$bf,$14,$00
-    .byte $01,$fe,$15,$00, $04,$fb,$15,$00, $10,$ef,$15,$00, $40,$bf,$15,$00
-    .byte $01,$fe,$16,$00, $04,$fb,$16,$00, $10,$ef,$16,$00, $40,$bf,$16,$00
-    .byte $01,$fe,$17,$00, $04,$fb,$17,$00, $10,$ef,$17,$00, $40,$bf,$17,$00
-    .byte $01,$fe,$18,$00, $04,$fb,$18,$00, $10,$ef,$18,$00, $40,$bf,$18,$00
-    .byte $01,$fe,$19,$00, $04,$fb,$19,$00, $10,$ef,$19,$00, $40,$bf,$19,$00
-    .byte $01,$fe,$1a,$00, $04,$fb,$1a,$00, $10,$ef,$1a,$00, $40,$bf,$1a,$00
-    .byte $01,$fe,$1b,$00, $04,$fb,$1b,$00, $10,$ef,$1b,$00, $40,$bf,$1b,$00
-    .byte $01,$fe,$1c,$00, $04,$fb,$1c,$00, $10,$ef,$1c,$00, $40,$bf,$1c,$00
-    .byte $01,$fe,$1d,$00, $04,$fb,$1d,$00, $10,$ef,$1d,$00, $40,$bf,$1d,$00
-    .byte $01,$fe,$1e,$00, $04,$fb,$1e,$00, $10,$ef,$1e,$00, $40,$bf,$1e,$00
-    .byte $01,$fe,$1f,$00, $04,$fb,$1f,$00, $10,$ef,$1f,$00, $40,$bf,$1f,$00
+    .byte $01,$fc,$00,$02, $04,$f3,$00,$08, $10,$cf,$00,$20, $40,$3f,$00,$80
+    .byte $01,$fc,$01,$02, $04,$f3,$01,$08, $10,$cf,$01,$20, $40,$3f,$01,$80
+    .byte $01,$fc,$02,$02, $04,$f3,$02,$08, $10,$cf,$02,$20, $40,$3f,$02,$80
+    .byte $01,$fc,$03,$02, $04,$f3,$03,$08, $10,$cf,$03,$20, $40,$3f,$03,$80
+    .byte $01,$fc,$04,$02, $04,$f3,$04,$08, $10,$cf,$04,$20, $40,$3f,$04,$80
+    .byte $01,$fc,$05,$02, $04,$f3,$05,$08, $10,$cf,$05,$20, $40,$3f,$05,$80
+    .byte $01,$fc,$06,$02, $04,$f3,$06,$08, $10,$cf,$06,$20, $40,$3f,$06,$80
+    .byte $01,$fc,$07,$02, $04,$f3,$07,$08, $10,$cf,$07,$20, $40,$3f,$07,$80
+    .byte $01,$fc,$08,$02, $04,$f3,$08,$08, $10,$cf,$08,$20, $40,$3f,$08,$80
+    .byte $01,$fc,$09,$02, $04,$f3,$09,$08, $10,$cf,$09,$20, $40,$3f,$09,$80
+    .byte $01,$fc,$0a,$02, $04,$f3,$0a,$08, $10,$cf,$0a,$20, $40,$3f,$0a,$80
+    .byte $01,$fc,$0b,$02, $04,$f3,$0b,$08, $10,$cf,$0b,$20, $40,$3f,$0b,$80
+    .byte $01,$fc,$0c,$02, $04,$f3,$0c,$08, $10,$cf,$0c,$20, $40,$3f,$0c,$80
+    .byte $01,$fc,$0d,$02, $04,$f3,$0d,$08, $10,$cf,$0d,$20, $40,$3f,$0d,$80
+    .byte $01,$fc,$0e,$02, $04,$f3,$0e,$08, $10,$cf,$0e,$20, $40,$3f,$0e,$80
+    .byte $01,$fc,$0f,$02, $04,$f3,$0f,$08, $10,$cf,$0f,$20, $40,$3f,$0f,$80
+    .byte $01,$fc,$10,$02, $04,$f3,$10,$08, $10,$cf,$10,$20, $40,$3f,$10,$80
+    .byte $01,$fc,$11,$02, $04,$f3,$11,$08, $10,$cf,$11,$20, $40,$3f,$11,$80
+    .byte $01,$fc,$12,$02, $04,$f3,$12,$08, $10,$cf,$12,$20, $40,$3f,$12,$80
+    .byte $01,$fc,$13,$02, $04,$f3,$13,$08, $10,$cf,$13,$20, $40,$3f,$13,$80
+    .byte $01,$fc,$14,$02, $04,$f3,$14,$08, $10,$cf,$14,$20, $40,$3f,$14,$80
+    .byte $01,$fc,$15,$02, $04,$f3,$15,$08, $10,$cf,$15,$20, $40,$3f,$15,$80
+    .byte $01,$fc,$16,$02, $04,$f3,$16,$08, $10,$cf,$16,$20, $40,$3f,$16,$80
+    .byte $01,$fc,$17,$02, $04,$f3,$17,$08, $10,$cf,$17,$20, $40,$3f,$17,$80
+    .byte $01,$fc,$18,$02, $04,$f3,$18,$08, $10,$cf,$18,$20, $40,$3f,$18,$80
+    .byte $01,$fc,$19,$02, $04,$f3,$19,$08, $10,$cf,$19,$20, $40,$3f,$19,$80
+    .byte $01,$fc,$1a,$02, $04,$f3,$1a,$08, $10,$cf,$1a,$20, $40,$3f,$1a,$80
+    .byte $01,$fc,$1b,$02, $04,$f3,$1b,$08, $10,$cf,$1b,$20, $40,$3f,$1b,$80
+    .byte $01,$fc,$1c,$02, $04,$f3,$1c,$08, $10,$cf,$1c,$20, $40,$3f,$1c,$80
+    .byte $01,$fc,$1d,$02, $04,$f3,$1d,$08, $10,$cf,$1d,$20, $40,$3f,$1d,$80
+    .byte $01,$fc,$1e,$02, $04,$f3,$1e,$08, $10,$cf,$1e,$20, $40,$3f,$1e,$80
+    .byte $01,$fc,$1f,$02, $04,$f3,$1f,$08, $10,$cf,$1f,$20, $40,$3f,$1f,$80
 
 ;------------------------------------------------------------------------------
 ; Size/hide bit manipulation tables (indexed by (id >> 2) & 3)
@@ -667,6 +668,54 @@ _vqu_done:
 .ENDS
 
 ;==============================================================================
+; DYN_PACK_TAIL large - the part of oamDynamic{8,16}Draw after the tile number
+;==============================================================================
+; In: A 16-bit, X = oamnumberperframe, Y = oambuffer offset, DB = $7E, the
+; tile number already stored. Packs X (low byte) and Y into the OAM entry,
+; copies the attribute, and writes the entry's two bits of the high table
+; (X bit 8, size) in ONE read-modify-write: oammask clears both, then sets
+; the X bit if the carry says so, and the size bit if `large` is 1.
+; Until 2026-11-01 this was a php/plp round trip around an index computation,
+; and the size bit a second read-modify-write through other tables.
+; The carry (X bit 8, from the ror) survives every instruction in between.
+;==============================================================================
+.MACRO DYN_PACK_TAIL ARGS large
+    lda.w oambuffer+OAM_OAMX,y
+    xba
+    sep #$20
+    .ACCU 8
+    ror a                           ; carry = X bit 8
+    lda.w oambuffer+OAM_OAMY,y
+    xba
+    rep #$20
+    .ACCU 16
+    sta.w oamMemory,x
+    sep #$20
+    .ACCU 8
+    lda.w oambuffer+OAM_ATTRIBUTE,y
+    sta.w oamMemory+3,x
+    rep #$20
+    .ACCU 16
+    lda.l oammask+2,x               ; high table byte index (byte 3 is masked off)
+    and.w #$00FF
+    tay
+    sep #$20
+    .ACCU 8
+    lda.w oamMemory+512,y
+    and.l oammask+1,x               ; clear this sprite's X bit and size bit
+    bcc @nox\@
+    ora.l oammask,x                 ; X bit 8 set
+@nox\@:
+.IF \1 == 1
+    ora.l oammask+3,x               ; size = large
+.ENDIF
+    sta.w oamMemory+512,y
+    rep #$20
+    .ACCU 16
+.ENDM
+
+
+;==============================================================================
 ; oamDynamic32Draw
 ;==============================================================================
 ; void oamDynamic32Draw(u16 id)
@@ -762,99 +811,20 @@ _o32d_no_refresh:
     ; Update OAM buffer with sprite position/attributes
     rep #$20
     .ACCU 16
-    ldx.w oamnumberperframe           ; Current OAM slot (×4)
-
-    ; Get tile ID from lookup table
-    phx
     lda.w oamnumberspr0
     asl a
     tax
     lda.l lkup32idT,x               ; Tile number for 32x32 sprite
-    plx
+    ldx.w oamnumberperframe         ; Current OAM slot (x4)
     sta.w oamMemory+2,x             ; Store tile in OAM
-
-    ; Pack X and Y coordinates
-    lda.w oambuffer+OAM_OAMX,y        ; X position
-    xba                             ; Save X high byte
-    sep #$20
-    .ACCU 8
-    ror a                           ; X bit 8 into carry
-
-    lda.w oambuffer+OAM_OAMY,y        ; Y position
-                                    ; stored as given, like oamSet (see sprite_oamset.asm): OAM y = 0 is the first visible line
-    xba                             ; Swap: now A = Y:X_high_bit_in_carry
-    rep #$20
-    .ACCU 16
-    sta.w oamMemory,x               ; Store X(lo) and Y
-
-    ; Handle X high bit in high table
-    ; NOTE: Carry flag contains X bit 8 from the ror above
-    phy                             ; Save oambuffer offset
-    php                             ; Save processor status including carry
-    rep #$20
-    .ACCU 16
-    txa                             ; A = oamnumberperframe (oam index × 4)
-    lsr a                           ; /2
-    lsr a                           ; /4
-    lsr a                           ; /8
-    lsr a                           ; /16 = high table byte index
-    clc
-    adc.w #512                      ; Add high table base address
-    tay                             ; Y = high table address (512+)
-    plp                             ; Restore carry flag from ror
-    sep #$20                        ; Ensure 8-bit A for mask operations
-    .ACCU 8
-
-    bcs _o32d_xhigh                 ; If carry set, X >= 256
-    lda.l oammask+1,x               ; Clear X high bit
-    and.w oamMemory,y
-    sta.w oamMemory,y
-    jmp _o32d_attr
-
-_o32d_xhigh:
-    lda.l oammask,x                 ; Set X high bit
-    ora.w oamMemory,y
-    sta.w oamMemory,y
-
-_o32d_attr:
-    ply
-    lda.w oambuffer+OAM_ATTRIBUTE,y   ; Sprite attributes
-    sta.w oamMemory+3,x
-
-    ; Set sprite size to LARGE in high table
-    rep #$20
-    .ACCU 16
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    clc
-    adc.w #512
-    tay                             ; Y = high table offset
-
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    and.w #$0003
-    tax
-
-    sep #$20
-    .ACCU 8
-    lda.w oamMemory,y
-    and.l oamSetExand,x             ; Clear size bit
-    sta.w oamMemory,y
-    lda.l oamSizeshift,x            ; Set size = large
-    ora.w oamMemory,y
-    sta.w oamMemory,y
-
-    ; Update counters
-    rep #$20
-    .ACCU 16
+    ; Position, attribute and high table bits: the same tail as the 16 and 8
+    ; (the Y is stored as given, like oamSet: OAM y = 0 is the first visible
+    ; line); the size is large.
+    DYN_PACK_TAIL 1
     inc.w oamnumberspr0             ; Next 32x32 slot
-    lda.w oamnumberperframe
+    txa
     clc
-    adc #$0004                      ; Next OAM entry
+    adc.w #$0004                    ; Next OAM entry
     sta.w oamnumberperframe
 
     ply
@@ -960,128 +930,33 @@ _o16d_get_block:
 _o16d_no_refresh:
     rep #$20
     .ACCU 16
-    ldx.w oamnumberperframe
-
-    ; Get tile ID based on size configuration
-    phx
     lda.w spr16addrgfx
     cmp.w spr0addrgfx
-    beq _o16d_large_tile
-    ; Small sprites use lkup16idT
+    beq _o16d_large
+    ; Small sprites: tile from lkup16idT
     lda.w oamnumberspr1
     asl a
     tax
     lda.l lkup16idT,x
-    jmp _o16d_store_tile
-_o16d_large_tile:
-    ; Large sprites use lkup16idT0
+    ldx.w oamnumberperframe
+    sta.w oamMemory+2,x
+    DYN_PACK_TAIL 0
+    inc.w oamnumberspr1
+    bra _o16d_inc_frame
+_o16d_large:
+    ; Large sprites: tile from lkup16idT0
     lda.w oamnumberspr0
     asl a
     tax
     lda.l lkup16idT0,x
-_o16d_store_tile:
-    plx
+    ldx.w oamnumberperframe
     sta.w oamMemory+2,x
-
-    ; Pack X and Y
-    lda.w oambuffer+OAM_OAMX,y
-    xba
-    sep #$20
-    .ACCU 8
-    ror a
-    lda.w oambuffer+OAM_OAMY,y
-    xba
-    rep #$20
-    .ACCU 16
-    sta.w oamMemory,x
-
-    ; Handle X high bit in high table
-    ; NOTE: Carry flag contains X bit 8 from the ror above
-    phy                             ; Save oambuffer offset
-    php                             ; Save processor status including carry
-    rep #$20
-    .ACCU 16
-    txa                             ; A = oamnumberperframe (oam index × 4)
-    lsr a                           ; /2
-    lsr a                           ; /4
-    lsr a                           ; /8
-    lsr a                           ; /16 = high table byte index
-    clc
-    adc.w #512                      ; Add high table base address
-    tay                             ; Y = high table address (512+)
-    plp                             ; Restore carry flag from ror
-    sep #$20                        ; Ensure 8-bit A for mask operations
-    .ACCU 8
-
-    bcs _o16d_xhigh
-    lda.l oammask+1,x               ; Clear mask
-    and.w oamMemory,y
-    sta.w oamMemory,y
-    jmp _o16d_attr
-
-_o16d_xhigh:
-    lda.l oammask,x                 ; Set mask
-    ora.w oamMemory,y
-    sta.w oamMemory,y
-
-_o16d_attr:
-    ply
-    lda.w oambuffer+OAM_ATTRIBUTE,y
-    sta.w oamMemory+3,x
-
-    ; Set sprite size in high table
-    rep #$20
-    .ACCU 16
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    clc
-    adc.w #512
-    tay
-
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    and.w #$0003
-    tax
-
-    sep #$20
-    .ACCU 8
-    lda.w oamMemory,y
-    and.l oamSetExand,x
-    sta.w oamMemory,y
-
-    ; Set size based on configuration (large if using spr0, small if spr1)
-    rep #$20
-    .ACCU 16
-    lda.w spr16addrgfx
-    cmp.w spr1addrgfx
-    beq _o16d_small_size
-    ; Large size
-    sep #$20
-    .ACCU 8
-    lda.l oamSizeshift,x
-    ora.w oamMemory,y
-    sta.w oamMemory,y
-
-_o16d_small_size:
-    ; Update counters
-    rep #$20
-    .ACCU 16
-    lda.w spr16addrgfx
-    cmp.w spr0addrgfx
-    beq _o16d_inc_large
-    inc.w oamnumberspr1
-    bra _o16d_inc_frame
-_o16d_inc_large:
+    DYN_PACK_TAIL 1
     inc.w oamnumberspr0
-
 _o16d_inc_frame:
-    lda.w oamnumberperframe
+    txa
     clc
-    adc #$0004
+    adc.w #$0004
     sta.w oamnumberperframe
 
     ply
@@ -1177,94 +1052,17 @@ oamDynamic8Draw:
 _o8d_no_refresh:
     rep #$20
     .ACCU 16
-    ldx.w oamnumberperframe
-
-    ; Get tile ID
-    phx
     lda.w oamnumberspr1
     asl a
     tax
     lda.l lkup8idT,x
-    plx
+    ldx.w oamnumberperframe
     sta.w oamMemory+2,x
-
-    ; Pack X and Y
-    lda.w oambuffer+OAM_OAMX,y
-    xba
-    sep #$20
-    .ACCU 8
-    ror a
-    lda.w oambuffer+OAM_OAMY,y
-    xba
-    rep #$20
-    .ACCU 16
-    sta.w oamMemory,x
-
-    ; Handle X high bit in high table
-    ; NOTE: Carry flag contains X bit 8 from the ror above
-    phy                             ; Save oambuffer offset
-    php                             ; Save processor status including carry
-    rep #$20
-    .ACCU 16
-    txa                             ; A = oamnumberperframe (oam index × 4)
-    lsr a                           ; /2
-    lsr a                           ; /4
-    lsr a                           ; /8
-    lsr a                           ; /16 = high table byte index
-    clc
-    adc.w #512                      ; Add high table base address
-    tay                             ; Y = high table address (512+)
-    plp                             ; Restore carry flag from ror
-    sep #$20                        ; Ensure 8-bit A for mask operations
-    .ACCU 8
-
-    bcs _o8d_xhigh
-    lda.l oammask+1,x               ; Clear X high bit
-    and.w oamMemory,y
-    sta.w oamMemory,y
-    jmp _o8d_attr
-
-_o8d_xhigh:
-    lda.l oammask,x                 ; Set X high bit
-    ora.w oamMemory,y
-    sta.w oamMemory,y
-
-_o8d_attr:
-    ply
-    lda.w oambuffer+OAM_ATTRIBUTE,y
-    sta.w oamMemory+3,x
-
-    ; Set sprite size = small in high table
-    rep #$20
-    .ACCU 16
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    clc
-    adc.w #512
-    tay
-
-    lda.w oamnumberperframe
-    lsr a
-    lsr a
-    and.w #$0003
-    tax
-
-    sep #$20
-    .ACCU 8
-    lda.w oamMemory,y
-    and.l oamSetExand,x             ; Clear size bit (small)
-    sta.w oamMemory,y
-
-    ; Update counters
-    rep #$20
-    .ACCU 16
+    DYN_PACK_TAIL 0
     inc.w oamnumberspr1
-    lda.w oamnumberperframe
+    txa
     clc
-    adc #$0004
+    adc.w #$0004
     sta.w oamnumberperframe
 
     ply

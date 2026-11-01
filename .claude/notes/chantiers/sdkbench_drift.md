@@ -11,5 +11,8 @@ un chantier de classe A, à ne lancer que si une autre charge le réclame.
 Piège : un worktree sans `testing/bin/luna` retombe sur le luna du PATH, dont
 l'attribution des cycles diffère ; copier le luna épinglé avant de mesurer.
 
-Lot 3 (suite) : dessin dynamique de métasprites, `oamMetaDrawDyn` + `_o16d_*`
-(rapport §6, ligne 2), dans une conversation neuve.
+Lot 3 fait : dessin dynamique de métasprites, voir §9 du rapport (55 048 -> 46 360).
+Écart restant avec PVSnesLib à remesurer (`make bench-twins`, ROMs jumelles à construire).
+Piège : `testing/manifests/movement_platform_objects_enemies.toml` échantillonnait
+`insectx` en plein rappel (monde ou écran selon la phase), assoupli en `ge`.
+Lot suivant : rapport §6 ligne 4 (le moteur dynamique perd des transferts en rafale) ou 5 (NMI).

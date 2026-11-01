@@ -203,3 +203,17 @@ long +1.3 %, switch +0.04 %, tilemap +0.05 %, grid +0.16 %, entities +0.17 %.
 
 **Gate.** `devtools/sdkbench/run.py --check` fails at **+2 %** in total and on any
 one workload (it was +5 % and +25 %). Baseline re-measured: total 119,128,592.
+
+## 9. Dynamic metasprite draw (lot 3, 2026-11-01)
+
+Row 2 of §6 done in the draw routines rather than in the iterator: the
+`_o16d_*` / `_o8d_*` tails did a `php`/`plp` round trip for the carry, two
+read-modify-writes of the high table through other tables, and three tests of
+the same size. One macro (`DYN_PACK_TAIL`, `sprite_dynamic.asm`) now does the
+position, the attribute and the two high-table bits in one pass; `oammask`
+carries what it needs. Scene `sprites/dynamic_sprite` (SELECT), busy mclk a
+frame, luna 1.40: **55,048 to 46,360 (-15.8 %)**; PVSnesLib's twin was 44,332
+on 2026-10-09 (the twin's ROM was not rebuilt here: re-measure with
+`make bench-twins` before quoting the gap). The iterator
+(`oamMetaDrawDyn@item`, 13 k) would gain about 7 cycles an item from a running
+offset: not taken.
