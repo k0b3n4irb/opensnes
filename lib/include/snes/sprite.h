@@ -967,6 +967,10 @@ _Static_assert(__builtin_offsetof(OamBatch, count) == 17, "OamBatch.count offset
  *   other or both for what changes.
  * - **The size bit is not touched**: set it once with oamSetSize().
  * - A batch that runs past sprite 127 stops there; `count` 0 does nothing.
+ * - **It pays when the arrays already exist.** A game whose objects move
+ *   and mask one by one in their own loop, and would have to build x and y
+ *   arrays only to hand them over, measured +1.4 % a step: write them with
+ *   oamSet() / oamSetXYFast() in that loop instead.
  * - **Opt-in module**: add `sprite_batch` to `LIB_MODULES`. A ROM that does
  *   not call it does not carry it.
  *

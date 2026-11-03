@@ -350,6 +350,10 @@ once with `oamSet()` and passed as 0, and only x, y and the ninth x bit are
 written. Give `tile`, `attr`, or both, for what changes. The size bit is
 never touched (`oamSetSize()`).
 
+It pays when the arrays already exist: a game that moves and masks each
+object in its own loop, and would build the x and y arrays only to hand them
+over, measured 1.4 % worse than writing the entries in that loop.
+
 Cost, measured on luna with 32 and 64 identical objects (slow ROM; the
 update loop of the game, about 1,870 master cycles an object, is not in these
 figures): x and y only, 741 master cycles an object against 2,256 for
