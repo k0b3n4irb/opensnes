@@ -237,7 +237,7 @@ the manifests do. Small rub also sent: `bench` ignores `HDMADEMO.SMC`
 (upper-case extension) where `luna test` takes it — the 42nd file.
 
 **2026-11-03 — what a scene really loads (for `opensnes budget`).** `budget` adds
-every converted asset ("if all were loaded at once"): 636 KB against 64 KB of
+every converted asset ("if all were loaded at once"): many times the 64 KB of
 VRAM for a game that loads one screen at a time, a figure that helps nobody.
 What a scene needs is the VRAM and CGRAM it actually received. Asked of luna:
 over a profiled window (`luna profile --from-frame/--until-frame`, or at a
