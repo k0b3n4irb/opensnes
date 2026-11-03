@@ -140,7 +140,10 @@ extern u16 audio_stream_blocks(const u8 *data, u16 full, u16 tail);
 u16 audio_error_count;          /**< refusals since power-on (wraps at 65536) */
 u8 audio_error_last;            /**< the code of the latest one (AUDIO_ERR_*) */
 
+extern void audioRefusedTrip(void);   /* audio_vset.asm: WDM $01 */
+
 static u8 audio_refuse(u8 code) {
+    audioRefusedTrip();
     audio_error_count++;
     audio_error_last = code;
     return code;

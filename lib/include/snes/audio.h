@@ -154,7 +154,8 @@
  *
  * Every AUDIO_ERR_* returned bumps this word and stores its code in
  * @ref audio_error_last, whether or not the caller looks at the return
- * value. A test reads both from WRAM (symbols `audio_error_count`,
+ * value, and fires WDM $01 (luna `--wdm-out`; a manifest's `wdm_empty`
+ * fails on it). A test reads both from WRAM (symbols `audio_error_count`,
  * `audio_error_last`); a game can show them in a debug overlay. A healthy
  * run leaves the count at 0. The counter wraps at 65536.
  */

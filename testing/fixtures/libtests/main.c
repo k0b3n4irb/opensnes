@@ -1288,6 +1288,13 @@ u16 r_fast[16];
  * the screen, camera at (100, 50) */
 u16 r_world[12];
 u16 r_worldo[8];
+/* a computed VRAM address a BG register cannot hold is counted (and fires WDM $03) */
+u16 r_bgaddr[2];
+extern u16 bg_address_refused;
+/* a refused audio call is counted (and fires WDM $01): slot 64 does not exist -> delta 1, code AUDIO_ERR_INVALID_ID */
+u16 r_audtrip[2];
+extern u16 audio_error_count;
+extern u8 audio_error_last;
 /* The screen-on check of the DMA routines: dma_unsafe_count moves by one for a transfer
  * started with the screen on in active display, and by none with the screen off or in VBlank */
 u16 r_dmachk[4];
@@ -1937,6 +1944,23 @@ int main(void) {
         r_dmachk[2] = dma_unsafe_count - before;           /* 0: in VBlank */
         r_dmachk[3] = 0x0D4A;
         console_force_blanked = shadow;
+    }
+    {
+        u16 before = audio_error_count;
+        u8 rc = audioLoadSample(64, (const u8 *)&before, 9, 0);
+        r_audtrip[0] = (audio_error_count - before) | ((u16)rc << 8);    /* 1, AUDIO_ERR_INVALID_ID */
+        r_audtrip[1] = audio_error_last | 0x0A00;
+    }
+    {
+        volatile u16 odd = 0x1010;
+        u16 before = bg_address_refused;
+        bgSetGfxPtr(3, odd);                                  /* BG4 base: not a multiple of 0x1000 */
+        bgSetMapPtr(3, odd, 0);                               /* nor of 0x400 */
+        r_bgaddr[0] = bg_address_refused - before;            /* 2 */
+        odd = 0x2000;
+        bgSetGfxPtr(3, odd);
+        bgSetMapPtr(3, (u16)(odd + 0x400), 0);
+        r_bgaddr[1] = (bg_address_refused - before) | 0x0A00; /* still 2 */
     }
     /* pads: no button is down in this ROM. The macros, the functions behind
      * them, and an index out of range (functions only) */

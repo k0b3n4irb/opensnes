@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): two more refusals fire the in-ROM assertion channel (luna `--wdm-out`,
+  a manifest's `wdm_empty`) besides being counted: every audio refusal
+  (`audio_refuse`: a sample slot of 64 or more, a voice that does not exist, no
+  SPC RAM left, a timeout) fires WDM $01, next to `audio_error_count`; and
+  `bgSetMapPtr()` / `bgSetGfxPtr()` given an address their register cannot
+  hold (a computed one: a constant is refused at compile time) round it down as
+  before but count it in `bg_address_refused` and fire WDM $03. The 60
+  examples fire none; `libtests` asserts both counts.
 - feat(lib): a DMA transfer started with the screen on, outside VBlank, is no longer
   silent: `dmaCopyVram`, `dmaCopyCGram`, `dmaCopyOam`, `dmaCopyVramMode7` and
   `dmaFillVRAM` count it in `dma_unsafe_count` and fire WDM $02, which luna
