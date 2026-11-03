@@ -680,16 +680,49 @@ static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
     long wframe = sum ? json_num(sum, "active_max_frame") : -1, total = sum ? json_num(sum, "total_mean") : -1;
     long lag = sum ? json_num(sum, "lag_frames") : -1, lagrun = sum ? json_num(sum, "lag_run") : -1;
     free(txt);
+    /* What the run wrote to VRAM and CGRAM, from frame 0 (the loading is part of it): luna state
+     * --vram-writers, whose totals count distinct words and entries. A luna without the totals
+     * (before 1.43) leaves these at -1 and the lines are left out. */
+    long vwords = -1, centries = -1;
+    {
+        char wf[PATHN], sj[PATHN];
+        snprintf(wf, sizeof wf, "%s.writers.txt", rom);
+        snprintf(sj, sizeof sj, "%s.state.json", rom);
+        const char *sargv[] = {luna, "state", rom, "--until-frame", until, "--vram-writers", wf, "--vram-writers-from", "0", "--out", sj, NULL};
+        if (run_argv(sargv, 0, junk, sizeof junk) == 0) {
+            size_t sl = 0;
+            unsigned char *sd = cli_read_file(ctx, sj, &sl);
+            if (sd) {
+                char *st = (char *)malloc(sl + 1);
+                if (st) {
+                    memcpy(st, sd, sl);
+                    st[sl] = '\0';
+                    const char *tot = strstr(st, "\"totals\"");
+                    if (tot) { vwords = json_num(tot, "vram_words"); centries = json_num(tot, "cgram_entries"); }
+                    free(st);
+                }
+                free(sd);
+            }
+        }
+        remove(wf);
+        remove(sj);
+    }
     if (mean < 0 || worst < 0 || total <= 0 || lag < 0) { cli_error(ctx, rom, "luna's report has no frame summary (luna too old? `opensnes doctor`)"); return CLI_IO; }
     if (ctx->json) {
         printf("{\"frame\":{\"frames\":%d,\"from_frame\":20,\"total_mclk\":%ld,\"busy_mean_mclk\":%ld,\"busy_worst_mclk\":%ld,"
-               "\"busy_worst_frame\":%ld,\"lag_frames\":%ld,\"lag_longest_run\":%ld}}\n", n, total, mean, worst, wframe, lag, lagrun < 0 ? 0 : lagrun);
+               "\"busy_worst_frame\":%ld,\"lag_frames\":%ld,\"lag_longest_run\":%ld,\"vram_words_written\":%ld,\"cgram_entries_written\":%ld}}\n",
+               n, total, mean, worst, wframe, lag, lagrun < 0 ? 0 : lagrun, vwords, centries);
         return CLI_OK;
     }
     printf("Frame (luna profile, %d frames after 20 of warm-up; one frame is %ld master cycles)\n", n, total);
     printf("  busy, mean          %7ld / %ld   %3ld%%\n", mean, total, (mean * 100 + total / 2) / total);
     printf("  busy, worst frame   %7ld / %ld   %3ld%%   (frame %ld)\n", worst, total, (worst * 100 + total / 2) / total, wframe);
     printf("  frames that lagged  %ld of %d%s\n", lag, n, lag ? "   <- the game missed a VBlank" : "");
+    if (vwords >= 0 && centries >= 0) {
+        printf("  VRAM written        %7ld words (%ld bytes)   %3ld%% of 32 K words   (frames 0 to %d, loading included)\n",
+               vwords, vwords * 2, (vwords * 100 + 16384) / 32768, 20 + n);
+        printf("  CGRAM written       %7ld colours   %3ld%% of 256\n", centries, (centries * 100 + 128) / 256);
+    }
     printf("  (busy = CPU, DMA, HDMA and DRAM refresh; the wait for the next frame is not counted)\n");
     return CLI_OK;
 }

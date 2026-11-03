@@ -12,9 +12,11 @@ All notable changes to OpenSNES are documented in this file.
   against the 357,365 of a frame, and the frames that lagged. `--json` prints a
   second object, `{"frame": {...}}`, after the report. Measured on the starter
   (3 %, 0 lagging frames) and on `sprites/sprite_swarm` (23 % mean, 24 % worst).
-  What it does not say yet: the VRAM a scene really loads (the report still adds
-  every asset, "if all were loaded at once", which a game that loads by screen
-  overshoots); that needs luna to report the VRAM and CGRAM bytes a run wrote.
+  It also reports what the run wrote to VRAM and CGRAM from frame 0, the
+  loading included (`luna state --vram-writers`, luna 1.43: distinct words and
+  entries), which is what a scene really loads, where the static report adds
+  every asset "if all were loaded at once"; a luna without the totals leaves
+  those lines out. `sprites/sprite_swarm`: 15,264 VRAM words (47 %), 256 colours.
 - feat(lib): two more refusals fire the in-ROM assertion channel (luna `--wdm-out`,
   a manifest's `wdm_empty`) besides being counted: every audio refusal
   (`audio_refuse`: a sample slot of 64 or more, a voice that does not exist, no

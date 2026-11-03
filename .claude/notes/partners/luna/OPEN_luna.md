@@ -246,3 +246,5 @@ as byte ranges in the JSON report, plus a per-window total. With that,
 `budget --frame` can say "this scene wrote 14.2 KB of VRAM and 96 colours".
 Prototype on our side: none (the ROM cannot see it; `peek_vram` snapshots give
 the occupied extent, not what was written). Weight: moyen. Not blocking.
+
+**2026-11-03 (later the same day) — delivered.** luna 76a641c: `state --vram-writers` carries the CGRAM writes and the window totals (`vram_writers.totals`); `opensnes budget --frame` reads them (from frame 0, loading included). Not asked, not needed: `profile` carrying it too.
