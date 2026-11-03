@@ -243,6 +243,11 @@ CASES = [
     # sprite 7), visible[] by sprite, then order bytes out of range
     ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
+    # oamSetBatch: x/y only keeps tile, attr and size bits; the ninth bit set
+    # and cleared; tile and attr from an unaligned id; one pointer only; cut at
+    # 127; count 0 and a bad id write nothing
+    ("r_batch", 22, sum(w << (16 * i) for i, w in enumerate([
+        0x050A, 0x062C, 0x07FF, 0x08FF, 0xBBAA, 0x01FE, 0xAAAA, 0x7F, 7, 3, 3]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
     ("r_vqcap", 2, 40),

@@ -4,6 +4,21 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(lib): `oamSetBatch(&batch)` (opt-in module `sprite_batch`, header
+  `OamBatch`) writes the OAM entries of N alike objects from parallel arrays
+  (`x`, `y`, and `tile` / `attr` when given) in one assembly loop: no call per
+  sprite, the ninth x bit through `oam_ext_tab`, the size bits and the tile and
+  attribute bytes it is not given left alone. Measured on luna with the
+  stand-alone scene of 32 and 64 identical objects (update + emission, slow
+  ROM): emission of x and y only 2,256 to 741 mclk an object against
+  `oamSetXYFast` in a loop (-67 %), x, y, tile and attribute 3,250 to
+  1,098 against `oamSetFast` (-66 %); update and emission together 4,112 to
+  2,602 and 5,099 to 2,959 mclk an object (-37 % and -42 %). The movement of
+  the objects stays the game's. A ROM that does not list `sprite_batch` does
+  not carry it. `libtests` asserts the bytes (ninth bit both ways, kept size
+  bits, one pointer only, a start off a high-table byte, a cut at 127, count 0).
+
 ## [0.54.0] — 2026-11-01
 
 The dynamic-sprite draw is 15.8 % cheaper, `budget` reports the SPC RAM of

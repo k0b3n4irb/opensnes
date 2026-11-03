@@ -90,6 +90,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
 | send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
+| write the OAM entries of N alike objects (bullets, particles) from arrays, in one call | `oamSetBatch`, `OamBatch` | `sprite_batch` (opt-in) | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `lzssDecodeVram` | `lzss` | |
 | copy, fill or compare memory and strings | `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`, `strcpy`, `strncpy` | `string` | [FAR RAM: copying](tutorials/far_ram.md) |

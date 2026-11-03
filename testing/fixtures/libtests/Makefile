@@ -15,7 +15,7 @@ USE_SRAM := 1
 BANK0_FAIL_THRESHOLD := 0
 # not the default 32: proves the size reaches C and the queue's arrays alike
 VRAM_QUEUE_MAX := 40
-LIB_MODULES := console sprite dma background text math anim map audio fixed32 collision window input object colormath mosaic profile scene tile math_ease string vramqueue
+LIB_MODULES := console sprite sprite_batch dma background text math anim map audio fixed32 collision window input object colormath mosaic profile scene tile math_ease string vramqueue
 
 CSRC   := main.c
 ASMSRC := data.asm

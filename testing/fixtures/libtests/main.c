@@ -1288,6 +1288,10 @@ u16 r_fast[16];
  * the screen, camera at (100, 50) */
 u16 r_world[12];
 u16 r_worldo[8];
+/* oamSetBatch: x/y only (tile and attribute bytes kept, size bits kept), the
+ * ninth bit set and cleared, tile and attr, one of them, a start that is not
+ * on a byte of the high table, a batch cut at 127, count 0 and a bad id */
+u16 r_batch[11];
 static const u8 w_rev[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 static const u8 w_bad[8] = { 0, 200, 1, 8, 3, 3, 6, 255 };
 static s16 w_x[8];
@@ -1829,6 +1833,78 @@ int main(void) {
                         && oamMemory[109 * 4] == 0xE1 && w_old.order == 0) ? 0 : 0xFFFF);
         wb.order = 0;
         for (i = 108; i < 128; i++) oamHide(i);
+        oam_update_flag = flag;
+    }
+    {
+        /* Sprites 100-107: bytes 25 and 26 of the high table start at $AA (size
+         * bits set, x bits clear); tile $AA, attribute $BB. */
+        static OamBatch bt;
+        static s16 bt_x[8], bt_y[8];
+        static u8 bt_tile[8], bt_attr[8];
+        u8 flag = oam_update_flag;
+        u8 before;
+        u16 i;
+        for (i = 100; i < 108; i++) {
+            oamMemory[i * 4 + 2] = 0xAA;
+            oamMemory[i * 4 + 3] = 0xBB;
+        }
+        oamMemory[512 + 25] = 0xAA;
+        oamMemory[512 + 26] = 0xAA;
+        bt.x = bt_x; bt.y = bt_y; bt.tile = 0; bt.attr = 0;
+        bt.first_id = 100; bt.count = 4;
+        bt_x[0] = 10; bt_x[1] = 300; bt_x[2] = -1; bt_x[3] = 511;
+        bt_y[0] = 5; bt_y[1] = 6; bt_y[2] = 7; bt_y[3] = 8;
+        oam_update_flag = 0;
+        oamSetBatch(&bt);
+        r_batch[0] = oamMemory[400] | (oamMemory[401] << 8);          /* 10, 5 */
+        r_batch[1] = oamMemory[404] | (oamMemory[405] << 8);          /* 300 & $FF, 6 */
+        r_batch[2] = oamMemory[408] | (oamMemory[409] << 8);          /* -1: $FF, 7 */
+        r_batch[3] = oamMemory[412] | (oamMemory[413] << 8);          /* 511: $FF, 8 */
+        r_batch[4] = oamMemory[402] | (oamMemory[403] << 8);          /* tile and attr kept: $AA, $BB */
+        r_batch[5] = oamMemory[512 + 25] | ((oam_update_flag != 0) << 8);   /* $AA | x bits of 1, 2, 3 = $FE, flag */
+        bt_x[0] = 1; bt_x[1] = 2; bt_x[2] = 3; bt_x[3] = 4;
+        oamSetBatch(&bt);
+        r_batch[6] = oamMemory[512 + 25] | (oamMemory[512 + 26] << 8);   /* x bits cleared, size bits and the next byte kept: $AA, $AA */
+        /* tile and attr, from sprite 102: two bytes of the high table */
+        bt.tile = bt_tile; bt.attr = bt_attr; bt.first_id = 102;
+        bt_x[0] = 261; bt_x[1] = 6; bt_x[2] = 300; bt_x[3] = 7;
+        bt_y[0] = 9; bt_y[1] = 10; bt_y[2] = 11; bt_y[3] = 12;
+        bt_tile[0] = 1; bt_tile[1] = 2; bt_tile[2] = 3; bt_tile[3] = 4;
+        bt_attr[0] = 0x10; bt_attr[1] = 0x20; bt_attr[2] = 0x30; bt_attr[3] = 0x40;
+        oamSetBatch(&bt);
+        r_batch[7] = (oamMemory[410] == 1 && oamMemory[411] == 0x10 && oamMemory[408] == 5 && oamMemory[409] == 9)
+                   | ((oamMemory[414] == 2 && oamMemory[415] == 0x20) << 1)
+                   | ((oamMemory[422] == 4 && oamMemory[423] == 0x40) << 2)
+                   | ((oamMemory[512 + 25] == 0xBA) << 3)
+                   | ((oamMemory[512 + 26] == 0xAB) << 4)
+                   | ((oamMemory[404] == 2) << 5)                     /* sprite 101: not in the batch */
+                   | ((oamMemory[426] == 0xAA) << 6);                 /* sprite 106 too */
+        /* one of the two pointers */
+        bt.first_id = 100; bt.count = 2; bt.attr = 0;
+        bt_tile[0] = 7; bt_tile[1] = 8; bt_x[0] = 50; bt_x[1] = 60;
+        oamSetBatch(&bt);
+        r_batch[8] = (oamMemory[402] == 7 && oamMemory[403] == 0xBB)
+                   | ((oamMemory[406] == 8 && oamMemory[407] == 0xBB) << 1);
+        bt.tile = 0; bt.attr = bt_attr; bt.count = 1; bt_attr[0] = 0x21;
+        oamSetBatch(&bt);
+        r_batch[8] |= (oamMemory[402] == 7 && oamMemory[403] == 0x21) << 2;   /* 7 */
+        /* a batch from 126 of five stops at 127; count 0 and an id that is
+         * not a sprite write nothing and do not raise the flag */
+        bt.tile = 0; bt.attr = 0; bt.first_id = 126; bt.count = 5;
+        bt_x[1] = 77;
+        before = oamMemory[512 + 32];
+        oamSetBatch(&bt);
+        r_batch[9] = (oamMemory[127 * 4] == 77 && oamMemory[512 + 32] == before)
+                   | ((oam_max_id == 127) << 1);                      /* 3 */
+        oam_update_flag = 0;
+        bt.count = 0; bt.first_id = 100;
+        oamSetBatch(&bt);
+        bt.count = 3; bt.first_id = 128;
+        oamSetBatch(&bt);
+        r_batch[10] = (oam_update_flag == 0) | ((oamMemory[402] == 7) << 1);   /* 3 */
+        for (i = 100; i < 108; i++) oamHide(i);
+        oamHide(126);
+        oamHide(127);
         oam_update_flag = flag;
     }
     /* pads: no button is down in this ROM. The macros, the functions behind
