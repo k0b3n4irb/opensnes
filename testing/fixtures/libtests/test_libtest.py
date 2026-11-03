@@ -248,6 +248,9 @@ CASES = [
     # 127; count 0 and a bad id write nothing
     ("r_batch", 22, sum(w << (16 * i) for i, w in enumerate([
         0x050A, 0x062C, 0x07FF, 0x08FF, 0xBBAA, 0x01FE, 0xAAAA, 0x7F, 7, 3, 3]))),
+    # the screen-on check of the DMA routines: one transfer in active display with the
+    # screen on is counted (and fires WDM $02), screen off and VBlank are not
+    ("r_dmachk", 8, sum(w << (16 * i) for i, w in enumerate([1, 0, 0, 0x0D4A]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
     ("r_vqcap", 2, 40),

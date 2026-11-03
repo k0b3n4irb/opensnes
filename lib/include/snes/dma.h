@@ -80,6 +80,16 @@
  *          silently lost.
  *
  *          Forced blank means setScreenOff() — INIDISP bit 7.
+ *
+ *          **Since this version the call tells you.** A transfer started
+ *          with the screen on, outside VBlank, still runs (it always did)
+ *          but is counted in `dma_unsafe_count` and fires WDM $02, which
+ *          luna reports (`--wdm-out`; a manifest's `wdm_empty = true` fails
+ *          on it). The screen state is the shadow setScreenOn() /
+ *          setScreenOff() keep: write REG_INIDISP yourself and the shadow
+ *          is behind. Applies to dmaCopyVram(), dmaCopyCGram(),
+ *          dmaCopyOam(), dmaCopyVramMode7() and dmaFillVRAM(). Cost,
+ *          measured (libbench row `dma`, 2 KB): +103 master cycles a call.
  *          setBrightness(0) blacks the screen but leaves the PPU
  *          fetching, so it does NOT open the write window.
  *
@@ -95,6 +105,9 @@
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
+
+/** @brief DMA transfers started with the screen on outside VBlank (see dmaCopyVram()): 0 on a healthy run. Wraps at 65536. */
+extern u16 dma_unsafe_count;
 
 /**
  * @brief Load Mode 7 interleaved data to VRAM.

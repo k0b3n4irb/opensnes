@@ -1288,6 +1288,11 @@ u16 r_fast[16];
  * the screen, camera at (100, 50) */
 u16 r_world[12];
 u16 r_worldo[8];
+/* The screen-on check of the DMA routines: dma_unsafe_count moves by one for a transfer
+ * started with the screen on in active display, and by none with the screen off or in VBlank */
+u16 r_dmachk[4];
+extern u8 console_force_blanked;
+static const u16 dmachk_color = 0x7FFF;
 /* oamSetBatch: x/y only (tile and attribute bytes kept, size bits kept), the
  * ninth bit set and cleared, tile and attr, one of them, a start that is not
  * on a byte of the high table, a batch cut at 127, count 0 and a bad id */
@@ -1906,6 +1911,32 @@ int main(void) {
         oamHide(126);
         oamHide(127);
         oam_update_flag = flag;
+    }
+    {
+        /* In active display (REG_HVBJOY bit 7 clear) with the shadow saying screen on,
+         * then screen off, then in VBlank. Colour 255, two bytes: the same transfer. */
+        u8 shadow = console_force_blanked;
+        u16 before;
+
+        WaitForVBlank();
+        while (REG_HVBJOY & 0x80) { }
+        console_force_blanked = 0;
+        WaitForVBlank();
+        while (REG_HVBJOY & 0x80) { }
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[0] = dma_unsafe_count - before;           /* 1 */
+        console_force_blanked = 1;
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[1] = dma_unsafe_count - before;           /* 0: screen off */
+        console_force_blanked = 0;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[2] = dma_unsafe_count - before;           /* 0: in VBlank */
+        r_dmachk[3] = 0x0D4A;
+        console_force_blanked = shadow;
     }
     /* pads: no button is down in this ROM. The macros, the functions behind
      * them, and an index out of range (functions only) */

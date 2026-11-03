@@ -23,6 +23,34 @@
 .SECTION ".dma_asm" SUPERFREE
 
 ;------------------------------------------------------------------------------
+; The screen-on check. A transfer started while the screen is on and outside
+; VBlank writes nothing: the PPU ignores VRAM, CGRAM and OAM writes during
+; active display, and the DMA reports no error. REG_INIDISP cannot be read
+; back, so "screen on" is the shadow setScreenOn()/setScreenOff() keep
+; (console_force_blanked); "in VBlank" is HVBJOY ($4212) bit 7, which can.
+; A transfer that breaks the rule counts itself in dma_unsafe_count (the
+; transfer still runs, as it always has) and fires WDM $02, the in-ROM
+; assertion channel luna reports (its `--wdm-out`, a manifest's
+; `wdm_empty`): the first transfer that would have been lost is found, not
+; the garbage it leaves two screens later. Fifteen CPU cycles a call when
+; the screen is off, twenty-four when it is on, in VBlank.
+; Code that writes REG_INIDISP itself, not through setScreenOn()/Off(), leaves
+; the shadow behind: it is reported on its next transfer outside VBlank.
+; Entered with an 16-bit accumulator, leaves it 16-bit.
+;------------------------------------------------------------------------------
+.MACRO DMA_SCREEN_CHECK
+    sep #$20
+    .ACCU 8
+    lda.l console_force_blanked
+    bne +
+    lda.l $004212           ; HVBJOY: bit 7 = in VBlank
+    bmi +
+    jsr dma_screen_trip
++   rep #$20
+    .ACCU 16
+.ENDM
+
+;------------------------------------------------------------------------------
 ; void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)
 ;
 ; Post-A6+A7 (v0.19.0): pointers are 4 bytes (24-bit address + 1 pad
@@ -45,6 +73,7 @@ dmaCopyVram:
     ; width is not touched (6 CPU cycles a call, 2026-10-09).
     rep #$20
     .ACCU 16
+    DMA_SCREEN_CHECK
     lda 6,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
@@ -89,6 +118,9 @@ dmaCopyVram:
 dmaCopyCGram:
     php
 
+    rep #$20
+    .ACCU 16
+    DMA_SCREEN_CHECK
     sep #$20
     .ACCU 8
     lda 7,s                 ; startColor (low byte = color index)
@@ -131,6 +163,7 @@ dmaCopyOam:
 
     rep #$20
     .ACCU 16
+    DMA_SCREEN_CHECK
     lda #$0000
     sta.l $2102             ; REG_OAMADDL/H: OAM address = 0
 
@@ -189,6 +222,7 @@ dmaCopyVramMode7:
     php
     rep #$20                ; 16-bit accumulator
     .ACCU 16
+    DMA_SCREEN_CHECK
 
     ; Step 1: Load tilemap to VRAM low bytes (VMDATAL)
     lda #$0000
@@ -251,6 +285,28 @@ dmaCopyVramMode7:
 
     plp
     rtl
+
+;------------------------------------------------------------------------------
+; void dmaCheckScreen(void)   (for the DMA that dma.c starts itself)
+;------------------------------------------------------------------------------
+dmaCheckScreen:
+    php
+    rep #$20
+    .ACCU 16
+    DMA_SCREEN_CHECK
+    plp
+    rtl
+
+; The failing path, shared; reached by jsr with an 8-bit accumulator.
+dma_screen_trip:
+    rep #$20
+    .ACCU 16
+    inc.w dma_unsafe_count
+    sep #$20
+    .ACCU 8
+    .db $42, $02            ; WDM $02: a DMA started with the screen on, outside VBlank
+    rts
+
 
 ;------------------------------------------------------------------------------
 ; void clearNmiFlag(void)

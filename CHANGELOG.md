@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): a DMA transfer started with the screen on, outside VBlank, is no longer
+  silent: `dmaCopyVram`, `dmaCopyCGram`, `dmaCopyOam`, `dmaCopyVramMode7` and
+  `dmaFillVRAM` count it in `dma_unsafe_count` and fire WDM $02, which luna
+  reports (`--wdm-out`, `wdm_empty`). The transfer runs as before. The test is the
+  `setScreenOn()`/`setScreenOff()` shadow and HVBJOY bit 7. Cost, libbench row
+  `dma` (2 KB): 17,866 to 17,969 master cycles (+103, +0.6 %); the 60 examples
+  fire nothing; `libtests` asserts the three cases (active display, screen off,
+  VBlank).
 - feat(lib): `oamSetBatch(&batch)` (opt-in module `sprite_batch`, header
   `OamBatch`) writes the OAM entries of N alike objects from parallel arrays
   (`x`, `y`, and `tile` / `attr` when given) in one assembly loop: no call per
