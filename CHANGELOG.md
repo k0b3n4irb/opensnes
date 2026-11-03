@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(tools): `opensnes budget --frame [--frames N]` adds the cost of a frame to the
+  report: luna profiles the ROM (20 frames of warm-up, then 300 by default) and
+  the report gives the busy master cycles of the mean and of the worst frame
+  (CPU, DMA, HDMA and DRAM refresh; the wait for the next frame is not counted)
+  against the 357,365 of a frame, and the frames that lagged. `--json` prints a
+  second object, `{"frame": {...}}`, after the report. Measured on the starter
+  (3 %, 0 lagging frames) and on `sprites/sprite_swarm` (23 % mean, 24 % worst).
+  What it does not say yet: the VRAM a scene really loads (the report still adds
+  every asset, "if all were loaded at once", which a game that loads by screen
+  overshoots); that needs luna to report the VRAM and CGRAM bytes a run wrote.
 - feat(lib): two more refusals fire the in-ROM assertion channel (luna `--wdm-out`,
   a manifest's `wdm_empty`) besides being counted: every audio refusal
   (`audio_refuse`: a sample slot of 64 or more, a voice that does not exist, no

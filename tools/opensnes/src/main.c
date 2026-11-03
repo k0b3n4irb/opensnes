@@ -634,6 +634,66 @@ static const char *shown(const char *path)
     return (l && strncmp(path, cwd, l) == 0 && path[l] == '/' && path[l + 1]) ? path + l + 1 : path;
 }
 
+static const cli_opt budget_opts[] = {
+    { "frame", 0, CLI_FLAG, NULL, "also measure the cost of a frame: the busy share of the CPU, the worst frame, the frames that lagged (runs the ROM in luna)", NULL },
+    { "frames", 0, CLI_INT, "N", "frames measured with --frame, after 20 of warm-up", "300" },
+};
+
+/* The number after "key": in s (a JSON object, from luna), or -1. */
+static long json_num(const char *s, const char *key)
+{
+    char pat[64];
+    snprintf(pat, sizeof pat, "\"%s\"", key);
+    const char *p = strstr(s, pat);
+    if (!p) return -1;
+    p += strlen(pat);
+    while (*p == ' ' || *p == ':') p++;
+    if (*p < '0' || *p > '9') return -1;
+    return strtol(p, NULL, 10);
+}
+
+/* `budget --frame`: luna profiles the ROM from frame 20 and its frame_summary says what the CPU
+ * spent: the busy master cycles of the mean and of the worst frame (CPU, DMA, HDMA and refresh),
+ * against the whole frame; the frames that lagged. The ROM's own idle loop is not counted. */
+static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
+{
+    char luna[PATHN], out[PATHN], junk[256], from[16], until[16];
+    int n = cli_int(ctx, "frames", 300);
+    if (n < 10 || n > 36000) { cli_error(ctx, NULL, "--frames takes 10 to 36000"); return CLI_USAGE; }
+    if (!find_luna(sdk, luna, sizeof luna)) { cli_error(ctx, NULL, "luna not found — scripts/install-luna.sh fetches it (`opensnes doctor`)"); return CLI_IO; }
+    snprintf(out, sizeof out, "%s.frame.json", rom);
+    snprintf(from, sizeof from, "20");
+    snprintf(until, sizeof until, "%d", 20 + n);
+    const char *argv[] = {luna, "profile", rom, "--from-frame", from, "--until-frame", until, "--out", out, NULL};
+    int rc = run_argv(argv, 0, junk, sizeof junk);
+    size_t len = 0;
+    unsigned char *data = rc == 0 ? cli_read_file(ctx, out, &len) : NULL;
+    remove(out);
+    if (!data) { cli_error(ctx, rom, "luna could not profile the ROM (run `luna profile` by hand to see why)"); return CLI_IO; }
+    char *txt = (char *)malloc(len + 1);
+    if (!txt) { free(data); return CLI_IO; }
+    memcpy(txt, data, len);
+    txt[len] = '\0';
+    free(data);
+    const char *sum = strstr(txt, "\"frame_summary\"");
+    long mean = sum ? json_num(sum, "active_mean") : -1, worst = sum ? json_num(sum, "active_max") : -1;
+    long wframe = sum ? json_num(sum, "active_max_frame") : -1, total = sum ? json_num(sum, "total_mean") : -1;
+    long lag = sum ? json_num(sum, "lag_frames") : -1, lagrun = sum ? json_num(sum, "lag_run") : -1;
+    free(txt);
+    if (mean < 0 || worst < 0 || total <= 0 || lag < 0) { cli_error(ctx, rom, "luna's report has no frame summary (luna too old? `opensnes doctor`)"); return CLI_IO; }
+    if (ctx->json) {
+        printf("{\"frame\":{\"frames\":%d,\"from_frame\":20,\"total_mclk\":%ld,\"busy_mean_mclk\":%ld,\"busy_worst_mclk\":%ld,"
+               "\"busy_worst_frame\":%ld,\"lag_frames\":%ld,\"lag_longest_run\":%ld}}\n", n, total, mean, worst, wframe, lag, lagrun < 0 ? 0 : lagrun);
+        return CLI_OK;
+    }
+    printf("Frame (luna profile, %d frames after 20 of warm-up; one frame is %ld master cycles)\n", n, total);
+    printf("  busy, mean          %7ld / %ld   %3ld%%\n", mean, total, (mean * 100 + total / 2) / total);
+    printf("  busy, worst frame   %7ld / %ld   %3ld%%   (frame %ld)\n", worst, total, (worst * 100 + total / 2) / total, wframe);
+    printf("  frames that lagged  %ld of %d%s\n", lag, n, lag ? "   <- the game missed a VBlank" : "");
+    printf("  (busy = CPU, DMA, HDMA and DRAM refresh; the wait for the next frame is not counted)\n");
+    return CLI_OK;
+}
+
 static int run_budget(cli_ctx *ctx)
 {
     char sdk[PATHN], proj[PATHN], rom[PATHN];
@@ -644,7 +704,10 @@ static int run_budget(cli_ctx *ctx)
     int rc = run_make(&quiet, sdk, proj, NULL);
     if (rc != CLI_OK) return rc;
     if (!project_rom(proj, rom, sizeof rom)) { cli_error(ctx, proj, "no ROM after the build — TARGET of the Makefile names a .sfc that is not there"); return CLI_REFUSED; }
-    return run_tool(ctx, sdk, "opensnes-rom", "budget", ctx->json ? "--json" : NULL, shown(rom), 0);
+    rc = run_tool(ctx, sdk, "opensnes-rom", "budget", ctx->json ? "--json" : NULL, shown(rom), 0);
+    if (rc != CLI_OK || !cli_has(ctx, "frame")) return rc;
+    if (!ctx->json) printf("\n");
+    return budget_frame(ctx, sdk, rom);
 }
 
 /* Does the project declare tests (test/<name>.toml)? */
@@ -998,8 +1061,8 @@ static const cli_cmd cmds[] = {
     { "clean", "remove what the build made", NULL, 0, "clean", 0, run_clean },
     { "run", "build, then open the ROM in an emulator", run_opts, CLI_N(run_opts), "run --emulator mesen", 0, run_run },
     { "test", "run the project's tests (test/*.toml) in luna", test_opts, CLI_N(test_opts), "test --update", 0, run_test },
-    { "budget", "build, then what the game uses of the console: ROM bank by bank, RAM, the VRAM and CGRAM of its assets", NULL, 0,
-      "budget", 0, run_budget },
+    { "budget", "build, then what the game uses of the console: ROM bank by bank, RAM, the VRAM and CGRAM of its assets; with --frame, the cost of a frame under luna", budget_opts, CLI_N(budget_opts),
+      "budget --frame", 0, run_budget },
     { "release", "a clean build, the project's tests, the header and checksum, then the ROM in release/ with its CRC32 and SHA-1",
       release_opts, CLI_N(release_opts), "release --tag v1.0", 0, run_release },
     { "doctor", "check the installation: SDK, host compiler, make, the binaries, the library, luna, an emulator (exit 1 on a failure)", NULL, 0,
