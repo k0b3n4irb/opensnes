@@ -69,9 +69,9 @@ void screenFrame(void) {
 void screenLoad(const u8 *src, u16 addr, u16 size, u16 step) {
     while (size) {
         u16 n = (size > SCREEN_LOAD_CHUNK) ? SCREEN_LOAD_CHUNK : size;
-        /* The budget is ours: what does not fit waits for the next VBlank */
-        if (vramQueueCost() + n + VRAM_QUEUE_ENTRY_COST > SCREEN_VBLANK_BUDGET
-            || !vramQueuePush(src, addr, n, step)) {
+        /* The budget is ours; vramQueuePushWithin() tests it and pushes in one call.
+         * What does not fit waits for the next VBlank (no refusal is counted for it). */
+        if (!vramQueuePushWithin(src, addr, n, step, SCREEN_VBLANK_BUDGET)) {
             screenFrame();      /* flushes the queue: it is empty and fits next time */
             continue;
         }
