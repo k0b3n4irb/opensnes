@@ -26,7 +26,8 @@
 /** @} */
 
 #define PLAYER_SPEED 2
-/** @name The field Kit's box may cover (inside the kerb, under the HUD) @{ */
+/** @name The field Kit's box may cover (inside the kerb, under the HUD)
+ *  @{ */
 #define PX_MIN 16
 #define PX_MAX 232
 #define PY_MIN 32

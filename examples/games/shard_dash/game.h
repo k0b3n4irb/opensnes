@@ -26,7 +26,8 @@
 #define RESULT_WAIT   900      /**< frames the result stays before the title returns */
 /** @} */
 
-/** @name Values of game_screen @{ */
+/** @name Values of game_screen
+ *  @{ */
 #define SCREEN_TITLE  0
 #define SCREEN_PLAY   1
 #define SCREEN_RESULT 2

@@ -15,7 +15,8 @@
 /** @brief Layout version: a record of another version is not read. */
 #define SAVE_VERSION   1
 
-/** @name Values of save_status @{ */
+/** @name Values of save_status
+ *  @{ */
 #define SAVE_UNREAD    0   /**< saveLoad() has not run */
 #define SAVE_OK        1   /**< a valid record was read */
 #define SAVE_FRESH     2   /**< no record (blank SRAM): the defaults */
