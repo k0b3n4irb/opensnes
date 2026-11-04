@@ -56,6 +56,14 @@ All notable changes to OpenSNES are documented in this file.
   the objects stays the game's. A ROM that does not list `sprite_batch` does
   not carry it. `libtests` asserts the bytes (ninth bit both ways, kept size
   bits, one pointer only, a start off a high-table byte, a cut at 127, count 0).
+- feat(examples): `games/shard_dash`, a short game written across several files:
+  one C file per screen (`title.c`, `play.c`, `result.c`), a screen layer
+  (`screen.c`: VBlank wait, VRAM queue flush with a budget, non-blocking fades,
+  pad edges, a per-image pump, a close hook), a versioned and checksummed save
+  (`save.c`: absent or corrupt SRAM gives the defaults) and text helpers.
+  Eight `luna test` manifests play it: each screen, the real fade (16 images,
+  the pump running), a lost round with a key held across screens, and a save
+  round trip (write, reload, corrupted copy).
 
 ## [0.54.0] — 2026-11-01
 

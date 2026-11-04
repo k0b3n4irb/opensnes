@@ -119,6 +119,10 @@
     "stream": "51498f2081f6e358410a1073cdf6a2a0f0ba8b9f4b3ad0287d1adc4eb01e93b5",
     "rom_sha256": "0e97876efccecbf543b210e1f05154c91a2341b824c0c5db68c93ab46b7d8b39"
   },
+  "games_shard_dash": {
+    "stream": "73cb6e1ff1bfbf1929965395a90f625dcfb746eb985c0ac2d8bed2e2b42f6c83",
+    "rom_sha256": "d5243b55a495310b3b52c9ca83450fce9770d660c96425907f4cb4b2c7d3ef21"
+  },
   "hdma_gradient_colors": {
     "stream": "8e439981d756f4dfab1c7a8c95652e93430c9eae58098f9972680dab57b81e90",
     "rom_sha256": "da8cee63f1c6ea8fcfaf6085656e8fbc078069aa5b18e06cfc673670d7c589bd"

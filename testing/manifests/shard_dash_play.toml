@@ -1,0 +1,51 @@
+# shard_dash, screen 2 of 3: the round. The fades are skipped (the manifest
+# pokes screen_fade_skip when titleRun is first reached) so the script is
+# short; START at frame 20 begins the round, then the pad walks Kit through
+# the five shards of the fixed table (152,112) (152,80) (120,80) (120,144)
+# (168,144). Every number is measured on luna with this exact script: the
+# shards come from a table, not from the random generator, so a round is
+# the same every time.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 140
+#        START     RIGHT 16    UP 16     LEFT 16   DOWN 32    RIGHT 24
+input = "20:0x1000,24:0,30:0x0100,46:0x0800,62:0x0200,78:0x0400,110:0x0100,134:0"
+
+[asserts]
+wdm_empty = true
+
+[asserts.dma]
+unsafe_writes = 0
+
+[[poke]]
+at_symbol = "titleRun"
+values = { screen_fade_skip = 1 }
+
+[[checkpoint]]                 # START taken: a fresh round, Kit in the middle, the first shard out
+at_frame = 28
+[checkpoint.values]
+game_screen = { eq = 1, width = 1 }
+play_shards = { eq = 0, width = 1 }
+play_px     = { eq = 120, width = 1 }
+play_py     = { eq = 112, width = 1 }
+play_sx     = { eq = 152, width = 1 }
+play_sy     = { eq = 112, width = 1 }
+play_secs   = { eq = 30, width = 1 }
+
+[[checkpoint]]                 # walked right onto the first shard: it scored and the second came
+at_frame = 44
+[checkpoint.values]
+play_shards = { eq = 1, width = 1 }
+play_sx     = { eq = 152, width = 1 }
+play_sy     = { eq = 80, width = 1 }
+
+[[checkpoint]]                 # three scored, the fourth is at (120,144)
+at_frame = 90
+[checkpoint.values]
+play_shards = { eq = 3, width = 1 }
+play_sy     = { eq = 144, width = 1 }
+
+[[checkpoint]]                 # the fifth is out
+at_frame = 115
+[checkpoint.values]
+play_shards = { eq = 4, width = 1 }
+play_sx     = { eq = 168, width = 1 }

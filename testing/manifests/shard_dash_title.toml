@@ -1,0 +1,23 @@
+# shard_dash, screen 1 of 3: the title. Nothing is pressed: the REAL fade-in
+# runs (no screen_fade_skip), the screen settles, and the oracles are the
+# globals the game keeps by name. The SRAM is blank (no srm_in), so the save
+# layer must report "fresh" and give the defaults without writing anything.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 60
+
+[asserts]
+wdm_empty = true                  # no SNES_ASSERT fired
+fbhash = "9864c4c88e7f99ac"
+
+[asserts.dma]
+unsafe_writes = 0                 # the map went through the queue inside blank
+
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+game_screen   = { eq = 0, width = 1 }
+save_status   = { eq = 2, width = 1 }        # SAVE_FRESH
+save_best     = { eq = 0xFFFF, width = 2 }   # SAVE_NONE
+save_wins     = { eq = 0, width = 1 }
+screen_fade_frames = { eq = 16, width = 2 }  # the fade-in took 16 images
+console_brightness = { eq = 15, width = 1 }

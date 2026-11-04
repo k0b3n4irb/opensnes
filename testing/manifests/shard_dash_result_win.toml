@@ -1,0 +1,33 @@
+# shard_dash, screen 3 of 3: the result of a won round, and the loop back.
+# The same script as shard_dash_play wins in 108 images; the result screen
+# shows it, START at frame 160 sends the game back to the title, which now
+# shows the best time. The save layer ran: one win, 108 frames, a new best.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 190
+input = "20:0x1000,24:0,30:0x0100,46:0x0800,62:0x0200,78:0x0400,110:0x0100,134:0,160:0x1000,164:0"
+
+[asserts]
+wdm_empty = true
+
+[asserts.dma]
+unsafe_writes = 0
+
+[[poke]]
+at_symbol = "titleRun"
+values = { screen_fade_skip = 1 }
+
+[[checkpoint]]
+at_frame = 145
+[checkpoint.values]
+game_screen  = { eq = 2, width = 1 }
+run_won      = { eq = 1, width = 1 }
+run_time     = { eq = 108, width = 2 }
+run_new_best = { eq = 1, width = 1 }
+save_best    = { eq = 108, width = 2 }
+save_wins    = { eq = 1, width = 1 }
+
+[[checkpoint]]                 # START on the result: back to the title, the best kept
+at_frame = 185
+[checkpoint.values]
+game_screen = { eq = 0, width = 1 }
+save_best   = { eq = 108, width = 2 }

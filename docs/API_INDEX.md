@@ -87,6 +87,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | darken or colour-cast a whole scene (night/underwater/sunset) | `colorMathShadow`, `colorMathTint` | `colormath` | [color/shadow_tint](../examples/color/shadow_tint/) |
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
+| structure a game in several files (a screen layer, a checksummed save, a test per screen) | `fadeStart`, `fadeStep`, `vramQueuePush`, `sramLoad`, `sramSave` | `vramqueue`, `sram` | [games/shard_dash](../examples/games/shard_dash/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
 | send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushWithin` (the push that checks a budget you give), `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |

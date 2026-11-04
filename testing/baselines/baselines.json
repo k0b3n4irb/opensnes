@@ -233,6 +233,12 @@
     "luna_version": "v1.40.0",
     "rom_sha256": "2e49ae43662a8c9240b49b50fe7bbdb5692f17fdfc1664aeb1c1809aed657ad3"
   },
+  "games_shard_dash": {
+    "fbhash": "9864c4c88e7f99ac",
+    "frames": 200,
+    "luna_version": "v1.40.0",
+    "rom_sha256": "d5243b55a495310b3b52c9ca83450fce9770d660c96425907f4cb4b2c7d3ef21"
+  },
   "hdma_gradient_colors": {
     "fbhash": "3a9873030e6da097",
     "frames": 200,

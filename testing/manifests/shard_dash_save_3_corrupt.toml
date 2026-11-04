@@ -1,0 +1,23 @@
+# shard_dash, save round trip, leg 3 of 3: the same battery file with one
+# byte of the best time changed in the RAM copy, inside saveLoad() just before
+# the checksum is computed (a poke at sramChecksum: byte 3, 6C -> FF). The magic and the version are intact, so
+# only the checksum can tell: the record is refused, the defaults are
+# used, the game boots and shows the title, and nothing crashes.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 60
+srm_in = "shard_dash_save.srm"
+
+[asserts]
+wdm_empty = true
+
+[[poke]]
+at_symbol = "sramChecksum"
+values = { "save_rec+3" = 0xFF }
+
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+game_screen = { eq = 0, width = 1 }
+save_status = { eq = 3, width = 1 }          # SAVE_CORRUPT
+save_best   = { eq = 0xFFFF, width = 2 }     # the defaults, not 0x00FF
+save_wins   = { eq = 0, width = 1 }

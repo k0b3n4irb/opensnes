@@ -1,0 +1,35 @@
+# shard_dash: a lost round, and a key held across a screen change.
+# Nobody walks: the 1800-image clock runs out and the result says so, with
+# no win saved (save_wins stays 0, SRAM stays blank). START is pressed at
+# frame 20 and NEVER released: it starts the round, and it is still held on
+# the result screen, where it must not count as a press (screenPressed()
+# wants a rising edge, and screenShow() takes what is held as already
+# held). Without that rule the result would be dismissed at once, and
+# game_screen would read 0 at frame 1900.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 1900
+input = "20:0x1000"
+
+[asserts]
+wdm_empty = true
+
+[[poke]]
+at_symbol = "titleRun"
+values = { screen_fade_skip = 1 }
+
+[[checkpoint]]
+at_frame = 1000
+[checkpoint.values]
+game_screen = { eq = 1, width = 1 }
+play_shards = { eq = 0, width = 1 }
+play_secs   = { eq = 14, width = 1 }
+
+[[checkpoint]]
+at_frame = 1900
+[checkpoint.values]
+game_screen  = { eq = 2, width = 1 }         # still on the result: the held START did not count
+run_won      = { eq = 0, width = 1 }
+run_time     = { eq = 1800, width = 2 }
+run_new_best = { eq = 0, width = 1 }
+save_wins    = { eq = 0, width = 1 }
+save_best    = { eq = 0xFFFF, width = 2 }

@@ -1,0 +1,17 @@
+# shard_dash, save round trip, leg 2 of 3: a new power-on with leg 1's
+# battery file. saveLoad() finds a valid record and the title shows it:
+# status OK, best 108, one win.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 60
+srm_in = "shard_dash_save.srm"
+
+[asserts]
+wdm_empty = true
+
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+game_screen = { eq = 0, width = 1 }
+save_status = { eq = 1, width = 1 }          # SAVE_OK
+save_best   = { eq = 108, width = 2 }
+save_wins   = { eq = 1, width = 1 }

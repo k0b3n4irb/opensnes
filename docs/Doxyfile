@@ -91,6 +91,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/demos/rpg \
                          ../examples/demos/shmup \
                          ../examples/games/blocks \
+                         ../examples/games/shard_dash \
                          ../examples/scrolling/continuous_scroll \
                          ../examples/scrolling/mixed_scroll \
                          ../examples/backgrounds/mode0 \

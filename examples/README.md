@@ -32,7 +32,7 @@ The table below counts them per folder.
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
 | [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
 | [demos/](demos/) | 3 | Playable demonstrations: several modules in one scene, without a game's rules (map engine + object engine, a vertical shmup, Tiled-driven RPG) |
-| [games/](games/) | 3 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer) |
+| [games/](games/) | 4 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer, a small game built across several files) |
 
 ## Building
 

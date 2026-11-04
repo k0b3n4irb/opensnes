@@ -148,6 +148,8 @@ everything above, and three complete games.
 
 @subpage examples_games_blocks
 
+@subpage examples_games_shard_dash
+
 @subpage examples_games_rooftop_run
 
 @subpage examples_demos_platform_objects

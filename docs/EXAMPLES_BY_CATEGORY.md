@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 60 examples organized by topic. For a progressive learning path, see
+All 61 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -245,4 +245,5 @@ Complete games, from the title screen to the game over.
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
 | @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
+| @subpage examples_games_shard_dash | A game in several files: one C file per screen, a screen layer, a checksummed save, a test per screen |
 | @subpage examples_games_rooftop_run | Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal |
