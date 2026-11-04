@@ -37,6 +37,15 @@ and the CHANGELOG.
 - `rom_coverage.py` reports two never-executed functions (`oamSetBatch`,
   `vramQueuePushSpriteWithin`), not from this lot; not in `make tests`.
 
+## Done 2026-11-04 (snes-rag's two doc findings)
+
+- `212ba5dc`: OAMADD is a word address (sprite N = `N * 2`) in `OAM.md` /
+  `REGISTERS.md`; `hdma.h` count byte `$01-$80` no repeat, `$81-$FF` repeat.
+  Answered in the thread; `make tests` green, `make lint-docs` OK.
+- Rest-time proposal (thread `au-repos-…`): go for step 1 only, reading with
+  xenon2 what its sound engine needs; code only if measured and the
+  two-games rule holds. Not started.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
