@@ -65,6 +65,17 @@ All notable changes to OpenSNES are documented in this file.
   the pump running), a lost round with a key held across screens, and a save
   round trip (write, reload, corrupted copy).
 
+### Changed
+- perf(compiler): a function that calls nothing and needs more than the 16
+  words of the direct-page block `tcc__lf` keeps its costliest temporaries
+  there (use count weighted by loop depth) and only the rest on the stack.
+  Until now one word too many sent every temporary to the stack. A 16.16
+  path walk with five 32-bit locals went from 53 to 42 instructions per
+  loop turn and from a 40-byte to a 10-byte stack frame. No example and no
+  library function has such a function: the corpus is byte-identical. A
+  function with a local whose address is taken keeps its stack frame.
+  `QBE_NO_LEAF_SPLIT=1` turns it off.
+
 ## [0.54.0] — 2026-11-01
 
 The dynamic-sprite draw is 15.8 % cheaper, `budget` reports the SPC RAM of

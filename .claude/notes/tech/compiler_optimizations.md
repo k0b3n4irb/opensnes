@@ -82,3 +82,42 @@ The 4 that remain, both expected:
   function has more than `MAX_ALIAS_TEMPS` (256) temporaries and the width
   analysis only tracks the first 256. Raising the limit would help very
   large functions; not done (it sizes several per-temp tables).
+
+## A leaf above 16 words keeps its costliest temps in the direct page (2026-11-04)
+
+Before: a leaf whose temps fit in the 16 words of `tcc__lf` had its whole
+frame there; one word more and every temp went to the stack (`lda n,s`, 4
+cycles for 3, a prologue and an epilogue, and none of the peephole rules
+that only read direct-page slots: `slotdead`, `loop_x`, the rotated loop's
+`dec.b`). Now `emitfn` colours such a leaf a second time with `leaf_split`
+set; `color_slots` treats it as a function that calls in which no temp
+crosses a call — the costliest first (`fn->tmp[].cost`, the order the mixed
+mode already used), first fit in `tcc__lf`, the overflow on the stack.
+
+Measured (instructions in the loop body, `bin/cc65816` with and without
+`QBE_NO_LEAF_SPLIT=1`):
+
+| Function | words (stack-only) | loop before | after | frame before → after |
+|---|---|---|---|---|
+| 16.16 path walk (5 u32 + counter) | 19 | 53 | 42 | 40 → 10 bytes |
+| `loop_carried_u32` check `f` | 19 | 53 | 42 | — |
+| `leaf_split` check `leaf17` | 17 | 51 | 49 | 36 → 6 |
+| `leaf21` | 21 | 62 | 60 | 44 → 14 |
+| `leaf25` | 25 | 74 | 72 | 52 → 22 |
+
+The instruction count moves little in the `leafN` checks (the operands
+change, not the instructions: one cycle saved per direct-page access); the
+walk gains 11 because direct-page slots let the peephole remove the stores
+and rotate the loop.
+
+Corpus: no example and no library function has a leaf above 16 words —
+the 93 C sources of `examples/`, `lib/source` and `lib/contrib` compile to
+identical assembly, and the 60 example ROMs are byte-identical. The gain is
+for user code with larger leaves.
+
+Residue: a temp that gets a slot and that the emitter never stores (a
+32-bit table index absorbed by `lda.l sym,x`) can be the only temp left on
+the stack, and the frame is then reserved and untouched (`leaf17`: 6 bytes,
+`tsa / sec / sbc / tas` and the epilogue for nothing). It was a dead slot
+before too; giving such temps no slot (`temp_noslot`) needs every high-half
+path of the emitter guarded first, as the low-half reads are.

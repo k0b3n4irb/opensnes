@@ -36,6 +36,8 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `c_features/` | switch forms, function pointers, struct members, the C features a game uses |
 | `debug_channel/` | the debug channel to luna (nocash / WDM) |
 | `d_quals/` | `volatile`, `const` and the qualifiers' codegen |
+| `leaf_frame/` | a leaf's direct-page frame (`tcc__lf`): the same leaf in the main loop and in the NMI callback, no wrong result on either side |
+| `leaf_split/` | leaves above the 16 words of `tcc__lf`, split between it and a stack frame: results against a host model, and the main loop against the NMI callback |
 | `static_dup/` | two sources each defining `static u16 k` and `static u16 tag()`: the link succeeds and each reads its own (statics are emitted `name.<source>`) |
 
 Each is rebuilt from clean before its test: a stale `.sfc` built with an

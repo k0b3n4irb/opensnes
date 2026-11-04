@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | d337fd5767abf4f15e8bd0274eec25469755860b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 42abcced56cb9941c69e89009211595e0001bce9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 1dee06b5e6a5094549de400e00dbcbf5f87aceb7 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -101,7 +101,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 139 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 140 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -113,6 +113,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1dee06b perf(w65816): a leaf above 16 words keeps its costliest temps in tcc__lf — one word too many sent every temp of a leaf to the stack; it is coloured again as a function that calls with no temp crossing a call (costliest first in tcc__lf, the overflow on the stack); a 16.16 path walk 53 -> 42 instructions a turn, frame 40 -> 10 bytes, the corpus byte-identical; `QBE_NO_LEAF_SPLIT=1` (2026-11-04)
 42abcce perf(w65816): the per-object loop, 64 to 55 instructions: one-word copies share their source's slot, sinkload, peephole_slotdead
 b8d9155 inline: a spliced block's label keeps the callee's name — inl51_userInput.3.if_false.536, where it read inl51.if_false.536; the splice's number and the block's index lead the label, so a chain of names cut at 80 characters never merges two blocks; the code is byte-identical on the 60 ROMs of the corpus (a request from a porting tool that names the routine behind a divergent write, 2026-10-30)
 ad9fe6c w65816: a far u32 load whose one use is the next add is emitted inside it (the value goes from the table to the adc), and a multiply by a power of two lets its operand's dead high half stay dead — tab[i] with a u16 i no longer writes the widened index's high word; 62 -> 48 instructions; `QBE_NO_LOAD_ADD_FUSE=1`, `QBE_NO_MUL_HIGH_DEAD=1` (a second game, 2026-10-25)

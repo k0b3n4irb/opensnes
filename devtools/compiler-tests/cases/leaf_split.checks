@@ -1,0 +1,14 @@
+# a leaf above 16 words: the costliest temps in tcc__lf, the overflow on the stack
+in leaf17: present adc\.b tcc__lf\+\d+
+in leaf17: present sta\.b tcc__lf\+\d+
+in leaf21: present adc\.b tcc__lf\+\d+
+in leaf21: present sta \d+,s
+in leaf25: present adc\.b tcc__lf\+\d+
+in leaf25: present sta \d+,s
+# the frame shrinks with them: 2, 6 and 10 words left (was 17, 21, 25)
+in leaf17: present sbc\.w #6\b
+in leaf21: present sbc\.w #14\b
+in leaf25: present sbc\.w #22\b
+# an object on the stack: the whole frame stays there, as before
+in leaf_arr: absent tcc__lf
+in leaf_arr: present \btas\b
