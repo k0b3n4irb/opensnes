@@ -1,3 +1,13 @@
+---
+paths:
+  - "make/**"
+  - "tools/**"
+  - "devtools/**"
+  - "scripts/**"
+  - ".github/**"
+  - "Makefile"
+---
+
 # Two audiences: game developers and contributors (Auto-loaded)
 
 Owner decision, 2026-10-05 (`.claude/notes/reviews/2026-10-05_tools_devtools_refactoring.md`, §9 to §11).

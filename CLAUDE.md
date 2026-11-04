@@ -87,61 +87,25 @@ include $(OPENSNES)/make/common.mk
 
 ## Code Style
 
-- C: 4 spaces, K&R braces, snake_case functions/vars, UPPER_CASE constants
-- Use fixed-width types: `u8`, `u16`, `s16`, `u32` (from `snes.h`). `unsigned int` = 2 bytes, `unsigned long` = 4 bytes on this target (since chantier A1; `compiler/cproc/type.c` `typeint` size 2 / `typelong` size 4). This matches `.claude/rules/compiler.md`.
-- ASM: labels at column 0, instructions indented with tab, `.section` for organization
-- Commits: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(scope):`, `fix(scope):`, `perf(scope):`, etc.
-- Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
-- IMPORTANT: Do NOT add `Co-Authored-By` trailers for AI tools in commit messages.
-- IMPORTANT: every commit is authored and committed by the maintainer, `k0b3n4irb <k0b3n4irb@gmail.com>` — no bot (no Dependabot), no tool identity, no `noreply` committer. A bot's proposal is applied by hand (`.claude/rules/commits.md`, "One author").
+- C: 4 spaces, K&R braces, snake_case functions/vars, UPPER_CASE constants. Fixed-width types `u8`, `u16`, `s16`, `u32` (`snes.h`): `unsigned int` is 2 bytes, `unsigned long` 4 (`compiler/cproc/type.c`, `.claude/rules/compiler.md`).
+- ASM: labels at column 0, instructions indented with a tab, `.section` for organisation.
+- Commits: Conventional Commits, all authored and committed by `k0b3n4irb <k0b3n4irb@gmail.com>`, no tool identity, no `Co-Authored-By` (`.claude/rules/commits.md`). Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`, plus those of `devtools/lint_commits.py`.
 
 ## Critical Constraints
 
-IMPORTANT: These are **silent failures** — no error messages, just wrong behavior.
-The canonical, public-facing list with severity tags and mitigation notes lives
-in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
+Silent failures: no error, just wrong behaviour. The public list with severity and mitigations is `KNOWN_LIMITATIONS.md`; keep this one in sync.
 
-- **VRAM writes only work during VBlank or forced blank** — the PPU silently ignores writes during active display
-- **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
-- **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data (`static const` arrays, string literals, const structs) is placed in the asset banks by default and every C read of it is a far read. The one bank-blind path left is casting `const` away and reading through a plain pointer; `devtools/check_bank_reads.py` fails the link on it. Code that does not fit bank $00 goes to bank $01 and up by itself (C functions and library routines are `SUPERFREE`, reached by `jsl`; `make test-bank-spill`); the free-space ratchet (`BANK0_FAIL_THRESHOLD`) is off by default since 2026-10-10, when it refused a working ROM to a game past 32 KB of code (#168).
-- **Plain C RAM lives below $2000; `FAR` is the way above it** (since chantier B2, v0.39.0): `sta.l $0000,x` reads bank $00, so a plain global must sit in `$00:0000-$1FFF`. Declare bulk buffers `FAR` (`snes/types.h`) to place them in `$7E:2000-$FFFF` with bank-honouring codegen; `symmap.py --check-ram-budget` fails the link on a plain-band overflow. Tutorial: `docs/tutorials/far_ram.md`.
-- **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
-- **`data_init_end.o` provides the data-init terminator** — `make/common.mk` lists it last; wlalink's size-descending sort of appended sections is what keeps the 5-byte terminator after every record, and `symmap.py --check-data-init` verifies it after every link (since 2026-10-05)
-- **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
-- **A SNESMOD effect that does not fit in the SPC RAM left by the module overwrites the echo buffer** — the driver never checks; size the effects with `opensnes-music inspect` (since 2026-10-18, open)
-- **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
-- **Vertical scroll is off by one on hardware** (the PPU never outputs scanline 0): the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you (`bgSetScroll`, map module, `mode7SetScroll`, reset default, since 2026-09-12), so `y = 0` shows tilemap row 0 on the first line. Data that reaches the register without the lib — HDMA tables on `BGnVOFS` — must carry the -1 itself. Exception: BG3 in Modes 2/4/6 is the offset-per-tile table and its VOFS is written raw (`setMode` tells the NMI, since 2026-10-02). PVSnesLib writes the raw value.
-- **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM
+- **VRAM writes only work in VBlank or forced blank**; ~4 KB DMA per VBlank, more needs force blank (`setScreenOff/On`) or splitting. The DMA routines count and flag (`WDM $02`) a transfer made with the screen on outside VBlank.
+- **Bank $00 ROM is code only** since #127.3: C const data lives in the asset banks and every C read of it is a far read; casting `const` away and reading through a plain pointer is the one bank-blind path (`opensnes-rom check` fails the link). Code that does not fit goes to bank $01+ by itself (`make test-bank-spill`); the free-space ratchet `BANK0_FAIL_THRESHOLD` is off by default.
+- **Plain C RAM lives below $2000; `FAR` is the way above** (`snes/types.h`, `docs/tutorials/far_ram.md`): declare bulk buffers `FAR`; `opensnes-rom check` fails the link on a plain-band overflow.
+- **cc65816 pushes args LEFT-TO-RIGHT**: ASM ported from PVSnesLib has swapped stack offsets (`compiler/ABI.md`).
+- **`data_init_end.o` provides the data-init terminator**, listed last by `make/common.mk`; `opensnes-rom check` verifies it after every link.
+- **The WRAM data port ($2180-$2183) is NOT safe in NMI.**
+- **A SNESMOD effect that does not fit the SPC RAM left by the module overwrites the echo buffer**; size effects with `opensnes-music inspect`.
+- **`volatile` is honoured by QBE** (each load/store survives); the lib still uses plain globals for NMI handshakes for cycle cost.
+- **Vertical scroll is off by one on hardware**: the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you; data reaching the register without the lib (HDMA tables on `BGnVOFS`) carries the -1 itself. BG3 in Modes 2/4/6 is the offset-per-tile table, written raw.
+- **WLA-DX loses `.ACCU/.INDEX` tracking after branch merges**: add explicit `.ACCU 8/16` after every `rep`/`sep` in hand-written ASM (`devtools/lint_asm.py`).
 
-## Auto-Loaded Rules
+## Rules and planning
 
-The `.claude/rules/` directory contains mandatory rules automatically loaded by context:
-- `testing.md` — 2-pillar validation (luna + full rebuild), change classification (A/B/C/D)
-- `commits.md` — One author for every commit (the maintainer, no bot, no tool); never add Co-Authored-By trailers
-- `compiler.md` — Compiler architecture, build, constraints
-- `templates.md` — Templates & build system, memory layout, linker order
-- `new_example.md` — Example checklist: init order, Doxygen docs, README + screenshot mandatory
-- `porting.md` — PVSnesLib→OpenSNES porting guide, API mapping, argument order
-- `nmi_audit.md` — NMI handler rules, must consult before crt0.asm changes
-- `regression_method.md` — Mandatory bisection-based debugging, never guess
-- `debugging.md` — root cause, never the symptom: identify the layer (compiler, library, templates, build) before any fix; never work around in an example.
-- `memory_routing.md` — project knowledge goes to `.claude/notes/` in the repo, not to the per-user memory directory.
-- `release.md` — Release workflow, CHANGELOG format, version tagging
-- `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
-- `bank0_budget.md` — Bank $00 ROM: what lives there, where code goes when it is full, the retired ratchet (`BANK0_FAIL_THRESHOLD`, off by default); must consult before pinning a section to bank $00 or setting the threshold.
-- `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
-- `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → message to luna's session → luna ships → delete). Must consult before adding any internal validation/analysis script.
-- `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
-- `partners.md` — the two shoulders, luna and snes-rag: the three work jointly, and feedback to each is a duty, not an option. A gap in a partner is written down the same day in `.claude/notes/partners/<partner>/`; snes-rag is passive and only learns what we and luna report; we are the bridge between the two.
-- `exchanges.md` — direct exchanges (owner decision 2026-10-10): OpenSNES, luna and the game talk session to session and challenge one another, no GitHub issue between the three; two axes (our own work, and collaboration); the game builds on this tree's `develop`, so a compiler chantier goes in a separate worktree and a full rebuild is announced.
-
-## Strategic Planning
-
-`.claude/STRUCTURAL_DEFECTS.md` is the maintainer-internal catalogue of
-defects that require deliberate chantiers (multi-day to multi-month).
-Carries effort estimates, risk profiles, an interaction matrix, and
-investigation logs that the public `KNOWN_LIMITATIONS.md` and
-`ROADMAP.md` deliberately omit. Consult before starting a non-trivial
-chantier; update the catalogue (status, investigation log, references)
-when shipping or deferring an entry. The public docs absorb only the
-high-level outcome (severity, headline, mitigation reference).
+`.claude/rules/*.md` load by context (those without `paths:` on every request): `debugging`, `partners` (luna, snes-rag, the game), `commits`, `memory_routing`; the others by the files you touch (`testing` with the change classes A/B/C/D, `compiler`, `release`, `doc_consistency` and its `make lint-docs` anchors, `new_example`, `hardware_claims`, `luna_tooling`, `abi_lint`, `nmi_audit`, `bank0_budget`, `templates`, `porting`, `two_audiences`). Changes of Class A and B (compiler, library, templates) are written by an Opus agent in its own worktree and re-validated by the session itself, every gate, before it merges; Sonnet is the default for the rest. `.claude/STRUCTURAL_DEFECTS.md` is the maintainer-internal catalogue of chantiers (estimates, risks, interaction matrix): consult it before a non-trivial chantier and update it when shipping or deferring one; the public docs absorb only the outcome.

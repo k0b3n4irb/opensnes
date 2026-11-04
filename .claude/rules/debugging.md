@@ -1,69 +1,26 @@
-# Debugging Methodology (Auto-loaded)
+# Debugging and regressions (always loaded)
 
-## Golden Rule: Fix the ROOT CAUSE, never the symptom
+## Fix the root cause, never the symptom
+A bug seen in an example is almost never in the example. Name the layer before touching anything:
 
-When a bug appears in an example, the problem is almost NEVER in the example code itself.
-Think **globally** — the real cause is usually in one of these layers:
+| Layer | Look at | How |
+|---|---|---|
+| Compiler | generated ASM, stack offsets | compare with what you expect; disassemble the ROM bytes |
+| Library | constants, ASM/C mismatches, LUTs | `grep` the constant in BOTH `lib/source/*.asm` and `lib/include/snes/*.h` |
+| Templates | crt0 init order, memory map, RAMSECTIONs | `.sym` addresses |
+| Build | converter flags, missing modules, link order | the example's Makefile against `make/common.mk` |
 
-| Layer | Examples | How to check |
-|-------|----------|-------------|
-| **Compiler** | Wrong codegen, bad stack offsets, misaligned instructions | Compare generated ASM with expected; disassemble ROM bytes |
-| **Library** | Wrong constant values, ASM/C mismatch, bad LUT tables | `grep` the constant in BOTH `.asm` and `.h` files |
-| **Templates** | crt0.asm init order, memory map, RAMSECTION layout | Check `.sym` file for variable addresses |
-| **Build system** | Wrong gfx4snes flags, missing modules, link order | Compare Makefile with PVSnesLib original |
+Never add a workaround to an example to "make it work" (an `extern` plus a manual write, a changed BG mode or VRAM address, an extra `WaitForVBlank` or DMA to paper over a timing bug, a duplicated constant): it hides a systemic bug. "Does this work in another example?" Yes: example-specific. No: library, compiler or template, fixed there.
 
-**NEVER** add workarounds in example code to "make it work" — this hides the systemic bug
-and breaks other examples or future code that hits the same path.
+## A regression is bisected, never guessed
+1. Last known good commit; `git bisect start` / `bad` / `good <commit>`; at each step `make clean && make` then the failing case; `git bisect reset`.
+2. Read the diff of the commit found, reproduce the exact failure, then fix. Never commit a fix without the root cause; a workaround is documented with why the real fix is not possible yet.
+3. All examples fail: compiler or runtime change (Class A), bisect in `compiler/` or `templates/`. One fails: look at its data. Stale objects cause phantom bugs: `make clean && make` first.
 
-## Mandatory Debugging Steps
+## Verify the assembled output, not the source
+`grep functionName x.sym`, then `xxd -s <offset> -l 64 x.sfc`: catches ASM/C constant mismatches (`$60` vs `3`), WLA-DX `.ACCU` tracking, wrong operand sizes, linker address errors. PVSnesLib's constants are register values (pre-shifted); OpenSNES C headers use index values, and ASM `.EQU`s must match the C `#define`s.
 
-### 1. Reproduce with PVSnesLib original
-Before any fix attempt, compare with the PVSnesLib original side-by-side
-(luna screenshots/`assets-dump` of both ROMs, or any GUI emulator).
-Path: `$PVSNESLIB_HOME/snes-examples/` (set `PVSNESLIB_HOME` to your local PVSnesLib clone)
-
-### 2. Identify the LAYER, not just the symptom
-Ask: "Does this work in another example?" If yes → example-specific (Class C).
-If no → library/compiler/template issue (Class A/B). Fix at the correct layer.
-
-### 3. Verify assembled output — don't trust source alone
-When source code looks correct but behavior is wrong:
-```bash
-# Find function address
-grep 'functionName' example.sym
-
-# Disassemble ROM bytes at that address
-xxd -s <rom_offset> -l 64 example.sfc
-```
-Compare actual instruction bytes with expected. This catches:
-- ASM/C constant mismatches (e.g., `$60` vs `3`)
-- WLA-DX `.ACCU` tracking bugs (wrong operand sizes)
-- Linker address resolution errors
-
-### 4. Use luna for runtime verification (docs/tutorials/debugging.md)
-- **`run_until_mem_write`** (MCP) to catch who writes a VRAM-bound buffer or a variable
-- **`peek_memory` / `state`** to monitor variable values by address (resolve names from the `.sym`)
-- **`assets-dump`** to compare VRAM tile sheets/tilemaps with PVSnesLib output
-- **`oam.json` / `ppu.oam_full`** to check OAM entries (tile numbers, sizes, positions)
-
-A figure read over the MCP depends on what the session did before (the
-emulator stays alive between questions); a number meant for a manifest, a
-baseline or a note is taken again at the CLI, from power-on (luna, 2026-10-03).
-
-### 5. Cross-check ASM/C constant definitions
-After ANY change to shared constants:
-```bash
-# Verify ASM and C definitions match
-grep -n 'CONSTANT_NAME' lib/source/*.asm lib/include/snes/*.h
-```
-PVSnesLib uses **register values** (pre-shifted). OpenSNES C headers use **index values**.
-ASM `.EQU` constants MUST match the C `#define` values, NOT PVSnesLib's convention.
-
-## Anti-Patterns (NEVER do these)
-
-| Anti-pattern | Why it's wrong | What to do instead |
-|-------------|---------------|-------------------|
-| Add `extern` + manual write in example to fix a library variable | Hides the real bug in the library ASM | Fix the library ASM |
-| Change `BG_MODE` or VRAM addresses to work around corruption | The corruption has a root cause elsewhere | Find and fix the root cause |
-| Add extra `WaitForVBlank` or `dmaCopyVram` to paper over timing | Timing issues indicate a systemic DMA/queue bug | Fix the DMA engine |
-| Duplicate constants with different values in ASM vs C | Silent mismatch causes impossible-to-trace bugs | Single source of truth |
+## Tools
+- luna (`docs/tutorials/debugging.md`): `run_until_mem_write` (who writes this buffer), `peek_memory` / `state`, `assets-dump` against the PVSnesLib original, `oam.json` / `ppu.oam_full`. A figure read over MCP depends on what the session did before; a number for a manifest or a baseline is taken again at the CLI from power-on.
+- `python devtools/symmap/symmap.py --check-overlap x.sym` (bank $00 overflow), `python3 testing/luna_runner.py --compare` (framebuffer), `xxd x.sfc | head` (header, vectors).
+- Black screen: init order (`consoleInit()`, `setScreenOn()`). Garbage tiles: VRAM write outside VBlank. Wrong colours: sprite palettes start at CGRAM 128. Crash: bank $00 overflow.
