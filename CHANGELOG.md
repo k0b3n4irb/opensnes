@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): `vramQueuePushWithin(src, addr, size, step, budget)`: `vramQueuePush()` with the
+  guard written once. It notes the transfer only if `vramQueueCost() + size +
+  VRAM_QUEUE_ENTRY_COST <= budget` and an entry is free, otherwise returns 0 and changes
+  nothing, and does not count a refusal in `vram_queue_refused` (a transfer that waits for the next
+  frame is not a full queue). The budget is the caller's, so the policy stays with the game (the
+  per-push budget refused in 01fe79bf decided by push order; this does not). Two games wrote the
+  same guard by hand ten times each. Costs 81 bytes of ROM in a ROM that links `vramqueue`;
+  `libtests` asserts: fits exactly, does not fit, full queue, the sum cannot wrap.
 - feat(tools): `opensnes budget --frame [--frames N]` adds the cost of a frame to the
   report: luna profiles the ROM (20 frames of warm-up, then 300 by default) and
   the report gives the busy master cycles of the mean and of the worst frame

@@ -241,6 +241,11 @@ apart in VRAM. `vramQueuePushSprite(src, addr, size_px)` notes them all
 in one call (two strips for 16x16, four for 32x32), or none if they do
 not all fit.
 
+To spend a budget, `vramQueuePushWithin(src, addr, size, step, budget)` is the push
+with the guard inside: it returns 0, and changes nothing, when the transfer would
+take `vramQueueCost()` past `budget`, so a module streams what fits and tries the
+rest next frame. The budget is yours; no refusal is counted for it.
+
 Be clear about what it buys. Six 128-byte transfers, measured
 (`devtools/libbench`):
 

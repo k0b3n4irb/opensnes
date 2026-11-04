@@ -258,6 +258,9 @@ CASES = [
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
     ("r_vqcap", 2, 40),
+    # vramQueuePushWithin: fits exactly (1, count 1; cost 252), does not fit (0, count 1; no refusal
+    # counted), full queue (0, count 40), the sum cannot wrap (0, cost kept: $FFF0 << 4 = $FF00 in 16 bits)
+    ("r_vqw", 12, sum(w << (16 * i) for i, w in enumerate([0x0101, 0x00FC, 0x0100, 0x0000, 0x2800, 0xFF00]))),
     ("r_vqref", 4, 2 | (3 << 16)),   # refusals counted, ignored return values or not
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit

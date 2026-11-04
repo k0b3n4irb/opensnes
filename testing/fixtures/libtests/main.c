@@ -54,6 +54,7 @@ static FAR u8 vq_sheet[576];
 u16 r_vqc[8];
 /* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
 u16 r_vqu[8];
+u16 r_vqw[6];     /* vramQueuePushWithin: fits exactly, does not fit, full queue, saturation; no refusal counted */
 u16 r_vqref[2];   /* vram_queue_refused since the sprite refusals: 2, then 3 after the full queue */
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
@@ -822,6 +823,23 @@ static void coverage_lot_b(void) {
     vram_queue_count = 0;
     vramQueueFlush();
     r_vqc[7] = vramQueueCost();                                /* 0 */
+    /* vramQueuePushWithin: a budget of 252 takes a 172-byte entry exactly (172 + 80), refuses
+     * the next, a full queue refuses whatever the budget, and the sum cannot wrap; no refusal is
+     * counted, and a refused push changes nothing */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    vram_queue_refused = 0;
+    r_vqw[0] = vramQueuePushWithin(lotb_vram, 0x6700, 172, VRAM_QUEUE_ROW, 252) | (vram_queue_count << 8);   /* 1, count 1 */
+    r_vqw[1] = vramQueueCost() | (vram_queue_addr[0] == 0x6700 ? 0 : 0x8000);                                /* 252 */
+    r_vqw[2] = vramQueuePushWithin(lotb_vram, 0x6710, 2, VRAM_QUEUE_ROW, 252) | (vram_queue_count << 8);     /* 0, count 1 */
+    r_vqw[3] = vram_queue_refused | (vramQueueCost() == 252 ? 0 : 0x8000);                                    /* 0 */
+    vram_queue_count = VRAM_QUEUE_MAX;
+    r_vqw[4] = vramQueuePushWithin(lotb_vram, 0x6710, 2, VRAM_QUEUE_ROW, 0xFFFF) | (vram_queue_count << 8); /* 0, 40 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0xFFF0;
+    r_vqw[5] = vramQueuePushWithin(lotb_vram, 0x6710, 0x20, VRAM_QUEUE_ROW, 0xFFFF) | (vram_queue_cost << 4); /* 0, cost kept */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
     /* vramQueueFlushUntil. The second entry is made dear by hand (its
      * running cost past any VBlank), so the cut does not depend on the
      * line the call lands on: the first entry goes, the second and third

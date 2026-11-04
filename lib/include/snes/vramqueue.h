@@ -126,6 +126,32 @@ extern u16 vram_queue_refused;
 u16 vramQueuePush(const u8 *src, u16 addr, u16 size, u16 step);
 
 /**
+ * @brief vramQueuePush(), if it fits a budget you give: the guard written once
+ *
+ * Notes the transfer only when `vramQueueCost() + size + VRAM_QUEUE_ENTRY_COST
+ * <= budget` and the queue has a free entry. Otherwise returns 0 and changes
+ * nothing, **and does not count a refusal** (`vram_queue_refused` is for a
+ * queue that was full, not for a transfer that waits for the next frame). The
+ * budget is yours: deciding what each module may spend stays with the game;
+ * this only does the test and the push together.
+ *
+ * @code
+ * // before: the guard by hand, every time
+ * if (vramQueueFree() && vramQueueCost() + 128 + VRAM_QUEUE_ENTRY_COST <= BUDGET)
+ *     vramQueuePush(row, addr, 128, VRAM_QUEUE_ROW);
+ * // after
+ * if (!vramQueuePushWithin(row, addr, 128, VRAM_QUEUE_ROW, BUDGET))
+ *     retry_next_frame = 1;
+ * @endcode
+ *
+ * @param src, addr, size, step  As vramQueuePush()
+ * @param budget  Most the queue may cost, in vramQueueCost()'s unit (bytes +
+ *                VRAM_QUEUE_ENTRY_COST an entry)
+ * @return 1 if noted, 0 if it did not fit
+ */
+u16 vramQueuePushWithin(const u8 *src, u16 addr, u16 size, u16 step, u16 budget);
+
+/**
  * @brief Note one frame of a streamed sprite: all its strips in one call
  *
  * A sprite frame in OBJ VRAM is `size_px / 8` rows of tiles; each row is a

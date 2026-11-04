@@ -366,6 +366,59 @@ vramQueuePush:
 .ENDS
 
 ;------------------------------------------------------------------------------
+; u16 vramQueuePushWithin(const u8 *src, u16 addr, u16 size, u16 step, u16 budget)
+;   14,s src (bank)   12,s src   10,s addr   8,s size   6,s step   4,s budget
+; Returns 1 and notes the entry when vramQueueCost() + size +
+; VRAM_QUEUE_ENTRY_COST <= budget and the queue has a free entry; returns 0
+; and changes NOTHING otherwise (vram_queue_refused is not touched: a
+; transfer that does not fit a budget is not a refusal, the caller tries
+; again next frame). The budget is the caller's: the policy stays with it.
+;------------------------------------------------------------------------------
+.SECTION ".text.vramQueuePushWithin" SUPERFREE
+
+vramQueuePushWithin:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 8,s             ; size
+    clc
+    adc.w #VRAM_QUEUE_ENTRY_COST
+    bcs @no
+    adc.w vram_queue_cost
+    bcs @no
+    cmp 4,s             ; budget
+    beq +
+    bcs @no             ; over the budget
++   lda.w vram_queue_count
+    cmp.l vram_queue_max
+    bcs @no             ; no free entry
+    asl a
+    tax
+    lda 12,s            ; src
+    sta.w vram_queue_src,x
+    lda 14,s            ; src (bank)
+    sta.w vram_queue_bank,x
+    lda 10,s            ; addr
+    sta.w vram_queue_addr,x
+    lda 8,s             ; size
+    sta.w vram_queue_size,x
+    clc
+    adc.w #VRAM_QUEUE_ENTRY_COST
+    adc.w vram_queue_cost   ; cannot carry: the sum was checked against the budget
+    sta.w vram_queue_cost
+    sta.w vram_queue_cum,x
+    lda 6,s             ; step
+    sta.w vram_queue_step,x
+    inc.w vram_queue_count
+    lda.w #1
+    rtl
+@no:
+    lda.w #0
+    rtl
+
+.ENDS
+
+;------------------------------------------------------------------------------
 ; u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px)
 ;   10,s src (bank)   8,s src   6,s addr   4,s size_px
 ; Returns 1, or 0 when the strips do not all fit (nothing is noted) or
