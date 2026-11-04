@@ -323,6 +323,7 @@ _DEP_text            := dma background console                                  
 _DEP_text4bpp        := dma
 _DEP_object          := map sprite sprite_dynamic                               # L2a: oambuffer (sprite_dynamic's)
 _DEP_map             := dma
+_DEP_dma             := console                                                 # console_force_blanked: the screen-on check of the DMA routines
 _DEP_background      := dma background_scroll                                                     # L2a: dmaCopyVram
 _DEP_fixed32         := math                                                    # L2a: sine_table
 _DEP_snesmod         := console
@@ -350,7 +351,8 @@ _DEP_audio           := apu audio_blob audio_stream audio_vset
 _DEP_audio_vset      := audio                                                   # audioSetVoiceVolumePitch (asm): audio.c's pending command, sequence and voice mirror
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
-_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
+# four rounds: sprite_dynamic_dispatch -> sprite_dynamic -> sprite -> dma -> console
+_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1))))))
 LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
 
 #------------------------------------------------------------------------------
