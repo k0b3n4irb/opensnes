@@ -21,6 +21,19 @@ int sym_rom_bank(int bank)
     return bank;
 }
 
+/* A [sections] row's linker bank. The $80/$C0 fold alone is wrong on a ROM
+ * past 64 banks: a FastROM LoROM image puts linker bank 64 at $C0, which the
+ * fold takes for bank 0. The ROM offset settles it: the fold stands when it
+ * agrees with the offset read as LoROM (32 KB banks) or HiROM (64 KB banks);
+ * otherwise a LoROM bank >= 64 is the 32 KB reading. */
+static int section_bank(int cpu_bank, unsigned romoff)
+{
+    int f = sym_rom_bank(cpu_bank), lo = (int)(romoff >> 15), hi = (int)(romoff >> 16);
+    if (f == lo || f == hi) return f;
+    if (lo >= 64 && (lo & 0x3F) == f) return lo;
+    return f;
+}
+
 static int hex(const char *s, int n, unsigned *out)
 {
     unsigned v = 0;
@@ -121,7 +134,7 @@ int sym_read(const char *path, sym_file *s, char *why, size_t why_len)
                 && isspace((unsigned char)p[30])) {
                 const char *name = p + 30;
                 while (isspace((unsigned char)*name)) name++;
-                sym_section sec = { dup_token(name), sym_rom_bank((int)b), (int)cpua, sz };
+                sym_section sec = { dup_token(name), section_bank((int)b, v), (int)cpua, sz, v };
                 if (!sec.name || !push_section(&s->sections, &s->nsections, &cs, sec)) ok = 0;
             }
             break;
@@ -131,7 +144,7 @@ int sym_read(const char *path, sym_file *s, char *why, size_t why_len)
                 && p[12] == ' ' && hex(p + 13, 8, &sz) && isspace((unsigned char)p[21])) {
                 const char *name = p + 21;
                 while (isspace((unsigned char)*name)) name++;
-                sym_section sec = { dup_token(name), sym_rom_bank((int)b), (int)cpua, sz };
+                sym_section sec = { dup_token(name), sym_rom_bank((int)b), (int)cpua, sz, 0 };
                 if (!sec.name || !push_section(&s->ramsections, &s->nramsections, &cr, sec)) ok = 0;
             }
             break;

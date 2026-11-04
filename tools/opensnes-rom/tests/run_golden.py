@@ -197,4 +197,42 @@ def ram_markers():
 
 g.check("check marked.sym (wlalink's RAM_USAGE_SLOT_* rows)", "removed from the .sym, nothing else touched", ram_markers)
 g.expect_refused("check missing.sym", ["check", "missing.sym"], needles=["cannot open"])
+def big_rom():
+    """A FastROM LoROM image of 128 banks (4 MB): linker bank 64 sits at $C0,
+    which the $80/$C0 fold alone took for bank 0 (a game of 80 banks showed
+    bank $00 at 200 % and a false "32768 bytes of asset data in bank $00").
+    Sections: code in bank 0, 32 KB of assets in banks 64 and 100."""
+    import json
+    import tempfile
+    errs = []
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        img = bytearray(128 * 0x8000)
+        img[:0x10000] = (g.fixtures / "good.sfc").read_bytes()[:0x10000]
+        img[0x7FD7] = 0x0C                              # ROM size 2^12 KB
+        img[0x7FDC:0x7FE0] = bytes([0, 0, 0xFF, 0xFF])  # checksum fields out of the sum
+        cs = sum(img) & 0xFFFF
+        img[0x7FDC:0x7FE0] = bytes([(cs ^ 0xFFFF) & 0xFF, (cs ^ 0xFFFF) >> 8, cs & 0xFF, cs >> 8])
+        (work / "big.sfc").write_bytes(img)
+        sym = (g.fixtures / "good.sym").read_text().split("[sections]")[0].replace("02:8000 mapdata", "40:8000 mapdata")
+        sym += ("[definitions]\n[sections]\n"
+                "00000000 00:0000 8000 00000010 .text.main\n"
+                "00200000 c0:0000 8000 00008000 .data.mapdata\n"
+                "00320000 e4:0000 8000 00008000 .data.more\n")
+        (work / "big.sym").write_text(sym)
+        proc = g.run(["budget", "--json", "big.sfc"], work, [])
+        if proc.returncode != 0:
+            return [f"exit {proc.returncode}: {proc.stderr.strip()[:200]}"]
+        banks = {b["bank"]: b["used"] for b in json.loads(proc.stdout)["rom"]["banks"]}
+        for b, u in {0: 16, 64: 32768, 100: 32768}.items():
+            if banks.get(b) != u:
+                errs.append(f"bank {b}: {banks.get(b)!r} bytes, {u} expected")
+        if "asset data are in bank $00" in proc.stderr:
+            errs.append("a false asset warning for bank $00")
+    return errs
+
+
+g.check("budget --json on a 128-bank FastROM image (banks past 64)", "each section in its own bank", big_rom)
+
+
 sys.exit(g.report())

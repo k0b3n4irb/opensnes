@@ -16,6 +16,7 @@ typedef struct {
     int      bank;
     int      address;     /* CPU address for [sections]; absolute for [ramsections] */
     unsigned size;
+    unsigned romoff;      /* [sections]: byte offset in the ROM image (no copier header) */
 } sym_section;
 
 typedef struct {
