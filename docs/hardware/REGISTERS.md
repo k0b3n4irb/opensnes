@@ -121,9 +121,9 @@ REG_OBJSEL = 0x60;
 
 | Register | Bits | Description |
 |----------|------|-------------|
-| $2102 | 7-0 | OAM address low byte |
+| $2102 | 7-0 | OAM word address, low byte (sprite N = word 2N) |
 | $2103 | 7 | OAM priority rotation |
-| $2103 | 0 | OAM address bit 9 |
+| $2103 | 0 | OAM word address bit 8 (byte address bit 9) |
 
 #### $2104 - OAMDATA (OAM Data Write)
 

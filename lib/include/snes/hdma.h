@@ -13,7 +13,8 @@
  * - The value(s) to write to the destination register
  *
  * Each entry in the table is:
- * - 1 byte: Line count (bit 7 = repeat mode, bits 0-6 = count)
+ * - 1 byte: Line count ($01-$80 = no repeat, 1 to 128 lines, $80 being 128 lines;
+ *   $81-$FF = repeat mode, 1 to 127 lines)
  * - N bytes: Data to write (1-4 bytes depending on transfer mode)
  *
  * ## Table Format
