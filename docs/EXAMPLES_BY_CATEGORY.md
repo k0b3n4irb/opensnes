@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 61 examples organized by topic. For a progressive learning path, see
+All 62 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -151,6 +151,7 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls, sound effects over the music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
 | @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample |
+| @subpage examples_audio_sfx_voices | Effects voice by voice: looped waveform with per-frame pitch, stop+play in one frame, piecewise sample load, with the scanline cost of each |
 | @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
 | @subpage examples_audio_speech_synth | BRR speech playback: the SNES says "OPEN SNES" (krom port) |
 

@@ -1,0 +1,41 @@
+# examples/audio/sfx_voices - the end state of the four recipes, measured.
+#
+# What this pins (all read from `luna state --until-frame 700` on this ROM):
+#  * piecewise load: three 4800-byte samples sent 192 bytes a frame arrive in
+#    ARAM whole and in order (head AND tail 16 bytes of each, at the addresses
+#    the sample directory at $0A00 gives), 25 frames each = 75, the module's
+#    free memory falls by exactly 3 x 4800 (62620 -> 48220), and the worst
+#    step costs 115 scanlines (about 157 000 master cycles).
+#  * the pitch sweep reached its last note (0x0800 + 119 * 16 = 0x0F70).
+#  * sixteen stop+play pairs on one voice inside one frame all answered voice
+#    3 (the restart rule); the module counted no refusal. The DSP side of the
+#    restart is in audio_sfx_voices_restart.toml (registers are end-of-run).
+#  * the cost of seven voice updates a frame: 29 scanlines, every frame
+#    (about 39 500 master cycles); four times a frame's worth of a 4-voice
+#    update. The floor of the measure itself is 1 line.
+rom = "../../examples/audio/sfx_voices/sfx_voices.sfc"
+frames = 700
+
+[asserts.values]
+phase           = { eq = 5, width = 1 }
+load_frames     = { eq = 75, width = 2 }
+load_lines_max  = { ge = 100, le = 130, width = 2 }
+free_before     = { eq = 62620, width = 2 }
+free_after      = { eq = 48220, width = 2 }
+sweep_pitch     = { eq = 0x0F70, width = 2 }
+sweep_lines_max = { le = 6, width = 2 }
+restarts_ok     = { eq = 16, width = 1 }
+restart_lines_max = { ge = 10, le = 30, width = 2 }
+idle_lines_max  = { le = 2, width = 2 }
+seven_frames    = { eq = 60, width = 2 }
+seven_lines_max = { ge = 25, le = 34, width = 2 }
+audio_error_count = { eq = 0, width = 2 }
+
+[asserts.blocks]
+# directory: wave $0B00 (loop = start), then the three fillers
+sample_dir = { space = "aram", offset = "0A00", hex = "000b000b240b240be41de41da430a430" }
+fill_a_head = { space = "aram", offset = "0B24", hex = "01080f161d242b323940474e555c636a" }
+fill_a_tail = { space = "aram", offset = "1DD4", hex = "d1d8dfe6edf4fb020910171e252c333a" }
+fill_b_head = { space = "aram", offset = "1DE4", hex = "05121f2c394653606d7a8794a1aebbc8" }
+fill_b_tail = { space = "aram", offset = "3094", hex = "f5020f1c293643505d6a7784919eabb8" }
+fill_c_head = { space = "aram", offset = "30A4", hex = "0b2845627f9cb9d6f3102d4a6784a1be" }

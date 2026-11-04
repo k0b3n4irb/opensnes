@@ -120,6 +120,8 @@ windows, the Mode 7 plane, and sound.
 
 @subpage examples_audio_soundboard
 
+@subpage examples_audio_sfx_voices
+
 ## Stage 5 — "Can I hold it all together?"
 
 *Confidence: architecture, not spaghetti.* Stop hand-rolling the main loop

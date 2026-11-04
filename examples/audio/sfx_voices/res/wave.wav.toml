@@ -1,0 +1,4 @@
+tool = "opensnes-sample"
+
+[encode]
+loop = [0, 64]

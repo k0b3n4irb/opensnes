@@ -150,6 +150,39 @@ one `audioPlaySampleOn()` gave it, or the one `audioSetVoicePan()` set
 since — exactly as `audioPlaySampleOn()` splits it, so a voice that plays
 hard left stays hard left.
 
+### Driving effects voice by voice {#audio_voice_recipes}
+
+A game that owns its sound player (it decides which voice a sound takes and
+what cuts what) needs three things from the module, all of which it already
+has. `@ref examples_audio_sfx_voices` runs each of them and times it; the
+figures below are read from that ROM by `testing/manifests/audio_sfx_voices.toml`.
+
+**A looped waveform whose note moves every frame.** Convert one cycle (64
+samples, a `loop = [0, 64]` settings file), play it on a voice with a full
+sustain, and send the pitch each frame with `audioSetVoiceVolumePitch()`: the
+pitch you send is the note you hear. One update costs 3 scanlines at most
+(about 4 000 master cycles).
+
+**Stop, then play, on the same voice in one frame.** `audioStopVoice(v)`
+followed at once by `audioPlaySampleOn(v, …)` is accepted: the voice takes the
+new sample, pitch and volume, and sounds from the next sample period (the
+example checks the DSP registers one frame later). The pair costs 18
+scanlines at most (about 24 000 master cycles), most of it the play command.
+This is the rule "the last sound to arrive cuts the one in progress".
+
+**A sample sent in pieces.** `audioLoadSampleBegin()` then
+`audioLoadSampleStep(192)` once a frame loaded three 4 800-byte samples in 75
+frames, byte for byte (the manifest compares the head and the tail of each
+in ARAM). The worst step cost 115 scanlines (about 157 000 master cycles),
+so size the step to the frame's spare time; samples live in one bank each,
+so a large bank of effects is several samples, not one.
+
+**Seven voices updated every frame** (volume and pitch together) cost 29
+scanlines (about 39 500 master cycles) every frame, 5 600 per voice, in line with
+the four-voice figure above. A scanline is 1 364 master cycles; the example
+counts them with `profileScanlineStart()` / `profileScanlineEnd()`, so the
+numbers come out of RAM with no tool.
+
 ### Shaping the envelope: ADSR or GAIN
 
 `audioSetADSR(voice, attack, decay, sustain, release)` gives a voice the
@@ -266,6 +299,7 @@ addresses, per-voice ADSR/pitch/envelope state, phoneme/note schedules.
 
 - `examples/audio/soundboard/` - samples, voices, ADSR and echo from C
 - `examples/audio/sfx_from_wav/` - a one-shot effect converted from a WAV
+- `examples/audio/sfx_voices/` - voice by voice: a looped waveform at a pitch set every frame, a stop and play on one voice in one frame, a sample sent in pieces, with the cost of each
 - `examples/audio/speech_synth/` - an SPC700 program of its own through `apu`
 - `examples/audio/apu_switch/` - replacing the running SPC700 program
 
