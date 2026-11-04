@@ -245,6 +245,11 @@ To spend a budget, `vramQueuePushWithin(src, addr, size, step, budget)` is the p
 with the guard inside: it returns 0, and changes nothing, when the transfer would
 take `vramQueueCost()` past `budget`, so a module streams what fits and tries the
 rest next frame. The budget is yours; no refusal is counted for it.
+`vramQueuePushSpriteWithin(src, addr, size_px, budget)` is the same guard for a
+whole sprite frame: every strip, or none when the frame would take
+`vramQueueCost()` past `budget` (288 for 16x16, 832 for 32x32) or its strips do
+not all fit. Unlike `vramQueuePushSprite`, a frame it refuses is not counted in
+`vram_queue_refused`.
 
 Be clear about what it buys. Six 128-byte transfers, measured
 (`devtools/libbench`):

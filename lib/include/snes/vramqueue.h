@@ -172,6 +172,37 @@ u16 vramQueuePushWithin(const u8 *src, u16 addr, u16 size, u16 step, u16 budget)
 u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px);
 
 /**
+ * @brief vramQueuePushSprite(), if the whole frame fits a budget you give
+ *
+ * Notes every strip of the frame only when `vramQueueCost() + (size_px / 8)
+ * * (size_px * 4 + VRAM_QUEUE_ENTRY_COST) <= budget` and all the strips fit
+ * in the queue (288 for a 16x16 frame, 832 for a 32x32 one). Otherwise
+ * returns 0 and changes nothing, **and does not count a refusal**
+ * (`vram_queue_refused` is for a queue that was full, not for a frame that
+ * waits for the next one): that is what sets it apart from
+ * vramQueuePushSprite(), which counts its refusals. A sum past $FFFF is a
+ * refusal, never a wrap. The budget is yours: deciding what each module may
+ * spend stays with the game; this only does the test and the push together.
+ *
+ * @code
+ * // before: the guard by hand, every time
+ * if (vramQueueCost() + 2 * (64 + VRAM_QUEUE_ENTRY_COST) <= BUDGET
+ *     && vramQueueFree() >= 2)
+ *     vramQueuePushSprite(frame, addr, 16);
+ * // after
+ * if (!vramQueuePushSpriteWithin(frame, addr, 16, BUDGET))
+ *     retry_next_frame = 1;
+ * @endcode
+ *
+ * @param src, addr, size_px  As vramQueuePushSprite()
+ * @param budget  Most the queue may cost, in vramQueueCost()'s unit (bytes +
+ *                VRAM_QUEUE_ENTRY_COST an entry)
+ * @return 1 if every strip was noted, 0 if the frame did not fit (nothing
+ *         noted) or size_px is under 8
+ */
+u16 vramQueuePushSpriteWithin(const u8 *src, u16 addr, u16 size_px, u16 budget);
+
+/**
  * @brief Send every queued transfer to VRAM and empty the queue
  *
  * One DMA per entry, on channel 0. Call it in VBlank — right after

@@ -496,3 +496,95 @@ vramQueuePushSprite:
 
 .ENDS
 
+;------------------------------------------------------------------------------
+; u16 vramQueuePushSpriteWithin(const u8 *src, u16 addr, u16 size_px, u16 budget)
+;   12,s src (bank)   10,s src   8,s addr   6,s size_px   4,s budget
+; vramQueuePushSprite() with the budget guard: notes every strip and returns
+; 1 when vramQueueCost() + (size_px / 8) * (size_px * 4 +
+; VRAM_QUEUE_ENTRY_COST) <= budget and the strips all fit in the queue;
+; returns 0 and changes NOTHING otherwise, size_px under 8 included. Unlike
+; vramQueuePushSprite, a refusal is not counted in vram_queue_refused (a
+; frame that waits for the next one is not a full queue). The sum saturates
+; to a refusal, never wraps. The budget is the caller's.
+; Written apart from vramQueuePushSprite: that one saturates the cost and
+; counts its refusals, this one refuses and counts nothing, so neither is the
+; other with an argument fixed.
+;------------------------------------------------------------------------------
+.SECTION ".text.vramQueuePushSpriteWithin" SUPERFREE
+
+vramQueuePushSpriteWithin:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 6,s             ; size_px
+    lsr a
+    lsr a
+    lsr a
+    beq @no             ; under 8 pixels: no strip
+    sta.b tcc__r9       ; strips left
+    clc
+    adc.w vram_queue_count
+    cmp.l vram_queue_max
+    beq +
+    bcs @no             ; the strips do not all fit
++   lda 6,s             ; size_px
+    asl a
+    bcs @no
+    asl a
+    bcs @no
+    sta.b tcc__r9+2     ; bytes in a strip
+    adc.w #VRAM_QUEUE_ENTRY_COST    ; carry clear here
+    bcs @no
+    sta.b tcc__r10      ; cost of a strip
+    ldx.b tcc__r9
+    lda.w vram_queue_cost
+-   clc
+    adc.b tcc__r10
+    bcs @no             ; past $FFFF: over any budget
+    dex
+    bne -
+    cmp 4,s             ; budget
+    beq +
+    bcs @no             ; over the budget
++   lda 10,s            ; src
+    sta.b tcc__r10
+    lda 8,s             ; addr
+    sta.b tcc__r10+2
+    lda.w vram_queue_count
+    asl a
+    tax
+@strip:
+    lda.b tcc__r10
+    sta.w vram_queue_src,x
+    clc
+    adc.w #512          ; the next row of tiles in the sheet
+    sta.b tcc__r10
+    lda 12,s            ; src (bank)
+    sta.w vram_queue_bank,x
+    lda.b tcc__r10+2
+    sta.w vram_queue_addr,x
+    clc
+    adc.w #256          ; the next row of tiles in VRAM
+    sta.b tcc__r10+2
+    lda.b tcc__r9+2
+    sta.w vram_queue_size,x
+    clc
+    adc.w #VRAM_QUEUE_ENTRY_COST
+    adc.w vram_queue_cost   ; cannot carry: the sum was checked against the budget
+    sta.w vram_queue_cost
+    sta.w vram_queue_cum,x  ; the cost up to this strip
+    lda.w #$0080        ; VRAM_QUEUE_ROW
+    sta.w vram_queue_step,x
+    inx
+    inx
+    inc.w vram_queue_count
+    dec.b tcc__r9
+    bne @strip
+    lda.w #1
+    rtl
+@no:
+    lda.w #0
+    rtl
+
+.ENDS
+

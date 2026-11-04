@@ -5,6 +5,15 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): `vramQueuePushSpriteWithin(src, addr, size_px, budget)`: the budget guard of a
+  whole sprite frame in one call. It notes every strip of the frame only if `vramQueueCost() +
+  (size_px / 8) * (size_px * 4 + VRAM_QUEUE_ENTRY_COST) <= budget` (288 for 16x16, 832 for
+  32x32) and the strips all fit in the queue; otherwise it returns 0 and changes nothing. Unlike
+  `vramQueuePushSprite()`, it does not count a refusal in `vram_queue_refused` (a frame that
+  waits for the next one is not a full queue), and a sum past $FFFF is a refusal, never a wrap.
+  The budget is the caller's. Costs 140 bytes of ROM in a ROM that calls it; `libtests` asserts:
+  fits exactly (16x16 and 32x32), one byte short, strips that do not all fit, saturation, under
+  8 pixels.
 - feat(lib): `vramQueuePushWithin(src, addr, size, step, budget)`: `vramQueuePush()` with the
   guard written once. It notes the transfer only if `vramQueueCost() + size +
   VRAM_QUEUE_ENTRY_COST <= budget` and an entry is free, otherwise returns 0 and changes

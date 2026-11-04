@@ -261,6 +261,12 @@ CASES = [
     # vramQueuePushWithin: fits exactly (1, count 1; cost 252), does not fit (0, count 1; no refusal
     # counted), full queue (0, count 40), the sum cannot wrap (0, cost kept: $FFF0 << 4 = $FF00 in 16 bits)
     ("r_vqw", 12, sum(w << (16 * i) for i, w in enumerate([0x0101, 0x00FC, 0x0100, 0x0000, 0x2800, 0xFF00]))),
+    # vramQueuePushSpriteWithin: a 16x16 frame at a budget of exactly 288 (1, two strips; cost 288,
+    # strips 512 bytes / 256 words apart), one byte short (0, count 2; no refusal counted), the
+    # strips do not both fit (0, count 39), a sum past $FFFF (0, cost kept), a 32x32 frame at
+    # exactly 832 (1, four strips), under 8 pixels (0, nothing noted, no refusal)
+    ("r_vqsw", 18, sum(w << (16 * i) for i, w in enumerate(
+        [0x0201, 0x0120, 0x0200, 0x0000, 0x2700, 0x0000, 0x0000, 0x0401, 0x0000]))),
     ("r_vqref", 4, 2 | (3 << 16)),   # refusals counted, ignored return values or not
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit

@@ -55,6 +55,7 @@ u16 r_vqc[8];
 /* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
 u16 r_vqu[8];
 u16 r_vqw[6];     /* vramQueuePushWithin: fits exactly, does not fit, full queue, saturation; no refusal counted */
+u16 r_vqsw[9];    /* vramQueuePushSpriteWithin: fits exactly (16x16, 32x32), does not fit, queue too small, saturation, under 8 px; no refusal counted */
 u16 r_vqref[2];   /* vram_queue_refused since the sprite refusals: 2, then 3 after the full queue */
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
@@ -838,6 +839,35 @@ static void coverage_lot_b(void) {
     vram_queue_count = 0;
     vram_queue_cost = 0xFFF0;
     r_vqw[5] = vramQueuePushWithin(lotb_vram, 0x6710, 0x20, VRAM_QUEUE_ROW, 0xFFFF) | (vram_queue_cost << 4); /* 0, cost kept */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    /* vramQueuePushSpriteWithin: a 16x16 frame costs 2 * (64 + 80) = 288 and takes a budget of
+     * 288 exactly, refuses one byte short of a second, refuses when its two strips do not both
+     * fit (whatever the budget), refuses a sum past $FFFF, takes a 32x32 frame (4 * (128 + 80) =
+     * 832) at 832, and refuses under 8 pixels; a refusal notes nothing and counts nothing */
+    vram_queue_refused = 0;
+    r_vqsw[0] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 288) | (vram_queue_count << 8);           /* 1, count 2 */
+    r_vqsw[1] = vramQueueCost()
+              | ((vram_queue_src[1] - vram_queue_src[0] == 512 && vram_queue_addr[1] == 0x6500
+                  && vram_queue_size[0] == 64 && vram_queue_step[1] == VRAM_QUEUE_ROW
+                  && vram_queue_cum[0] == 144) ? 0 : 0x8000);                                          /* 288 */
+    r_vqsw[2] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 288 + 287) | (vram_queue_count << 8);     /* 0, count 2 */
+    r_vqsw[3] = vram_queue_refused | (vramQueueCost() == 288 ? 0 : 0x8000);                              /* 0 */
+    vram_queue_count = VRAM_QUEUE_MAX - 1;
+    vram_queue_cost = 0;
+    r_vqsw[4] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 0xFFFF) | (vram_queue_count << 8);       /* 0, count 39 */
+    r_vqsw[5] = vram_queue_refused | (vramQueueCost() == 0 ? 0 : 0x8000);                                /* 0 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0xFF00;
+    r_vqsw[6] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 32, 0xFFFF) | (vram_queue_count << 8)
+              | (vram_queue_cost == 0xFF00 ? 0 : 0x8000);                                              /* 0, cost kept */
+    vram_queue_cost = 0;
+    r_vqsw[7] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 32, 832) | (vram_queue_count << 8)
+              | (vram_queue_cost == 832 ? 0 : 0x8000);                                                 /* 1, count 4 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    r_vqsw[8] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 4, 0xFFFF) | (vram_queue_count << 8)
+              | (vram_queue_refused << 12);                                                            /* 0 */
     vram_queue_count = 0;
     vram_queue_cost = 0;
     /* vramQueueFlushUntil. The second entry is made dear by hand (its
