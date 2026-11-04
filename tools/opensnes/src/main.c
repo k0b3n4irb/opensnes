@@ -636,7 +636,10 @@ static const char *shown(const char *path)
 
 static const cli_opt budget_opts[] = {
     { "frame", 0, CLI_FLAG, NULL, "also measure the cost of a frame: the busy share of the CPU, the worst frame, the frames that lagged (runs the ROM in luna)", NULL },
-    { "frames", 0, CLI_INT, "N", "frames measured with --frame, after 20 of warm-up", "300" },
+    { "frames", 0, CLI_INT, "N", "frames measured with --frame, after the warm-up", "300" },
+    { "from-frame", 0, CLI_INT, "F", "the frame the measure starts at (the warm-up before it is not counted)", "20" },
+    { "input", 0, CLI_STR, "SCRIPT", "scripted joypad-1 input for the run (luna's `--input` grammar), to reach the scene to measure", NULL },
+    { "top", 0, CLI_INT, "N", "also list the N functions that cost the most in the measured frames", "0" },
 };
 
 /* The number after "key": in s (a JSON object, from luna), or -1. */
@@ -658,13 +661,17 @@ static long json_num(const char *s, const char *key)
 static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
 {
     char luna[PATHN], out[PATHN], junk[256], from[16], until[16];
-    int n = cli_int(ctx, "frames", 300);
+    int n = cli_int(ctx, "frames", 300), f0 = cli_int(ctx, "from-frame", 20), top = cli_int(ctx, "top", 0);
+    const char *input = cli_has(ctx, "input") ? cli_str(ctx, "input", NULL) : NULL;
     if (n < 10 || n > 36000) { cli_error(ctx, NULL, "--frames takes 10 to 36000"); return CLI_USAGE; }
+    if (f0 < 0 || f0 > 1000000) { cli_error(ctx, NULL, "--from-frame takes 0 to 1000000"); return CLI_USAGE; }
+    if (top < 0 || top > 50) { cli_error(ctx, NULL, "--top takes 0 to 50"); return CLI_USAGE; }
     if (!find_luna(sdk, luna, sizeof luna)) { cli_error(ctx, NULL, "luna not found — scripts/install-luna.sh fetches it (`opensnes doctor`)"); return CLI_IO; }
     snprintf(out, sizeof out, "%s.frame.json", rom);
-    snprintf(from, sizeof from, "20");
-    snprintf(until, sizeof until, "%d", 20 + n);
-    const char *argv[] = {luna, "profile", rom, "--from-frame", from, "--until-frame", until, "--out", out, NULL};
+    snprintf(from, sizeof from, "%d", f0);
+    snprintf(until, sizeof until, "%d", f0 + n);
+    const char *argv[12] = {luna, "profile", rom, "--from-frame", from, "--until-frame", until, "--out", out, NULL};
+    if (input) { argv[9] = "--input"; argv[10] = input; argv[11] = NULL; }
     int rc = run_argv(argv, 0, junk, sizeof junk);
     size_t len = 0;
     unsigned char *data = rc == 0 ? cli_read_file(ctx, out, &len) : NULL;
@@ -679,6 +686,30 @@ static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
     long mean = sum ? json_num(sum, "active_mean") : -1, worst = sum ? json_num(sum, "active_max") : -1;
     long wframe = sum ? json_num(sum, "active_max_frame") : -1, total = sum ? json_num(sum, "total_mean") : -1;
     long lag = sum ? json_num(sum, "lag_frames") : -1, lagrun = sum ? json_num(sum, "lag_run") : -1;
+    /* The functions that cost the most: luna's entries, heaviest first; the wait for the next
+     * frame (idle_mclk > 0) is not a function of the game. */
+    char tname[10][64];
+    long tcost[10];
+    int tn = 0;
+    if (top > 0) {
+        if (top > 10) top = 10;
+        const char *end = strstr(txt, "\"frame_series\""), *p = strstr(txt, "\"entries\"");
+        while (p && (p = strstr(p + 1, "\"symbol\"")) && (!end || p < end)) {
+            const char *nm = p + 8;
+            while (*nm == ' ' || *nm == ':') nm++;
+            if (*nm == '"') nm++;
+            size_t l = strcspn(nm, "\"");
+            long c = json_num(p, "mclk"), idle = json_num(p, "idle_mclk");
+            if (c <= 0 || idle > 0) continue;
+            int at = tn;
+            while (at > 0 && tcost[at - 1] < c) at--;
+            if (at >= top) continue;
+            if (tn < top) tn++;
+            for (int k = tn - 1; k > at; k--) { memcpy(tname[k], tname[k - 1], 64); tcost[k] = tcost[k - 1]; }
+            snprintf(tname[at], 64, "%.*s", (int)(l < 63 ? l : 63), nm);
+            tcost[at] = c;
+        }
+    }
     free(txt);
     /* What the run wrote to VRAM and CGRAM, from frame 0 (the loading is part of it): luna state
      * --vram-writers, whose totals count distinct words and entries. A luna without the totals
@@ -688,7 +719,8 @@ static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
         char wf[PATHN], sj[PATHN];
         snprintf(wf, sizeof wf, "%s.writers.txt", rom);
         snprintf(sj, sizeof sj, "%s.state.json", rom);
-        const char *sargv[] = {luna, "state", rom, "--until-frame", until, "--vram-writers", wf, "--vram-writers-from", "0", "--out", sj, NULL};
+        const char *sargv[14] = {luna, "state", rom, "--until-frame", until, "--vram-writers", wf, "--vram-writers-from", "0", "--out", sj, NULL, NULL, NULL};
+        if (input) { sargv[11] = "--input"; sargv[12] = input; }
         if (run_argv(sargv, 0, junk, sizeof junk) == 0) {
             size_t sl = 0;
             unsigned char *sd = cli_read_file(ctx, sj, &sl);
@@ -709,20 +741,22 @@ static int budget_frame(cli_ctx *ctx, const char *sdk, const char *rom)
     }
     if (mean < 0 || worst < 0 || total <= 0 || lag < 0) { cli_error(ctx, rom, "luna's report has no frame summary (luna too old? `opensnes doctor`)"); return CLI_IO; }
     if (ctx->json) {
-        printf("{\"frame\":{\"frames\":%d,\"from_frame\":20,\"total_mclk\":%ld,\"busy_mean_mclk\":%ld,\"busy_worst_mclk\":%ld,"
+        printf("{\"frame\":{\"frames\":%d,\"from_frame\":%d,\"total_mclk\":%ld,\"busy_mean_mclk\":%ld,\"busy_worst_mclk\":%ld,"
                "\"busy_worst_frame\":%ld,\"lag_frames\":%ld,\"lag_longest_run\":%ld,\"vram_words_written\":%ld,\"cgram_entries_written\":%ld}}\n",
-               n, total, mean, worst, wframe, lag, lagrun < 0 ? 0 : lagrun, vwords, centries);
+               n, f0, total, mean, worst, wframe, lag, lagrun < 0 ? 0 : lagrun, vwords, centries);
         return CLI_OK;
     }
-    printf("Frame (luna profile, %d frames after 20 of warm-up; one frame is %ld master cycles)\n", n, total);
+    printf("Frame (luna profile, %d frames from frame %d; one frame is %ld master cycles)\n", n, f0, total);
     printf("  busy, mean          %7ld / %ld   %3ld%%\n", mean, total, (mean * 100 + total / 2) / total);
     printf("  busy, worst frame   %7ld / %ld   %3ld%%   (frame %ld)\n", worst, total, (worst * 100 + total / 2) / total, wframe);
     printf("  frames that lagged  %ld of %d%s\n", lag, n, lag ? "   <- the game missed a VBlank" : "");
     if (vwords >= 0 && centries >= 0) {
         printf("  VRAM written        %7ld words (%ld bytes)   %3ld%% of 32 K words   (frames 0 to %d, loading included)\n",
-               vwords, vwords * 2, (vwords * 100 + 16384) / 32768, 20 + n);
+               vwords, vwords * 2, (vwords * 100 + 16384) / 32768, f0 + n);
         printf("  CGRAM written       %7ld colours   %3ld%% of 256\n", centries, (centries * 100 + 128) / 256);
     }
+    for (int k = 0; k < tn; k++)
+        printf("  #%d %-34s %9ld master cycles over %d frames (%ld a frame)\n", k + 1, tname[k], tcost[k], n, tcost[k] / n);
     printf("  (busy = CPU, DMA, HDMA and DRAM refresh; the wait for the next frame is not counted)\n");
     return CLI_OK;
 }

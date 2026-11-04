@@ -12,6 +12,8 @@ All notable changes to OpenSNES are documented in this file.
   against the 357,365 of a frame, and the frames that lagged. `--json` prints a
   second object, `{"frame": {...}}`, after the report. Measured on the starter
   (3 %, 0 lagging frames) and on `sprites/sprite_swarm` (23 % mean, 24 % worst).
+  `--from-frame F` starts the measure later, `--input SCRIPT` gives luna a joypad script
+  (to reach a scene behind a menu), `--top N` lists the N functions that cost most.
   It also reports what the run wrote to VRAM and CGRAM from frame 0, the
   loading included (`luna state --vram-writers`, luna 1.43: distinct words and
   entries), which is what a scene really loads, where the static report adds

@@ -22,6 +22,7 @@ opensnes test --update                  # first time: record the visual baseline
 opensnes test                           # run test/*.toml in luna
 opensnes budget                         # how much of the console the game uses
 opensnes budget --frame                 # ... and what a frame costs the CPU, measured in luna
+opensnes budget --frame --from-frame 600 --input "590:0x1000,600:0" --top 5   # a scene behind the title
 opensnes release --tag v1.0             # the ROM you hand over, in release/
 opensnes clean
 opensnes doctor                         # is everything there?
