@@ -161,6 +161,12 @@ opt-in list.
     releases later; anchor 3 reads its example counts (and the starter's
     README) since the same day.
 
+21. **OAM address and HDMA count byte are taught right** (since 2026-11-05):
+    no `OAMADD… = x * 4` in `docs/`, `lib/` or the examples (OAMADD is a word
+    address: sprite N = `N * 2`), and no "bit 7 = repeat mode, bits 0-6 = count"
+    (`$01-$80` no repeat, 1-128 lines; `$81-$FF` repeat, 1-127). Caught by
+    snes-rag when it built an evaluation set from our hardware docs.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the
