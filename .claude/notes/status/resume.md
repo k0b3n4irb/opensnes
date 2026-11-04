@@ -42,6 +42,7 @@ and the CHANGELOG.
 - `212ba5dc`: OAMADD is a word address (sprite N = `N * 2`) in `OAM.md` /
   `REGISTERS.md`; `hdma.h` count byte `$01-$80` no repeat, `$81-$FF` repeat.
   Answered in the thread; `make tests` green, `make lint-docs` OK.
+- `04bec2d1`: doc-drift anchor 21 (`devtools/check_doc_drift.py`) refuses `OAMADD… = x * 4` and the old HDMA count wording. Before: `make lint-docs` passed with `N * 4` put back; after: exit 1 on both.
 - Rest-time proposal (thread `au-repos-…`): go for step 1 only, reading with
   xenon2 what its sound engine needs; code only if measured and the
   two-games rule holds. Not started.
