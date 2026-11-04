@@ -424,7 +424,7 @@ test-project:
 	done
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@# A module left out of LIB_MODULES: the failed link names it.
-	@sed -i 's/^LIB_MODULES *:=.*/LIB_MODULES := dma/' $(TEST_PROJECT_DIR)/Makefile
+	@sed -i 's/^LIB_MODULES *:=.*/LIB_MODULES := math/' $(TEST_PROJECT_DIR)/Makefile
 	@printf '#include <snes.h>\nint main(void) { setMode(BG_MODE1, 0); for (;;) {} return 0; }\n' > $(TEST_PROJECT_DIR)/main.c
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) > $(TEST_PROJECT_DIR)/link.log 2>&1; then \
 		echo "ERROR: a project without console linked setMode"; exit 1; fi
