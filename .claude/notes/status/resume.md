@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-11-03)
+# Where the work stands (resume note, 2026-11-04)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -25,6 +25,17 @@ and the CHANGELOG.
 - The first game: remove its fade workaround, replay its sound test.
 - A thread waits on the owner's decision (`fils liste --auteur`); none is
   in this session's hands.
+
+## Done 2026-11-04 (lot « sons de jeu »)
+
+- Step 1 closed: no new sound module (the game's rule is `audioPlaySampleOn` +
+  `audioStopVoice` + `audioSetVoiceVolumePitch`).
+- `examples/audio/sfx_voices` (`2d67f4c0`) + manifests `audio_sfx_voices*.toml`:
+  pitch update 3 scanlines, stop+play in one frame 18 (works: DSP follows),
+  192-byte load step 115, seven voices 29 (~39 500 mclk). Reply to the game's
+  session: fil `2026-11-04-sons-de-jeu-…`.
+- `rom_coverage.py` reports two never-executed functions (`oamSetBatch`,
+  `vramQueuePushSpriteWithin`), not from this lot; not in `make tests`.
 
 ## In progress
 
