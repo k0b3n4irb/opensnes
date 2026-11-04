@@ -31,6 +31,12 @@ the hard ceiling is about **6 KB** per VBlank — but once the NMI handler has
 read the controllers and done its own housekeeping, **~4 KB is the safe working
 budget** you should plan around.
 
+The 4 KB is bytes of data; the queue (`<snes/vramqueue.h>`) also charges each
+entry its own cost (`VRAM_QUEUE_ENTRY_COST`, 80 bytes' worth of time: the loop
+overhead of one transfer), so a budget in bytes is `sum(size + 80)` over the
+entries. `vramQueueCost()` gives that sum for what is queued; spend your budget
+against it, not against the bytes alone.
+
 That shapes real decisions:
 
 - **A full 32×32 tilemap is 2 KB, a 4bpp tile is 32 bytes.** You can refresh a
