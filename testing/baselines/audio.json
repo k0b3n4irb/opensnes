@@ -3,7 +3,7 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "f93caafb5cd4f8a8d147b6436c7f3f8f666f3beb4c72574de3f5ad781cfddc5f",
+      "sha256": "7fa3f969c4520a6ef2b834cbfae2e6ad5bb0f156d1923e913619ef73dea6cb19",
       "samples": 159936,
       "peak": 21264
     },
@@ -18,7 +18,7 @@
       "peak": 8269
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "a3bf9740ede1cf16506724f5ed6f785c2d06934c00b2292ce43b497d7b50c23a",
+      "sha256": "95a6c4f1f48386fb02548394d8d57e01121da4542a20fcbc22888db354be2d62",
       "samples": 160006,
       "peak": 8321
     },
