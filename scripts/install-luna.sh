@@ -106,13 +106,20 @@ install-luna: no binary for ${VERSION} at ${BASE}
 EOM
     fi
 }
-if curl -fsSL "$BASE/${ARCHIVE}" -o "$TMP/${ARCHIVE}"; then
-    :
-elif command -v gh >/dev/null 2>&1 \
-     && gh release download "$VERSION" --repo "$REPO" \
-        --pattern "${ARCHIVE}" --dir "$TMP" --clobber; then
-    :
-else
+# A runner's network drops now and then (a macOS job lost its download that way
+# on 2026-11-04): three attempts, five seconds apart, curl then gh each time.
+fetched=0
+for attempt in 1 2 3; do
+    if curl -fsSL "$BASE/${ARCHIVE}" -o "$TMP/${ARCHIVE}"; then
+        fetched=1; break
+    elif command -v gh >/dev/null 2>&1 \
+         && gh release download "$VERSION" --repo "$REPO" \
+            --pattern "${ARCHIVE}" --dir "$TMP" --clobber; then
+        fetched=1; break
+    fi
+    [ "$attempt" -lt 3 ] && { echo "install-luna: attempt ${attempt} failed, retrying in 5 s" >&2; sleep 5; }
+done
+if [ "$fetched" != 1 ]; then
     no_asset_hint
     echo "install-luna: download of ${ARCHIVE} (${VERSION}) failed" >&2
     exit 1
