@@ -47,6 +47,13 @@ and the CHANGELOG.
   xenon2 what its sound engine needs; code only if measured and the
   two-games rule holds. Not started.
 
+## Done 2026-11-05 (budget past 64 banks)
+
+- `668dc2a4`: `opensnes-rom budget` takes a section's bank from its ROM offset
+  (the `$C0` fold made linker bank 64 look like bank 0 on a FastROM LoROM of 80+
+  banks). Golden on a 128-bank image: bank 0 32 784 -> 16 bytes. CI green.
+  Asked by xenon2; thread answered and closed.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
