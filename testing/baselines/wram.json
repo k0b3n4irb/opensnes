@@ -3,6 +3,10 @@
     "stream": "92eb1fa7724e05398674b987cc4999390f3b93f2d938c19bd728685d19283dd8",
     "rom_sha256": "3538cb4664e20b3db64cff20f10584c1bf8bf6f902c9b3f8513ee5b04a805baa"
   },
+  "audio_sample_swap": {
+    "stream": "24e56a9c585b10865779024c8e42861512ebdf395a21182ee39a42a55987b404",
+    "rom_sha256": "ae50a631abc31018a341d7bde60bd5bc9ba705524338b136436c9e7f96e08756"
+  },
   "audio_sfx_from_wav": {
     "stream": "2bd9e5df1c83ad932ede1367dc90a09e32ad805ccb4aeb4ccbc487fcec36a5fe",
     "rom_sha256": "e9b296c7ca25e0717e201c7b9d723a9f0851a325b210a63a3ee92d732d7e0ade"

@@ -331,6 +331,119 @@ u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
 u16 audioLoadSampleStep(u16 maxBytes);
 
 /**
+ * @brief Load a sample at an address of the sound CPU's memory the game
+ *        chooses
+ *
+ * audioLoadSample() places each sample where the last one ended. A game
+ * whose samples do not all fit keeps a resident set and replaces others,
+ * during play, in places of its own: a swap area. This call writes the
+ * sample at @p spcAddr, whole, then its directory entry, as
+ * audioLoadSample() does.
+ *
+ * - **Any address** in the sample area: $0B00 up to the end
+ *   audioGetFreeMemory() counts to ($FFC0, or the echo ring). A directory
+ *   entry is two 16-bit addresses, and the S-DSP reads a sample from the
+ *   byte its entry names, 9 bytes a block, whatever that byte is: no
+ *   alignment (audioLoadSample() itself places samples on any byte).
+ * - **No overlap** with a loaded sample or with the load in steps under
+ *   way, except slot @p id's own place: a slot can be replaced where it
+ *   was, by a sample of any size the area allows.
+ * - **The allocator never goes back.** When the sample ends above the
+ *   place audioLoadSample() would use next, that place moves up to its end,
+ *   so a later audioLoadSample() goes above it; a sample placed lower
+ *   leaves it where it was. audioUnloadSample() gives memory back only for
+ *   the sample that ends exactly there (the bump allocator's rule): a
+ *   sample loaded at an address below it gives nothing back, and its place
+ *   is reused by loading another sample there with this call.
+ * - From the first byte to the directory entry, slot @p id is "not
+ *   loaded" (playing it is refused); if the driver stops answering half
+ *   way it stays so.
+ * - A voice still playing the old sample of this place reads the new bytes
+ *   as they arrive: see audioLoadSampleBeginAt() for what to do first.
+ *
+ * The place is checked against the 64 slots before anything is sent:
+ * about 20 scanlines, measured (audioLoadSampleBeginAt() alike), on top of
+ * the bytes' own time (about 650 master cycles a byte, as audioLoadSample()).
+ *
+ * Errors (nothing is sent and nothing changes):
+ * - AUDIO_ERR_INVALID_ID: @p id is 64 or more, or is the slot being loaded
+ *   in steps;
+ * - AUDIO_ERR_TIMEOUT: audioInit() did not start the driver (or it
+ *   stopped answering during the load: then the slot is "not loaded");
+ * - AUDIO_ERR_NO_MEMORY: @p size is 0, or the place is refused: below
+ *   $0B00, at or above the end of the sample area, running past that end
+ *   (a place that would wrap past $FFFF included), or overlapping another
+ *   loaded sample or the load in steps.
+ *
+ * @param id Sample slot (0-63)
+ * @param spcAddr Where the sample's first byte goes
+ * @param brrData Pointer to the BRR data
+ * @param size Size in bytes (1 at least; a BRR sample is a multiple of 9)
+ * @param loopPoint As for audioLoadSample()
+ * @return AUDIO_OK or one of the errors above
+ *
+ * @code
+ * #define SWAP_AREA 0x8000
+ * audioLoadSampleAt(SMP_BOSS, SWAP_AREA, boss_brr, (u16)(boss_brr_end - boss_brr), 0);
+ * @endcode
+ */
+u8 audioLoadSampleAt(u8 id, u16 spcAddr, const u8 *brrData, u16 size,
+                     u16 loopPoint);
+
+/**
+ * @brief Start loading a sample in steps at an address the game chooses
+ *
+ * audioLoadSampleBegin() at the address of audioLoadSampleAt(), with the
+ * same rules for the place; then audioLoadSampleStep() sends it and its
+ * last step writes the directory entry, and audioUnloadSample(@p id)
+ * before that gives the load up, as for audioLoadSampleBegin().
+ *
+ * Replacing a slot that is loaded: from this call to the last step the
+ * slot is "not loaded", so a note asked of it meanwhile is refused
+ * (audioPlaySampleOn() returns AUDIO_VOICE_NONE); a voice that was already
+ * playing it goes on reading the place, which now holds the new bytes as
+ * they arrive.
+ *
+ * **Silence the place before its first byte goes** (here and for
+ * audioLoadSampleAt()). A key-off is a release, not a cut: the S-DSP takes
+ * 8 off the voice's envelope every sample, from at most $7FF, so 256
+ * samples, 8 ms, and the voice reads its sample all that time (anomie's
+ * S-DSP doc: release E-=8 every sample; BRR decoding never stops for a
+ * voice, KOFF only sets the envelope). Measured on luna with
+ * examples/audio/sample_swap, against a build whose replacement holds the
+ * old bytes: audioStopVoice() then the first step at once (36 scanlines
+ * later), the output differs for 8 ms; stopped at scanline 200 then one
+ * WaitForVBlank() (62 scanlines), it differs for 2 ms; stopped one frame
+ * (294 scanlines) or two before, it does not. The envelope reads 0 133
+ * scanlines after audioStopVoice(). So:
+ * - call audioStopVoice() for every voice that may be playing the place,
+ * - then let 8 ms pass before the first step: two WaitForVBlank() always
+ *   do, wherever in the frame the stop was sent; one does only when the
+ *   stop went at least 126 scanlines before the VBlank.
+ *
+ * A note on another voice in the frame of a step goes at its usual time if
+ * it is sent before the step, and later by the step's own time if sent
+ * after it (105 scanlines for 192 bytes, measured): send the frame's notes
+ * first.
+ *
+ * Errors (nothing is taken and nothing changes):
+ * - AUDIO_ERR_INVALID_ID: @p id is 64 or more, or a load in steps is
+ *   already under way;
+ * - AUDIO_ERR_TIMEOUT: audioInit() did not start the driver;
+ * - AUDIO_ERR_NO_MEMORY: @p size is under 3, or the place is refused, as
+ *   for audioLoadSampleAt().
+ *
+ * @param id Sample slot (0-63)
+ * @param spcAddr Where the sample's first byte goes
+ * @param brrData Pointer to the BRR data; must stay valid until the last step
+ * @param size Size in bytes (3 at least)
+ * @param loopPoint As for audioLoadSample()
+ * @return AUDIO_OK or one of the errors above
+ */
+u8 audioLoadSampleBeginAt(u8 id, u16 spcAddr, const u8 *brrData, u16 size,
+                          u16 loopPoint);
+
+/**
  * @brief Unload a sample from a slot
  * @param id Sample slot (0-63)
  *
@@ -339,9 +452,13 @@ u16 audioLoadSampleStep(u16 maxBytes);
  *
  * It does NOT stop a voice that is playing the sample — stop it first. The
  * allocator is a bump pointer: SPC memory comes back only when the sample
- * unloaded is the most recently loaded one, and loading a slot that is
- * already loaded leaks the old block. (The "voices will be stopped" sentence
- * that stood here was never implemented.)
+ * unloaded ends where the next audioLoadSample() would go (the most recently
+ * loaded one, among the samples audioLoadSample() placed), and loading a
+ * slot that is already loaded with audioLoadSample() leaks the old block. A
+ * sample placed with audioLoadSampleAt() below that point gives nothing
+ * back: its place is reused by loading another sample there with
+ * audioLoadSampleAt(). (The "voices will be stopped" sentence that stood
+ * here was never implemented.)
  */
 void audioUnloadSample(u8 id);
 

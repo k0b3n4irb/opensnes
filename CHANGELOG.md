@@ -6,6 +6,29 @@ All notable changes to OpenSNES are documented in this file.
 
 ### Added
 - feat(build): `ROM_BANKS` goes up to 128 on plain LoROM (4 MB). The code has been addressed from `$80` since 2026-10-26, so banks 126 and 127 sit at `$FE:` and `$FF:`, clear of the WRAM at `$7E`/`$7F`; the cap of 126 dated from the `$00` addressing. A 128-bank build of `audio/apu_switch` shows the same frame hash and the same audio as the 8-bank one, `opensnes-rom inspect` and `luna cart-check` find the checksum right. New fixture `libtests_bigrom` and manifest: a const table in bank 127 (`$FF:8000`) read back. Counts between that are not 2^k or 2^k + 2^j (126) leave a remainder that is not a power of two: the linker's checksum then differs from the emulators' (`$6013` against `$08FE`); `docs/tools/build.md` says which counts to prefer.
+- feat(lib): `audioLoadSampleAt(id, spcAddr, brr, size, loop)` and
+  `audioLoadSampleBeginAt(...)` (then `audioLoadSampleStep()` as before) load a sample at an
+  address of the sound CPU's memory the game chooses: a resident set plus a swap area of
+  fixed places, replaced during play. Any byte from $0B00 to the end of the sample area (a
+  directory entry is two 16-bit addresses; no alignment); refused, with nothing sent, a place
+  below $0B00, at or past the end, past $FFFF, on another loaded sample or on the load in
+  steps (`AUDIO_ERR_NO_MEMORY`, as a size of 0, or under 3 in steps), a slot of 64 or more, the
+  slot being loaded in steps, a second load in steps (`AUDIO_ERR_INVALID_ID`); a slot may be
+  replaced in its own place, and is "not loaded" until its new entry is written. The bump
+  allocator never goes back: a sample placed above its point raises it to its end, so
+  `audioLoadSample()` always goes above; `audioUnloadSample()` gives back only what ends at
+  that point. CPU side only, no driver change. 749 bytes of ROM in a ROM that calls both (530
+  for `audioLoadSampleAt()` alone, 473 for the version in steps alone), about 20 scanlines to
+  check the place; a ROM that calls neither is byte-identical (`audio/sfx_voices`,
+  `audio/soundboard`, `audio/sfx_from_wav` rebuilt clean, and every other example). Measured
+  on luna for a game that overwrites a place a voice may be playing: the release after
+  `audioStopVoice()` lasts 133 scanlines (8 ms: E-8 a sample from $7FF), and the voice reads
+  its sample meanwhile, so a stop just before the first step is heard (output differs from a
+  control for 8 ms; stopped at scanline 200 then one VBlank, 2 ms); stop, then two VBlanks.
+  A note on another voice stays in its frame during a load in steps (twelve in twelve); sent
+  after a 192-byte step it goes 105 scanlines later, before it at its usual time. New example
+  `audio/sample_swap`; manifests `audio_sample_swap.toml` (fails on a load one byte off, an
+  overlap of one byte accepted, an allocator that goes back) and `audio_sample_swap_silence.toml`.
 - feat(lib): `lzssDecodeRam(source, dest)` expands an LZ77 (tag 0x10) stream into RAM of any
   bank, $7E and $7F included, with the screen on: no PPU register written, interrupts left
   enabled, references copied by MVN for banks $7E/$7F and by a byte loop for any other bank

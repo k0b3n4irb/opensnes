@@ -16,6 +16,7 @@ from C — then the DSP's party tricks.
 | [snesmod_music](snesmod_music/) | How do I play tracker music with transport controls, and mix sound effects over it? |
 | [sfx_from_wav](sfx_from_wav/) | How do I play a sound effect from a WAV file, converted by the build? |
 | [sfx_voices](sfx_voices/) | How do I drive effects voice by voice: a looped waveform at a pitch set every frame, a stop and play on one voice in one frame, a sample sent in pieces? |
+| [sample_swap](sample_swap/) | How do I keep some samples resident and replace others during play, at places I choose, without a click? |
 
 **Raw APU from C (audio v2)** — the lib uploads its own resident SPC700 driver;
 everything else is plain C:

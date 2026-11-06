@@ -127,6 +127,7 @@ its header.
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio_samples.md) |
 | `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio_samples.md) |
+| `audio.h` | `audioLoadSampleAt`, `audioLoadSampleBeginAt` | [audio: a swap area](tutorials/audio_samples.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
 | `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |

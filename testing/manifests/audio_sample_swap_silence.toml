@@ -1,0 +1,35 @@
+# examples/audio/sample_swap - is audioStopVoice() before overwriting a
+# sample enough, or must the game wait? The ROM's own timings, which say
+# when the overwrite starts against when the voice falls silent.
+#
+#  * release_lines: from audioStopVoice() to the envelope read back at 0
+#    (audioGetVoiceState(), one ENVX read a poll): 133 scanlines measured
+#    (8.4 ms, 20 polls). The S-DSP's release takes 8 off the envelope every
+#    sample, from at most $7FF: 256 samples, 8.0 ms, 126 lines; the rest is
+#    the key-off command's way to the DSP and the poll's step.
+#  * q3_gap_lines: per case, from the key-off to the first audioLoadSampleStep()
+#    (index 2 bytes a case): stopped and loaded at once 36 lines; stopped
+#    after one VBlank right after the previous one 294; after two 556;
+#    stopped at line 200 then one VBlank 62. The first and the last are
+#    shorter than the release.
+#
+# What the voice then reads was compared on luna, not here (a manifest has
+# one ROM): `luna diff --audio --window-ms 2` against a control build whose
+# replacement holds the old bytes (examples/audio/sample_swap/main.c,
+# silence_case) differs only in the cases whose gap is under the release
+# (36 and 62 lines: 8 ms and 2 ms of output), not at 294 or 556.
+rom = "../../examples/audio/sample_swap/sample_swap.sfc"
+frames = 450
+
+[asserts.values]
+phase               = { eq = 6, width = 1 }
+release_lines       = { ge = 126, le = 140, width = 2 }
+release_polls       = { ge = 10, width = 2 }
+"q3_gap_lines+4"    = { le = 60, width = 2 }     # stopped, then the step at once
+"q3_gap_lines+6"    = { ge = 262, width = 2 }    # stopped, one VBlank (stop sent at its start)
+"q3_gap_lines+8"    = { ge = 524, width = 2 }    # stopped, two VBlanks
+"q3_gap_lines+10"   = { le = 100, width = 2 }    # stopped at line 200, one VBlank
+"q3_gap_frames+4"   = { eq = 0, width = 2 }
+"q3_gap_frames+6"   = { eq = 1, width = 2 }
+"q3_gap_frames+8"   = { eq = 2, width = 2 }
+"q3_gap_frames+10"  = { eq = 1, width = 2 }

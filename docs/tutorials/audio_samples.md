@@ -104,6 +104,76 @@ is a multiple of 3:
 
 A 5.3 KB voice is whole in 85 frames at 64 bytes a frame.
 
+### A swap area: samples at addresses you choose {#audio_swap_area}
+
+`audioLoadSample()` puts each sample where the last one ended, and
+`audioUnloadSample()` gives memory back only for the last one. A game whose
+samples do not all fit in the sound CPU's 62 KB keeps a resident set and
+replaces the others during play, in places it chooses:
+
+```c
+#define SWAP_A 0x8000                    /* places the game decided on */
+#define SWAP_B 0xA000
+
+audioLoadSampleAt(SMP_ENGINE, SWAP_A, engine_brr, (u16)(engine_brr_end - engine_brr), 0);
+/* ...later, the level changes: another sound in the same place */
+audioStopVoice(VOICE_ENGINE);
+/* two VBlanks: see below */
+audioLoadSampleBeginAt(SMP_ENGINE, SWAP_A, boss_brr, (u16)(boss_brr_end - boss_brr), 0);
+/* then audioLoadSampleStep() once a frame, as above */
+```
+
+The place is any byte from $0B00 to the end of the sample area: a
+directory entry is two 16-bit addresses and the S-DSP reads the sample
+from the byte its entry names, 9 bytes a block, so there is no alignment
+(`audioLoadSample()` places samples on any byte too). It may not overlap
+another loaded sample or the load in steps under way, except the slot's
+own old place: a slot is replaced where it was. A refused place answers
+`AUDIO_ERR_NO_MEMORY` (below $0B00, at or past the end of the area, past
+$FFFF, on another sample, a size of 0, or under 3 for the version in steps)
+and `AUDIO_ERR_INVALID_ID` (slot 64 or more, the slot being loaded in steps,
+a second load in steps); nothing is sent then.
+
+The two allocators share the memory without meeting. A sample placed above
+the point where `audioLoadSample()` would load next moves that point up to
+its end, so an ordinary load always goes above the placed ones; a sample
+placed lower leaves the point where it was, and unloading it gives nothing
+back: its place is reused by placing another sample there. Placing a sample
+checks the 64 slots first, about 20 scanlines.
+
+**Silence before overwriting.** A voice still playing the sample of a place
+reads the new bytes as they arrive. `audioStopVoice()` is a key-off, which
+is a release, not a cut: the S-DSP takes 8 off the voice's envelope every
+sample, from at most $7FF, so the voice still sounds for 256 samples, 8 ms,
+and goes on reading its sample meanwhile (anomie's S-DSP doc). Measured on
+luna with @ref examples_audio_sample_swap, against a build whose
+replacement holds the old bytes, so that any difference in the output is a
+changed byte the voice played:
+
+| Before the first step | Key-off to first step | Output |
+|---|---:|---|
+| voice left playing | — | the new bytes are heard (expected) |
+| `audioStopVoice()`, step at once | 36 scanlines | differs for 8 ms |
+| `audioStopVoice()` at scanline 200, one VBlank | 62 scanlines | differs for 2 ms |
+| `audioStopVoice()` after a VBlank, one VBlank | 294 scanlines | identical |
+| `audioStopVoice()`, two VBlanks | 556 scanlines | identical |
+
+The voice's envelope reads 0 133 scanlines (8.4 ms) after `audioStopVoice()`.
+So the rule: stop every voice that may be playing the place, then let 8 ms
+pass before the first step. Two `WaitForVBlank()` always do, wherever in the
+frame the stop was sent; one does only when the stop went at least 126
+scanlines before the VBlank. The same holds for `audioLoadSampleAt()`.
+
+From `audioLoadSampleBeginAt()` to the last step the slot is "not loaded":
+a note asked of it is refused (`audioPlaySampleOn()` returns
+`AUDIO_VOICE_NONE`) and plays again once the new sample is whole.
+
+**Notes on other voices.** A load in steps does not move a note to another
+frame: in the example twelve notes on another voice went in twelve frames
+running, with and without the load. Within the frame, a note sent before
+the step goes at its usual time; sent after a 192-byte step it goes 105
+scanlines later, the step's own time. Send the frame's notes first.
+
 ### Choosing the voice
 
 `audioPlaySample()` and `audioPlaySampleEx()` pick a voice round-robin
@@ -300,6 +370,7 @@ addresses, per-voice ADSR/pitch/envelope state, phoneme/note schedules.
 - `examples/audio/soundboard/` - samples, voices, ADSR and echo from C
 - `examples/audio/sfx_from_wav/` - a one-shot effect converted from a WAV
 - `examples/audio/sfx_voices/` - voice by voice: a looped waveform at a pitch set every frame, a stop and play on one voice in one frame, a sample sent in pieces, with the cost of each
+- `examples/audio/sample_swap/` - samples at addresses the game chooses: a resident set, a swap area replaced during play, the refusals, the silence a replacement needs
 - `examples/audio/speech_synth/` - an SPC700 program of its own through `apu`
 - `examples/audio/apu_switch/` - replacing the running SPC700 program
 

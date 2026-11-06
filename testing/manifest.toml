@@ -117,3 +117,11 @@ frames = [200, 260]
 # one point, after the tests: they run screen on for about 290 frames (the C
 # fills and compares of 32 KB buffers), and the result lines appear then
 frames = [400]
+
+# audio/sample_swap trips the WDM channel on purpose: it shows the refusals of
+# audioLoadSampleAt / audioLoadSampleBeginAt, and each refused audio call fires
+# WDM $01 (the module's refusal trace, beside audio_error_count). The count is
+# exact (`wdm_expected`): one refusal more or less still fails the pass; the
+# manifest audio_sample_swap.toml pins the ten codes.
+[examples."audio/sample_swap"]
+wdm_expected = 10
