@@ -73,6 +73,19 @@ and the CHANGELOG.
   Lesson: after a fast-forward of a lib change into this tree, `make lib` before the
   clean-export pre-push check, or the new symbol is unknown.
 
+## Done 2026-11-06 (4 MB LoROM, sample swap)
+
+- `d5005098`: `ROM_BANKS` up to 128 on plain LoROM. Code is linked from `$80` since 2026-10-26, so banks
+  126/127 are `$FE:`/`$FF:`; the old cap of 126 dated from `$00` addressing. 128 banks: same frame hash and
+  audio as 8 banks; fixture `libtests_bigrom` reads a const table in bank 127. At 126 banks the linker's
+  checksum (`$6013`) differs from luna's recursive-mirror one (`$08FE`): the rules agree only when the part
+  above the largest power of two is itself a power of two. Not fixed in the linker; build.md says which counts to prefer.
+- `7ac47544`: `audioLoadSampleAt` / `audioLoadSampleBeginAt` (xenon2). `audioStopVoice` alone is not enough before
+  overwriting: wait 8 ms (two VBlanks). `wdm_expected` key in `luna_runner.py` / `manifest.toml`.
+  Open: fil to luna for a DSP-register read (ENVX) in a manifest checkpoint.
+- Waiting: xenon2's real-game figures for `lzssDecodeRam` (resumable slices only if needed) and for `audioLoadSampleAt`;
+  whether their ROM in 128 banks passes `luna cart-check`. `pace` module (6/5 units per VBlank): nothing written, owner's call.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
