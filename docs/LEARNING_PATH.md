@@ -146,6 +146,8 @@ everything above, and three complete games.
 
 @subpage examples_memory_hirom_demo
 
+@subpage examples_memory_lzss_ram
+
 @subpage examples_games_breakout
 
 @subpage examples_games_blocks

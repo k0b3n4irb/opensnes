@@ -5,6 +5,20 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): `lzssDecodeRam(source, dest)` expands an LZ77 (tag 0x10) stream into RAM of any
+  bank, $7E and $7F included, with the screen on: no PPU register written, interrupts left
+  enabled, references copied by MVN for banks $7E/$7F and by a byte loop for any other bank
+  (an overlapping reference gives the LZ77 result). Returns the bytes written; refuses (0,
+  nothing written) a tag other than 0x10, a length of 0 or above 65535, an output past the end
+  of the bank. Measured with `luna profile`, master cycles per output byte, SlowROM / FastROM:
+  104 / 88 for literals only, 101 / 87 for long references, 163 / 139 for 2 bpp tiles (32768
+  bytes from 17856; `lzssDecodeVram`, measured the same way on the 4 bpp tiles of
+  `backgrounds/mode1`: 709). 376 bytes of ROM in a
+  ROM that calls it, its own section: a ROM that calls only `lzssDecodeVram` is byte-identical
+  (`backgrounds/mode1` checked). New example `memory/lzss_ram` (tiles into $7F and $7E,
+  overlapping references, a reference cut at the end, the end of bank $7F, four refused streams;
+  manifest `memory_lzss_ram.toml`, which fails on a copy one byte short, a memmove-style copy of
+  overlapping references and a missing end cut).
 - test(lib): the region gate. `libtests_region` / `libtests_region_pal` read back the header
   country byte (`$FFD9`, set by `ROM_REGION`) and `isPAL()`; three luna manifests assert NTSC build on
   NTSC (`$01`, 0), NTSC build on a PAL console (`$01`, 1: `isPAL()` reads the console, not the

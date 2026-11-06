@@ -1,0 +1,79 @@
+# memory/lzss_ram — lzssDecodeRam expands LZ77 into RAM of any bank, with the
+# screen on and the NMI running, and refuses what it cannot write whole.
+#
+# Every test of the example leaves two words: r_X_len, the return value, and
+# r_X_bad, the bytes that differ from the expectation, counting the 16 guard
+# bytes after the output (an overrun) or, for a refused stream, the 16 bytes
+# it must leave at $A5. The oracles are independent of the decoder: the tiles
+# against the same png converted without --lz, the hand-built streams against
+# a formula (P(k) = 37k + 11) or a table written by hand (streams.asm).
+#
+#   t7f / t7e   2 bpp tiles, 17856 -> 32768 bytes, into $7F:0000 and a FAR
+#               buffer of bank $7E (the two MVN paths)
+#   lit         4096 literals only (the eight-literal fast path)
+#   ref         32 literals + 224 references of 18 bytes at distance 32
+#   r194        the same cut to 194 bytes, into a plain C buffer of bank $00:
+#               references of the fast loop through the byte-loop copy
+#   clip        'A' + a reference of 18 in a 5-byte stream: cut at the end
+#   ovlong*     330 bytes of references at distance 1, 2 and 3 (shorter than
+#               their 18 bytes): the overlap through MVN ($7F, $7E) and the
+#               byte loop (bank $00)
+#   ovl*        44 bytes of the same kind, all in the last 144 bytes (the
+#               careful loop); edge: those 44 bytes ending at $7F:FFFF
+#   zero / big / tag / cross   length 0, length 65536, tag $11, and 44 bytes
+#               from $7F:FFE0: each returns 0 and writes nothing
+#
+# Negative controls (2026-11-06, each fault injected in lib/source/lzss.asm,
+# the lib and the example rebuilt, this manifest run, the fault removed):
+#   F1 fast-loop copy count one short (`adc #2` -> `adc #1`): FAIL, r_failed 7
+#      (t7f_bad 0x7D0C, t7e_bad 0x7D27, ref_bad 0xE0, r194_bad 8, ovlong*_bad
+#      0xD2 each);
+#   F2 overlap mishandled: the $7E/$7F references copied backwards with MVP,
+#      as a memmove would: FAIL, r_failed 4 (ovlong7f/7e_bad 0xE7, t7f/t7e_bad
+#      0x893: the compressed tiles do contain overlapping references); the
+#      non-overlapping ref test still passes, as it should;
+#   F3 the cut at the end removed (careful loop): FAIL, clip_bad 0x15.
+rom = "../../examples/memory/lzss_ram/lzss_ram.sfc"
+frames = 600
+
+[asserts.values]
+r_done = 0xD0E5
+r_failed = 0
+r_t7f_len = 32768
+r_t7f_bad = 0
+r_t7e_len = 32768
+r_t7e_bad = 0
+r_lit_len = 4096
+r_lit_bad = 0
+r_ref_len = 4064
+r_ref_bad = 0
+r_r194_len = 194
+r_r194_bad = 0
+r_clip_len = 5
+r_clip_bad = 0
+r_ovlong7f_len = 330
+r_ovlong7f_bad = 0
+r_ovlong7e_len = 330
+r_ovlong7e_bad = 0
+r_ovlonglo_len = 330
+r_ovlonglo_bad = 0
+r_ovl7f_len = 44
+r_ovl7f_bad = 0
+r_ovl7e_len = 44
+r_ovl7e_bad = 0
+r_ovllo_len = 44
+r_ovllo_bad = 0
+r_edge_len = 44
+r_edge_bad = 0
+r_zero_len = 0
+r_zero_bad = 0
+r_big_len = 0
+r_big_bad = 0
+r_tag_len = 0
+r_tag_bad = 0
+r_cross_len = 0
+r_cross_bad = 0
+
+# the decodes run with the screen on: no VRAM byte outside blank
+[asserts.dma]
+unsafe_writes = 0

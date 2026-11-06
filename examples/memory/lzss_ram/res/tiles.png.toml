@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# 2048 tiles of 8x8 at 2 bpp, kept as they are: the reference copy (32768 bytes)
+[sheet]
+size = 8
+bpp = 2
+colors = 4

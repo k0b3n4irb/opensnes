@@ -93,7 +93,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | write the OAM entries of N alike objects (bullets, particles) from arrays, in one call | `oamSetBatch`, `OamBatch` | `sprite_batch` (opt-in) | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
-| decompress | `lzssDecodeVram` | `lzss` | |
+| decompress LZ77 tiles (into VRAM under forced blank, or into RAM of any bank with the screen on) | `lzssDecodeVram`, `lzssDecodeRam` | `lzss` | [memory/lzss_ram](../examples/memory/lzss_ram/) — about 100 master cycles per byte, 160 for tiles |
 | copy, fill or compare memory and strings | `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`, `strcpy`, `strncpy` | `string` | [FAR RAM: copying](tutorials/far_ram.md) |
 
 ## 3D math on the DSP-1 coprocessor

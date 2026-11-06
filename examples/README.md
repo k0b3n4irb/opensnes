@@ -29,7 +29,7 @@ The table below counts them per folder.
 | [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 6 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
-| [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
+| [memory/](memory/) | 3 | HiROM mode, battery-backed saves, LZ77 decompression into RAM |
 | [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
 | [demos/](demos/) | 3 | Playable demonstrations: several modules in one scene, without a game's rules (map engine + object engine, a vertical shmup, Tiled-driven RPG) |
 | [games/](games/) | 4 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer, a small game built across several files) |

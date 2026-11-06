@@ -1,0 +1,8 @@
+tool = "opensnes-sprite"
+
+# the same picture, LZ77-compressed: the stream lzssDecodeRam expands
+[sheet]
+size = 8
+bpp = 2
+colors = 4
+lz = true

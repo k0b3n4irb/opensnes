@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 62 examples organized by topic. For a progressive learning path, see
+All 63 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -189,6 +189,7 @@ Persistence and ROM mapping.
 |---------|-------------|
 | @subpage examples_memory_hirom_demo | HiROM vs LoROM memory mapping |
 | @subpage examples_memory_save_game | SRAM battery-backed saves |
+| @subpage examples_memory_lzss_ram | LZ77 decompression into RAM ($7E, $7F), screen on |
 
 ---
 
