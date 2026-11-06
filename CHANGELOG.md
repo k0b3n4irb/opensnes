@@ -5,6 +5,7 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(build): `ROM_BANKS` goes up to 128 on plain LoROM (4 MB). The code has been addressed from `$80` since 2026-10-26, so banks 126 and 127 sit at `$FE:` and `$FF:`, clear of the WRAM at `$7E`/`$7F`; the cap of 126 dated from the `$00` addressing. A 128-bank build of `audio/apu_switch` shows the same frame hash and the same audio as the 8-bank one, `opensnes-rom inspect` and `luna cart-check` find the checksum right. New fixture `libtests_bigrom` and manifest: a const table in bank 127 (`$FF:8000`) read back. Counts between that are not 2^k or 2^k + 2^j (126) leave a remainder that is not a power of two: the linker's checksum then differs from the emulators' (`$6013` against `$08FE`); `docs/tools/build.md` says which counts to prefer.
 - feat(lib): `lzssDecodeRam(source, dest)` expands an LZ77 (tag 0x10) stream into RAM of any
   bank, $7E and $7F included, with the screen on: no PPU register written, interrupts left
   enabled, references copied by MVN for banks $7E/$7F and by a byte loop for any other bank

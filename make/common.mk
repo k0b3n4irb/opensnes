@@ -243,9 +243,9 @@ endif
 # dsp1 module drives is the 1 MB LoROM one (fullsnes, DSP-1 LoROM: data and
 # status in $30-$3F:8000-$FFFF). Lower bound 8: the prebuilt library pins
 # its asset sections to banks 7-1.
-ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,126))))
+ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,128))))
 ifeq ($(shell [ "$(ROM_BANKS)" -ge 8 ] && [ "$(ROM_BANKS)" -le "$(ROM_BANKS_MAX)" ] 2>/dev/null && echo ok),)
-$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 126 banks of 32 KB before WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
+$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 128 banks of 32 KB, addressed from $$80 so the last two sit at $$FE and $$FF, clear of the WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
 endif
 ifeq ($(filter 1,$(USE_SUPERFX)),1)
 ifeq ($(filter 32 64 128,$(GSU_RAM_KB)),)

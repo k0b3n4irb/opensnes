@@ -21,6 +21,7 @@ roots. The root `Makefile` holds the one list (`FIXTURES_LIB`,
 | `libtests_gsu/` | the Super FX job path: cache-resident job, RAM job, ROM job, a save while a job runs | `libtest_gsu_cached*.toml`, `f_`/`g_gsu_save_*.toml` |
 | `libtests_dma_channels/` | the DMA channels the library takes: a Super FX letterbox, the game's HDMA on 2-6, the NMI's text flush and dynamic sprite uploads together; the channels' registers read back | `libtest_dma_channels.toml` |
 | `libtests_region/`, `libtests_region_pal/` | the region a ROM declares (header byte $FFD9, `ROM_REGION`) and the one it runs on (`isPAL()`), read back; the PAL twin includes the same `main.c` | `libtest_region_ntsc.toml`, `libtest_region_ntsc_on_pal.toml`, `libtest_region_pal.toml` |
+| `libtests_bigrom/` | a 4 MB LoROM image (`ROM_BANKS=128`): a const table in bank 127 (`$FF:8000`) read back, the header size byte `$0C` | `libtest_bigrom.toml` |
 | `libtests_aram/` | the sound CPU's memory. A sample loaded in steps (`audioLoadSampleBegin` / `Step`): refusals, a voice command and another load between two steps, the bytes and the directory entry read back, a load given up. The echo ring's place: refused when 48 KB of samples reach into it, accepted when they do not, a shorter delay giving memory back; the sample still loaded whole after a 12 KB ring is replaced by a 2 KB one (the driver's wait) | `test_libtest_aram.py` |
 | `libtests_snesmod/` | the SNESMOD stop / pause / fade queue and what the driver leaves of the machine | `libtest_snesmod.toml` |
 

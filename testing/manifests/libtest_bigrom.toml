@@ -1,0 +1,15 @@
+# A 4 MB LoROM image (ROM_BANKS=128, the plain-LoROM maximum): C const data
+# goes to the highest bank first, so the fixture's table sits in bank 127,
+# addressed $FF:8000, and is read back through the far read C uses for const
+# data. The header's ROM size byte reads $0C. Before 2026-11-06 the build
+# stopped at 126 banks, which left 64 KB of a 4 MB chip unaddressable and an
+# image whose checksum rule (a remainder that is not a power of two) the
+# emulators and the linker do not share.
+rom = "../fixtures/libtests_bigrom/libtest_bigrom.sfc"
+frames = 30
+
+[asserts.values]
+r_table_bank = 0xFF
+r_table_sum = 0x148
+r_header_size = 0x0C
+r_done = 0xBEEF
