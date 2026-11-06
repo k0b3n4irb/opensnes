@@ -5,6 +5,11 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- test(lib): the region gate. `libtests_region` / `libtests_region_pal` read back the header
+  country byte (`$FFD9`, set by `ROM_REGION`) and `isPAL()`; three luna manifests assert NTSC build on
+  NTSC (`$01`, 0), NTSC build on a PAL console (`$01`, 1: `isPAL()` reads the console, not the
+  header) and `ROM_REGION=pal` on PAL (`$02`, 1). Header byte put back to the wrong value: the
+  manifest fails.
 - feat(lib): `vramQueuePushSpriteWithin(src, addr, size_px, budget)`: the budget guard of a
   whole sprite frame in one call. It notes every strip of the frame only if `vramQueueCost() +
   (size_px / 8) * (size_px * 4 + VRAM_QUEUE_ENTRY_COST) <= budget` (288 for 16x16, 832 for

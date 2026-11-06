@@ -1,0 +1,11 @@
+# The PAL build (`ROM_REGION=pal`, header $02) on a PAL console: isPAL() == 1.
+# The header byte is read back from the ROM image, so a ROM_REGION that no
+# longer reaches templates/hdr.asm fails here ($01 instead of $02).
+rom = "../fixtures/libtests_region_pal/libtest_region_pal.sfc"
+frames = 30
+region = "pal"
+
+[asserts.values]
+r_header_country = 2
+r_ispal = 1
+r_done = 0xBEEF
