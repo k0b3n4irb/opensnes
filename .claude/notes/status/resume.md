@@ -64,6 +64,15 @@ and the CHANGELOG.
 - luna `1cce8de`: `luna state --dsp-events notes.jsonl` (one line per KON) and a `frame` column
   in `--dsp-trace`; usable for SNESMOD note-by-note checks at the next pin bump.
 
+## Done 2026-11-06 (lzssDecodeRam)
+
+- `f67b6abb`: `lzssDecodeRam(source, FAR dest)`, LZ10 into RAM of any bank, screen on, no `sei`.
+  163 master cycles/byte on a 2 bpp tile block (139 FastROM), 4.3x faster than `lzssDecodeVram`;
+  376 bytes of ROM only in a ROM that calls it. Example `examples/memory/lzss_ram`. CI green.
+  Asked by xenon2; resumable slices (`lzssDecodeRamWithin`) wait for their real-block figure.
+  Lesson: after a fast-forward of a lib change into this tree, `make lib` before the
+  clean-export pre-push check, or the new symbol is unknown.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
