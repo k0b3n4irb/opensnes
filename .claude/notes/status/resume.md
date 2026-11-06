@@ -54,6 +54,16 @@ and the CHANGELOG.
   banks). Golden on a 128-bank image: bank 0 32 784 -> 16 bytes. CI green.
   Asked by xenon2; thread answered and closed.
 
+## Done 2026-11-06 (region gate)
+
+- `ea446cf8`: fixtures `libtests_region` / `libtests_region_pal` + three luna manifests
+  (`libtest_region_*.toml`): header byte `$FFD9` per `ROM_REGION`, `isPAL()` per console.
+  CI green. `isPAL()` itself was already covered both regions by `test_libtest.py` (`make test-pal`).
+- Waiting on the owner: a possible `pace` module (`PaceClock`, `paceFrames`, 6/5 units per
+  VBlank) for xenon2 / speedball2. Nothing written; speedball2's card 0009 (30 ticks/s NTSC) stands.
+- luna `1cce8de`: `luna state --dsp-events notes.jsonl` (one line per KON) and a `frame` column
+  in `--dsp-trace`; usable for SNESMOD note-by-note checks at the next pin bump.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
