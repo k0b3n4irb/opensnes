@@ -206,13 +206,13 @@ Le compte porte sur les lignes des sections « Suivi de l'audit du 03/10 » des 
 
 Une ligne par manque, à reporter le jour même dans `OPEN_<partenaire>.md` (`partners.md`). Chaque ligne cite sa pièce.
 
-**snes-rag** → `.claude/notes/partners/snes-rag/OPEN_snes-rag.md` (puis copie dans son dossier d'échange) :
+**rag-partner** → `.claude/notes/partners/rag-partner/OPEN_rag-partner.md` (puis copie dans son dossier d'échange) :
 
 - `snes_verify` rend `arbiter_covers_topic_only` sur « drapeau H-blank à H = 274 », alors qu'anomie-timing `08a81c8c93552908` l'énonce. La phrase n'est pas dans `evidence` (01, risque 5).
 - `snes_verify` rend `unsettled` sur le verrou d'écriture partagé entre BG1 scroll et Mode 7, alors que fullsnes `6b054a12234f8aa4` et snesdev-wiki `78c0e95f65b95a86` l'énoncent (01, risque 5).
 - La ligne Super FX de `sd2snes-changelog` n'est toujours pas servie : seul `99d8550526ffa29f` (S-DD1) remonte (02-4 ; G rec 11, rejoué aujourd'hui).
-- La règle de choix `dsp1.bin` / `dsp1b.bin` du FXPak reste sans source (02-8). La ligne `OPEN_snes-rag.md:14` existe : ajouter la pièce du jour.
-- La ligne SA-1 BW-RAM (`OPEN_snes-rag.md:11`) reste en attente (12, rec 8).
+- La règle de choix `dsp1.bin` / `dsp1b.bin` du FXPak reste sans source (02-8). La ligne `OPEN_rag-partner.md:14` existe : ajouter la pièce du jour.
+- La ligne SA-1 BW-RAM (`OPEN_rag-partner.md:11`) reste en attente (12, rec 8).
 - Fait non couvert : la valeur du 17ᵉ bit d'un port 2 vide n'est donnée par aucune référence (`crt0.asm:1416-1418`, 01 risque 2). À mesurer pendant la session console, puis à transmettre avec sa provenance.
 - Fait mesuré, à proposer au corpus : huit KON enchaînés par le protocole du pilote v2 ne perdent aucune voix (ENVX actif sur `0xFF`, `0xFF`, `0x03`, sonde `kon.toml`), malgré l'avertissement de fullsnes `5c23c8e8dbaf1931` (03, points forts).
 - Récupération : sur l'ordre KON / VOL / P / ENV, une requête a ramené snesdev-wiki `6768cd86607515b5`, qui ne tranche pas, et pas anomie-sdsp `f16a9436d9b55cb6`, qui tranche (03 contre 11, F n°4).

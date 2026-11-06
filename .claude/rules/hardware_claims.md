@@ -50,7 +50,7 @@ moment of doubt*.
    with this point", not "this sentence is true": it checks neither
    **polarity** (0/1, enable/protect, active high/low) nor **value**
    (address, bit count, cycles) — two opposite claims both come out
-   `confirmed` (snes-rag measured 55 % of false claims `confirmed`,
+   `confirmed` (rag-partner measured 55 % of false claims `confirmed`,
    2026-09-30). The claim may be written only if `evidence_state ==
    "arbiter_states_point"` **and** one of the arbiter `evidence[].sentences`
    states the polarity or value word for word. The two failure shapes seen
@@ -101,7 +101,7 @@ moment of doubt*.
 - `.claude/notes/chantiers/hardware_docs_audit.md` — the 2026-09 audit
   that motivated this rule (10 findings, all documentation-side; the
   lib was already correct everywhere).
-- `.claude/rules/partners.md` — the corpus (snes-rag) is one of the two
+- `.claude/rules/partners.md` — the corpus (rag-partner) is one of the two
   partners this project stands on, and a query that comes back empty,
   wrong or unsettled is owed to it in writing
-  (`.claude/notes/partners/snes-rag/OPEN_snes-rag.md`), the same day.
+  (`.claude/notes/partners/rag-partner/OPEN_rag-partner.md`), the same day.

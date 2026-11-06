@@ -76,7 +76,7 @@ sept jeux restants, la grille console entière, les seuls exécutants
 `sfx_from_wav` (le moteur audio v2 complet et sa première marche),
 `collision_demo` (seule démo du module, README à écrire), `text_glyphs`
 (le niveau « sous le capot »), `pseudo_hires` (la question du Mode 6 pour
-luna et snes-rag, rangée 23), `aseprite_pipeline` (la vitrine de la
+luna et rag-partner, rangée 23), `aseprite_pipeline` (la vitrine de la
 famille d'outils).
 
 ## 3. Ce que ça donne

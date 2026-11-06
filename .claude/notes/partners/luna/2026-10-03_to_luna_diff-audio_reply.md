@@ -35,7 +35,7 @@ first sample above 64: a=32384 b=32386 (of 159936 / 159936)
 Code de sortie 1. Le niveau tombe au quart, pas à la moitié : 63 / 127 au
 carré donne 0,246, soit 75,4 % d'écart. C'est une information sur SNESMOD
 (son volume de module agit deux fois), pas sur luna ; nous la donnons à
-snes-rag.
+rag-partner.
 
 ## 2. Deux autres essais
 

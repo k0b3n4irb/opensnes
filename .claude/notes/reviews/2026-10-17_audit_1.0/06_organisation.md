@@ -6,7 +6,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 
 1. Lus : `CLAUDE.md`, les 19 fichiers de `.claude/rules/`, `.claude/settings.json` et ses trois hooks, `.claude/agents/`, `.claude/skills/`, `.claude/notes/README.md`, les six notes de `status/`, l'en-tête et l'entrée A5 de `STRUCTURAL_DEFECTS.md`, `ROADMAP.md`, `docs/STABILITY.md`, `CONTRIBUTING.md`, `MAINTAINING.md`, `.github/` (CODEOWNERS, 9 workflows, `lint.yml`, `release.yml`), `devtools/lint_commits.py`, `compiler/PINS.md`.
 2. Audits précédents : `H_governance.md` et `2026-10-04_reste_a_traiter.md` (lignes H), la fiche D1-D5 et `silent_defects_log.md` (critère 7).
-3. Mesuré dans l'arbre principal, en lecture seule : `git log` / `shortlog` / `numstat` sur 30 jours (614 commits sur `develop`), tailles des sections du CHANGELOG, octets chargés à chaque session, l'état des dossiers d'échange partenaires (`~/workspace/partner-reports/opensnes/`, dossier snes-rag).
+3. Mesuré dans l'arbre principal, en lecture seule : `git log` / `shortlog` / `numstat` sur 30 jours (614 commits sur `develop`), tailles des sections du CHANGELOG, octets chargés à chaque session, l'état des dossiers d'échange partenaires (`~/workspace/partner-reports/opensnes/`, dossier rag-partner).
 4. Lancé dans le worktree `opensnes-audit` : `make lint-docs` (vert, 85 exemples), `devtools/lint_commits.py --message-file` sous une identité de contributeur fictive (refus, exit 1).
 5. Pas de mesure réseau (`gh issue list` interdit par le mandat) : l'état des issues et PR GitHub n'est pas mesuré dans ce rapport.
 
@@ -16,7 +16,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 - **Les frontières entre l'utilisateur et le contributeur sont tenues mécaniquement.** `make/common.mk` n'appelle plus aucun interpréteur (ancre 17 de `check_doc_drift.py`, `make lint-docs` vert). Les scripts de `devtools/` et `testing/` ont tous un appelant : sur tous les `.py`/`.sh` hors tests et fixtures, la seule entrée sans référence dans `Makefile`, les workflows ou les README est `devtools/vram_layout/vram_spec.py`, qui est un module importé. `devtools/README.md` dit quelles dépendances il faut (Python 3.10+ en stdlib, ortools en option).
 - **Le cycle avec les partenaires fonctionne, et on peut le vérifier date par date.**
   - Côté luna : 80 fichiers dans `partners/luna/`. Les trois notes `luna-vers-opensnes` du 2026-10-12 ont chacune reçu leur réponse le jour même (`2026-10-12_to_luna_*_reply.md`). Le pin est passé à v1.38.0 le jour de sa publication (10-10, `2026-10-10_from_luna_v1.38.0-publiee.md`).
-  - Côté snes-rag : depuis la consigne du 10-02, chaque fichier `to_` est livré dans son dossier.
+  - Côté rag-partner : depuis la consigne du 10-02, chaque fichier `to_` est livré dans son dossier.
   - Côté amont : SNESMOD est vérifié chaque semaine (prochain contrôle le 10-24) et QBE chaque mois, avec une politique écrite (`partners/qbe-upstream/README.md`, décision du 10-13).
 - **Le processus de release est outillé et suivi.** Six versions mineures entre le 09-26 et le 10-12. `release.yml:27` refuse une étiquette hors de `main`. La fusion de release se fait en local (`fe7620f6 release: v0.50.0`, committer k0b3n4irb). La CI de `develop` n'annule plus ses propres runs (`lint.yml:43`, `cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}`).
 - **Plusieurs constats H du 03/10 sont fermés pour de bon** (le détail est dans la dernière section) : le « 3-pillar » de `CLAUDE.md`, l'agent `snes-engine-reviewer.md:29`, « Twenty engineers », la règle « une session par arbre » (`release.md` point 7) et le paragraphe d'effort minimal du critère 7.
@@ -142,7 +142,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 ## Risques
 
 - **Le jeu pilote l'API dans les derniers jours avant le gel.** `[Unreleased]` ajoute quatre fonctions publiques demandées par un jeu bâti sur le SDK (`vramQueueCost`, `audioReleaseEcho`, `audioLoadSampleBegin/Step`) cinq jours après « the SDK carries the public API meant for 1.0 » (`ROADMAP.md:14`). Une API gelée avant d'avoir servi à un second projet risque de garder la forme d'un seul jeu, que le dépôt ne peut même pas montrer (06-9).
-- **Les règles dépendent d'une seule machine.** `partners.md` et `exchanges.md` (auto-chargés) imposent des chemins locaux (`/media/psf/Home/...`, `~/workspace/partner-reports/`) et des sessions jointes par `SendMessage`. snes-rag n'est pas public (H PF18). Un second mainteneur ne pourrait suivre ni le circuit partenaires ni la règle `hardware_claims.md` sans recréer cet environnement.
+- **Les règles dépendent d'une seule machine.** `partners.md` et `exchanges.md` (auto-chargés) imposent des chemins locaux (`/media/psf/Home/...`, `~/workspace/partner-reports/`) et des sessions jointes par `SendMessage`. rag-partner n'est pas public (H PF18). Un second mainteneur ne pourrait suivre ni le circuit partenaires ni la règle `hardware_claims.md` sans recréer cet environnement.
 - **Des sessions concurrentes travaillent sur l'arbre que le jeu consomme.** `exchanges.md` reconnaît que le jeu voit les modifications non commitées de cet arbre, et il y avait déjà eu une casse `-Werror` le 10-10. Plusieurs sessions (le jeu, les auditeurs, la session principale) partagent `bin/`, et le marqueur de tests (06-15) est commun à toutes.
 - **Le rythme dépend de l'outillage IA.** Avec 108 commits un jour donné et 45 % des commits le week-end, une interruption de l'outil ou de la disponibilité du mainteneur arrête le projet. Rien n'est prévu pour ce cas.
 - **Une 1.0 avec 185 patchs de compilateur maintenus seul.** cproc 46, QBE 134, wla-dx 5 (`compiler/PINS.md`), pour une promesse de stabilité « until 2.0 ».
@@ -184,7 +184,7 @@ Les automatismes du processus tiennent : identité unique, frontières entre l'u
 | PF15 (critères de gel absents de ROADMAP) | **partiel** | `ROADMAP.md:19` renvoie à `STABILITY.md`, mais les sept critères n'y sont toujours pas → 06-4 |
 | PF16 (A5, patchs non remontés) | **partiel** | Le propriétaire a décidé le 10-13 de ne rien remonter, mais `STRUCTURAL_DEFECTS.md:737` dit toujours « 34 current patches » (réel : 185) et la branche de pin reste `feat/b2-far-qualifier` → 06-7 |
 | PF17 (blob SNESMOD) | **ouvert** | `sm_spc.asm` : 173 lignes de données sur 206 ; aucune décision dans `STABILITY.md` → 06-11 |
-| PF18 (snes-rag non public) | **ouvert** | `MAINTAINING.md` : « run outside this repository » → Risques |
+| PF18 (rag-partner non public) | **ouvert** | `MAINTAINING.md` : « run outside this repository » → Risques |
 | PF19 (facteur bus = 1, critère 2) | **ouvert**, durci | Aucun contributeur externe, et le lint d'identité refuse désormais tout autre auteur → 06-1 |
 | PF20 (charge de soirées et de week-ends, docs internes) | **ouvert** | 70 % des commits hors de 9 h-18 h, 45 % le week-end, 24 % de commits `.claude/` seuls → 06-10 |
 | rec 5 (effort minimal pendant la fenêtre) | **partiel** | Le paragraphe existe (`silent_defects_log.md`, « Effort during the window ») mais n'est pas appliqué : semaine 2 absente → 06-2 |

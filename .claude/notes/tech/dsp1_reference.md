@@ -375,7 +375,7 @@ originals are the ultimate primaries but only reachable via those derivatives.
 ## 15. Raster protocol — Phase 0 probe results (2026-09-03, luna v1.17.0, DSP-1B LLE)
 
 Source of truth: official SNES Development Manual Book II §5.4.1–5.4.4
-(local corpus `snes-rag/corpus/manual/book2_text.pdf`) + a throwaway probe ROM
+(local corpus `rag-partner/corpus/manual/book2_text.pdf`) + a throwaway probe ROM
 (`--dsp1-trace-commands` + WRAM peeks). Everything below is measured unless
 marked *manual*.
 

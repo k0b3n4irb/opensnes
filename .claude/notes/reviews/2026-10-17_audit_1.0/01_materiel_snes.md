@@ -116,7 +116,7 @@ Aucune des affirmations 🔴/🟠 de `KNOWN_LIMITATIONS.md` échantillonnées n'
 2. **Port 2 vide.** La valeur du 17e bit sur un port vide n'est donnée par aucune référence (`crt0.asm:1416-1418`, assumé honnêtement). La ligne 2 du protocole ne demande pas de démarrer **sans** pad en port 2 pour lire `padIsConnected(1)`. C'est à ajouter : une observation de cinq secondes, qui tranchera aussi le point pour le corpus.
 3. **Bus ouvert et état PPU au démarrage.** luna randomise les RAM, pas les registres PPU. `InitHardware` écrit presque tout. Restent non écrits la CGRAM au-delà de l'entrée 0 (vidée par `consoleInit`) et COLDATA (`stz $2132` n'écrit aucun canal, `crt0.asm:446` ; c'est sans effet tant que les maths de couleur sont coupées). Risque faible.
 4. **Les conflits de canal entre modules** (01-1) sont une classe, pas un cas. La lib a 4 usagers internes de canaux DMA (0, 1, 7, et 1 pour le GSU). Aucune table ne les recense et aucun test ne combine les modules qui les partagent.
-5. **Arbitrage outillé imparfait.** Deux fois aujourd'hui, `snes_verify` a rendu `arbiter_covers_topic_only`/`unsettled` alors qu'un arbitre énonce le point mot pour mot. Le cas H = 274 est dans anomie-timing `08a81c8c93552908`, dont la phrase n'est pas dans `evidence`. Le cas du verrou BG1/Mode 7 est dans fullsnes `6b054a12234f8aa4` et snesdev-wiki `78c0e95f65b95a86`. À reporter à snes-rag (`OPEN_snes-rag.md`) : je n'ai pas le droit d'écrire hors de ce rapport. Même chose pour luna : la colonne `hclock` des écritures HDMA vaut 0 dans `--mem-trace`, alors que le HDMA a lieu vers H = 278 (fullsnes `ae801928f9327bcc`). Une demande « révision S-CPU / PPU / 1-CHIP » est aussi à faire.
+5. **Arbitrage outillé imparfait.** Deux fois aujourd'hui, `snes_verify` a rendu `arbiter_covers_topic_only`/`unsettled` alors qu'un arbitre énonce le point mot pour mot. Le cas H = 274 est dans anomie-timing `08a81c8c93552908`, dont la phrase n'est pas dans `evidence`. Le cas du verrou BG1/Mode 7 est dans fullsnes `6b054a12234f8aa4` et snesdev-wiki `78c0e95f65b95a86`. À reporter à rag-partner (`OPEN_rag-partner.md`) : je n'ai pas le droit d'écrire hors de ce rapport. Même chose pour luna : la colonne `hclock` des écritures HDMA vaut 0 dans `--mem-trace`, alors que le HDMA a lieu vers H = 278 (fullsnes `ae801928f9327bcc`). Une demande « révision S-CPU / PPU / 1-CHIP » est aussi à faire.
 
 ## Améliorations recommandées
 
@@ -132,7 +132,7 @@ Aucune des affirmations 🔴/🟠 de `KNOWN_LIMITATIONS.md` échantillonnées n'
 | 8 | `hdmaSetup` refuse les canaux réservés | 01-11 | 🟡 | S |
 | 9 | `vram_dma_blank.py` étendu à CGRAM/OAM/CPU et aux scripts d'entrée des manifestes | 01-12 | 🟡 | S |
 | 10 | Doc : `setScreenOn` hors VBlank, recette HVBJOY, BRK piégé | 01-10, 01-13, 01-14 | 🟡 | S |
-| 11 | Rapports partenaires : snes-rag (deux faux `unsettled`), luna (`hclock` HDMA, révisions de puces) | risque 5 | 🟡 | S |
+| 11 | Rapports partenaires : rag-partner (deux faux `unsettled`), luna (`hclock` HDMA, révisions de puces) | risque 5 | 🟡 | S |
 
 ## Verdict
 

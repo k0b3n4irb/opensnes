@@ -2513,7 +2513,7 @@ header against luna's view. luna v1.32.0.
   `snesmod_music`): 127 halves the level, 255 leaves it unchanged, 63 leaves
   a quarter. `snesmod.h`, `docs/tutorials/audio.md` and the `snesmod_music`
   README said 0-127, and the example's volume variable started at 127 so the
-  first L press jumped from 255 to 117 (snes-rag, reading the SNESMOD
+  first L press jumped from 255 to 117 (rag-partner, reading the SNESMOD
   source; library audit D12). The effect volume stays 0-127: our wrapper
   reduces it to the driver's nibble.
 - docs: `fix32Sin()` / `fix32Cos()` carry the NMI warning of `fix32Mul()`:
@@ -2729,7 +2729,7 @@ header against luna's view. luna v1.32.0.
   dropped, the stray `cli` in `QueueMessage` / `snesmodInit` is gone and
   `snesmodGetPosition()` reads until two reads agree; commands with no
   parameter queue 0 in their unused bytes instead of what a scratch variable
-  held. Found by snes-rag
+  held. Found by rag-partner
   reading the upstream driver; measured and pinned by `libtest_snesmod`
   (before: latch flag `$40`, 3 lines, depth 44 after 100 sends, never
   drained; after: 0, 6, 255, drained in 40 frames).

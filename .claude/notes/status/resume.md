@@ -37,14 +37,14 @@ and the CHANGELOG.
 - `rom_coverage.py` reports two never-executed functions (`oamSetBatch`,
   `vramQueuePushSpriteWithin`), not from this lot; not in `make tests`.
 
-## Done 2026-11-04 (snes-rag's two doc findings)
+## Done 2026-11-04 (rag-partner's two doc findings)
 
 - `212ba5dc`: OAMADD is a word address (sprite N = `N * 2`) in `OAM.md` /
   `REGISTERS.md`; `hdma.h` count byte `$01-$80` no repeat, `$81-$FF` repeat.
   Answered in the thread; `make tests` green, `make lint-docs` OK.
 - `04bec2d1`: doc-drift anchor 21 (`devtools/check_doc_drift.py`) refuses `OAMADD… = x * 4` and the old HDMA count wording. Before: `make lint-docs` passed with `N * 4` put back; after: exit 1 on both.
 - Rest-time proposal (thread `au-repos-…`): go for step 1 only, reading with
-  xenon2 what its sound engine needs; code only if measured and the
+  a partner port what its sound engine needs; code only if measured and the
   two-games rule holds. Not started.
 
 ## Done 2026-11-05 (budget past 64 banks)
@@ -52,7 +52,7 @@ and the CHANGELOG.
 - `668dc2a4`: `opensnes-rom budget` takes a section's bank from its ROM offset
   (the `$C0` fold made linker bank 64 look like bank 0 on a FastROM LoROM of 80+
   banks). Golden on a 128-bank image: bank 0 32 784 -> 16 bytes. CI green.
-  Asked by xenon2; thread answered and closed.
+  Asked by a partner port; thread answered and closed.
 
 ## Done 2026-11-06 (region gate)
 
@@ -60,7 +60,7 @@ and the CHANGELOG.
   (`libtest_region_*.toml`): header byte `$FFD9` per `ROM_REGION`, `isPAL()` per console.
   CI green. `isPAL()` itself was already covered both regions by `test_libtest.py` (`make test-pal`).
 - Waiting on the owner: a possible `pace` module (`PaceClock`, `paceFrames`, 6/5 units per
-  VBlank) for xenon2 / speedball2. Nothing written; speedball2's card 0009 (30 ticks/s NTSC) stands.
+  VBlank) for two partner ports. Nothing written; one port's card 0009 (30 ticks/s NTSC) stands.
 - luna `1cce8de`: `luna state --dsp-events notes.jsonl` (one line per KON) and a `frame` column
   in `--dsp-trace`; usable for SNESMOD note-by-note checks at the next pin bump.
 
@@ -69,7 +69,7 @@ and the CHANGELOG.
 - `f67b6abb`: `lzssDecodeRam(source, FAR dest)`, LZ10 into RAM of any bank, screen on, no `sei`.
   163 master cycles/byte on a 2 bpp tile block (139 FastROM), 4.3x faster than `lzssDecodeVram`;
   376 bytes of ROM only in a ROM that calls it. Example `examples/memory/lzss_ram`. CI green.
-  Asked by xenon2; resumable slices (`lzssDecodeRamWithin`) wait for their real-block figure.
+  Asked by a partner port; resumable slices (`lzssDecodeRamWithin`) wait for their real-block figure.
   Lesson: after a fast-forward of a lib change into this tree, `make lib` before the
   clean-export pre-push check, or the new symbol is unknown.
 
@@ -80,10 +80,10 @@ and the CHANGELOG.
   audio as 8 banks; fixture `libtests_bigrom` reads a const table in bank 127. At 126 banks the linker's
   checksum (`$6013`) differs from luna's recursive-mirror one (`$08FE`): the rules agree only when the part
   above the largest power of two is itself a power of two. Not fixed in the linker; build.md says which counts to prefer.
-- `7ac47544`: `audioLoadSampleAt` / `audioLoadSampleBeginAt` (xenon2). `audioStopVoice` alone is not enough before
+- `7ac47544`: `audioLoadSampleAt` / `audioLoadSampleBeginAt` (a partner port). `audioStopVoice` alone is not enough before
   overwriting: wait 8 ms (two VBlanks). `wdm_expected` key in `luna_runner.py` / `manifest.toml`.
   Open: fil to luna for a DSP-register read (ENVX) in a manifest checkpoint.
-- Waiting: xenon2's real-game figures for `lzssDecodeRam` (resumable slices only if needed) and for `audioLoadSampleAt`;
+- Waiting: a partner port's real-game figures for `lzssDecodeRam` (resumable slices only if needed) and for `audioLoadSampleAt`;
   whether their ROM in 128 banks passes `luna cart-check`. `pace` module (6/5 units per VBlank): nothing written, owner's call.
 
 ## In progress

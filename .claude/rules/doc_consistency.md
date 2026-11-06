@@ -165,7 +165,7 @@ opt-in list.
     no `OAMADD… = x * 4` in `docs/`, `lib/` or the examples (OAMADD is a word
     address: sprite N = `N * 2`), and no "bit 7 = repeat mode, bits 0-6 = count"
     (`$01-$80` no repeat, 1-128 lines; `$81-$FF` repeat, 1-127). Caught by
-    snes-rag when it built an evaluation set from our hardware docs.
+    rag-partner when it built an evaluation set from our hardware docs.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —

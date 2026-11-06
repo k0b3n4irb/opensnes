@@ -627,7 +627,7 @@ def check_example_stale_claims() -> list[str]:
 # OAMADD ($2102/$2103) is a WORD address: sprite N starts at word 2N, so
 # `REG_OAMADDL = N * 4` aims at sprite 2N (and overflows from N >= 64).
 # The HDMA count byte is not "bit 7 = repeat, bits 0-6 = count": $80 is 128
-# lines without repeat (snes-rag finding, 2026-11-04, both in the docs).
+# lines without repeat (rag-partner finding, 2026-11-04, both in the docs).
 # --------------------------------------------------------------------------
 
 _OAMADD_BYTES_RE = re.compile(r"OAMADD[LH]?\s*=\s*[^;\n]*\*\s*4\b")
