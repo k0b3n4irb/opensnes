@@ -91,6 +91,16 @@ and the CHANGELOG.
 - luna `281485c` (`[checkpoint.dsp]`) is not under a tag yet (pin `v1.40.0`; checked 2026-11-07: v1.42.0 is `8fee4e6`, 28 commits BEFORE it, and the 1.42.0 binary rejects `[checkpoint.dsp]`; test with `git merge-base --is-ancestor 281485c <tag>`, not `git tag --contains`): at the first tag that carries it, bump the pin,
   replay the corpus golden queries, add the ENVX-after-KOFF manifest (`at_symbol` on `audioUpdate`).
 
+## Done 2026-11-07 (ppuReset)
+
+- `ff9e50d4` / `279f61d5`: `ppuReset()` (module `ppu_reset`, asm), example `basics/ppu_reset`, manifest
+  `basics_ppu_reset.toml` (52 PPU registers + 33 lib variables equal to the boot state; 80 diffs without the call).
+  283 bytes ROM, 167 832 master cycles. CI green (run 42361931119). Thread: `2026-11-07-detecter-a-la-volee-…`.
+- Open: crt0 writes COLDATA = 0 (selects no plane, fixed colour stays); `ppuReset` writes `$E0`. Fixing crt0 is Class A, waits for the conductor.
+- Measured for the author: a linked module keeps its SEMISUPERFREE const data uncalled (wlalink -d never discards it):
+  math/fixed32 +577 B, sprite +512, math_ease/mode7 +256, hdma +64, text+dma +38; all in asset banks, none in bank $00.
+  Fixing it for all = compiler emits discardable const (Class A, ~1.7 KB): not started, waits for the author.
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
