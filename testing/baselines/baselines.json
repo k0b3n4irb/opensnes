@@ -107,6 +107,18 @@
     "luna_version": "v1.40.0",
     "rom_sha256": "dc62d5c3a8f646ecadbe109ca50f9e896ad9dcdc620188911d03f9dbb0923e41"
   },
+  "basics_ppu_reset": {
+    "fbhash": [
+      "90b0551871acb915",
+      "ef023b8939facbf7"
+    ],
+    "frames": [
+      100,
+      200
+    ],
+    "luna_version": "v1.40.0",
+    "rom_sha256": "03df66bda9723652a16f01ab346d8ba3fb329a53c6492aeed04e8c980f18b69e"
+  },
   "basics_scene_stack": {
     "fbhash": "65f812bced3ec393",
     "frames": 200,

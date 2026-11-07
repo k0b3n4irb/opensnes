@@ -82,6 +82,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
                          ../examples/basics/game_skeleton \
+                         ../examples/basics/ppu_reset \
                          ../examples/basics/panel_hud \
                          ../examples/basics/scene_stack \
                          ../examples/games/breakout \

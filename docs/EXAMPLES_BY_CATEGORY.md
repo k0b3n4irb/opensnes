@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 64 examples organized by topic. For a progressive learning path, see
+All 65 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -179,6 +179,7 @@ The reusable logic toolbox.
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |
 | @subpage examples_basics_game_skeleton | The smallest complete game: title → play → game-over state machine |
+| @subpage examples_basics_ppu_reset | `ppuReset()` between two screens: every PPU register back to power-on |
 
 ---
 

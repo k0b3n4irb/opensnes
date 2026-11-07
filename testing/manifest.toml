@@ -93,6 +93,11 @@ frames = [200, 400]
 [examples."chips/superfx_game_skeleton"]
 frames = [200, 400]
 
+# Two screens, not an animation: screen A (frame 100, everything changed and
+# the HDMA wave running) and screen B after ppuReset() (from frame 128).
+[examples."basics/ppu_reset"]
+frames = [100, 200]
+
 [examples."demos/shmup"]
 frames = [200, 400]
 

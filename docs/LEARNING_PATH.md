@@ -136,6 +136,8 @@ every game needs.
 
 @subpage examples_basics_game_skeleton
 
+@subpage examples_basics_ppu_reset
+
 @subpage examples_basics_aim_target
 
 ## Stage 6 — "Can I finish and ship?"
