@@ -88,7 +88,7 @@ and the CHANGELOG.
 
 ## Waiting (2026-11-07)
 
-- luna `281485c` (`[checkpoint.dsp]`) is not under a tag yet (pin `v1.40.0`): at the tag that carries it, bump the pin,
+- luna `281485c` (`[checkpoint.dsp]`) is not under a tag yet (pin `v1.40.0`; checked 2026-11-07: v1.42.0 is `8fee4e6`, 28 commits BEFORE it, and the 1.42.0 binary rejects `[checkpoint.dsp]`; test with `git merge-base --is-ancestor 281485c <tag>`, not `git tag --contains`): at the first tag that carries it, bump the pin,
   replay the corpus golden queries, add the ENVX-after-KOFF manifest (`at_symbol` on `audioUpdate`).
 
 ## In progress
