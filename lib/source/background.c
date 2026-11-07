@@ -24,7 +24,7 @@
  * presentation step (superfx.asm, gsu_present_step) swaps BG1's nibble in
  * the NMI and keeps this copy right for the next bgSetGfxPtr(). */
 u8 bg12nba_shadow;
-static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
+u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C); not static: ppuReset() zeroes it */
 
 extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */
 extern u16 bg_scroll_y[4]; /* Synced to hardware by NMI handler */

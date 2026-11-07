@@ -134,6 +134,7 @@ its header.
 | `console.h` | `rngNext`, `rngSeed` | [math: random numbers](tutorials/math.md) |
 | `console.h` | `resetFrameCount` | [animation](tutorials/animation.md) |
 | `console.h` | `isInVBlank` | [DMA](tutorials/dma.md) |
+| `console.h` | `ppuReset` | [game states: registers the previous screen left](tutorials/game_states.md) |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` (behind `SNES_BREAK`, `SNES_NOCASH`) | [debugging](tutorials/debugging.md) |
 | `hdma.h` | `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaBrightnessGradientStop`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWindowShape`, `hdmaGetEnabled`, `hdmaDisableAll` | [HDMA: ready-made effects](tutorials/hdma.md) |
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |

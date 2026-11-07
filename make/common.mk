@@ -343,6 +343,7 @@ _DEP_hdma            := dma math_sqrt
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
 _DEP_panel           := dma console
+_DEP_ppu_reset       := console background colormath mosaic window mode7 hdma sprite   # ppuReset: the shadows of each, oamClear
 _DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
