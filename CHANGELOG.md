@@ -140,6 +140,15 @@ All notable changes to OpenSNES are documented in this file.
   round trip (write, reload, corrupted copy).
 
 ### Changed
+- perf(compiler): a division or remainder of two integer constants is
+  computed by the compiler. `19391 / 3584`, `(7 * 32 + 3584 - 1) / 3584` or
+  `1800 / 60` called the division helper at run time, while `7 * 32` was
+  already folded. A zero divisor and the most negative value divided by -1
+  (16 or 32 bits) are left to run time. Two examples change:
+  `games/shard_dash` (one call gone) and `sprites/world_sprites` (six); the
+  library is byte-identical. New
+  fixture `const_div` (values written by hand, no helper called) and
+  compiler check `const_div_fold`.
 - perf(compiler): a function that calls nothing and needs more than the 16
   words of the direct-page block `tcc__lf` keeps its costliest temporaries
   there (use count weighted by loop depth) and only the rest on the stack.
