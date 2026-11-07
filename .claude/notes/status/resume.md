@@ -86,6 +86,11 @@ and the CHANGELOG.
 - Waiting: a partner port's real-game figures for `lzssDecodeRam` (resumable slices only if needed) and for `audioLoadSampleAt`;
   whether their ROM in 128 banks passes `luna cart-check`. `pace` module (6/5 units per VBlank): nothing written, owner's call.
 
+## Waiting (2026-11-07)
+
+- luna `281485c` (`[checkpoint.dsp]`) is not under a tag yet (pin `v1.40.0`): at the tag that carries it, bump the pin,
+  replay the corpus golden queries, add the ENVX-after-KOFF manifest (`at_symbol` on `audioUpdate`).
+
 ## In progress
 
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
