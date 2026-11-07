@@ -47,8 +47,11 @@ The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,
 QBE, wla-dx and the asset tools with ASan + UBSan and runs the fixtures,
 the lib build, the tool goldens and the whole corpus under
 `halt_on_error=1` (CI job `sanitizers` in `lint.yml`). Run it after any
-change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
-`bin/`, so `make clean && make` afterwards.
+change to `compiler/` or `tools/*/src`; it swaps sanitized binaries into
+`bin/` for the run and rebuilds the normal ones at the end, pass or fail (a
+sanitized `cproc-qbe` left behind broke a partner build on 2026-11-07). Tell
+the partners whose build uses this tree before it runs: `bin/` is incomplete
+for the whole run.
 `make test-toolchain-suites` runs the three submodules' own upstream
 suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and

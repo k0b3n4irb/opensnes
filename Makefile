@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -490,10 +490,18 @@ test-tools:
 # buffer on one-character macro labels, wlalink READ_T signed-shift
 # overflow, QBE memset on a NULL table, smconv int stores through u16
 # fields and negative shifts in the BRR encoder, wav2brr negative shift,
-# tmx2snes offsetof through NULL). The tree is left with SANITIZED binaries
-# in bin/ — run `make clean && make` afterwards before anything else.
+# tmx2snes offsetof through NULL). The pass swaps SANITIZED binaries into
+# bin/; the target restores the normal ones at the end, pass or fail (a
+# sanitized cproc-qbe left behind made a partner build fail on LeakSanitizer,
+# 2026-11-07), so the tree is usable again when it returns.
 SAN_ENV := ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1
 test-sanitizers:
+	@$(MAKE) test-sanitizers-pass; rc=$$?; \
+	  echo "test-sanitizers: restoring the normal binaries (make clean && make)"; \
+	  $(MAKE) clean >/dev/null && $(MAKE) >/dev/null || { echo "test-sanitizers: the restoring build FAILED, bin/ is not usable"; exit 1; }; \
+	  exit $$rc
+
+test-sanitizers-pass:
 	$(MAKE) -C $(COMPILER_PATH) clean
 	$(MAKE) -C $(TOOLS_PATH) clean
 	$(MAKE) -C $(LIB_PATH) clean
@@ -513,11 +521,17 @@ test-sanitizers:
 # the whole tree first, then the files this fork owns (the w65816 backend
 # and cproc's target/IR-emission side). A report, not a gate: the numbers
 # are the map of what the fixtures never reach. Leaves instrumented
-# binaries in bin/ — `make clean && make` afterwards.
+# binaries in bin/ during the run; the target restores the normal ones.
 LLVM_PROFDATA ?= $(shell command -v llvm-profdata || command -v llvm-profdata-18 || ls /usr/lib64/llvm*/bin/llvm-profdata 2>/dev/null | tail -1)
 LLVM_COV      ?= $(shell command -v llvm-cov || command -v llvm-cov-18 || ls /usr/lib64/llvm*/bin/llvm-cov 2>/dev/null | tail -1)
 COV_DIR       := /tmp/opensnes_coverage
 coverage-host:
+	@$(MAKE) coverage-host-pass; rc=$$?; \
+	  echo "coverage-host: restoring the normal binaries (make clean && make)"; \
+	  $(MAKE) clean >/dev/null && $(MAKE) >/dev/null || { echo "coverage-host: the restoring build FAILED, bin/ is not usable"; exit 1; }; \
+	  exit $$rc
+
+coverage-host-pass:
 	@test -n "$(LLVM_PROFDATA)" -a -n "$(LLVM_COV)" || { echo "coverage-host: llvm-profdata / llvm-cov not found (install llvm)"; exit 1; }
 	$(MAKE) -C $(COMPILER_PATH) clean
 	$(MAKE) -C $(LIB_PATH) clean
@@ -857,7 +871,7 @@ help:
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  check-clean-export - Build every example from a clean export of HEAD, as CI does"
 	@echo "  clean-tmp - Remove what the tests left in \$$OPENSNES_TMP (default /tmp/opensnes-tests); make tests ends with it"
-	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
+	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (restores the normal binaries at the end)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
 	@echo "  test-bank-spill   - Rebuild four examples with bank $$00 full: code in bank $$01 must show the same frames"
