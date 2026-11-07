@@ -95,7 +95,7 @@ include $(OPENSNES)/make/common.mk
 
 Silent failures: no error, just wrong behaviour. The public list with severity and mitigations is `KNOWN_LIMITATIONS.md`; keep this one in sync.
 
-- **VRAM writes only work in VBlank or forced blank**; ~4 KB DMA per VBlank, more needs force blank (`setScreenOff/On`) or splitting. The DMA routines count and flag (`WDM $02`) a transfer made with the screen on outside VBlank.
+- **VRAM writes only work in VBlank or forced blank**; ~4 KB DMA per VBlank, more needs force blank (`setScreenOff/On`) or splitting. The DMA routines count and flag (`WDM $02`) a transfer made with the screen on outside VBlank, at its start and at its end.
 - **Bank $00 ROM is code only** since #127.3: C const data lives in the asset banks and every C read of it is a far read; casting `const` away and reading through a plain pointer is the one bank-blind path (`opensnes-rom check` fails the link). Code that does not fit goes to bank $01+ by itself (`make test-bank-spill`); the free-space ratchet `BANK0_FAIL_THRESHOLD` is off by default.
 - **Plain C RAM lives below $2000; `FAR` is the way above** (`snes/types.h`, `docs/tutorials/far_ram.md`): declare bulk buffers `FAR`; `opensnes-rom check` fails the link on a plain-band overflow.
 - **cc65816 pushes args LEFT-TO-RIGHT**: ASM ported from PVSnesLib has swapped stack offsets (`compiler/ABI.md`).

@@ -10,10 +10,15 @@
 
 #include <snes.h>
 
-/** Transfers started with the screen on, outside VBlank (see dma.asm):
- *  0 on a healthy run. Wraps at 65536. */
+/** Transfers made with the screen on, outside VBlank (see dma.asm): started
+ *  outside it, or started inside it and run past its end. 0 on a healthy
+ *  run. Wraps at 65536. */
 u16 dma_unsafe_count;
+/** Set by the start check when the screen is on and VBlank open, cleared by
+ *  a trip: the end check of dma.asm counts a call once. */
+u8 dma_end_armed;
 extern void dmaCheckScreen(void);
+extern void dmaStartCheckEnd(void);
 
 /*============================================================================
  * VRAM Transfers
@@ -31,7 +36,7 @@ static void fill_pass(u8 vmain, u8 bbad, u16 src, u16 dest, u16 count) {
     REG_A1B(0) = 0x7E;           /* bank-$00 RAM through its $7E mirror */
     REG_DASL(0) = count & 0xFF;
     REG_DASH(0) = (count >> 8) & 0xFF;
-    REG_MDMAEN = 0x01;
+    dmaStartCheckEnd();          /* MDMAEN = 1, then: did it end in VBlank? */
 }
 
 void dmaFillVRAM(u16 value, u16 dest, u16 size) {

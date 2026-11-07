@@ -330,7 +330,9 @@ vramQueueFlushUntil(262);   /* NTSC: the blank ends after line 261; 312 in PAL *
 
 Put per-frame transfers after `WaitForVBlank()` and wrap heavy bulk
 transfers in `setScreenOff()`/`setScreenOn()`; a write during active
-display is ignored with no error. Detail in
+display is ignored with no error. The library's DMA calls count such a
+transfer in `dma_unsafe_count` and fire WDM $02 (luna `--wdm-out`): one started
+outside VBlank, and one started inside it but too big to finish there. Detail in
 [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md).
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame

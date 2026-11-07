@@ -5,57 +5,57 @@
       "detail": {}
     },
     "pad": {
-      "cycles": 9742,
+      "cycles": 9729,
       "detail": {
-        "row_pad@for_body.12": 129240,
-        "padReleased": 65320,
-        "NmiHandler": 154,
-        "row_pad@for_body.8": 80
+        "row_pad@for_body.12": 128902,
+        "padReleased": 64800,
+        "bench_nop@body.4": 640,
+        "NmiHandler": 154
       }
     },
     "scroll": {
-      "cycles": 27356,
+      "cycles": 27358,
       "detail": {
-        "bgSetScroll": 318782,
-        "row_scroll@for_body.22": 199142,
-        "bgSetScroll@out": 27200,
+        "bgSetScroll": 319164,
+        "row_scroll@for_body.22": 199000,
+        "bgSetScroll@out": 27160,
         "NmiHandler@scroll_go": 406
       }
     },
     "oamset": {
-      "cycles": 64978,
+      "cycles": 64956,
       "detail": {
-        "oamSet": 679084,
-        "row_oamset@for_body.32": 489662,
-        "oamSet@x_done": 96588,
-        "oamSet@none": 29040
+        "oamSet": 679546,
+        "row_oamset@for_body.32": 488904,
+        "oamSet@x_done": 96246,
+        "oamSet@none": 28840
       }
     },
     "oamxy": {
-      "cycles": 42475,
+      "cycles": 42477,
       "detail": {
-        "row_oamxy@for_body.42": 365446,
-        "oamSetXY": 353542,
-        "oamSetXY@x_done": 96286,
+        "row_oamxy@for_body.42": 365726,
+        "oamSetXY": 353382,
+        "oamSetXY@x_done": 96206,
         "oamSetXY@none": 29160
       }
     },
     "oamsize": {
-      "cycles": 28886,
+      "cycles": 28884,
       "detail": {
-        "oamSetSize": 387930,
-        "row_oamsize@for_body.68": 155680,
-        "oamSetSize@none": 28960,
+        "oamSetSize": 387646,
+        "row_oamsize@for_body.68": 155804,
+        "oamSetSize@none": 28920,
         "NmiHandler@oam_done": 4244
       }
     },
     "dma": {
-      "cycles": 17866,
+      "cycles": 18142,
       "detail": {
-        "opensnes_font_2bpp_end": 351104,
-        "row_dma@for_body.74": 5920,
-        "NmiHandler": 154,
-        "bench_nop@body.4": 80
+        "opensnes_font_2bpp_end": 356904,
+        "row_dma@for_body.74": 5720,
+        "NmiHandler": 114,
+        "NmiHandler@lag_done": 46
       }
     },
     "text": {
@@ -68,75 +68,75 @@
       }
     },
     "frame": {
-      "cycles": 91387,
+      "cycles": 91385,
       "detail": {
-        "oamSet": 678440,
+        "oamSet": 678480,
         "row_frame@for_body.169": 490080,
         "asm_textRun": 190160,
-        "oamSet@x_done": 97446
+        "oamSet@x_done": 97406
       }
     },
     "worldc": {
-      "cycles": 53414,
+      "cycles": 53409,
       "detail": {
-        "row_worldc@inl1_world_c.scene.3.for_body.95": 333526,
-        "row_worldc@inl1_world_c.scene.6.if_true.100": 265800,
-        "row_worldc@inl1_world_c.scene.8.if_false.103": 147240,
-        "row_worldc@inl1_world_c.scene.10.if_false.101": 112784
+        "row_worldc@inl1_world_c.scene.3.for_body.95": 333520,
+        "row_worldc@inl1_world_c.scene.6.if_true.100": 266120,
+        "row_worldc@inl1_world_c.scene.8.if_false.103": 146360,
+        "row_worldc@inl1_world_c.scene.10.if_false.101": 112822
       }
     },
     "world": {
-      "cycles": 31741,
+      "cycles": 31747,
       "detail": {
-        "oamPlaceWorld@sprite": 229582,
-        "oamPlaceWorld@next8": 133280,
-        "opensnes_font_2bpp_end": 116200,
-        "oamPlaceWorld@x_done": 86040
+        "oamPlaceWorld@sprite": 229544,
+        "oamPlaceWorld@next8": 133840,
+        "opensnes_font_2bpp_end": 116280,
+        "oamPlaceWorld@x_done": 85600
       }
     },
     "vramc": {
-      "cycles": 15916,
+      "cycles": 17626,
       "detail": {
-        "opensnes_font_2bpp_end": 207024,
-        "row_vramc@for_body.149": 111080,
-        "NmiHandler": 114,
-        "NmiHandler@lag_done": 46
+        "opensnes_font_2bpp_end": 241544,
+        "row_vramc@for_body.149": 110640,
+        "bench_nop": 120,
+        "NmiHandler": 114
       }
     },
     "vramq": {
-      "cycles": 10576,
+      "cycles": 10545,
       "detail": {
-        "vramQueueFlush@next": 141992,
-        "vramQueueFlush@entry": 54880,
+        "vramQueueFlush@next": 141912,
+        "vramQueueFlush@entry": 54920,
         "vramQueueFlush": 10120,
-        "vramQueueFlush@out": 2880
+        "vramQueueFlush@out": 2920
       }
     },
     "worldo": {
-      "cycles": 36311,
+      "cycles": 36309,
       "detail": {
-        "oamPlaceWorld@oslot": 297662,
-        "opensnes_font_2bpp_end": 115912,
-        "oamPlaceWorld@onext8": 113720,
+        "oamPlaceWorld@oslot": 297542,
+        "opensnes_font_2bpp_end": 116032,
+        "oamPlaceWorld@onext8": 113800,
         "oamPlaceWorld@ox_done": 87542
       }
     },
     "hideeach": {
-      "cycles": 25586,
+      "cycles": 25588,
       "detail": {
-        "oamHide": 397166,
-        "row_hideeach@for_body.52": 109342,
+        "oamHide": 396886,
+        "row_hideeach@for_body.52": 109520,
         "NmiHandler@oam_done": 4244,
         "NmiHandler": 308
       }
     },
     "hiderange": {
-      "cycles": 9824,
+      "cycles": 9820,
       "detail": {
         "oamHideRange@low": 102760,
-        "oamHideRange@mid": 67560,
-        "oamHideRange": 9280,
-        "oamHideRange@done": 5240
+        "oamHideRange@mid": 67600,
+        "oamHideRange": 9240,
+        "oamHideRange@done": 5200
       }
     }
   }

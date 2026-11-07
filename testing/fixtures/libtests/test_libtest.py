@@ -39,7 +39,8 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 5_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
+STEPS = 6_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth;
+                    # 5 M until 2026-11-07: the DMA end check's frames reach r_done at ~5.3 M under PAL
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -251,6 +252,10 @@ CASES = [
     # the screen-on check of the DMA routines: one transfer in active display with the
     # screen on is counted (and fires WDM $02), screen off and VBlank are not
     ("r_dmachk", 8, sum(w << (16 * i) for i, w in enumerate([1, 0, 0, 0x0D4A]))),
+    # the end check: started in VBlank, screen on — a 0xF000-byte fill runs out
+    # of VBlank (1, its two passes count once), screen off (0), 2 KB fits (0),
+    # a 32 KB copy runs out (1), 4 KB fits (0), Mode 7's two 16 KB passes (1)
+    ("r_dmaend", 14, sum(w << (16 * i) for i, w in enumerate([1, 0, 0, 1, 0, 1, 0x0E4D]))),
     # a refused audio call is counted: +1, code 2 (AUDIO_ERR_INVALID_ID)
     ("r_audtrip", 4, 0x0201 | (0x0A02 << 16)),
     # a computed BG address the register cannot hold: 2 counted, none for aligned ones

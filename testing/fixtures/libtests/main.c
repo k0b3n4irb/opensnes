@@ -1346,6 +1346,9 @@ extern u8 audio_error_last;
 /* The screen-on check of the DMA routines: dma_unsafe_count moves by one for a transfer
  * started with the screen on in active display, and by none with the screen off or in VBlank */
 u16 r_dmachk[4];
+/* ...and by one for a transfer started in VBlank that runs past its end (the
+ * end check), once per call however many passes the call makes */
+u16 r_dmaend[7];
 extern u8 console_force_blanked;
 static const u16 dmachk_color = 0x7FFF;
 /* oamSetBatch: x/y only (tile and attribute bytes kept, size bits kept), the
@@ -1992,6 +1995,50 @@ int main(void) {
         r_dmachk[2] = dma_unsafe_count - before;           /* 0: in VBlank */
         r_dmachk[3] = 0x0D4A;
         console_force_blanked = shadow;
+    }
+    {
+        /* The END of the transfer: each one starts in VBlank, after
+         * WaitForVBlank(), so the start check passes; the long ones run past
+         * the end of VBlank and lose their tail. Destinations leave words
+         * $6000-$67FF alone (VRAM_CASES of test_libtest.py): a 0xF000-byte
+         * fill is 0x7800 words, from $6800 it wraps round to $5FFF.
+         * Overscan off for the block (part_ppu turned it on, test_libtest.py
+         * reads it back): the 37-line VBlank of a 224-line display. */
+        u8 shadow = console_force_blanked;
+        u16 before;
+
+        videoSetOverscan(0);
+        console_force_blanked = 0;
+        WaitForVBlank();
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaFillVRAM(0, 0x6800, 0xF000);
+        r_dmaend[0] = dma_unsafe_count - before;           /* 1: two passes, counted once */
+        console_force_blanked = 1;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaFillVRAM(0, 0x6800, 0xF000);
+        r_dmaend[1] = dma_unsafe_count - before;           /* 0: screen off */
+        console_force_blanked = 0;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 2048);
+        r_dmaend[2] = dma_unsafe_count - before;           /* 0: fits in VBlank */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 0x8000);
+        r_dmaend[3] = dma_unsafe_count - before;           /* 1: too big */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 4096);
+        r_dmaend[4] = dma_unsafe_count - before;           /* 0: 4 KB still fits */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVramMode7((const u8 *)&dmachk_color, 0x4000, (const u8 *)&dmachk_color, 0x4000);
+        r_dmaend[5] = dma_unsafe_count - before;           /* 1: two passes, counted once */
+        r_dmaend[6] = 0x0E4D;
+        console_force_blanked = shadow;
+        videoSetOverscan(1);
     }
     {
         u16 before = audio_error_count;

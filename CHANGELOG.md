@@ -88,14 +88,35 @@ All notable changes to OpenSNES are documented in this file.
   hold (a computed one: a constant is refused at compile time) round it down as
   before but count it in `bg_address_refused` and fire WDM $03. The 60
   examples fire none; `libtests` asserts both counts.
-- feat(lib): a DMA transfer started with the screen on, outside VBlank, is no longer
+- feat(lib): a DMA transfer made with the screen on, outside VBlank, is no longer
   silent: `dmaCopyVram`, `dmaCopyCGram`, `dmaCopyOam`, `dmaCopyVramMode7` and
   `dmaFillVRAM` count it in `dma_unsafe_count` and fire WDM $02, which luna
   reports (`--wdm-out`, `wdm_empty`). The transfer runs as before. The test is the
-  `setScreenOn()`/`setScreenOff()` shadow and HVBJOY bit 7. Cost, libbench row
-  `dma` (2 KB): 17,866 to 17,969 master cycles (+103, +0.6 %); the 60 examples
-  fire nothing; `libtests` asserts the three cases (active display, screen off,
-  VBlank).
+  `setScreenOn()`/`setScreenOff()` shadow and HVBJOY bit 7, read twice: before the
+  transfer starts, and right after the MDMAEN write, where the CPU resumes only
+  once the DMA is over (IRQs masked for those few cycles) — so a transfer started
+  in VBlank but too big for it is caught too, which the start alone missed:
+  `dmaFillVRAM(0, 0, 0xF000)` with the screen on, called in VBlank, lost
+  its second pass to active display and was not counted. A call counts once,
+  however many passes it makes; a single transfer longer than the whole active
+  display (about 38 KB) that ends in the next VBlank is not seen. Cost, libbench
+  row `dma` (2 KB): 17,866 to 18,142 master cycles (+276, +1.5 %; the start
+  check alone was +103), `vramc` (six 128-byte calls) +176 a call; the examples
+  fire nothing; `libtests` asserts the start (active display, screen off,
+  VBlank) and the end: started in VBlank with the screen on, a 0xF000-byte fill,
+  a 32 KB copy and Mode 7's two 16 KB passes count one each, the same fill with
+  the screen off, 2 KB and 4 KB count none (the 4 KB copy, from the line
+  `WaitForVBlank()` returns on, ends seven lines before VBlank does). Without the
+  end check the three long ones read 0. libbench's baseline is re-taken
+  (`vramc` was past the 10 % gate of its old figure; OpenSNES is now behind
+  PVSnesLib on `dma` and `vramc`, by 1.4 % and 1.3 %), and `baselines/audio.json`
+  for `apu_switch`, `speech_synth` and `superfx_game_skeleton`, whose sound
+  starts a few samples off (`luna diff --audio --align-onset`: MATCH, max delta
+  0.14 %, shift at most 4 samples); `baselines/wram.json` too: the new
+  `dma_end_armed` byte moves the RAM that follows it by one (`games/blocks`
+  at frame 290: `$0534` is now the flag, `$C0` = HVBJOY when armed, and
+  `hdma_enabled_state` moved to `$0535` with its value) and the stack holds
+  other return addresses (`backgrounds/mode1`: only `$1FA2-$1FFB` differ).
 - feat(lib): `oamSetBatch(&batch)` (opt-in module `sprite_batch`, header
   `OamBatch`) writes the OAM entries of N alike objects from parallel arrays
   (`x`, `y`, and `tile` / `attr` when given) in one assembly loop: no call per
