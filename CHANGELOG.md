@@ -4,6 +4,9 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- fix(ci): the cppcheck download of the Lint workflow retries five times, ten seconds apart, like the Doxygen one.
+
 ## [0.55.0] — 2026-11-08
 
 `ppuReset()`, `lzssDecodeRam()`, `audioLoadSampleAt()`, `oamSetBatch()` and the

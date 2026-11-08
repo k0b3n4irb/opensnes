@@ -90,7 +90,7 @@ jobs:
           CPPCHECK_VERSION: 2.22.0
           CPPCHECK_SHA256: d74945deb2d50393430e07596b766f8a779512c7f60dac2a30ea64e059ece57b
         run: |
-          curl -fsSL -o /tmp/cppcheck.tgz "https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
+          curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/cppcheck.tgz "https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
           echo "${CPPCHECK_SHA256}  /tmp/cppcheck.tgz" | sha256sum -c -
           tar xzf /tmp/cppcheck.tgz -C /tmp
           make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" -j"$(nproc)" FILESDIR=/opt/cppcheck/share CXXOPTS=-O2 >/dev/null

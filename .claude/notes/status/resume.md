@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-11-04)
+# Where the work stands (resume note, 2026-11-08)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -6,8 +6,7 @@ and the CHANGELOG.
 
 ## State
 
-- **v0.54.0 is released** (tag on `main`, changelog dated 2026-11-01). `develop`
-  is clean and equal to `origin/develop` at `01d22764`.
+- **v0.55.0 is released** (2026-11-08): `main` at `f21b3fc7` (merge of `develop` `6ee38284`), tag `v0.55.0` pushed, `release.yml` run 42472392201. It is published (5 assets). GitHub had an incident that morning (timeouts on release assets and archives): the Windows leg (MSYS2 download), Doxygen and cppcheck downloads answered 504/503 several times; failed jobs were re-run. v0.54.0 was 2026-11-01.
 - The 0.53.0 worktree `../opensnes-requests` / `wip/requests` is merged and
   can go.
 
@@ -100,6 +99,17 @@ and the CHANGELOG.
 - Measured for the author: a linked module keeps its SEMISUPERFREE const data uncalled (wlalink -d never discards it):
   math/fixed32 +577 B, sprite +512, math_ease/mode7 +256, hdma +64, text+dma +38; all in asset banks, none in bank $00.
   Fixing it for all = compiler emits discardable const (Class A, ~1.7 KB): not started, waits for the author.
+
+## PAUSE (author, 2026-11-08)
+
+All work stops for the independent audit once the release is out. Nothing is half done here.
+Waits for the author, after the audit: a cache for the CI downloads (Doxygen, MSYS2:
+three 504s in one morning; retries exist on the Doxygen and cppcheck curls only) with its
+lesson in the kit's `lecons/`; the `ppuReset` COLDATA question (Class A); the
+discardable const data of linked modules (Class A).
+Waits for luna: a tag that carries `281485c` (`[checkpoint.dsp]`) and `de03dd8` (DMA per
+byte); then bump the pin, replay the corpus queries, the DMA/HDMA timing tests and the
+ENVX-after-KOFF manifest.
 
 ## In progress
 
