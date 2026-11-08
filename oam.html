@@ -202,16 +202,16 @@ OAM Registers</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Register  </th><th class="markdownTableHeadNone">Address  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">OAMADDL  </td><td class="markdownTableBodyNone">$2102  </td><td class="markdownTableBodyNone">OAM address (low byte)  </td></tr>
+<td class="markdownTableBodyNone">OAMADDL  </td><td class="markdownTableBodyNone">$2102  </td><td class="markdownTableBodyNone">OAM word address (low byte)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">OAMADDH  </td><td class="markdownTableBodyNone">$2103  </td><td class="markdownTableBodyNone">OAM address (high byte) + priority rotation  </td></tr>
+<td class="markdownTableBodyNone">OAMADDH  </td><td class="markdownTableBodyNone">$2103  </td><td class="markdownTableBodyNone">OAM word address (bit 8) + priority rotation  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">OAMDATA  </td><td class="markdownTableBodyNone">$2104  </td><td class="markdownTableBodyNone">OAM data write  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="setting-oam-address"></a>
 Setting OAM Address</h3>
 <div class="fragment"><div class="line"><span class="comment">// Set OAM address to sprite N (N = 0-127)</span></div>
-<div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = N * 4;  <span class="comment">// Each sprite is 4 bytes</span></div>
+<div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = N * 2;  <span class="comment">// OAMADD is a WORD address: a sprite is 4 bytes = 2 words</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a> = 0;</div>
 </div><!-- fragment --><p>For the extended table: </p><div class="fragment"><div class="line"><span class="comment">// Set OAM address to extended table</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = 0;</div>
@@ -222,7 +222,7 @@ Sprite Sizes</h2>
 <h2 class="doxsection"><a class="anchor" id="hiding-sprites-1"></a>
 Hiding Sprites</h2>
 <p>To hide a sprite, set its Y position to 240 <b>and</b> set its X-position high bit (placing it at X=256, off-screen to the right):</p>
-<div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = sprite_id * 4;</div>
+<div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = sprite_id * 2;  <span class="comment">// word address (4 bytes = 2 words)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a> = 0;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 0;    <span class="comment">// X low byte (don&#39;t care)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 240;  <span class="comment">// Y = 240</span></div>

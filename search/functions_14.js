@@ -16,12 +16,13 @@ var searchData=
   ['windowsetpos_13',['windowSetPos',['../window_8h.html#a69900cfa7ecb5f94e7f6195024ac9e10',1,'window.h']]],
   ['windowsetsubmask_14',['windowSetSubMask',['../window_8h.html#a6cdc44e1b2242ad4ee985c972dae0b00',1,'window.h']]],
   ['windowsplit_15',['windowSplit',['../window_8h.html#a977a0f5193aa0688fef854dce181d2de',1,'window.h']]],
-  ['write_5ftile_16',['write_tile',['../memory_2hirom__demo_2main_8c.html#a7e612617242d479ac289ab6632a5116e',1,'main.c']]],
-  ['write_5fvram_5fcolumn_17',['write_vram_column',['../games_2rooftop__run_2main_8c.html#a08f0ca6d6bd43a513eb762fdbfb5f64d',1,'main.c']]],
-  ['writeedgestosram_18',['writeEdgesToSRAM',['../chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
-  ['writeedgetable_19',['writeEdgeTable',['../chips_2superfx__game__skeleton_2main_8c.html#ad77f76f07223f5c2a332daad5bf18310',1,'main.c']]],
-  ['writenum_20',['writenum',['../games_2breakout_2main_8c.html#aa94bc4cfa95e2b8bf5c8c4ed8994a6b9',1,'main.c']]],
-  ['writenum_5fbg2_21',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
-  ['writestring_22',['writestring',['../games_2breakout_2main_8c.html#aeaffc0d7f18fb5ca3879eb91a1b5d268',1,'main.c']]],
-  ['writestring_5fbg2_5fattr_23',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
+  ['witness_5fnote_16',['witness_note',['../audio_2sample__swap_2main_8c.html#a18f2b9ba4c71b16f2762fc0113f6cba3',1,'main.c']]],
+  ['write_5ftile_17',['write_tile',['../memory_2hirom__demo_2main_8c.html#a7e612617242d479ac289ab6632a5116e',1,'main.c']]],
+  ['write_5fvram_5fcolumn_18',['write_vram_column',['../games_2rooftop__run_2main_8c.html#a08f0ca6d6bd43a513eb762fdbfb5f64d',1,'main.c']]],
+  ['writeedgestosram_19',['writeEdgesToSRAM',['../chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
+  ['writeedgetable_20',['writeEdgeTable',['../chips_2superfx__game__skeleton_2main_8c.html#ad77f76f07223f5c2a332daad5bf18310',1,'main.c']]],
+  ['writenum_21',['writenum',['../games_2breakout_2main_8c.html#aa94bc4cfa95e2b8bf5c8c4ed8994a6b9',1,'main.c']]],
+  ['writenum_5fbg2_22',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
+  ['writestring_23',['writestring',['../games_2breakout_2main_8c.html#aeaffc0d7f18fb5ca3879eb91a1b5d268',1,'main.c']]],
+  ['writestring_5fbg2_5fattr_24',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
 ];

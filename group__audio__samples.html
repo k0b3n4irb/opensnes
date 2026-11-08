@@ -136,8 +136,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:gadf524c7893ef6324ceb2e343bc541444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get information about a loaded sample.  <br /></td></tr>
 <tr class="memitem:gadeb5b5b2ca5fd6cad1127442a546af6d" id="r_gadeb5b5b2ca5fd6cad1127442a546af6d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *brrData, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> loopPoint)</td></tr>
 <tr class="memdesc:gadeb5b5b2ca5fd6cad1127442a546af6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a BRR sample into SPC700 RAM.  <br /></td></tr>
+<tr class="memitem:ga8ea1436ef7da039cc6f0bbd6a9130273" id="r_ga8ea1436ef7da039cc6f0bbd6a9130273"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273">audioLoadSampleAt</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> spcAddr, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *brrData, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> loopPoint)</td></tr>
+<tr class="memdesc:ga8ea1436ef7da039cc6f0bbd6a9130273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a sample at an address of the sound CPU's memory the game chooses.  <br /></td></tr>
 <tr class="memitem:gad32cb742ca31a6e6432995d5c1235711" id="r_gad32cb742ca31a6e6432995d5c1235711"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gad32cb742ca31a6e6432995d5c1235711">audioLoadSampleBegin</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *brrData, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> loopPoint)</td></tr>
 <tr class="memdesc:gad32cb742ca31a6e6432995d5c1235711"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start loading a sample in steps, while the game runs.  <br /></td></tr>
+<tr class="memitem:ga289fd684cb4de6ac8a183a8a26ceaa28" id="r_ga289fd684cb4de6ac8a183a8a26ceaa28"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga289fd684cb4de6ac8a183a8a26ceaa28">audioLoadSampleBeginAt</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> spcAddr, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *brrData, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> loopPoint)</td></tr>
+<tr class="memdesc:ga289fd684cb4de6ac8a183a8a26ceaa28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start loading a sample in steps at an address the game chooses.  <br /></td></tr>
 <tr class="memitem:ga46612deaa5841b76ba44398cd81a3352" id="r_ga46612deaa5841b76ba44398cd81a3352"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga46612deaa5841b76ba44398cd81a3352">audioLoadSampleStep</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> maxBytes)</td></tr>
 <tr class="memdesc:ga46612deaa5841b76ba44398cd81a3352"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the next piece of the sample <a class="el" href="#gad32cb742ca31a6e6432995d5c1235711" title="Start loading a sample in steps, while the game runs.">audioLoadSampleBegin()</a> started.  <br /></td></tr>
 <tr class="memitem:ga09d2e53a4a311fffed540c0410edab88" id="r_ga09d2e53a4a311fffed540c0410edab88"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ga09d2e53a4a311fffed540c0410edab88">audioUnloadSample</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id)</td></tr>
@@ -265,6 +269,74 @@ Functions</h2></td></tr>
 </div><!-- fragment --> 
 </div>
 </div>
+<a id="ga8ea1436ef7da039cc6f0bbd6a9130273" name="ga8ea1436ef7da039cc6f0bbd6a9130273"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8ea1436ef7da039cc6f0bbd6a9130273">&#9670;&#160;</a></span>audioLoadSampleAt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioLoadSampleAt </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>spcAddr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>brrData</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>size</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>loopPoint</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Load a sample at an address of the sound CPU's memory the game chooses. </p>
+<p><a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> places each sample where the last one ended. A game whose samples do not all fit keeps a resident set and replaces others, during play, in places of its own: a swap area. This call writes the sample at <code class="param">spcAddr</code>, whole, then its directory entry, as <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> does.</p>
+<ul>
+<li><b>Any address</b> in the sample area: $0B00 up to the end <a class="el" href="#ga76b4689468ab6db5a7a0180111a27d85" title="Get available SPC700 RAM for samples.">audioGetFreeMemory()</a> counts to ($FFC0, or the echo ring). A directory entry is two 16-bit addresses, and the S-DSP reads a sample from the byte its entry names, 9 bytes a block, whatever that byte is: no alignment (<a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> itself places samples on any byte).</li>
+<li><b>No overlap</b> with a loaded sample or with the load in steps under way, except slot <code class="param">id's</code> own place: a slot can be replaced where it was, by a sample of any size the area allows.</li>
+<li><b>The allocator never goes back.</b> When the sample ends above the place <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> would use next, that place moves up to its end, so a later <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> goes above it; a sample placed lower leaves it where it was. <a class="el" href="#ga09d2e53a4a311fffed540c0410edab88" title="Unload a sample from a slot.">audioUnloadSample()</a> gives memory back only for the sample that ends exactly there (the bump allocator's rule): a sample loaded at an address below it gives nothing back, and its place is reused by loading another sample there with this call.</li>
+<li>From the first byte to the directory entry, slot <code class="param">id</code> is "not
+  loaded" (playing it is refused); if the driver stops answering half way it stays so.</li>
+<li>A voice still playing the old sample of this place reads the new bytes as they arrive: see <a class="el" href="#ga289fd684cb4de6ac8a183a8a26ceaa28" title="Start loading a sample in steps at an address the game chooses.">audioLoadSampleBeginAt()</a> for what to do first.</li>
+</ul>
+<p>The place is checked against the 64 slots before anything is sent: about 20 scanlines, measured (<a class="el" href="#ga289fd684cb4de6ac8a183a8a26ceaa28" title="Start loading a sample in steps at an address the game chooses.">audioLoadSampleBeginAt()</a> alike), on top of the bytes' own time (about 650 master cycles a byte, as <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a>).</p>
+<p>Errors (nothing is sent and nothing changes):</p><ul>
+<li>AUDIO_ERR_INVALID_ID: <code class="param">id</code> is 64 or more, or is the slot being loaded in steps;</li>
+<li>AUDIO_ERR_TIMEOUT: <a class="el" href="group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a> did not start the driver (or it stopped answering during the load: then the slot is "not loaded");</li>
+<li>AUDIO_ERR_NO_MEMORY: <code class="param">size</code> is 0, or the place is refused: below $0B00, at or above the end of the sample area, running past that end (a place that would wrap past $FFFF included), or overlapping another loaded sample or the load in steps.</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Sample slot (0-63) </td></tr>
+    <tr><td class="paramname">spcAddr</td><td>Where the sample's first byte goes </td></tr>
+    <tr><td class="paramname">brrData</td><td>Pointer to the BRR data </td></tr>
+    <tr><td class="paramname">size</td><td>Size in bytes (1 at least; a BRR sample is a multiple of 9) </td></tr>
+    <tr><td class="paramname">loopPoint</td><td>As for <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK or one of the errors above</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define SWAP_AREA 0x8000</span></div>
+<div class="line"><a class="code hl_function" href="#ga8ea1436ef7da039cc6f0bbd6a9130273">audioLoadSampleAt</a>(SMP_BOSS, SWAP_AREA, boss_brr, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(boss_brr_end - boss_brr), 0);</div>
+<div class="ttc" id="agroup__audio__samples_html_ga8ea1436ef7da039cc6f0bbd6a9130273"><div class="ttname"><a href="#ga8ea1436ef7da039cc6f0bbd6a9130273">audioLoadSampleAt</a></div><div class="ttdeci">u8 audioLoadSampleAt(u8 id, u16 spcAddr, const u8 *brrData, u16 size, u16 loopPoint)</div><div class="ttdoc">Load a sample at an address of the sound CPU&#39;s memory the game chooses.</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a id="gad32cb742ca31a6e6432995d5c1235711" name="gad32cb742ca31a6e6432995d5c1235711"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gad32cb742ca31a6e6432995d5c1235711">&#9670;&#160;</a></span>audioLoadSampleBegin()</h2>
 
@@ -318,8 +390,68 @@ Functions</h2></td></tr>
 <div class="line"><span class="keywordflow">if</span> (voice_loading &amp;&amp; <a class="code hl_function" href="#ga46612deaa5841b76ba44398cd81a3352">audioLoadSampleStep</a>(64) == 0) voice_loading = 0;</div>
 <div class="ttc" id="agroup__audio__samples_html_ga46612deaa5841b76ba44398cd81a3352"><div class="ttname"><a href="#ga46612deaa5841b76ba44398cd81a3352">audioLoadSampleStep</a></div><div class="ttdeci">u16 audioLoadSampleStep(u16 maxBytes)</div><div class="ttdoc">Send the next piece of the sample audioLoadSampleBegin() started.</div></div>
 <div class="ttc" id="agroup__audio__samples_html_gad32cb742ca31a6e6432995d5c1235711"><div class="ttname"><a href="#gad32cb742ca31a6e6432995d5c1235711">audioLoadSampleBegin</a></div><div class="ttdeci">u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint)</div><div class="ttdoc">Start loading a sample in steps, while the game runs.</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --> 
+</div>
+</div>
+<a id="ga289fd684cb4de6ac8a183a8a26ceaa28" name="ga289fd684cb4de6ac8a183a8a26ceaa28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga289fd684cb4de6ac8a183a8a26ceaa28">&#9670;&#160;</a></span>audioLoadSampleBeginAt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioLoadSampleBeginAt </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>spcAddr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>brrData</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>size</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>loopPoint</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Start loading a sample in steps at an address the game chooses. </p>
+<p><a class="el" href="#gad32cb742ca31a6e6432995d5c1235711" title="Start loading a sample in steps, while the game runs.">audioLoadSampleBegin()</a> at the address of <a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273" title="Load a sample at an address of the sound CPU&#39;s memory the game chooses.">audioLoadSampleAt()</a>, with the same rules for the place; then <a class="el" href="#ga46612deaa5841b76ba44398cd81a3352" title="Send the next piece of the sample audioLoadSampleBegin() started.">audioLoadSampleStep()</a> sends it and its last step writes the directory entry, and audioUnloadSample(<code class="param">id</code>) before that gives the load up, as for <a class="el" href="#gad32cb742ca31a6e6432995d5c1235711" title="Start loading a sample in steps, while the game runs.">audioLoadSampleBegin()</a>.</p>
+<p>Replacing a slot that is loaded: from this call to the last step the slot is "not loaded", so a note asked of it meanwhile is refused (<a class="el" href="group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020" title="Play a sample on a voice YOU choose.">audioPlaySampleOn()</a> returns AUDIO_VOICE_NONE); a voice that was already playing it goes on reading the place, which now holds the new bytes as they arrive.</p>
+<p><b>Silence the place before its first byte goes</b> (here and for <a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273" title="Load a sample at an address of the sound CPU&#39;s memory the game chooses.">audioLoadSampleAt()</a>). A key-off is a release, not a cut: the S-DSP takes 8 off the voice's envelope every sample, from at most $7FF, so 256 samples, 8 ms, and the voice reads its sample all that time (anomie's S-DSP doc: release E-=8 every sample; BRR decoding never stops for a voice, KOFF only sets the envelope). Measured on luna with examples/audio/sample_swap, against a build whose replacement holds the old bytes: <a class="el" href="group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a> then the first step at once (36 scanlines later), the output differs for 8 ms; stopped at scanline 200 then one <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> (62 scanlines), it differs for 2 ms; stopped one frame (294 scanlines) or two before, it does not. The envelope reads 0 133 scanlines after <a class="el" href="group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a>. So:</p><ul>
+<li>call <a class="el" href="group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a> for every voice that may be playing the place,</li>
+<li>then let 8 ms pass before the first step: two <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> always do, wherever in the frame the stop was sent; one does only when the stop went at least 126 scanlines before the VBlank.</li>
+</ul>
+<p>A note on another voice in the frame of a step goes at its usual time if it is sent before the step, and later by the step's own time if sent after it (105 scanlines for 192 bytes, measured): send the frame's notes first.</p>
+<p>Errors (nothing is taken and nothing changes):</p><ul>
+<li>AUDIO_ERR_INVALID_ID: <code class="param">id</code> is 64 or more, or a load in steps is already under way;</li>
+<li>AUDIO_ERR_TIMEOUT: <a class="el" href="group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a> did not start the driver;</li>
+<li>AUDIO_ERR_NO_MEMORY: <code class="param">size</code> is under 3, or the place is refused, as for <a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273" title="Load a sample at an address of the sound CPU&#39;s memory the game chooses.">audioLoadSampleAt()</a>.</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Sample slot (0-63) </td></tr>
+    <tr><td class="paramname">spcAddr</td><td>Where the sample's first byte goes </td></tr>
+    <tr><td class="paramname">brrData</td><td>Pointer to the BRR data; must stay valid until the last step </td></tr>
+    <tr><td class="paramname">size</td><td>Size in bytes (3 at least) </td></tr>
+    <tr><td class="paramname">loopPoint</td><td>As for <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK or one of the errors above </dd></dl>
+
 </div>
 </div>
 <a id="ga46612deaa5841b76ba44398cd81a3352" name="ga46612deaa5841b76ba44398cd81a3352"></a>
@@ -371,7 +503,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <p>On the sample <a class="el" href="#gad32cb742ca31a6e6432995d5c1235711" title="Start loading a sample in steps, while the game runs.">audioLoadSampleBegin()</a> started and no step has finished: gives that load up.</p>
-<p>It does NOT stop a voice that is playing the sample — stop it first. The allocator is a bump pointer: SPC memory comes back only when the sample unloaded is the most recently loaded one, and loading a slot that is already loaded leaks the old block. (The "voices will be stopped" sentence that stood here was never implemented.) </p>
+<p>It does NOT stop a voice that is playing the sample — stop it first. The allocator is a bump pointer: SPC memory comes back only when the sample unloaded ends where the next <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> would go (the most recently loaded one, among the samples <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> placed), and loading a slot that is already loaded with <a class="el" href="#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> leaks the old block. A sample placed with <a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273" title="Load a sample at an address of the sound CPU&#39;s memory the game chooses.">audioLoadSampleAt()</a> below that point gives nothing back: its place is reused by loading another sample there with <a class="el" href="#ga8ea1436ef7da039cc6f0bbd6a9130273" title="Load a sample at an address of the sound CPU&#39;s memory the game chooses.">audioLoadSampleAt()</a>. (The "voices will be stopped" sentence that stood here was never implemented.) </p>
 
 </div>
 </div>

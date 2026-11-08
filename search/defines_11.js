@@ -42,7 +42,7 @@ var searchData=
   ['tile_5forbiter_39',['TILE_ORBITER',['../basics_2aim__target_2main_8c.html#a5b840601f08b2e0073b3930e845737c7',1,'main.c']]],
   ['tile_5fplus_40',['TILE_PLUS',['../memory_2hirom__demo_2main_8c.html#a86fb9e359c28bb44bfbb04bcefc8750b',1,'main.c']]],
   ['tile_5fr_41',['TILE_R',['../memory_2hirom__demo_2main_8c.html#a9ea8a028b4b8913c8ed225888d9865c2',1,'main.c']]],
-  ['tile_5fshard_42',['TILE_SHARD',['../basics_2game__skeleton_2main_8c.html#a4dd0f8a25e979e41b1f6080fc78a8daf',1,'main.c']]],
+  ['tile_5fshard_42',['TILE_SHARD',['../basics_2game__skeleton_2main_8c.html#a4dd0f8a25e979e41b1f6080fc78a8daf',1,'TILE_SHARD:&#160;main.c'],['../play_8c.html#a4dd0f8a25e979e41b1f6080fc78a8daf',1,'TILE_SHARD:&#160;play.c']]],
   ['tile_5fsmall_43',['TILE_SMALL',['../sprites_2sprite__sizes_2main_8c.html#a9f934140ea125cd0c817be3e243dfc69',1,'main.c']]],
   ['tile_5fspace_44',['TILE_SPACE',['../memory_2hirom__demo_2main_8c.html#abf336af2110de222d6ae9d2a522597fa',1,'main.c']]],
   ['tilemap_5faddr_45',['TILEMAP_ADDR',['../memory_2hirom__demo_2main_8c.html#a60b214eb168a301978b985734feb083a',1,'main.c']]],
@@ -50,8 +50,10 @@ var searchData=
   ['tiles_5faddr_47',['TILES_ADDR',['../memory_2hirom__demo_2main_8c.html#a3414098cc139b0d04081fe47ad757c23',1,'main.c']]],
   ['tiles_5flz_48',['TILES_LZ',['../backgrounds_2mode1_2main_8c.html#aec6d53e2c8cc80ae281858336d6feca3',1,'main.c']]],
   ['tiles_5fplain_49',['TILES_PLAIN',['../backgrounds_2mode1_2main_8c.html#a832a34876a8d52d1fc8d9d2180b44d9c',1,'main.c']]],
-  ['turn_5fframes_50',['TURN_FRAMES',['../mode7_2perspective__rotate_2main_8c.html#affd30c52e0d4aa2c62b10a56deeb9bd6',1,'main.c']]],
-  ['turn_5fstep_51',['TURN_STEP',['../mode7_2dsp1__ground_2main_8c.html#a6068b13bb4328d1a52bfdeecd55a6d3b',1,'main.c']]],
-  ['turret_5fx_52',['TURRET_X',['../basics_2aim__target_2main_8c.html#af5b79d84b830c8b55efd2016ae60e8a9',1,'main.c']]],
-  ['turret_5fy_53',['TURRET_Y',['../basics_2aim__target_2main_8c.html#abe6ba13cd494a412de59d77ba5f1f07b',1,'main.c']]]
+  ['tiles_5fsize_50',['TILES_SIZE',['../memory_2lzss__ram_2main_8c.html#a6e60feb39ded2048d25a49bf01031581',1,'main.c']]],
+  ['time_5flimit_51',['TIME_LIMIT',['../game_8h.html#acb7e51d1df3047c08c50ae6682a6cd70',1,'game.h']]],
+  ['turn_5fframes_52',['TURN_FRAMES',['../mode7_2perspective__rotate_2main_8c.html#affd30c52e0d4aa2c62b10a56deeb9bd6',1,'main.c']]],
+  ['turn_5fstep_53',['TURN_STEP',['../mode7_2dsp1__ground_2main_8c.html#a6068b13bb4328d1a52bfdeecd55a6d3b',1,'main.c']]],
+  ['turret_5fx_54',['TURRET_X',['../basics_2aim__target_2main_8c.html#af5b79d84b830c8b55efd2016ae60e8a9',1,'main.c']]],
+  ['turret_5fy_55',['TURRET_Y',['../basics_2aim__target_2main_8c.html#abe6ba13cd494a412de59d77ba5f1f07b',1,'main.c']]]
 ];

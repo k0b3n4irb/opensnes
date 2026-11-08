@@ -156,6 +156,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:ade39bb80a8d7cf72a11075c930410086"><td class="mdescLeft">&#160;</td><td class="mdescRight">Note one transfer for the next <a class="el" href="#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a>.  <br /></td></tr>
 <tr class="memitem:a910d5040c609176a6d5518da95567518" id="r_a910d5040c609176a6d5518da95567518"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a910d5040c609176a6d5518da95567518">vramQueuePushSprite</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size_px)</td></tr>
 <tr class="memdesc:a910d5040c609176a6d5518da95567518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Note one frame of a streamed sprite: all its strips in one call.  <br /></td></tr>
+<tr class="memitem:a2b33f7bc8659910dd49e9db114248e6e" id="r_a2b33f7bc8659910dd49e9db114248e6e"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2b33f7bc8659910dd49e9db114248e6e">vramQueuePushSpriteWithin</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size_px, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> budget)</td></tr>
+<tr class="memdesc:a2b33f7bc8659910dd49e9db114248e6e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a910d5040c609176a6d5518da95567518" title="Note one frame of a streamed sprite: all its strips in one call.">vramQueuePushSprite()</a>, if the whole frame fits a budget you give  <br /></td></tr>
+<tr class="memitem:aa2245e616396408d7f09eefd20a96466" id="r_aa2245e616396408d7f09eefd20a96466"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa2245e616396408d7f09eefd20a96466">vramQueuePushWithin</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> step, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> budget)</td></tr>
+<tr class="memdesc:aa2245e616396408d7f09eefd20a96466"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#ade39bb80a8d7cf72a11075c930410086" title="Note one transfer for the next vramQueueFlush().">vramQueuePush()</a>, if it fits a budget you give: the guard written once  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -464,6 +468,115 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>1, or 0 when the strips do not all fit in the queue (none is noted) or size_px is under 8 </dd></dl>
+
+</div>
+</div>
+<a id="a2b33f7bc8659910dd49e9db114248e6e" name="a2b33f7bc8659910dd49e9db114248e6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b33f7bc8659910dd49e9db114248e6e">&#9670;&#160;</a></span>vramQueuePushSpriteWithin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramQueuePushSpriteWithin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>src</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>addr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>size_px</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>budget</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#a910d5040c609176a6d5518da95567518" title="Note one frame of a streamed sprite: all its strips in one call.">vramQueuePushSprite()</a>, if the whole frame fits a budget you give </p>
+<p>Notes every strip of the frame only when <span class="tt"><a class="el" href="#ab06208e0076eda7a2e051fb87acd218d" title="VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.">vramQueueCost()</a> + (size_px / 8)</p><ul>
+<li>(size_px * 4 + <a class="el" href="#a4e5eea7ec2d0965a705d36ae61d30fa5" title="What one entry costs the flush beyond its bytes, in bytes.">VRAM_QUEUE_ENTRY_COST</a>) &lt;= budget</li>
+</ul>
+<p></span> and all the strips fit in the queue (288 for a 16x16 frame, 832 for a 32x32 one). Otherwise returns 0 and changes nothing, <b>and does not count a refusal</b> (<span class="tt"><a class="el" href="#af6374d25743f3daf96c9a55d65eb615c" title="Pushes refused since power-on (queue full): 0 on a healthy run. Counted whether or not the caller rea...">vram_queue_refused</a></span> is for a queue that was full, not for a frame that waits for the next one): that is what sets it apart from <a class="el" href="#a910d5040c609176a6d5518da95567518" title="Note one frame of a streamed sprite: all its strips in one call.">vramQueuePushSprite()</a>, which counts its refusals. A sum past $FFFF is a refusal, never a wrap. The budget is yours: deciding what each module may spend stays with the game; this only does the test and the push together.</p>
+<div class="fragment"><div class="line"><span class="comment">// before: the guard by hand, every time</span></div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#ab06208e0076eda7a2e051fb87acd218d">vramQueueCost</a>() + 2 * (64 + <a class="code hl_define" href="#a4e5eea7ec2d0965a705d36ae61d30fa5">VRAM_QUEUE_ENTRY_COST</a>) &lt;= BUDGET</div>
+<div class="line">    &amp;&amp; <a class="code hl_define" href="#a94704dd016478729ab4e5463343fd32c">vramQueueFree</a>() &gt;= 2)</div>
+<div class="line">    <a class="code hl_function" href="#a910d5040c609176a6d5518da95567518">vramQueuePushSprite</a>(<a class="code hl_variable" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, addr, 16);</div>
+<div class="line"><span class="comment">// after</span></div>
+<div class="line"><span class="keywordflow">if</span> (!<a class="code hl_function" href="#a2b33f7bc8659910dd49e9db114248e6e">vramQueuePushSpriteWithin</a>(<a class="code hl_variable" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, addr, 16, BUDGET))</div>
+<div class="line">    retry_next_frame = 1;</div>
+<div class="ttc" id="aaudio_2sample__swap_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
+<div class="ttc" id="avramqueue_8h_html_a2b33f7bc8659910dd49e9db114248e6e"><div class="ttname"><a href="#a2b33f7bc8659910dd49e9db114248e6e">vramQueuePushSpriteWithin</a></div><div class="ttdeci">u16 vramQueuePushSpriteWithin(const u8 *src, u16 addr, u16 size_px, u16 budget)</div><div class="ttdoc">vramQueuePushSprite(), if the whole frame fits a budget you give</div></div>
+</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src,addr,size_px</td><td>As <a class="el" href="#a910d5040c609176a6d5518da95567518" title="Note one frame of a streamed sprite: all its strips in one call.">vramQueuePushSprite()</a> </td></tr>
+    <tr><td class="paramname">budget</td><td>Most the queue may cost, in <a class="el" href="#ab06208e0076eda7a2e051fb87acd218d" title="VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.">vramQueueCost()</a>'s unit (bytes + VRAM_QUEUE_ENTRY_COST an entry) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if every strip was noted, 0 if the frame did not fit (nothing noted) or size_px is under 8 </dd></dl>
+
+</div>
+</div>
+<a id="aa2245e616396408d7f09eefd20a96466" name="aa2245e616396408d7f09eefd20a96466"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2245e616396408d7f09eefd20a96466">&#9670;&#160;</a></span>vramQueuePushWithin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramQueuePushWithin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>src</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>addr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>size</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>step</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>budget</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#ade39bb80a8d7cf72a11075c930410086" title="Note one transfer for the next vramQueueFlush().">vramQueuePush()</a>, if it fits a budget you give: the guard written once </p>
+<p>Notes the transfer only when <span class="tt"><a class="el" href="#ab06208e0076eda7a2e051fb87acd218d" title="VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.">vramQueueCost()</a> + size + <a class="el" href="#a4e5eea7ec2d0965a705d36ae61d30fa5" title="What one entry costs the flush beyond its bytes, in bytes.">VRAM_QUEUE_ENTRY_COST</a>
+&lt;= budget</span> and the queue has a free entry. Otherwise returns 0 and changes nothing, <b>and does not count a refusal</b> (<span class="tt"><a class="el" href="#af6374d25743f3daf96c9a55d65eb615c" title="Pushes refused since power-on (queue full): 0 on a healthy run. Counted whether or not the caller rea...">vram_queue_refused</a></span> is for a queue that was full, not for a transfer that waits for the next frame). The budget is yours: deciding what each module may spend stays with the game; this only does the test and the push together.</p>
+<div class="fragment"><div class="line"><span class="comment">// before: the guard by hand, every time</span></div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#a94704dd016478729ab4e5463343fd32c">vramQueueFree</a>() &amp;&amp; <a class="code hl_define" href="#ab06208e0076eda7a2e051fb87acd218d">vramQueueCost</a>() + 128 + <a class="code hl_define" href="#a4e5eea7ec2d0965a705d36ae61d30fa5">VRAM_QUEUE_ENTRY_COST</a> &lt;= BUDGET)</div>
+<div class="line">    <a class="code hl_function" href="#ade39bb80a8d7cf72a11075c930410086">vramQueuePush</a>(row, addr, 128, <a class="code hl_define" href="#a31a3e5ed50414936dd498d0727c3611d">VRAM_QUEUE_ROW</a>);</div>
+<div class="line"><span class="comment">// after</span></div>
+<div class="line"><span class="keywordflow">if</span> (!<a class="code hl_function" href="#aa2245e616396408d7f09eefd20a96466">vramQueuePushWithin</a>(row, addr, 128, <a class="code hl_define" href="#a31a3e5ed50414936dd498d0727c3611d">VRAM_QUEUE_ROW</a>, BUDGET))</div>
+<div class="line">    retry_next_frame = 1;</div>
+<div class="ttc" id="avramqueue_8h_html_aa2245e616396408d7f09eefd20a96466"><div class="ttname"><a href="#aa2245e616396408d7f09eefd20a96466">vramQueuePushWithin</a></div><div class="ttdeci">u16 vramQueuePushWithin(const u8 *src, u16 addr, u16 size, u16 step, u16 budget)</div><div class="ttdoc">vramQueuePush(), if it fits a budget you give: the guard written once</div></div>
+</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src,addr,size,step</td><td>As <a class="el" href="#ade39bb80a8d7cf72a11075c930410086" title="Note one transfer for the next vramQueueFlush().">vramQueuePush()</a> </td></tr>
+    <tr><td class="paramname">budget</td><td>Most the queue may cost, in <a class="el" href="#ab06208e0076eda7a2e051fb87acd218d" title="VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.">vramQueueCost()</a>'s unit (bytes + VRAM_QUEUE_ENTRY_COST an entry) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if noted, 0 if it did not fit </dd></dl>
 
 </div>
 </div>

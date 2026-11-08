@@ -7,7 +7,8 @@ var searchData=
   ['piece_2ec_4',['piece.c',['../piece_8c.html',1,'']]],
   ['piece_2eh_5',['piece.h',['../piece_8h.html',1,'']]],
   ['planning_2emd_6',['planning.md',['../planning_8md.html',1,'']]],
-  ['ppu_2emd_7',['PPU.md',['../PPU_8md.html',1,'']]],
-  ['profile_2eh_8',['profile.h',['../profile_8h.html',1,'']]],
-  ['profiling_2emd_9',['profiling.md',['../profiling_8md.html',1,'']]]
+  ['play_2ec_7',['play.c',['../play_8c.html',1,'']]],
+  ['ppu_2emd_8',['PPU.md',['../PPU_8md.html',1,'']]],
+  ['profile_2eh_9',['profile.h',['../profile_8h.html',1,'']]],
+  ['profiling_2emd_10',['profiling.md',['../profiling_8md.html',1,'']]]
 ];

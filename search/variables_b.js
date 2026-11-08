@@ -17,5 +17,8 @@ var searchData=
   ['kitflp_14',['kitflp',['../kit_8c.html#ac996a8c45dc6adced64c6e7a00068b2a',1,'kit.c']]],
   ['kitid_15',['kitid',['../kit_8c.html#a68e6f421448561948aa73b5314a9dbfd',1,'kit.c']]],
   ['kitx_16',['kitx',['../kit_8c.html#a51daea947660414b79831754e5410d4e',1,'kit.c']]],
-  ['kity_17',['kity',['../kit_8c.html#a9113bbb6a68422fa0332cc1587995ac9',1,'kit.c']]]
+  ['kity_17',['kity',['../kit_8c.html#a9113bbb6a68422fa0332cc1587995ac9',1,'kit.c']]],
+  ['kon_5fframe_18',['kon_frame',['../audio_2sample__swap_2main_8c.html#a9edcd92105962f9263c51861e0c25d58',1,'main.c']]],
+  ['kon_5fline_19',['kon_line',['../audio_2sample__swap_2main_8c.html#ab9f3c23a5a237c9103fab8e40057a7ed',1,'main.c']]],
+  ['kon_5fsteady_20',['kon_steady',['../audio_2sample__swap_2main_8c.html#adadbecd0379bc54ba09e1fcc8089a26a',1,'main.c']]]
 ];

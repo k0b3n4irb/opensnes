@@ -11,5 +11,6 @@ var examples_games =
       ] ]
     ] ],
     [ "Breakout", "examples_games_breakout.html", null ],
-    [ "rooftop_run — Kit's Rooftop Run", "examples_games_rooftop_run.html", null ]
+    [ "rooftop_run — Kit's Rooftop Run", "examples_games_rooftop_run.html", null ],
+    [ "shard_dash — a game in several files, with a test for each screen", "examples_games_shard_dash.html", null ]
 ];

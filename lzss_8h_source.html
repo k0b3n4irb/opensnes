@@ -123,21 +123,25 @@ $(function(){initNavTree('lzss_8h_source.html','',''); });
 </div><!--header-->
 <div class="contents">
 <a href="lzss_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">#ifndef OPENSNES_LZSS_H</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#define OPENSNES_LZSS_H</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">/* Removed on 2026-10-05 (1.0 plan, lot C): LzssDecodeVram.</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">   60</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address);</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_LZSS_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#ifndef OPENSNES_LZSS_H</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#define OPENSNES_LZSS_H</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">/* Removed on 2026-10-05 (1.0 plan, lot C): LzssDecodeVram.</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">   61</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="lzss_8h.html#a9b446a4f30a78d7a819c4454046aa8c1">  109</a></span><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="lzss_8h.html#a9b446a4f30a78d7a819c4454046aa8c1">lzssDecodeRam</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_define" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *dest);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_LZSS_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+<div class="ttc" id="agroup__volatile__types_html_gaef060b3456fdcc093a7210a762d5f2ed"><div class="ttname"><a href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a></div><div class="ttdeci">#define FAR</div><div class="ttdoc">Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.</div><div class="ttdef"><b>Definition</b> types.h:130</div></div>
 <div class="ttc" id="alzss_8h_html_a98bf298dae04c21afcd57da9f2f92104"><div class="ttname"><a href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104">lzssDecodeVram</a></div><div class="ttdeci">void lzssDecodeVram(const u8 *source, u16 address)</div><div class="ttdoc">Decompress LZ77 data directly to VRAM.</div></div>
+<div class="ttc" id="alzss_8h_html_a9b446a4f30a78d7a819c4454046aa8c1"><div class="ttname"><a href="lzss_8h.html#a9b446a4f30a78d7a819c4454046aa8c1">lzssDecodeRam</a></div><div class="ttdeci">u16 lzssDecodeRam(const u8 *source, u8 FAR *dest)</div><div class="ttdoc">Decompress LZ77 data into RAM, screen on, interrupts left alone.</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">OpenSNES Standard Types.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

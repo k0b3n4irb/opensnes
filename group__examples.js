@@ -1,7 +1,10 @@
 var group__examples =
 [
+    [ "game.h", "game_8h.html", null ],
     [ "main.c", "audio_2apu__switch_2main_8c.html", null ],
+    [ "main.c", "audio_2sample__swap_2main_8c.html", null ],
     [ "main.c", "audio_2sfx__from__wav_2main_8c.html", null ],
+    [ "main.c", "audio_2sfx__voices_2main_8c.html", null ],
     [ "main.c", "audio_2snesmod__music_2main_8c.html", null ],
     [ "main.c", "audio_2soundboard_2main_8c.html", null ],
     [ "main.c", "audio_2speech__synth_2main_8c.html", null ],
@@ -14,6 +17,7 @@ var group__examples =
     [ "main.c", "basics_2collision__demo_2main_8c.html", null ],
     [ "main.c", "basics_2game__skeleton_2main_8c.html", null ],
     [ "main.c", "basics_2panel__hud_2main_8c.html", null ],
+    [ "main.c", "basics_2ppu__reset_2main_8c.html", null ],
     [ "main.c", "basics_2scene__stack_2main_8c.html", null ],
     [ "main.c", "chips_2sa1__starfield_2main_8c.html", null ],
     [ "main.c", "chips_2superfx__3d_2main_8c.html", null ],
@@ -30,6 +34,7 @@ var group__examples =
     [ "main.c", "games_2blocks_2main_8c.html", null ],
     [ "main.c", "games_2breakout_2main_8c.html", null ],
     [ "main.c", "games_2rooftop__run_2main_8c.html", null ],
+    [ "main.c", "games_2shard__dash_2main_8c.html", null ],
     [ "main.c", "hdma_2gradient__colors_2main_8c.html", null ],
     [ "main.c", "hdma_2hdma__helpers_2main_8c.html", null ],
     [ "main.c", "hdma_2hdma__wave_2main_8c.html", null ],
@@ -38,6 +43,7 @@ var group__examples =
     [ "main.c", "input_2superscope_2main_8c.html", null ],
     [ "main.c", "maps_2map__scroll_2main_8c.html", null ],
     [ "main.c", "memory_2hirom__demo_2main_8c.html", null ],
+    [ "main.c", "memory_2lzss__ram_2main_8c.html", null ],
     [ "main.c", "memory_2save__game_2main_8c.html", null ],
     [ "main.c", "mode7_2dsp1__ground_2main_8c.html", null ],
     [ "main.c", "mode7_2extbg_2main_8c.html", null ],
@@ -59,5 +65,14 @@ var group__examples =
     [ "main.c", "text_2print__string_2main_8c.html", null ],
     [ "main.c", "transitions_2fading_2main_8c.html", null ],
     [ "main.c", "windows_2window_2main_8c.html", null ],
-    [ "main.c", "windows_2window__multi__hdma_2main_8c.html", null ]
+    [ "main.c", "windows_2window__multi__hdma_2main_8c.html", null ],
+    [ "play.c", "play_8c.html", null ],
+    [ "result.c", "result_8c.html", null ],
+    [ "save.c", "save_8c.html", null ],
+    [ "save.h", "save_8h.html", null ],
+    [ "screen.c", "screen_8c.html", null ],
+    [ "screen.h", "screen_8h.html", null ],
+    [ "title.c", "title_8c.html", null ],
+    [ "ui.c", "ui_8c.html", null ],
+    [ "ui.h", "ui_8h.html", null ]
 ];

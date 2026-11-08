@@ -21,5 +21,8 @@ var searchData=
   ['orange_5fpal_5fend_18',['orange_pal_end',['../render_8c.html#a758423799a10ec752d719b45d37fd944',1,'render.c']]],
   ['orb_5fx_19',['orb_x',['../mode7_2extbg_2main_8c.html#a30e52ebc3059eb2df30603ee18a7b794',1,'main.c']]],
   ['order_20',['order',['../structOamWorldBatch.html#aa2f66bf32e69170541da3acea0fc5833',1,'OamWorldBatch']]],
-  ['owords_21',['owords',['../backgrounds_2mode2_2main_8c.html#a5aadf7133a1cc485036dc554a790e488',1,'main.c']]]
+  ['ovl_5fexpected_21',['ovl_expected',['../memory_2lzss__ram_2main_8c.html#abaa36a62c8aebe337314f0912e03240b',1,'main.c']]],
+  ['ovl_5flz_22',['ovl_lz',['../memory_2lzss__ram_2main_8c.html#a76f3cd89efd445113e10cee4ef06f57c',1,'main.c']]],
+  ['ovlong_5flz_23',['ovlong_lz',['../memory_2lzss__ram_2main_8c.html#a5ecadf4d0144c76092ea29269f0de1c6',1,'main.c']]],
+  ['owords_24',['owords',['../backgrounds_2mode2_2main_8c.html#a5aadf7133a1cc485036dc554a790e488',1,'main.c']]]
 ];

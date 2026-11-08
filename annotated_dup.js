@@ -16,6 +16,7 @@ var annotated_dup =
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
     [ "MetaspriteStyle", "structMetaspriteStyle.html", "structMetaspriteStyle" ],
     [ "Npc", "structNpc.html", null ],
+    [ "OamBatch", "structOamBatch.html", "structOamBatch" ],
     [ "OamDynamicConfig", "structOamDynamicConfig.html", "structOamDynamicConfig" ],
     [ "OamWorldBatch", "structOamWorldBatch.html", "structOamWorldBatch" ],
     [ "Panel", "structPanel.html", "structPanel" ],

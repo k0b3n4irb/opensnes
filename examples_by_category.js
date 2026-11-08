@@ -23,10 +23,10 @@ var examples_by_category =
       ] ],
       [ "Demos", "examples_by_category.html#demos", null ],
       [ "Games", "examples_by_category.html#games", [
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-23", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-35", null ],
-        [ "How to build", "examples_text_print_string.html#how-to-build-15", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-52", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-25", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-38", null ],
+        [ "How to build", "examples_text_print_string.html#how-to-build-18", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-57", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -70,6 +70,8 @@ var examples_by_category =
     [ "SNESMOD Music and Sound Effects", "examples_audio_snesmod_music.html", null ],
     [ "soundboard — the audio v2 engine, driven entirely from C", "examples_audio_soundboard.html", null ],
     [ "SFX from WAV", "examples_audio_sfx_from_wav.html", null ],
+    [ "SFX voices", "examples_audio_sfx_voices.html", null ],
+    [ "Sample swap", "examples_audio_sample_swap.html", null ],
     [ "apu_switch — two S-DSP programs, swapped at runtime", "examples_audio_apu_switch.html", null ],
     [ "speech_synth — the SNES says \"OPEN SNES… DAVEO\"", "examples_audio_speech_synth.html", null ],
     [ "Map Scroll", "examples_maps_map_scroll.html", null ],
@@ -78,8 +80,10 @@ var examples_by_category =
     [ "Scene Stack", "examples_basics_scene_stack.html", null ],
     [ "panel_hud — a HUD that survives a dialog box", "examples_basics_panel_hud.html", null ],
     [ "game_skeleton — the smallest complete game", "examples_basics_game_skeleton.html", null ],
+    [ "ppu_reset — the next screen starts from a clean PPU", "examples_basics_ppu_reset.html", null ],
     [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", null ],
     [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ],
+    [ "LZ77 into RAM — lzssDecodeRam", "examples_memory_lzss_ram.html", null ],
     [ "SA-1 Starfield (Murmuration)", "examples_chips_sa1_starfield.html", null ],
     [ "SuperFX 3D Cube", "examples_chips_superfx_3d.html", null ],
     [ "Super FX Game Skeleton", "examples_chips_superfx_game_skeleton.html", null ],
@@ -88,5 +92,6 @@ var examples_by_category =
     [ "rpg — an RPG template driven by a Tiled map", "examples_demos_rpg.html", null ],
     [ "Breakout", "examples_games_breakout.html", null ],
     [ "Blocks", "examples_games_blocks.html", null ],
+    [ "shard_dash — a game in several files, with a test for each screen", "examples_games_shard_dash.html", null ],
     [ "rooftop_run — Kit's Rooftop Run", "examples_games_rooftop_run.html", null ]
 ];

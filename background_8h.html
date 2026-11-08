@@ -159,7 +159,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a6a9b36b5d6bd66b043bb5e775f9802ed" id="r_a6a9b36b5d6bd66b043bb5e775f9802ed"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6a9b36b5d6bd66b043bb5e775f9802ed">bgInitTileSetData</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a>, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>(<a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a> !=0xFF &amp;&amp;(<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x0FFF) !=0</td></tr>
 <tr class="memdesc:a6a9b36b5d6bd66b043bb5e775f9802ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load tile graphics only (no palette).  <br /></td></tr>
 <tr class="memitem:a2530cc08688a3c5bbe949b17f9e7a2aa" id="r_a2530cc08688a3c5bbe949b17f9e7a2aa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2530cc08688a3c5bbe949b17f9e7a2aa">bgSetGfxPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>((<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x0FFF) !=0</td></tr>
-<tr class="memdesc:a2530cc08688a3c5bbe949b17f9e7a2aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tile graphics address.  <br /></td></tr>
 <tr class="memitem:ab0fc2f727fd9cee4e4fb56c4c4950560" id="r_ab0fc2f727fd9cee4e4fb56c4c4950560"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab0fc2f727fd9cee4e4fb56c4c4950560">bgSetMapPtr</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mapSize) <a class="el" href="types_8h.html#a83c542a181cfca79715f3b281f48e272">OPENSNES_CHECK_ARGS</a>((<a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &amp;0x03FF) !=0</td></tr>
 <tr class="memdesc:ab0fc2f727fd9cee4e4fb56c4c4950560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tilemap address and size.  <br /></td></tr>
 <tr class="memitem:a9bf45b3dbc30dec36aeb592b58b120f4" id="r_a9bf45b3dbc30dec36aeb592b58b120f4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
@@ -171,6 +170,8 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a972ae0822926de7f8d5e828da57da9bb" id="r_a972ae0822926de7f8d5e828da57da9bb"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a972ae0822926de7f8d5e828da57da9bb">bg_address_refused</a></td></tr>
+<tr class="memdesc:a972ae0822926de7f8d5e828da57da9bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set background tile graphics address.  <br /></td></tr>
 <tr class="memitem:a044c746ddf6e28c3e6c56e08c2570369" id="r_a044c746ddf6e28c3e6c56e08c2570369"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></td></tr>
 <tr class="memitem:a4a97fbf5131c05b45ba8ed791440d5d2" id="r_a4a97fbf5131c05b45ba8ed791440d5d2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4a97fbf5131c05b45ba8ed791440d5d2">bgInitTileSetData</a></td></tr>
 <tr class="memitem:a219e6986a886a886eb420f879fea8029" id="r_a219e6986a886a886eb420f879fea8029"><td class="memItemLeft">void or&#160;</td><td class="memItemRight"><a class="el" href="#a219e6986a886a886eb420f879fea8029">bgNumber</a></td></tr>
@@ -230,7 +231,7 @@ Overview</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fill with a specific tile entry (palette 2, tile 5)</span></div>
 <div class="line"><a class="code hl_define" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(0x0400, 0x1005, 2048);</div>
-<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:239</div></div>
+<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:245</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -388,7 +389,7 @@ Overview</h2>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> tiles[], tiles_end[];</div>
 <div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>[];</div>
 <div class="line"><a class="code hl_variable" href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, 0, tiles_end - tiles, 32, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
-<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:203</div></div>
+<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:209</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="atext_2pixel__text_2main_8c_html_aed41e53efdee92d24f64b3bae717c207"><div class="ttname"><a href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a></div><div class="ttdeci">static const u8 palette[]</div><div class="ttdef"><b>Definition</b> main.c:83</div></div>
 </div><!-- fragment --> 
@@ -470,20 +471,6 @@ Overview</h2>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Set background tile graphics address. </p>
-<p>Configures where the background's tile graphics (CHR) are located in VRAM.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">bg</td><td>Background number (0-3) </td></tr>
-    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM WORD address, a multiple of 0x1000 words (the register holds <span class="tt"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &gt;&gt; 12</span>; lower bits are dropped silently). Said "multiple of 0x2000" until 2026-09-20 — that is the same step counted in bytes.</td></tr>
-  </table>
-  </dd>
-</dl>
-<div class="fragment"><div class="line"><span class="comment">// Set BG1 tiles at VRAM $2000</span></div>
-<div class="line"><a class="code hl_variable" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a>(0, 0x2000);</div>
-<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:163</div></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>BG1/BG2 share one register, BG3/BG4 share another. Setting one does not affect the other in the pair. </dd></dl>
 
 </div>
 </div>
@@ -578,7 +565,7 @@ Overview</h2>
 <div class="fragment"><div class="line"><span class="comment">// Scroll BG1 right by 10 pixels</span></div>
 <div class="line"><a class="code hl_function" href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, scrollX, 0);</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
-</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -643,6 +630,43 @@ Overview</h2>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a972ae0822926de7f8d5e828da57da9bb" name="a972ae0822926de7f8d5e828da57da9bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a972ae0822926de7f8d5e828da57da9bb">&#9670;&#160;</a></span>bg_address_refused</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> bg_address_refused</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set background tile graphics address. </p>
+<p>Configures where the background's tile graphics (CHR) are located in VRAM.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bg</td><td>Background number (0-3) </td></tr>
+    <tr><td class="paramname"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a></td><td>VRAM WORD address, a multiple of 0x1000 words (the register holds <span class="tt"><a class="el" href="#ab281851bdfe178b2a5fac4b747d4a501">vramAddr</a> &gt;&gt; 12</span>; lower bits are dropped silently). Said "multiple of 0x2000" until 2026-09-20 — that is the same step counted in bytes.</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><span class="comment">// Set BG1 tiles at VRAM $2000</span></div>
+<div class="line"><a class="code hl_variable" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a>(0, 0x2000);</div>
+<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:169</div></div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>BG1/BG2 share one register, BG3/BG4 share another. Setting one does not affect the other in the pair.</dd></dl>
+<p>Addresses <a class="el" href="#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr()</a> / <a class="el" href="#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr()</a> were given that their register cannot hold (not a multiple of 0x400 / 0x1000 words), rounded down: counted here and fired as WDM $03 (luna <span class="tt">--wdm-out</span>). 0 on a healthy run. A constant address is refused at compile time; this catches the computed ones. </p>
+
+</div>
+</div>
 <a id="a044c746ddf6e28c3e6c56e08c2570369" name="a044c746ddf6e28c3e6c56e08c2570369"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a044c746ddf6e28c3e6c56e08c2570369">&#9670;&#160;</a></span>bgInitTileSet</h2>
 

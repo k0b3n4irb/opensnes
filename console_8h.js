@@ -12,6 +12,7 @@ var console_8h =
     [ "getFrameCount", "console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6", null ],
     [ "isInVBlank", "console_8h.html#a1bb80e4838ae89136bf886d0bc9ddfc2", null ],
     [ "isPAL", "console_8h.html#a3b56ab7f353055ded8e2960b94d6ba57", null ],
+    [ "ppuReset", "console_8h.html#a99e97289ca46d8ffa0739d5f8317cb91", null ],
     [ "resetFrameCount", "console_8h.html#a66b5cb8d7cb64a0afb9392e880020a0b", null ],
     [ "rngNext", "console_8h.html#af00b46ef13a81876e2a8806eee9dde8c", null ],
     [ "rngSeed", "console_8h.html#a82344e91af2df5885fa4f7e92fa42efd", null ],

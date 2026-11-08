@@ -130,7 +130,7 @@ Why it matters for your game</h2>
 <img src="shadow_tint.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-9"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-10"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>colour math against a <em>fixed</em> colour.</b> The PPU takes the finished main-screen image and adds or subtracts a constant colour per layer — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow()</a></span> subtracts a grey (darken), <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint()</a></span> adds a colour (cast). This rests on the layers, tiles and palette you already know; the effect sits <em>on top</em> of them and touches no VRAM, CGRAM or OAM.</p>
 <p>Because both effects share the one fixed-colour register and the single add/subtract bit, <b>only one is active at a time</b> — which is exactly why the demo cycles through them rather than combining them. The scene is a street of the city at night — apartment blocks and a noodle sign (<span class="tt">res/street.png</span>, Néo-Lumen art, CC0) — so you can watch the transform land on a picture. The sky is the backdrop, not BG1: it keeps its colour, because colour math here is enabled on BG1 only.</p>
@@ -151,7 +151,7 @@ Build &amp; run</h2>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="assets-10"></a>
 Assets</h2>
 <p><span class="tt">res/street.png</span> is <span class="tt">backgrounds/city_near.png</span> of <span class="tt">assets/neo-lumen/</span>, indexed by <span class="tt">devtools/art_assets/build.py</span>; the build converts it (<span class="tt">res/street.png.toml</span>).</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-19"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-22"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span>, <span class="tt">input</span></p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-4"></a>

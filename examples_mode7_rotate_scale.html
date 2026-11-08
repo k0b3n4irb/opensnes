@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_mode7_rotate_scale.html','',''); });
 <img src="rotate_scale.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-4"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-5"></a>
 What This Example Shows</h2>
 <p>How to use the SNES Mode 7 &ndash; a special background mode that applies an affine transformation (rotation + scaling) to a single 128x128 tile layer. This is the same technique behind F-Zero's ground, Mario Kart's tracks, and Pilotwings' maps.</p>
 <p>A glider flies over the plane, and the zoom is its altitude: zoom out and the view widens as if it climbed, while its shadow slides further away; zoom in and the shadow closes in. Scale and shadow are the two cues that make a flat Mode 7 plane read as height.</p>
@@ -147,12 +147,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify) — the glider descends, its shadow closes in  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-26"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-28"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/rotate_scale</div>
 </div><!-- fragment --><p>Then open <span class="tt">rotate_scale.sfc</span> in luna (<span class="tt">luna-gui rotate_scale.sfc</span>) or any emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-8"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-9"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-mode-7-vram-format"></a>
 1. Mode 7 VRAM format</h3>
@@ -198,7 +198,7 @@ How It Works</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310">mode7SetScroll</a>(0, 16);       <span class="comment">/* plane point (128, 128) -&gt; screen (128, 112) */</span></div>
 <div class="ttc" id="amode7_8h_html_a43ff7fa2834e9151b5c1d1bc3837c310"><div class="ttname"><a href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310">mode7SetScroll</a></div><div class="ttdeci">void mode7SetScroll(s16 x, s16 y)</div><div class="ttdoc">Set Mode 7 scroll position.</div></div>
 </div><!-- fragment --><p>The glider is Kit's, a 32x32 sprite drawn there; the plane turns under it. Its shadow is the same picture in an all-dark palette, drawn <span class="tt">zscale &gt;&gt; 5</span> pixels below: 8 at 1:1, up to 60 at the widest view. The glider is OAM entry 0 and the shadow entry 1: between two sprites the lower index is drawn in front, whatever their priority bits, which only rank a sprite against the backgrounds (<a href="https://snes.nesdev.org/wiki/Sprites">SNESdev wiki, Sprites</a>).</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-25"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-28"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="affine-transformation"></a>
 Affine Transformation</h3>
@@ -250,7 +250,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-40"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

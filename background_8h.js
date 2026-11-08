@@ -23,6 +23,7 @@ var background_8h =
     [ "bgSetScroll", "background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4", null ],
     [ "bgSetScrollX", "background_8h.html#a255b7012c710513afe464505ec420d3c", null ],
     [ "bgSetScrollY", "background_8h.html#a1fcd01a63d5efa74df2394d1374588b6", null ],
+    [ "bg_address_refused", "background_8h.html#a972ae0822926de7f8d5e828da57da9bb", null ],
     [ "bgInitTileSet", "background_8h.html#a044c746ddf6e28c3e6c56e08c2570369", null ],
     [ "bgInitTileSetData", "background_8h.html#a4a97fbf5131c05b45ba8ed791440d5d2", null ],
     [ "bgNumber", "background_8h.html#a219e6986a886a886eb420f879fea8029", null ],

@@ -129,7 +129,7 @@ $(function(){initNavTree('examples_fundamentals_text_glyphs.html','',''); });
 <h2 class="doxsection"><a class="anchor" id="controls-8"></a>
 Controls</h2>
 <p>No interactive controls. The text is displayed statically.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-12"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-13"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES turns pixels into pictures (tiles, tilemaps, palettes — the holy trinity)</li>
@@ -175,7 +175,7 @@ here, tile #7 there." That's it — that's the entire display system. If you wan
 <div class="line"><a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x0400, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);   <span class="comment">/* BG1SC: tilemap at VRAM $0400, 32x32 entries */</span></div>
 <div class="line"><a class="code hl_variable" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a>(0, 0x0000);                 <span class="comment">/* BG12NBA: BG1 tile graphics at VRAM $0000 */</span></div>
 <div class="ttc" id="abackground_8h_html_a7562c524ad6c4c62897ad159bf12b2c6"><div class="ttname"><a href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
-<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:163</div></div>
+<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:169</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga82bccfa80c8aa4ff5aa4e1416e0ade25"><div class="ttname"><a href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a></div><div class="ttdeci">#define BG_MODE0</div><div class="ttdef"><b>Definition</b> video.h:38</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
@@ -302,7 +302,7 @@ Why These Modules?</h3>
 <p><b>"But there are no sprites in Hello World!"</b> Correct. The dependency chain is: <span class="tt">console</span> → <span class="tt">sprite</span> → <span class="tt">dma</span>. The NMI handler (in console) always DMAs the OAM buffer (in sprite) to the PPU, and that DMA call lives in the dma module. The build system does NOT auto-resolve these dependencies — if you forget <span class="tt">dma</span>, you get a linker error about an undefined <span class="tt"><a class="el" href="dma_8h.html#a50a418c73f494651a1be98404d753c21" title="Copy OAM data (PVSnesLib compatible).">dmaCopyOam</a></span> symbol and no hint about why. </p>
 </blockquote>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-24"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-27"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference"></a>

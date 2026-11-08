@@ -282,7 +282,7 @@ Test Your Game</h3>
 <div class="fragment"><div class="line">scripts/install-luna.sh   # once, from the SDK root: fetch the pinned luna</div>
 <div class="line">make test-update          # seed the visual baselines (asserts.fbhash) in place</div>
 <div class="line">make test                 # from now on: exit 0 = green, 1 = regression</div>
-</div><!-- fragment --><p>(Or <span class="tt">opensnes test</span> / <span class="tt">opensnes test --update</span> from the project directory.)</p>
+</div><!-- fragment --><p>(Or <span class="tt">opensnes test</span> / <span class="tt">opensnes test --<a class="el" href="play_8c.html#a432d8d1823e525c8951824c889ce3f6c" title="One image of play. Flat u8/u16 only: no call through a pointer in the hot loop.">update</a></span> from the project directory.)</p>
 <p>What a manifest can judge:</p>
 <ul>
 <li><b>WRAM values</b> — <span class="tt">[checkpoint.values]</span> entries are read by luna at <span class="tt">at_frame</span>, with symbol names resolved from your ROM's <span class="tt">.sym</span> file: write the name the variable has in your C. Two sources may define a <span class="tt">static</span> of the same name; luna then refuses the bare name and lists the candidates, each with its source file as a suffix (<span class="tt">"player_x.main"</span> for the one of <span class="tt">main.c</span>, quoted because of the dot). A value is a number, or <span class="tt">{ eq = 0x10, width = 1 }</span> to set the width; <span class="tt">[checkpoint.delta]</span> says <span class="tt">"increased"</span> / <span class="tt">"unchanged"</span> between two checkpoints;</li>

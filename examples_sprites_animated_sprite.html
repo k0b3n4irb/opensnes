@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_sprites_animated_sprite.html','',''); });
 <img src="animated_sprite.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-6"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-7"></a>
 What This Example Shows</h2>
 <p>How to animate a character sprite that walks in 4 directions with 3 animation frames each. Demonstrates sprite sheet layout, direction state machines, and horizontal flip to reuse art.</p>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-6"></a>
@@ -146,12 +146,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Right  </td><td class="markdownTableBodyNone">Walk right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-30"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/animated_sprite</div>
 </div><!-- fragment --><p>Then open <span class="tt">animated_sprite.sfc</span> in luna (<span class="tt">luna-gui animated_sprite.sfc</span>) or any emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-11"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-12"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-sprite-sheet-layout"></a>
 1. Sprite sheet layout</h3>
@@ -191,7 +191,7 @@ How It Works</h2>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_a40d20879d5ecca950af2b5d40fa95874"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a></div><div class="ttdeci">Walker kit</div><div class="ttdoc">Kit, the player-controlled sprite, initialized facing down at (100, 100).</div><div class="ttdef"><b>Definition</b> main.c:109</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_aca96d6bd10d9a1eca2363540f9d3f5a8"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a></div><div class="ttdeci">#define ANIM_DELAY</div><div class="ttdoc">Number of frames to hold each animation frame before advancing.</div><div class="ttdef"><b>Definition</b> main.c:106</div></div>
 </div><!-- fragment --><p>Animation only advances when a direction button is held. <span class="tt"><a class="el" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8" title="Number of frames to hold each animation frame before advancing.">ANIM_DELAY</a></span> (6 frames) controls walking speed &ndash; at 60 fps, this means about 10 animation steps per second.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-28"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-31"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="obj_flipx----hardware-horizontal-mirror"></a>
 OBJ_FLIPX &ndash; Hardware Horizontal Mirror</h3>
@@ -227,7 +227,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-44"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

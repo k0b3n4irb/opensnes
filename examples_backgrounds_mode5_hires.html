@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_backgrounds_mode5_hires.html','',''); });
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>InterlaceFont</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Interlace/InterlaceFont</span>). BG Mode 5 renders <b>512 horizontal pixels</b> with 16×8 tiles; SETINI bit 0 adds screen interlace for <b>448 visible lines</b>. This example lands the SDK's SETINI surface (<span class="tt">videoSetInterlace/ObjInterlace/Overscan/PseudoHires</span>, all composing through a write-only-register shadow) with a text page as the canonical hi-res payload — every glyph is 8 px wide, unrepresentable at 256.</p>
 <p>The page is a screen of the Rue basse's terminal, 63 columns of the library's 8x8 font in the city's colours (white, cyan and amber on the glass), drawn and converted to Mode 5's paired-tile format by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">hires_page</span>); the outputs are committed. The 1-pixel stripe/checker bands are the acid test: at true 512 px they alternate every column — a 256-wide mode would alias them to flat gray.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-4"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-6"></a>
 SNES Concepts</h2>
 <ul>
 <li>BG Mode 5: 512 px, 16×8 tiles stored as 8×8 character pairs (N, N+1)</li>
@@ -164,12 +164,12 @@ Register fidelity vs the original</h2>
 <h2 class="doxsection"><a class="anchor" id="validation-notes"></a>
 Validation notes</h2>
 <p>The screenshot above is luna's capture at native resolution (<span class="tt">luna run --native-res</span>, 512×448: the field pair, every column), and the visual baseline is taken the same way. The full 448-line page displays once with no vertical wrap (the 32×64 map: a 32-row map only covers 256 hi-res lines in interlace).</p>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-3"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-5"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/backgrounds/mode5_hires &amp;&amp; make</div>
 <div class="line"># redraw the page (contributors, needs Pillow):</div>
 <div class="line">python3 ../../../devtools/art_assets/build.py &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-7"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-9"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span></p>
 <h2 class="doxsection"><a class="anchor" id="assets-1"></a>

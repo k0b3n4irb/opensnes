@@ -2,6 +2,7 @@ var sprite_8h =
 [
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
     [ "MetaspriteStyle", "structMetaspriteStyle.html", "structMetaspriteStyle" ],
+    [ "OamBatch", "structOamBatch.html", "structOamBatch" ],
     [ "OamDynamicConfig", "structOamDynamicConfig.html", "structOamDynamicConfig" ],
     [ "OamWorldBatch", "structOamWorldBatch.html", "structOamWorldBatch" ],
     [ "t_sprites", "structt__sprites.html", "structt__sprites" ],
@@ -62,6 +63,7 @@ var sprite_8h =
     [ "oamMetaDrawDyn", "sprite_8h.html#ae4d4517a682025275d57356f692e2548", null ],
     [ "oamPlaceWorld", "sprite_8h.html#abd8864858828dc6c2646b15d59420b5a", null ],
     [ "oamSet", "sprite_8h.html#a697c4b66632525f55f21fb6008582b3f", null ],
+    [ "oamSetBatch", "sprite_8h.html#a7519143e6fefdcbe97f2c6fcbaa73bbd", null ],
     [ "oamSetSize", "sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5", null ],
     [ "oamSetTile", "sprite_8h.html#adb68723edfe9fcb5f46620c5753e293b", null ],
     [ "oamSetX", "sprite_8h.html#aee7801788489ccf4dd20f3a23c4eadea", null ],

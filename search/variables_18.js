@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['y_0',['y',['../structRect.html#a80b79e77c6e4bc28681ba8fc723024be',1,'Rect::y'],['../structDsp1Camera.html#aba3d4a68f737a0c006f8daedc42b6468',1,'Dsp1Camera::y'],['../structOamWorldBatch.html#aff1b99dd435e2fed062edf8723457e27',1,'OamWorldBatch::y'],['../structEntity.html#a752e31b7ff5897bd771a8611137ff88f',1,'Entity::y'],['../structLamp.html#af61014bf73bd4cf2893f688d84225bdd',1,'Lamp::y'],['../structWalker.html#ad892232699b21aa70ddfedd59883d904',1,'Walker::y']]],
-  ['yloc_1',['yloc',['../maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1',1,'main.c']]],
-  ['yofs_2',['yofs',['../structt__objs.html#a63dd6f946d11f7e39d35ce9050c1e168',1,'t_objs']]],
-  ['ypos_3',['ypos',['../structt__objs.html#af033b263019aea8c1fb4fd095dde7997',1,'t_objs']]],
-  ['yvel_4',['yvel',['../structt__objs.html#a401ea031f21458eb788a7c3150b5a3f0',1,'t_objs']]]
+  ['x_0',['x',['../structRect.html#a9e32b68a268c298487173d197726d6ab',1,'Rect::x'],['../structDsp1Camera.html#ad1e20e8da9fdc161b5080f6651b1926c',1,'Dsp1Camera::x'],['../structOamWorldBatch.html#a3809be06a1ccc59d745e1e0c683e7eec',1,'OamWorldBatch::x'],['../structOamBatch.html#a7387dc943485c0622d9a9301fe64ee96',1,'OamBatch::x'],['../structEntity.html#abb39fb6fdbad51636ea22e63fdc0fcd7',1,'Entity::x'],['../structLamp.html#a55fb8de91e19b6a0cdd036dcb43d57dd',1,'Lamp::x'],['../structWalker.html#a76806f45ae5c6eabcf263a5cc3da0572',1,'Walker::x']]],
+  ['x_5foff_1',['x_off',['../text_2pixel__text_2main_8c.html#a10a8c9763c73a9b6eb3299776e818dda',1,'main.c']]],
+  ['xloc_2',['xloc',['../maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8',1,'main.c']]],
+  ['xmax_3',['xmax',['../structt__objs.html#acd8923cc8af679f29948a046cc75facf',1,'t_objs']]],
+  ['xmin_4',['xmin',['../structt__objs.html#afe1bb9b465b03a6ce06be3563a3a7b7a',1,'t_objs']]],
+  ['xofs_5',['xofs',['../structt__objs.html#ad5a67be825dd45b98f19bda952a856f5',1,'t_objs']]],
+  ['xpos_6',['xpos',['../structt__objs.html#a7d8d754f7264eebc304486e94750c5ce',1,'t_objs::xpos'],['../sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0',1,'xpos:&#160;main.c']]],
+  ['xvel_7',['xvel',['../structt__objs.html#a3805bf290808a8490f0e866e58843e48',1,'t_objs']]]
 ];

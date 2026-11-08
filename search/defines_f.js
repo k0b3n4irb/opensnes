@@ -77,12 +77,13 @@ var searchData=
   ['res_5fid_74',['RES_ID',['../sprites_2world__sprites_2main_8c.html#a1185c7c06af1e8dce0275d3f735b63a2',1,'main.c']]],
   ['resident_5ftile_75',['RESIDENT_TILE',['../demos_2rpg_2main_8c.html#a542365d524d857e1ac008bab722fc4e8',1,'main.c']]],
   ['residents_76',['RESIDENTS',['../demos_2rpg_2main_8c.html#a3dd0ae547459c5a142e21afc8c5ae2a8',1,'main.c']]],
-  ['rgb_77',['RGB',['../video_8h.html#a4a118ad3ee36468a3fa616977a64864e',1,'video.h']]],
-  ['rgb24_78',['RGB24',['../video_8h.html#ad8da1514f9cd03e3cda94953525627f2',1,'video.h']]],
-  ['rim_5fy_79',['RIM_Y',['../chips_2superfx__game__skeleton_2main_8c.html#a4fdcffe367c4f2a15cb51219704f73d9',1,'main.c']]],
-  ['rival_5fframe_80',['RIVAL_FRAME',['../mode7_2mode7__racing_2main_8c.html#ace1b29465a09caec17f81546e34433ec',1,'main.c']]],
-  ['roof_5fmap_81',['ROOF_MAP',['../basics_2aim__target_2main_8c.html#a3bfde2d6bdb39781832cf10bf0e704c6',1,'main.c']]],
-  ['roof_5ftiles_82',['ROOF_TILES',['../basics_2aim__target_2main_8c.html#a11723159f1463f1975722dc7e8fea8c9',1,'main.c']]],
-  ['roof_5fy_83',['ROOF_Y',['../maps_2map__scroll_2main_8c.html#ae149f3c623db4510b5901377062d11cc',1,'main.c']]],
-  ['rows_84',['ROWS',['../text_2pixel__text_2main_8c.html#a3cfd3aa62338d12609f6d65bce97e9cd',1,'main.c']]]
+  ['result_5fwait_77',['RESULT_WAIT',['../game_8h.html#ae8ddb9901bb3657d5ffabcc46a5f7d48',1,'game.h']]],
+  ['rgb_78',['RGB',['../video_8h.html#a4a118ad3ee36468a3fa616977a64864e',1,'video.h']]],
+  ['rgb24_79',['RGB24',['../video_8h.html#ad8da1514f9cd03e3cda94953525627f2',1,'video.h']]],
+  ['rim_5fy_80',['RIM_Y',['../chips_2superfx__game__skeleton_2main_8c.html#a4fdcffe367c4f2a15cb51219704f73d9',1,'main.c']]],
+  ['rival_5fframe_81',['RIVAL_FRAME',['../mode7_2mode7__racing_2main_8c.html#ace1b29465a09caec17f81546e34433ec',1,'main.c']]],
+  ['roof_5fmap_82',['ROOF_MAP',['../basics_2aim__target_2main_8c.html#a3bfde2d6bdb39781832cf10bf0e704c6',1,'main.c']]],
+  ['roof_5ftiles_83',['ROOF_TILES',['../basics_2aim__target_2main_8c.html#a11723159f1463f1975722dc7e8fea8c9',1,'main.c']]],
+  ['roof_5fy_84',['ROOF_Y',['../maps_2map__scroll_2main_8c.html#ae149f3c623db4510b5901377062d11cc',1,'main.c']]],
+  ['rows_85',['ROWS',['../text_2pixel__text_2main_8c.html#a3cfd3aa62338d12609f6d65bce97e9cd',1,'main.c']]]
 ];

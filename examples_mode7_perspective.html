@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_mode7_perspective.html','',''); });
 <img src="perspective.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-3"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-4"></a>
 What This Example Shows</h2>
 <p>How to combine Mode 7 with HDMA to create a <b>perspective ground plane</b> &ndash; the same technique used in F-Zero, Mario Kart, and Pilotwings. The screen is split in two: a static sky on top and a scaled ground that recedes into the distance.</p>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-4"></a>
@@ -140,12 +140,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD  </td><td class="markdownTableBodyNone">Scroll the ground plane  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-27"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/perspective</div>
 </div><!-- fragment --><p>Then run <span class="tt">perspective.sfc</span> in luna (<span class="tt">opensnes run</span>) or any SNES emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-7"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-8"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-split-screen-with-hdma"></a>
 1. Split-screen with HDMA</h3>
@@ -187,7 +187,7 @@ How It Works</h2>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_aca454876f36e8f32b3ef01f1eb441ecd"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#aca454876f36e8f32b3ef01f1eb441ecd">setCamera</a></div><div class="ttdeci">static void setCamera(void)</div><div class="ttdoc">Place the camera: Mode 7 scroll and center, and the sky&#39;s scroll.</div><div class="ttdef"><b>Definition</b> main.c:124</div></div>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:114</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll()</a></span> and <span class="tt"><a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a></span> write the registers at once, so they run right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-23"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-26"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="mode-switching-mid-frame"></a>
 Mode Switching Mid-Frame</h3>
@@ -225,7 +225,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-38"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-43"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

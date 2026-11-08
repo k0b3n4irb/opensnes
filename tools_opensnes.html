@@ -133,6 +133,8 @@ Commands</h2>
 <div class="line">opensnes test --update                  # first time: record the visual baselines</div>
 <div class="line">opensnes test                           # run test/*.toml in luna</div>
 <div class="line">opensnes budget                         # how much of the console the game uses</div>
+<div class="line">opensnes budget --frame                 # ... and what a frame costs the CPU, measured in luna</div>
+<div class="line">opensnes budget --frame --from-frame 600 --input &quot;590:0x1000,600:0&quot; --top 5   # a scene behind the title</div>
 <div class="line">opensnes release --tag v1.0             # the ROM you hand over, in release/</div>
 <div class="line">opensnes clean</div>
 <div class="line">opensnes doctor                         # is everything there?</div>
@@ -148,7 +150,7 @@ Commands</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">run [--emulator NAME]</span>  </td><td class="markdownTableBodyNone">builds, then opens the ROM (the <span class="tt">TARGET</span> of your Makefile) in the luna GUI that <span class="tt">scripts/install-luna.sh</span> installed, or the first of Mesen, bsnes, snes9x on your <span class="tt">PATH</span>; <span class="tt">--emulator</span> names another  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">test [--update]</span>  </td><td class="markdownTableBodyNone"><span class="tt">luna test</span> on the project's <span class="tt">test/*.toml</span>; <span class="tt">--update</span> rewrites the <span class="tt">asserts.fbhash</span> baselines  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">test [--<a class="el" href="play_8c.html#a432d8d1823e525c8951824c889ce3f6c" title="One image of play. Flat u8/u16 only: no call through a pointer in the hot loop.">update</a>]</span>  </td><td class="markdownTableBodyNone"><span class="tt">luna test</span> on the project's <span class="tt">test/*.toml</span>; <span class="tt">--<a class="el" href="play_8c.html#a432d8d1823e525c8951824c889ce3f6c" title="One image of play. Flat u8/u16 only: no call through a pointer in the hot loop.">update</a></span> rewrites the <span class="tt">asserts.fbhash</span> baselines  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">budget [--json]</span>  </td><td class="markdownTableBodyNone">builds, then one report of what the game uses of what the console has: ROM bank by bank, the C variables' 8 KB and the FAR band, the cartridge's save RAM, and the VRAM and CGRAM the project's assets weigh (<a class="el" href="tools_opensnes_rom.html" title="opensnes-rom — is the ROM good?">opensnes-rom — is the ROM good?</a>). The build talks on stderr; the report is all there is on stdout.  </td></tr>
 <tr class="markdownTableRowOdd">

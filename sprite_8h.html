@@ -135,6 +135,8 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metasprite item structure (PVSnesLib compatible).  <a href="structMetaspriteItem.html#details">More...</a><br /></td></tr>
 <tr class="memitem:MetaspriteStyle" id="r_MetaspriteStyle"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">What stays the same from one frame of a metasprite to the next.  <a href="structMetaspriteStyle.html#details">More...</a><br /></td></tr>
+<tr class="memitem:OamBatch" id="r_OamBatch"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structOamBatch.html">OamBatch</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A batch of sprites in screen coordinates, for <a class="el" href="#a7519143e6fefdcbe97f2c6fcbaa73bbd" title="Write the OAM entries of N sprites from parallel arrays, in one call.">oamSetBatch()</a>.  <a href="structOamBatch.html#details">More...</a><br /></td></tr>
 <tr class="memitem:OamDynamicConfig" id="r_OamDynamicConfig"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structOamDynamicConfig.html">OamDynamicConfig</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration for the dynamic sprite engine.  <a href="structOamDynamicConfig.html#details">More...</a><br /></td></tr>
 <tr class="memitem:OamWorldBatch" id="r_OamWorldBatch"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structOamWorldBatch.html">OamWorldBatch</a></td></tr>
@@ -228,7 +230,7 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a7ffabc8e75e6d2ca0ae455c38c9ebfe8" id="r_a7ffabc8e75e6d2ca0ae455c38c9ebfe8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7ffabc8e75e6d2ca0ae455c38c9ebfe8">oamClear</a> (void)</td></tr>
 <tr class="memdesc:a7ffabc8e75e6d2ca0ae455c38c9ebfe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all sprites.  <br /></td></tr>
-<tr class="memitem:ad029b6c418d7e2b620009d54aec5cb0e" id="r_ad029b6c418d7e2b620009d54aec5cb0e"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *<a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> *style, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924">flip</a>)</td></tr>
+<tr class="memitem:ad029b6c418d7e2b620009d54aec5cb0e" id="r_ad029b6c418d7e2b620009d54aec5cb0e"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *<a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> *style, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924">flip</a>)</td></tr>
 <tr class="memdesc:ad029b6c418d7e2b620009d54aec5cb0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw one frame of a metasprite.  <br /></td></tr>
 <tr class="memitem:aca7db2b4a23c0c7a4aaa392b77bc4410" id="r_aca7db2b4a23c0c7a4aaa392b77bc4410"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aca7db2b4a23c0c7a4aaa392b77bc4410">oamDynamicDrainQueue</a> (void)</td></tr>
 <tr class="memdesc:aca7db2b4a23c0c7a4aaa392b77bc4410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block until the dynamic-sprite VRAM tile queue is empty.  <br /></td></tr>
@@ -256,6 +258,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:abd8864858828dc6c2646b15d59420b5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place a batch of world-space sprites: camera, culling, OAM, in one call.  <br /></td></tr>
 <tr class="memitem:a697c4b66632525f55f21fb6008582b3f" id="r_a697c4b66632525f55f21fb6008582b3f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> priority, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> flags)</td></tr>
 <tr class="memdesc:a697c4b66632525f55f21fb6008582b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties.  <br /></td></tr>
+<tr class="memitem:a7519143e6fefdcbe97f2c6fcbaa73bbd" id="r_a7519143e6fefdcbe97f2c6fcbaa73bbd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">oamSetBatch</a> (const <a class="el" href="structOamBatch.html">OamBatch</a> *batch)</td></tr>
+<tr class="memdesc:a7519143e6fefdcbe97f2c6fcbaa73bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the OAM entries of N sprites from parallel arrays, in one call.  <br /></td></tr>
 <tr class="memitem:a2ffba63a8844c983761138b1fbf81bd5" id="r_a2ffba63a8844c983761138b1fbf81bd5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5">oamSetSize</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> large)</td></tr>
 <tr class="memdesc:a2ffba63a8844c983761138b1fbf81bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite size (large/small).  <br /></td></tr>
 <tr class="memitem:adb68723edfe9fcb5f46620c5753e293b" id="r_adb68723edfe9fcb5f46620c5753e293b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb68723edfe9fcb5f46620c5753e293b">oamSetTile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile)</td></tr>
@@ -1278,7 +1282,7 @@ Attribution</h2>
     <tr><td class="paramname">startId</td><td>First sprite ID to use (0-127) </td></tr>
     <tr><td class="paramname">x</td><td>X position of the metasprite origin </td></tr>
     <tr><td class="paramname">y</td><td>Y position of the metasprite origin </td></tr>
-    <tr><td class="paramname"><a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a></td><td>The frame to draw (<a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible).">MetaspriteItem</a>[]) </td></tr>
+    <tr><td class="paramname"><a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></td><td>The frame to draw (<a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible).">MetaspriteItem</a>[]) </td></tr>
     <tr><td class="paramname">style</td><td>Base tile, palette, size and extent (see <a class="el" href="structMetaspriteStyle.html" title="What stays the same from one frame of a metasprite to the next.">MetaspriteStyle</a>) </td></tr>
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924" title="Frame counter for scroll speed throttle (scrolls every 3 frames).">flip</a></td><td>0, or OBJ_FLIPX and / or OBJ_FLIPY to mirror the whole metasprite inside its <span class="tt">width</span> x <span class="tt">height</span> box. Each piece is moved to the mirrored place and its own flip bit toggled.</td></tr>
   </table>
@@ -1309,7 +1313,7 @@ Attribution</h2>
 <div class="ttc" id="asprites_2aseprite__pipeline_2main_8c_html_ae5399d474914cf86e2e3470bca1cb5b9"><div class="ttname"><a href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a></div><div class="ttdeci">static const MetaspriteStyle hero_style</div><div class="ttdoc">Metasprite pointer table generated by opensnes-sprite sheet (res/hero.png.toml).</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:570</div></div>
 <div class="ttc" id="astructMetaspriteStyle_html"><div class="ttname"><a href="structMetaspriteStyle.html">MetaspriteStyle</a></div><div class="ttdoc">What stays the same from one frame of a metasprite to the next.</div><div class="ttdef"><b>Definition</b> sprite.h:611</div></div>
-</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -1367,7 +1371,7 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -1533,7 +1537,7 @@ Attribution</h2>
 </dl>
 <dl class="section see"><dt>See also</dt><dd>examples/demos/rpg — culls its villagers this way </dd>
 <dd>
-<a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+<a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -1863,8 +1867,50 @@ Attribution</h2>
 <dl class="section note"><dt>Note</dt><dd><b>Performance</b>: <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is written in assembly and is cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) save the call itself.</dd>
 <dd>
 Any integer type works for the coordinates you keep on your side (<span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, struct members or plain variables). Until 2026-09-21 this block warned that separate <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables gave jerky movement and that an <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> struct was mandatory; that was a compiler defect of early 2026, long fixed — <span class="tt">examples/input/move_sprite</span> uses plain <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> and its manifest pins the motion to the pixel. Prefer <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> when a sprite can leave the screen by the left or the top, so the off-screen test is a signed compare. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
+</div>
+</div>
+<a id="a7519143e6fefdcbe97f2c6fcbaa73bbd" name="a7519143e6fefdcbe97f2c6fcbaa73bbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">&#9670;&#160;</a></span>oamSetBatch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void oamSetBatch </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structOamBatch.html">OamBatch</a> *</td>          <td class="paramname"><span class="paramname"><em>batch</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write the OAM entries of N sprites from parallel arrays, in one call. </p>
+<p>The emission half of a game with many alike objects: the game moves its objects (its code, its policy: movement, respawn, how many), and this writes the result, a loop in assembly with no call per sprite.</p>
+<ul>
+<li><b>x and y are screen coordinates</b>, with <a class="el" href="#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY()</a>'s meaning: x of 0-511 (or a negative <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a>, whose ninth bit is the OAM's), y low byte.</li>
+<li><b><span class="tt">tile</span> and <span class="tt">attr</span> are optional.</b> A game whose objects never change tile writes them once (<a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>) and passes 0 for both: only x, y and the ninth x bit are then written, the cheapest path. Give one, the other or both for what changes.</li>
+<li><b>The size bit is not touched</b>: set it once with <a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a>.</li>
+<li>A batch that runs past sprite 127 stops there; <span class="tt">count</span> 0 does nothing.</li>
+<li><b>It pays when the arrays already exist.</b> A game whose objects move and mask one by one in their own loop, and would have to build x and y arrays only to hand them over, measured +1.4 % a step: write them with <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> / <a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a> in that loop instead.</li>
+<li><b>Opt-in module</b>: add <span class="tt">sprite_batch</span> to <span class="tt">LIB_MODULES</span>. A ROM that does not call it does not carry it.</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">batch</td><td>The sprites (see <a class="el" href="structOamBatch.html" title="A batch of sprites in screen coordinates, for oamSetBatch().">OamBatch</a>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a>[32], <a class="code hl_variable" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a>[32];              <span class="comment">// moved by the game</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structOamBatch.html">OamBatch</a> shots = { <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a>, 0, 0, 0, 32 };</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">oamSetBatch</a>(&amp;shots);                    <span class="comment">// every frame, after the game moved them</span></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_acaa2531ea968a59c1e1ca003c5e8773a"><div class="ttname"><a href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a></div><div class="ttdeci">static u16 by</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
+<div class="ttc" id="asprite_8h_html_a7519143e6fefdcbe97f2c6fcbaa73bbd"><div class="ttname"><a href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">oamSetBatch</a></div><div class="ttdeci">void oamSetBatch(const OamBatch *batch)</div><div class="ttdoc">Write the OAM entries of N sprites from parallel arrays, in one call.</div></div>
+<div class="ttc" id="astructOamBatch_html"><div class="ttname"><a href="structOamBatch.html">OamBatch</a></div><div class="ttdoc">A batch of sprites in screen coordinates, for oamSetBatch().</div><div class="ttdef"><b>Definition</b> sprite.h:938</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a2ffba63a8844c983761138b1fbf81bd5" name="a2ffba63a8844c983761138b1fbf81bd5"></a>
@@ -1894,7 +1940,7 @@ Any integer type works for the coordinates you keep on your side (<span class="t
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>

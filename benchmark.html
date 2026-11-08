@@ -122,7 +122,7 @@ $(function(){initNavTree('benchmark.html','',''); });
   <div class="headertitle"><div class="title">Compiler Benchmark — OpenSNES vs PVSnesLib </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><em>OpenSNES figures: <span class="tt">make bench</span> (<span class="tt">devtools/cyclecount/bench.py</span>, which CI compares against <span class="tt">devtools/cyclecount/bench_baseline.json</span> at every push). PVSnesLib figures: its <span class="tt">816-tcc</span> + <span class="tt">816-opt</span> on the same C file.</em></p>
+<div class="textblock"><p><em>OpenSNES figures: <span class="tt">make <a class="el" href="memory_2lzss__ram_2main_8c.html#a1d93ad590061eca238ae1ff791e8201b" title="One decode alone, for luna profile (see the README).">bench</a></span> (<span class="tt">devtools/cyclecount/bench.py</span>, which CI compares against <span class="tt">devtools/cyclecount/bench_baseline.json</span> at every push). PVSnesLib figures: its <span class="tt">816-tcc</span> + <span class="tt">816-opt</span> on the same C file.</em></p>
 <p>This page has two benchmarks. The first, below, is a <b>static estimate</b> on 34 isolated functions: the cost of the instructions each compiler emits, added up. The second, <a class="el" href="#measured" title="Measured on luna">measured on luna</a>, runs the same C program built by both SDKs and counts the master cycles the machine really spent.</p>
 <p>On these 34 functions OpenSNES is <b>about 38 %</b> faster; measured on 23 whole workloads, 62 % (below). What made the difference on code that indexes an array or follows a pointer was not the pointer width: it was the stack frame and stack slots for values PVSnesLib keeps in the direct page, and code the optimiser left dead. Both are gone (see "Reading it" at the end of this page).</p>
 <h2 class="doxsection"><a class="anchor" id="summary"></a>
@@ -262,7 +262,7 @@ Caveats</h2>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="the-ci-gate"></a>
 The CI gate</h2>
-<p>Every push runs <span class="tt">make bench</span> and the luna workloads below on the OpenSNES side and fails on a regression: more than 5 % in total, or more than 25 % and 50 cycles on one function; the luna workloads fail at +2 % in total or on any one workload. The benchmark is narrow — 34 functions and 24 workloads — so it is one check among the others (<span class="tt">make tests</span>, the compiler tests).</p>
+<p>Every push runs <span class="tt">make <a class="el" href="memory_2lzss__ram_2main_8c.html#a1d93ad590061eca238ae1ff791e8201b" title="One decode alone, for luna profile (see the README).">bench</a></span> and the luna workloads below on the OpenSNES side and fails on a regression: more than 5 % in total, or more than 25 % and 50 cycles on one function; the luna workloads fail at +2 % in total or on any one workload. The benchmark is narrow — 34 functions and 24 workloads — so it is one check among the others (<span class="tt">make tests</span>, the compiler tests).</p>
 <h2 class="doxsection"><a class="anchor" id="measured"></a>
 Measured on luna</h2>
 <p><em>Measured with <span class="tt">make bench-sdk</span> on luna (the pin in <span class="tt">testing/luna.version</span>), PVSnesLib at <span class="tt">fa758c9b 2025-12-28</span>, both ROMs LoROM SlowROM. The figures are the two files committed in <span class="tt">devtools/sdkbench/</span>; CI re-measures the OpenSNES side at every push.</em></p>

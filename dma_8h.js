@@ -6,5 +6,6 @@ var dma_8h =
     [ "dmaCopyVram", "dma_8h.html#a428ee7d96f20485046c89d95f8719ca5", null ],
     [ "dmaCopyVramMode7", "dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb", null ],
     [ "dmaFillVRAM", "dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e", null ],
-    [ "dmaTransfer", "dma_8h.html#a70adeaf9f8c9b064b42c4ec3ddd6b499", null ]
+    [ "dmaTransfer", "dma_8h.html#a70adeaf9f8c9b064b42c4ec3ddd6b499", null ],
+    [ "dma_unsafe_count", "dma_8h.html#a90b57887d1efa50073680b5af9b74098", null ]
 ];

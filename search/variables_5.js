@@ -15,5 +15,6 @@ var searchData=
   ['enemy_5fbox_12',['enemy_box',['../basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a',1,'main.c']]],
   ['enemy_5fx_13',['enemy_x',['../basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297',1,'main.c']]],
   ['enemy_5fy_14',['enemy_y',['../basics_2collision__demo_2main_8c.html#a49bfa517490e1db79447e8458479040c',1,'main.c']]],
-  ['extbg_5fon_15',['extbg_on',['../mode7_2extbg_2main_8c.html#af2356516c9b2ec14b6ac2d9a2376cf16',1,'main.c']]]
+  ['errors_5frefused_15',['errors_refused',['../audio_2sample__swap_2main_8c.html#a35d33edbca015e1db6f71051f3e17b38',1,'main.c']]],
+  ['extbg_5fon_16',['extbg_on',['../mode7_2extbg_2main_8c.html#af2356516c9b2ec14b6ac2d9a2376cf16',1,'main.c']]]
 ];

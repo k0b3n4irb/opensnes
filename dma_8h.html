@@ -145,6 +145,11 @@ Functions</h2></td></tr>
 <tr class="memdesc:afcc5b9f47bd12569f7d51adb0acdfa0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set VRAM to a value.  <br /></td></tr>
 <tr class="memitem:a70adeaf9f8c9b064b42c4ec3ddd6b499" id="r_a70adeaf9f8c9b064b42c4ec3ddd6b499"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a70adeaf9f8c9b064b42c4ec3ddd6b499">dmaTransfer</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *src, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a70adeaf9f8c9b064b42c4ec3ddd6b499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform generic DMA transfer.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a90b57887d1efa50073680b5af9b74098" id="r_a90b57887d1efa50073680b5af9b74098"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a90b57887d1efa50073680b5af9b74098">dma_unsafe_count</a></td></tr>
+<tr class="memdesc:a90b57887d1efa50073680b5af9b74098"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMA calls that wrote with the screen on outside VBlank, started outside it or run past its end (see <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>): 0 on a healthy run. Wraps at 65536.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES DMA (Direct Memory Access). </p>
@@ -306,10 +311,11 @@ Banks</h2>
 <div class="line"><a class="code hl_function" href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(tileset, 0x0000, tileset_end - tileset);</div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank. During active display the PPU rejects VRAM writes and the transfer is silently lost.</dd></dl>
-<p>Forced blank means <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> — INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching, so it does NOT open the write window.</p>
-<dl class="section warning"><dt>Warning</dt><dd><b>VBlank fits roughly 4 KB.</b> A larger transfer has its tail dropped during active display, and the failure is partial: the first few KB land, so the screen is half right. Anything bigger than a few KB belongs between <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> and <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>, not in VBlank.</dd></dl>
+<p>Forced blank means <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> — INIDISP bit 7.</p>
+<p><b>Since this version the call tells you.</b> A transfer made with the screen on outside VBlank — started outside it, or started inside it and still running when it ends — still runs (it always did) but is counted in <span class="tt"><a class="el" href="#a90b57887d1efa50073680b5af9b74098" title="DMA calls that wrote with the screen on outside VBlank, started outside it or run past its end (see d...">dma_unsafe_count</a></span> and fires WDM $02, which luna reports (<span class="tt">--wdm-out</span>; a manifest's <span class="tt">wdm_empty = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> fails on it). One call counts once, even <a class="el" href="#afcc5b9f47bd12569f7d51adb0acdfa0e" title="Set VRAM to a value.">dmaFillVRAM()</a> and <a class="el" href="#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>, which make two passes. The end is read from HVBJOY right after the transfer (the CPU is stopped while it runs), with IRQs masked for those few cycles. Not seen: a single transfer longer than the whole active display (about 38 KB) that ends in the next VBlank. The screen state is the shadow <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> / <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> keep: write REG_INIDISP yourself and the shadow is behind. Applies to <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>, <a class="el" href="#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a>, <a class="el" href="#a50a418c73f494651a1be98404d753c21" title="Copy OAM data (PVSnesLib compatible).">dmaCopyOam()</a>, <a class="el" href="#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> and <a class="el" href="#afcc5b9f47bd12569f7d51adb0acdfa0e" title="Set VRAM to a value.">dmaFillVRAM()</a>. Cost, measured (libbench row <span class="tt">dma</span>, 2 KB): +276 master cycles a call, both checks. setBrightness(0) blacks the screen but leaves the PPU fetching, so it does NOT open the write window.</p>
+<dl class="section warning"><dt>Warning</dt><dd><b>VBlank fits roughly 4 KB.</b> A larger transfer has its tail dropped during active display, and the failure is partial: the first few KB land, so the screen is half right (such a transfer is counted, above). Anything bigger than a few KB belongs between <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> and <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>, not in VBlank.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The bank is taken from <code class="param">source's</code> own bank byte, so the data may live in ANY bank — a SUPERFREE section, a bank you pinned yourself. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -450,6 +456,31 @@ Banks</h2>
 <div class="ttc" id="adma_8h_html_a70adeaf9f8c9b064b42c4ec3ddd6b499"><div class="ttname"><a href="#a70adeaf9f8c9b064b42c4ec3ddd6b499">dmaTransfer</a></div><div class="ttdeci">void dmaTransfer(u8 channel, u8 mode, const u8 *src, u8 destReg, u16 size)</div><div class="ttdoc">Perform generic DMA transfer.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W).</div><div class="ttdef"><b>Definition</b> registers.h:154</div></div>
 </div><!-- fragment --> 
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a90b57887d1efa50073680b5af9b74098" name="a90b57887d1efa50073680b5af9b74098"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90b57887d1efa50073680b5af9b74098">&#9670;&#160;</a></span>dma_unsafe_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dma_unsafe_count</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DMA calls that wrote with the screen on outside VBlank, started outside it or run past its end (see <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>): 0 on a healthy run. Wraps at 65536. </p>
+
 </div>
 </div>
 </div><!-- contents -->

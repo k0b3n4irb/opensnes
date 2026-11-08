@@ -1,26 +1,7 @@
 var searchData=
 [
-  ['vblank_5fflag_0',['vblank_flag',['../system_8h.html#aaaa70a72e192e5cc318437192516fe9c',1,'system.h']]],
-  ['vel_5fx_1',['vel_x',['../games_2breakout_2main_8c.html#ae162ea9295db01996b894786eb967116',1,'main.c']]],
-  ['vel_5fy_2',['vel_y',['../games_2breakout_2main_8c.html#a0071485059e75f7bbb09abbfab93e477',1,'main.c']]],
-  ['visible_3',['visible',['../structOamWorldBatch.html#a977d181c90d9d43b1a6987e2a6cd3e60',1,'OamWorldBatch']]],
-  ['vof_4',['vof',['../mode7_2dsp1__ground_2main_8c.html#ad484e4dd4663b8e2f5bb4878e08d408c',1,'main.c']]],
-  ['volume_5',['volume',['../structAudioVoiceState.html#a2872432aa733029ad75c201f8d026e67',1,'AudioVoiceState']]],
-  ['vram_5faddr_6',['vram_addr',['../structPanel.html#aecfacebeaf78a4044321759978eb1dd3',1,'Panel']]],
-  ['vram_5fqueue_5faddr_7',['vram_queue_addr',['../vramqueue_8h.html#a2a5ee7ba048d1b5463825d1aa75f723e',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fbank_8',['vram_queue_bank',['../vramqueue_8h.html#a315d78677e4433a2634b66a078ccd5c5',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fcost_9',['vram_queue_cost',['../vramqueue_8h.html#aa60c70a83627b2e80a32d3bc7ee6656d',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fcount_10',['vram_queue_count',['../vramqueue_8h.html#a70aaa84c6d6707ffcf45ba53bd9768de',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fcum_11',['vram_queue_cum',['../vramqueue_8h.html#a649192dab9f538414a6e601b2df45fe5',1,'vramqueue.h']]],
-  ['vram_5fqueue_5frefused_12',['vram_queue_refused',['../vramqueue_8h.html#af6374d25743f3daf96c9a55d65eb615c',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fsize_13',['vram_queue_size',['../vramqueue_8h.html#add4b248595d18586fbc43babee9f7416',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fsrc_14',['vram_queue_src',['../vramqueue_8h.html#a25d849788160a7c4c9dad7aa016c3520',1,'vramqueue.h']]],
-  ['vram_5fqueue_5fstep_15',['vram_queue_step',['../vramqueue_8h.html#a2ca399e6660c42575871371dc016f81d',1,'vramqueue.h']]],
-  ['vramaddr_16',['vramAddr',['../background_8h.html#ab281851bdfe178b2a5fac4b747d4a501',1,'background.h']]],
-  ['vramlarge_17',['vramLarge',['../structOamDynamicConfig.html#a35d9be87b911f19ad2755521f5e38e0c',1,'OamDynamicConfig']]],
-  ['vramsmall_18',['vramSmall',['../structOamDynamicConfig.html#a41458c21e282d4ba1f2c811b7413a2bc',1,'OamDynamicConfig']]],
-  ['vtl_19',['vtl',['../memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4',1,'main.c']]],
-  ['vts_20',['vts',['../memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc',1,'main.c']]],
-  ['vva_21',['vva',['../mode7_2dsp1__ground_2main_8c.html#a7c5dd6b6daea44eb646a7ed0f61b674c',1,'main.c']]],
-  ['vwords_22',['vwords',['../backgrounds_2mode2_2main_8c.html#ab91ef47d237191e385f21b37e05ae8f4',1,'main.c']]]
+  ['ui_0',['ui',['../basics_2panel__hud_2main_8c.html#adb4660c7233d9cfcef3a529a39341bcb',1,'ui:&#160;main.c'],['../demos_2rpg_2main_8c.html#adb4660c7233d9cfcef3a529a39341bcb',1,'ui:&#160;main.c']]],
+  ['update_1',['update',['../structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2',1,'Scene']]],
+  ['upload_2',['upload',['../text_2pixel__text_2main_8c.html#aeea3914633a8e2a2b265c646a881f6ad',1,'main.c']]],
+  ['use_5flib_3',['use_lib',['../hdma_2hdma__wave_2main_8c.html#affde91a1c5930b082aa520c30f2bdd3a',1,'main.c']]]
 ];

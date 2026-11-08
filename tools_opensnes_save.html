@@ -146,7 +146,7 @@ Inspect, get, set, diff</h2>
 <li><b><span class="tt">inspect</span></b> says how much of the file is written and where; with <span class="tt">--rom</span> it refuses a save whose size is not the one that ROM declares (a save of another build, or of another game).</li>
 <li><b><span class="tt">get</span></b> prints bytes in hex, or writes them to a file with <span class="tt">--to</span>.</li>
 <li><b><span class="tt">set</span></b> patches bytes in place, from <span class="tt">--hex</span> or from a file; a write that would pass the end of the file writes nothing.</li>
-<li><b><span class="tt">diff</span></b> lists the byte ranges in which two saves differ, and exits 1 when they do — a script can use it as an assertion.</li>
+<li><b><span class="tt"><a class="el" href="memory_2lzss__ram_2main_8c.html#a8b04e22829e1ac134739317d51bf18b5" title="Bytes of d[0..n) that differ from ref[0..n).">diff</a></span></b> lists the byte ranges in which two saves differ, and exits 1 when they do — a script can use it as an assertion.</li>
 </ul>
 <p>Every subcommand takes <span class="tt">--json</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="a-prepared-save-in-a-test"></a>

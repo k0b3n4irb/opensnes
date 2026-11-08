@@ -1,11 +1,17 @@
 var searchData=
 [
-  ['x_0',['x',['../structRect.html#a9e32b68a268c298487173d197726d6ab',1,'Rect::x'],['../structDsp1Camera.html#ad1e20e8da9fdc161b5080f6651b1926c',1,'Dsp1Camera::x'],['../structOamWorldBatch.html#a3809be06a1ccc59d745e1e0c683e7eec',1,'OamWorldBatch::x'],['../structEntity.html#abb39fb6fdbad51636ea22e63fdc0fcd7',1,'Entity::x'],['../structLamp.html#a55fb8de91e19b6a0cdd036dcb43d57dd',1,'Lamp::x'],['../structWalker.html#a76806f45ae5c6eabcf263a5cc3da0572',1,'Walker::x']]],
-  ['x_5foff_1',['x_off',['../text_2pixel__text_2main_8c.html#a10a8c9763c73a9b6eb3299776e818dda',1,'main.c']]],
-  ['xloc_2',['xloc',['../maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8',1,'main.c']]],
-  ['xmax_3',['xmax',['../structt__objs.html#acd8923cc8af679f29948a046cc75facf',1,'t_objs']]],
-  ['xmin_4',['xmin',['../structt__objs.html#afe1bb9b465b03a6ce06be3563a3a7b7a',1,'t_objs']]],
-  ['xofs_5',['xofs',['../structt__objs.html#ad5a67be825dd45b98f19bda952a856f5',1,'t_objs']]],
-  ['xpos_6',['xpos',['../structt__objs.html#a7d8d754f7264eebc304486e94750c5ce',1,'t_objs::xpos'],['../sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0',1,'xpos:&#160;main.c']]],
-  ['xvel_7',['xvel',['../structt__objs.html#a3805bf290808a8490f0e866e58843e48',1,'t_objs']]]
+  ['walk_5fframe_0',['walk_frame',['../demos_2rpg_2main_8c.html#aaef0dd9b645d14a7c46326168c7c2a94',1,'main.c']]],
+  ['wattr_1',['wattr',['../sprites_2world__sprites_2main_8c.html#a0be223dce7ce6ad79b7aaedfff96bdc6',1,'main.c']]],
+  ['wave_5fphase_2',['wave_phase',['../backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016',1,'wave_phase:&#160;main.c'],['../hdma_2hdma__wave_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016',1,'wave_phase:&#160;main.c']]],
+  ['wavetable_3',['wavetable',['../hdma_2hdma__wave_2main_8c.html#abf00a26b74624dc6a2f78c58bdb7c8c3',1,'main.c']]],
+  ['width_4',['width',['../structRect.html#a8615d560240836dcef0d97712ca4201f',1,'Rect::width'],['../structt__objs.html#a44853e98e10b36f63d1d0d23ff37ecd0',1,'t_objs::width'],['../structMetaspriteStyle.html#a7cd37bd420f06790a47dbf280bba3740',1,'MetaspriteStyle::width']]],
+  ['window_5ftable_5',['window_table',['../windows_2window__multi__hdma_2main_8c.html#a95518c8f78fade4f7756c1fed229fde4',1,'main.c']]],
+  ['world_5ffront_6',['world_front',['../sprites_2world__sprites_2main_8c.html#a3e5aba6465454f3ddfdb0a29e12ad851',1,'main.c']]],
+  ['world_5fvisible_7',['world_visible',['../sprites_2world__sprites_2main_8c.html#a1bdfc1d91dd3471440873a3d1382834b',1,'main.c']]],
+  ['wseen_8',['wseen',['../sprites_2world__sprites_2main_8c.html#a9aa924c96ae31490c841a4008066ce0f',1,'main.c']]],
+  ['wtile_9',['wtile',['../sprites_2world__sprites_2main_8c.html#a58a387f7cfb467835a289b42bf90970b',1,'main.c']]],
+  ['wvx_10',['wvx',['../sprites_2world__sprites_2main_8c.html#aa739fa64d50a83fe7241828f0902fc61',1,'main.c']]],
+  ['wvy_11',['wvy',['../sprites_2world__sprites_2main_8c.html#acdbde29588db031347d64671e32c8c1f',1,'main.c']]],
+  ['wx_12',['wx',['../sprites_2world__sprites_2main_8c.html#a7abff15ccfbbf7f64fcbb8397b3a6062',1,'main.c']]],
+  ['wy_13',['wy',['../sprites_2world__sprites_2main_8c.html#afb49c4bf200c669fc2d17311aebcbe74',1,'main.c']]]
 ];

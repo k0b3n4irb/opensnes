@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['oamdynamicconfig_0',['OamDynamicConfig',['../structOamDynamicConfig.html',1,'']]],
-  ['oamworldbatch_1',['OamWorldBatch',['../structOamWorldBatch.html',1,'']]]
+  ['oambatch_0',['OamBatch',['../structOamBatch.html',1,'']]],
+  ['oamdynamicconfig_1',['OamDynamicConfig',['../structOamDynamicConfig.html',1,'']]],
+  ['oamworldbatch_2',['OamWorldBatch',['../structOamWorldBatch.html',1,'']]]
 ];

@@ -3,11 +3,11 @@ var examples_mode7 =
     [ "DSP-1 Ground — the Super Mario Kart floor", "examples_mode7_dsp1_ground.html", [
       [ "The ladder", "examples_mode7.html#the-ladder-7", null ],
       [ "The idea in one screen", "examples_mode7.html#the-idea-in-one-screen-6", [
-        [ "How it works", "examples_mode7_dsp1_ground.html#how-it-works-6", null ],
+        [ "How it works", "examples_mode7_dsp1_ground.html#how-it-works-7", null ],
         [ "Controls", "examples_mode7_dsp1_ground.html#controls-20", null ],
-        [ "SNES Concepts", "examples_mode7_dsp1_ground.html#snes-concepts-20", null ],
-        [ "How to Build", "examples_mode7_dsp1_ground.html#how-to-build-9", null ],
-        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-35", null ],
+        [ "SNES Concepts", "examples_mode7_dsp1_ground.html#snes-concepts-23", null ],
+        [ "How to Build", "examples_mode7_dsp1_ground.html#how-to-build-12", null ],
+        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-40", null ],
         [ "Project Structure", "examples_mode7_dsp1_ground.html#project-structure-6", null ],
         [ "Going Further", "examples_mode7_dsp1_ground.html#going-further-4", null ]
       ] ]

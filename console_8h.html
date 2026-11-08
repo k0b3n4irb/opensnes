@@ -159,6 +159,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1bb80e4838ae89136bf886d0bc9ddfc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if currently in VBlank.  <br /></td></tr>
 <tr class="memitem:a3b56ab7f353055ded8e2960b94d6ba57" id="r_a3b56ab7f353055ded8e2960b94d6ba57"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57">isPAL</a> (void)</td></tr>
 <tr class="memdesc:a3b56ab7f353055ded8e2960b94d6ba57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if PAL system.  <br /></td></tr>
+<tr class="memitem:a99e97289ca46d8ffa0739d5f8317cb91" id="r_a99e97289ca46d8ffa0739d5f8317cb91"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a99e97289ca46d8ffa0739d5f8317cb91">ppuReset</a> (void)</td></tr>
+<tr class="memdesc:a99e97289ca46d8ffa0739d5f8317cb91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put every PPU register, and the library's PPU shadows, back to their power-on state.  <br /></td></tr>
 <tr class="memitem:a66b5cb8d7cb64a0afb9392e880020a0b" id="r_a66b5cb8d7cb64a0afb9392e880020a0b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a66b5cb8d7cb64a0afb9392e880020a0b">resetFrameCount</a> (void)</td></tr>
 <tr class="memdesc:a66b5cb8d7cb64a0afb9392e880020a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset frame counter.  <br /></td></tr>
 <tr class="memitem:af00b46ef13a81876e2a8806eee9dde8c" id="r_af00b46ef13a81876e2a8806eee9dde8c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a> (void)</td></tr>
@@ -399,7 +401,7 @@ Attribution</h2>
 <div class="line">    soundUpdate();           <span class="comment">// whatever the loop does each frame</span></div>
 <div class="line">} <span class="keywordflow">while</span> (<a class="code hl_function" href="#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a>());</div>
 <div class="ttc" id="aconsole_8h_html_a99f3a1608e68fecae6e38b2ad64dfdd6"><div class="ttname"><a href="#a99f3a1608e68fecae6e38b2ad64dfdd6">fadeStep</a></div><div class="ttdeci">u8 fadeStep(void)</div><div class="ttdoc">Advance the fade started by fadeStart(), one call a frame.</div></div>
-<div class="ttc" id="aconsole_8h_html_ae77da5ad4cbc80c45959a539d739cfd3"><div class="ttname"><a href="#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a></div><div class="ttdeci">#define FADE_OUT</div><div class="ttdoc">fadeStart() direction: from full brightness down to black</div><div class="ttdef"><b>Definition</b> console.h:194</div></div>
+<div class="ttc" id="aconsole_8h_html_ae77da5ad4cbc80c45959a539d739cfd3"><div class="ttname"><a href="#ae77da5ad4cbc80c45959a539d739cfd3">FADE_OUT</a></div><div class="ttdeci">#define FADE_OUT</div><div class="ttdoc">fadeStart() direction: from full brightness down to black</div><div class="ttdef"><b>Definition</b> console.h:246</div></div>
 <div class="ttc" id="aconsole_8h_html_af4257c9535801690b4c0f126418790d0"><div class="ttname"><a href="#af4257c9535801690b4c0f126418790d0">fadeStart</a></div><div class="ttdeci">void fadeStart(u8 direction, u8 speed)</div><div class="ttdoc">Start a fade that does not hold the program: the frames are yours.</div></div>
 </div><!-- fragment --><p>It writes the first level (15 for FADE_OUT, 0 for FADE_IN) and returns; <a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="fadeStep">fadeStep</a> makes each of the 15 others. The fade lasts as long as the blocking one: <span class="tt">16 x speed</span> frames, so <span class="tt"><a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a></span> returns 0 on the call that comes <span class="tt">16 x speed</span> frames after <span class="tt"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a></span>. <span class="tt">speed</span> 0 writes the end level at once, and <span class="tt"><a class="el" href="#a99f3a1608e68fecae6e38b2ad64dfdd6" title="Advance the fade started by fadeStart(), one call a frame.">fadeStep()</a></span> returns 0. One fade runs at a time: a new <span class="tt"><a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a></span> replaces the one under way. Under forced blank the brightness writes are skipped, as for <a class="el" href="#a6c68f9393684a2b251292a9e93891a02" title="fadeOut">fadeOut</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -482,7 +484,7 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:320</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:372</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --> 
 </div>
@@ -529,6 +531,37 @@ Attribution</h2>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_a3b56ab7f353055ded8e2960b94d6ba57"><div class="ttname"><a href="#a3b56ab7f353055ded8e2960b94d6ba57">isPAL</a></div><div class="ttdeci">u8 isPAL(void)</div><div class="ttdoc">Check if PAL system.</div></div>
 </div><!-- fragment --> 
+</div>
+</div>
+<a id="a99e97289ca46d8ffa0739d5f8317cb91" name="a99e97289ca46d8ffa0739d5f8317cb91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99e97289ca46d8ffa0739d5f8317cb91">&#9670;&#160;</a></span>ppuReset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ppuReset </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Put every PPU register, and the library's PPU shadows, back to their power-on state. </p>
+<p>crt0 writes all the PPU registers once, at boot; <a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a> rewrites only a few of them. A screen set up after another one therefore inherits whatever the first left: sprite size and tile base (OBJSEL), BG2-4 maps and tiles, scrolls, main and sub screen (TM/TS), windows, color math, mosaic, the BG mode, Mode 7's matrix, a running HDMA. <a class="el" href="#a99e97289ca46d8ffa0739d5f8317cb91" title="Put every PPU register, and the library&#39;s PPU shadows, back to their power-on state.">ppuReset()</a> undoes all of it, in this order:</p><ul>
+<li>HDMA stopped (HDMAEN = 0, the HDMA module's state cleared);</li>
+<li>every write-only PPU register from $2100 to $2133 set to the value crt0 writes at boot: forced blank, BGMODE 0, all map and tile bases 0, horizontal scrolls 0 and vertical scrolls -1 (tilemap row 0 on the first line), the identity Mode 7 matrix, windows and color math off, TM = BG1, TS = 0, fixed colour black, SETINI 0;</li>
+<li>the shadows of the console, background, mosaic, color math, window, Mode 7 and HDMA modules set to their value at <a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a>: brightness 15, screen marked blanked, a running <a class="el" href="#af4257c9535801690b4c0f126418790d0" title="Start a fade that does not hold the program: the frames are yours.">fadeStart()</a> stopped, scrolls 0;</li>
+<li><a class="el" href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8" title="Clear all sprites.">oamClear()</a>: every sprite hidden, uploaded at the next <a class="el" href="#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>.</li>
+</ul>
+<p>After it the screen is black (forced blank) and the next screen is set up as after <a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a>: mode, palettes, tiles, maps, <a class="el" href="#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>.</p>
+<dl class="section user"><dt>When to call it</dt><dd>Between two screens, before the setup of the next one: leaving the title for the game, the game for its game-over screen, a level for the next when the next uses another layout. Call it from the main loop, never from an NMI callback: the screen is blanked the moment it starts.</dd></dl>
+<dl class="section user"><dt>Module and cost</dt><dd>Module <span class="tt">ppu_reset</span> (add it to <span class="tt">LIB_MODULES</span>; it brings console, background, colormath, mosaic, window, mode7, hdma and sprite with it). It costs 283 bytes of ROM (a 140-byte register table and its loop), at most 31 bytes of RAM (the shadows of those modules, for a ROM that did not link them already), and 167,832 master cycles a call on luna, under half a frame, of which 145,816 are <a class="el" href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8" title="Clear all sprites.">oamClear()</a> (examples/basics/ppu_reset). A ROM that lists the module and never calls <a class="el" href="#a99e97289ca46d8ffa0739d5f8317cb91" title="Put every PPU register, and the library&#39;s PPU shadows, back to their power-on state.">ppuReset()</a> is byte for byte the ROM that does not list it.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It does not touch the contents of VRAM, CGRAM or OAM (only their address registers; the OAM buffer is cleared and uploaded by the next NMI as usual), the audio (SPC700), NMITIMEN (NMI, joypad and IRQ settings stay), an NMI callback set with <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a>, the text module's buffer, the VRAM queue, nor the dynamic sprite engine's state: reinitialise those that the next screen uses with their own init function (<a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit()</a>, <a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit()</a>, ...). </dd>
+<dd>
+The BG mode after it is 0, not <a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a>'s Mode 1: call <a class="el" href="video_8h.html#ad89d023577743a32d3407027e535b0ff" title="Set background mode.">setMode()</a> in the next screen's setup. </dd></dl>
+
 </div>
 </div>
 <a id="a66b5cb8d7cb64a0afb9392e880020a0b" name="a66b5cb8d7cb64a0afb9392e880020a0b"></a>

@@ -3,9 +3,9 @@ var examples_color =
     [ "direct_color — the pixel byte IS the color", "examples_color_direct_color.html", [
       [ "The ladder", "examples_color.html#the-ladder-3", null ],
       [ "The idea in one screen", "examples_color.html#the-idea-in-one-screen-2", [
-        [ "SNES Concepts", "examples_color_direct_color.html#snes-concepts-8", null ],
-        [ "How to Build", "examples_color_direct_color.html#how-to-build-6", null ],
-        [ "Modules Used", "examples_color_direct_color.html#modules-used-16", null ]
+        [ "SNES Concepts", "examples_color_direct_color.html#snes-concepts-10", null ],
+        [ "How to Build", "examples_color_direct_color.html#how-to-build-9", null ],
+        [ "Modules Used", "examples_color_direct_color.html#modules-used-19", null ]
       ] ]
     ] ],
     [ "HiColor — 1792 colors from a 4bpp background", "examples_color_hicolor_1792.html", null ],

@@ -139,12 +139,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Cursor  </td><td class="markdownTableBodyNone">Advance to ready state  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-20"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-21"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/superscope</div>
 </div><!-- fragment --><p>Then open <span class="tt">superscope.sfc</span> in an emulator with a Super Scope on port 2 (luna drives one from a test manifest).</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-18"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-20"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES Super Scope communicates hit position via PPU H/V counters</li>
@@ -170,7 +170,7 @@ Walkthrough</h2>
 <div class="line"><a class="code hl_variable" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a>(0, 0x0000);</div>
 <div class="line"><a class="code hl_variable" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a>(0, 0x3800, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
 <div class="ttc" id="abackground_8h_html_a7562c524ad6c4c62897ad159bf12b2c6"><div class="ttname"><a href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr</div><div class="ttdef"><b>Definition</b> background.h:140</div></div>
-<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:163</div></div>
+<div class="ttc" id="abackground_8h_html_a802df79274cbe778da9c013a4f538c72"><div class="ttname"><a href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr</div><div class="ttdef"><b>Definition</b> background.h:169</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
 <div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
 <div class="ttc" id="atext_8h_html_a6aeb037193a9aff1d616ceed3becbdce"><div class="ttname"><a href="text_8h.html#a6aeb037193a9aff1d616ceed3becbdce">TEXT_DEFAULT_FONT_TILE</a></div><div class="ttdeci">#define TEXT_DEFAULT_FONT_TILE</div><div class="ttdoc">Default first font tile (zero — font occupies tiles 0-95).</div><div class="ttdef"><b>Definition</b> text.h:48</div></div>
@@ -220,7 +220,7 @@ Tips &amp; Tricks</h2>
 <li><b>2bpp pictures</b>: draw them indexed on their four colours (here <span class="tt">devtools/art_assets/build.py</span> writes the target pixel by pixel): an RGB picture quantized down to 4 colours can lose a thin line that covers few pixels.</li>
 <li><b>Sprite tile numbering</b>: in a 128px-wide sprite sheet of 16x16 sprites, tile numbers follow <span class="tt">row * 32 + col * 2</span>. <span class="tt">opensnes-sprite inspect</span> reports the block and tile counts.</li>
 <li><b>OBJSEL macro</b>: Instead of memorizing that <span class="tt">0x62</span> means "16/32 sizes at VRAM $4000", use <span class="tt"><a class="el" href="sprite_8h.html#a7ad237518b773199a39686500d459ced" title="Build OBJSEL register value from size constant + VRAM base address.">OBJSEL(OBJ_SIZE16_L32, 0x4000)</a></span>.</li>
-<li><b>Trying it without a gun</b>: luna drives the Super Scope from a test manifest (<span class="tt">superscope = "<a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a>:x,y,buttons"</span>, see <span class="tt">testing/manifests/superscope.toml</span>).</li>
+<li><b>Trying it without a gun</b>: luna drives the Super Scope from a test manifest (<span class="tt">superscope = "<a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>:x,y,buttons"</span>, see <span class="tt">testing/manifests/superscope.toml</span>).</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="under-the-hood-the-build-3"></a>
 Under the Hood: The Build</h2>
@@ -243,7 +243,7 @@ Under the Hood: The Build</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a802df79274cbe778da9c013a4f538c72">bgSetGfxPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a7562c524ad6c4c62897ad159bf12b2c6">bgSetMapPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="modules-used-31"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-35"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-4"></a>

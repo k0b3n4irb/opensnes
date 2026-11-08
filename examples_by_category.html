@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_by_category.html','',''); });
   <div class="headertitle"><div class="title">Browse Examples by Category </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>All 60 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
+<div class="textblock"><p>All 65 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="text"></a>
 Text</h2>
@@ -301,6 +301,10 @@ Audio</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_sfx_from_wav.html" title="SFX from WAV">SFX from WAV</a>  </td><td class="markdownTableBodyNone">One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_sfx_voices.html" title="SFX voices">SFX voices</a>  </td><td class="markdownTableBodyNone">Effects voice by voice: looped waveform with per-frame pitch, stop+play in one frame, piecewise sample load, with the scanline cost of each  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_sample_swap.html" title="Sample swap">Sample swap</a>  </td><td class="markdownTableBodyNone">Samples at addresses the game chooses: a resident set, a swap area replaced during play, the refusals, the silence a replacement needs  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — two S-DSP programs, swapped at runtime">apu_switch — two S-DSP programs, swapped at runtime</a>  </td><td class="markdownTableBodyNone">Hot-swapping APU programs at runtime  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES… DAVEO&quot;">speech_synth — the SNES says "OPEN SNES… DAVEO"</a>  </td><td class="markdownTableBodyNone">BRR speech playback: the SNES says "OPEN SNES" (krom port)  </td></tr>
@@ -332,6 +336,8 @@ Game math &amp; mechanics</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_basics_panel_hud.html" title="panel_hud — a HUD that survives a dialog box">panel_hud — a HUD that survives a dialog box</a>  </td><td class="markdownTableBodyNone">9-slice HUD + dialog box on one layer (the <span class="tt">panel</span> module)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_basics_game_skeleton.html" title="game_skeleton — the smallest complete game">game_skeleton — the smallest complete game</a>  </td><td class="markdownTableBodyNone">The smallest complete game: title → play → game-over state machine  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_ppu_reset.html" title="ppu_reset — the next screen starts from a clean PPU">ppu_reset — the next screen starts from a clean PPU</a>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="console_8h.html#a99e97289ca46d8ffa0739d5f8317cb91" title="Put every PPU register, and the library&#39;s PPU shadows, back to their power-on state.">ppuReset()</a></span> between two screens: every PPU register back to power-on  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="memory--mappers"></a>
@@ -344,6 +350,8 @@ Memory &amp; mappers</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_memory_hirom_demo.html" title="HiROM Demo -- Understanding SNES Memory Mapping">HiROM Demo -- Understanding SNES Memory Mapping</a>  </td><td class="markdownTableBodyNone">HiROM vs LoROM memory mapping  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a>  </td><td class="markdownTableBodyNone">SRAM battery-backed saves  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_memory_lzss_ram.html" title="LZ77 into RAM — lzssDecodeRam">LZ77 into RAM — lzssDecodeRam</a>  </td><td class="markdownTableBodyNone">LZ77 decompression into RAM ($7E, $7F), screen on  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="enhancement-chips"></a>
@@ -399,6 +407,8 @@ Games</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_games_blocks.html" title="Blocks">Blocks</a>  </td><td class="markdownTableBodyNone">Falling-blocks puzzle with Korobeiniki music, multi-line clear  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_games_shard_dash.html" title="shard_dash — a game in several files, with a test for each screen">shard_dash — a game in several files, with a test for each screen</a>  </td><td class="markdownTableBodyNone">A game in several files: one C file per screen, a screen layer, a checksummed save, a test per screen  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_games_rooftop_run.html" title="rooftop_run — Kit&#39;s Rooftop Run">rooftop_run — Kit's Rooftop Run</a>  </td><td class="markdownTableBodyNone">Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal  </td></tr>
 </table>
 </div></div><!-- contents -->

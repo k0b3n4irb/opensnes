@@ -57,7 +57,7 @@ var searchData=
   ['kit_5fmaxaccel_54',['KIT_MAXACCEL',['../kit_8c.html#a3ee4c7d8497bc7efd504429c8a28b84e',1,'KIT_MAXACCEL:&#160;kit.c'],['../games_2rooftop__run_2main_8c.html#a3ee4c7d8497bc7efd504429c8a28b84e',1,'KIT_MAXACCEL:&#160;main.c']]],
   ['kit_5fplace_55',['kit_place',['../games_2rooftop__run_2main_8c.html#a3fcdfc44d89d94d9498f9a19d89de03f',1,'main.c']]],
   ['kit_5fsafe_56',['kit_safe',['../games_2rooftop__run_2main_8c.html#ab83fa525a552e23dff8e508d5f48cd76',1,'main.c']]],
-  ['kit_5ftile_57',['kit_tile',['../basics_2game__skeleton_2main_8c.html#ad19fabc7c07daebf70556da870bcae87',1,'kit_tile(u16 f):&#160;main.c'],['../maps_2map__scroll_2main_8c.html#ad19fabc7c07daebf70556da870bcae87',1,'kit_tile(u16 f):&#160;main.c']]],
+  ['kit_5ftile_57',['kit_tile',['../basics_2game__skeleton_2main_8c.html#ad19fabc7c07daebf70556da870bcae87',1,'kit_tile(u16 f):&#160;main.c'],['../play_8c.html#ad19fabc7c07daebf70556da870bcae87',1,'kit_tile(u16 f):&#160;play.c'],['../maps_2map__scroll_2main_8c.html#ad19fabc7c07daebf70556da870bcae87',1,'kit_tile(u16 f):&#160;main.c']]],
   ['kit_5fupdate_5fcamera_58',['kit_update_camera',['../games_2rooftop__run_2main_8c.html#ad504ab29adacc6b5fbbf57907cbffa20',1,'main.c']]],
   ['kit_5fx_59',['KIT_X',['../basics_2panel__hud_2main_8c.html#ac696baeb52142dcbca7996c0fe04f003',1,'KIT_X:&#160;main.c'],['../windows_2window_2main_8c.html#ac696baeb52142dcbca7996c0fe04f003',1,'KIT_X:&#160;main.c']]],
   ['kit_5fx_60',['kit_x',['../games_2rooftop__run_2main_8c.html#a7f0dda667456daf1218088d67fde5452',1,'main.c']]],
@@ -83,5 +83,8 @@ var searchData=
   ['known_20limitations_80',['Known Limitations',['../known_limitations.html',1,'documentation']]],
   ['known_5flimitations_2emd_81',['KNOWN_LIMITATIONS.md',['../KNOWN__LIMITATIONS_8md.html',1,'']]],
   ['ko_82',['What to do with a KO',['../hardware_verification.html#what-to-do-with-a-ko',1,'']]],
-  ['krom_20s_20map_83',['Controls (krom&apos;s map)',['../examples_mode7_perspective_rotate.html#controls-kroms-map',1,'']]]
+  ['kon_5fframe_83',['kon_frame',['../audio_2sample__swap_2main_8c.html#a9edcd92105962f9263c51861e0c25d58',1,'main.c']]],
+  ['kon_5fline_84',['kon_line',['../audio_2sample__swap_2main_8c.html#ab9f3c23a5a237c9103fab8e40057a7ed',1,'main.c']]],
+  ['kon_5fsteady_85',['kon_steady',['../audio_2sample__swap_2main_8c.html#adadbecd0379bc54ba09e1fcc8089a26a',1,'main.c']]],
+  ['krom_20s_20map_86',['Controls (krom&apos;s map)',['../examples_mode7_perspective_rotate.html#controls-kroms-map',1,'']]]
 ];

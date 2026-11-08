@@ -132,6 +132,8 @@ Example ROMs</h2>
 <td class="markdownTableBodyNone"><a href="examples_memory_hirom_demo.html">hirom_demo</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">HiROM mode with 64KB banks (vs LoROM's 32KB)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="examples_memory_save_game.html">save_game</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Battery-backed SRAM for saving and loading game state  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="examples_memory_lzss_ram.html">lzss_ram</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">LZ77 tiles decompressed into RAM (banks $7E and $7F) with the screen on  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="key-concepts-2"></a>
 Key Concepts</h2>
@@ -161,7 +163,7 @@ SRAM (Battery Backup)</h3>
 <p>Enable SRAM: set <span class="tt">USE_SRAM=1</span> in your Makefile. Write to the SRAM address range to store data; it persists when the console is powered off (battery permitting).</p>
 <hr  />
 <p>Start with <b>hirom_demo</b> to understand memory mapping, then <b>save_game</b> for persistent storage.</p>
-<p><a class="el" href="examples_memory_hirom_demo.html" title="HiROM Demo -- Understanding SNES Memory Mapping">HiROM Demo -- Understanding SNES Memory Mapping</a> <a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a> </p>
+<p><a class="el" href="examples_memory_hirom_demo.html" title="HiROM Demo -- Understanding SNES Memory Mapping">HiROM Demo -- Understanding SNES Memory Mapping</a> <a class="el" href="examples_memory_lzss_ram.html" title="LZ77 into RAM — lzssDecodeRam">LZ77 into RAM — lzssDecodeRam</a> <a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

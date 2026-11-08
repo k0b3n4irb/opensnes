@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_memory_save_game.html','',''); });
 <img src="save_game.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-2"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-3"></a>
 What This Example Shows</h2>
 <p>How to save and load game data using the SNES cartridge SRAM (Static RAM). The SRAM is battery-backed &ndash; data persists even when the console is powered off. This is how classic SNES games like Zelda and Final Fantasy save progress.</p>
 <p>The screen is a save terminal of the Rue basse: two slot cards on the terminal's glass. Saving or loading a slot writes its status in its card and puts Kit's icon there; a load prints the values read back.</p>
@@ -147,12 +147,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Y  </td><td class="markdownTableBodyNone">Read Slot 2 and show it in its card  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-23"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/save_game</div>
 </div><!-- fragment --><p>Then open <span class="tt">save_game.sfc</span> in luna or any emulator. luna keeps the battery in a <span class="tt">.srm</span> file when asked (<span class="tt">srm_out</span> / <span class="tt">srm_in</span> in a test manifest: this example's three manifests save, power-cycle and read back).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-5"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-6"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-define-a-save-structure"></a>
 1. Define a save structure</h3>
@@ -166,16 +166,16 @@ How It Works</h2>
 </div><!-- fragment --><p>The structure is 8 bytes. In a real game, this would hold player position, inventory, level progress, etc.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-save-to-sram"></a>
 2. Save to SRAM</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a>, <a class="code hl_define" href="save_8h.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="save_8h.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="amemory_2save__game_2main_8c_html_a3ef531cbe1242a15cd087b7542356808"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a></div><div class="ttdeci">#define SAVE_SIZE</div><div class="ttdoc">Size in bytes of one save slot (must equal sizeof(SaveState)).</div><div class="ttdef"><b>Definition</b> main.c:88</div></div>
 <div class="ttc" id="amemory_2save__game_2main_8c_html_a86e7f1b7f5ebbab30d693661f380d1b9"><div class="ttname"><a href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a></div><div class="ttdeci">#define SLOT1</div><div class="ttdoc">SRAM byte offset for save slot 1 (starts at byte 0).</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
 <div class="ttc" id="amemory_2save__game_2main_8c_html_ad1c5ad15a7e11834ff3a4a9acb0cc9dc"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a></div><div class="ttdeci">SaveState vts</div><div class="ttdoc">Write buffer: filled with test data before saving to SRAM.</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
+<div class="ttc" id="asave_8h_html_a3ef531cbe1242a15cd087b7542356808"><div class="ttname"><a href="save_8h.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a></div><div class="ttdeci">#define SAVE_SIZE</div><div class="ttdoc">Bytes of the record.</div><div class="ttdef"><b>Definition</b> save.h:14</div></div>
 <div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
-</div><!-- fragment --><p><span class="tt"><a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a></span> copies <span class="tt"><a class="el" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808" title="Size in bytes of one save slot (must equal sizeof(SaveState)).">SAVE_SIZE</a></span> bytes from RAM to SRAM at the given offset. Multiple save slots use different offsets (Slot 0 at offset 0, Slot 1 at offset 8, etc.).</p>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a></span> copies <span class="tt"><a class="el" href="save_8h.html#a3ef531cbe1242a15cd087b7542356808" title="Bytes of the record.">SAVE_SIZE</a></span> bytes from RAM to SRAM at the given offset. Multiple save slots use different offsets (Slot 0 at offset 0, Slot 1 at offset 8, etc.).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-load-from-sram"></a>
 3. Load from SRAM</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a>, <a class="code hl_define" href="save_8h.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a>, <a class="code hl_define" href="save_8h.html#a3ef531cbe1242a15cd087b7542356808">SAVE_SIZE</a> * <a class="code hl_define" href="memory_2save__game_2main_8c.html#a86e7f1b7f5ebbab30d693661f380d1b9">SLOT1</a>);</div>
 <div class="ttc" id="amemory_2save__game_2main_8c_html_ab3904980c9a71424f906b737d40069b4"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ab3904980c9a71424f906b737d40069b4">vtl</a></div><div class="ttdeci">SaveState vtl</div><div class="ttdoc">Read buffer: populated by sramLoadOffset() when loading from SRAM.</div><div class="ttdef"><b>Definition</b> main.c:79</div></div>
 <div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset()</a></span> copies bytes back from SRAM into a RAM structure. The loaded values are then displayed as hex on screen using <span class="tt"><a class="el" href="text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab" title="Print an unsigned integer in hexadecimal.">textPrintHex()</a></span>.</p>
@@ -188,11 +188,11 @@ How It Works</h2>
 5. The screen: text on BG1, the terminal on BG2</h3>
 <p><span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span> sets Mode 0 with the text on BG1 (font at VRAM $0000, map at $3800). The terminal is a four-colour picture on BG2; in Mode 0 each BG has its own palettes, BG2's from CGRAM 32, which <span class="tt"><a class="el" href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a></span> selects:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a>(1, terminal_tiles, terminal_pal, 0, ..., <a class="code hl_define" href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a>, <a class="code hl_define" href="memory_2save__game_2main_8c.html#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a>);</div>
-<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:203</div></div>
+<div class="ttc" id="abackground_8h_html_a044c746ddf6e28c3e6c56e08c2570369"><div class="ttname"><a href="background_8h.html#a044c746ddf6e28c3e6c56e08c2570369">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet</div><div class="ttdef"><b>Definition</b> background.h:209</div></div>
 <div class="ttc" id="agroup__bg__colors_html_gaf195eec5c93ea5507399f3c85109f3d0"><div class="ttname"><a href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a></div><div class="ttdeci">#define BG_4COLORS0</div><div class="ttdef"><b>Definition</b> background.h:51</div></div>
 <div class="ttc" id="amemory_2save__game_2main_8c_html_ad94fc85e2e721e173adfdb060012bc95"><div class="ttname"><a href="memory_2save__game_2main_8c.html#ad94fc85e2e721e173adfdb060012bc95">TERM_TILES</a></div><div class="ttdeci">#define TERM_TILES</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
 </div><!-- fragment --><p>BG1 is in front of BG2 in Mode 0, so the text sits on the glass. <span class="tt"><a class="el" href="memory_2save__game_2main_8c.html#ae1fc44f0e15cc32485e6942b83a44d9b" title="Write a slot&#39;s status in its card, and show Kit&#39;s icon there.">show_slot()</a></span> writes a slot's status in its card and moves that slot's sprite, Kit's icon, into the card's well. The text module's NMI hook sends what was written at the next VBlank.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-19"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-22"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="sram-address-space"></a>
 SRAM Address Space</h3>
@@ -231,10 +231,10 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="assets-15"></a>
+<h2 class="doxsection"><a class="anchor" id="assets-16"></a>
 Assets</h2>
 <p><span class="tt">res/terminal.png</span> is drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">terminal</span>), <span class="tt">res/icon.png</span> is the Néo-Lumen <span class="tt">logo/kit_icon.png</span> indexed by <span class="tt">save_icon</span> (CC0; <span class="tt">assets/neo-lumen/README.md</span>); the build converts both from the settings file beside each.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-34"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-39"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

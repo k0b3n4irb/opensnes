@@ -6,21 +6,21 @@ var examples_hdma =
         [ "What This Example Shows", "examples_hdma_gradient_colors.html#what-this-example-shows", null ],
         [ "Prerequisites", "examples_hdma_gradient_colors.html#prerequisites-1", null ],
         [ "Controls", "examples_hdma_gradient_colors.html#controls-12", null ],
-        [ "Build &amp; Run", "examples_hdma_gradient_colors.html#build--run-16", null ],
+        [ "Build &amp; Run", "examples_hdma_gradient_colors.html#build--run-17", null ],
         [ "How It Works", "examples_hdma_gradient_colors.html#how-it-works-2", [
           [ "1. HDMA targets CGADD ($2121)", "examples_hdma_gradient_colors.html#autotoc_md1-hdma-targets-cgadd-2121", null ],
           [ "2. The gradient table", "examples_hdma_gradient_colors.html#autotoc_md2-the-gradient-table", null ],
           [ "3. Toggle at runtime", "examples_hdma_gradient_colors.html#autotoc_md3-toggle-at-runtime", null ],
           [ "4. The same effect through indirect HDMA (X)", "examples_hdma_gradient_colors.html#autotoc_md4-the-same-effect-through-indirect-hdma-x", null ]
         ] ],
-        [ "SNES Concepts", "examples_hdma_gradient_colors.html#snes-concepts-14", [
+        [ "SNES Concepts", "examples_hdma_gradient_colors.html#snes-concepts-16", [
           [ "CGRAM (Color Generator RAM)", "examples_hdma_gradient_colors.html#cgram-color-generator-ram", null ],
           [ "HDMA Mode 3 (2REG_2X)", "examples_hdma_gradient_colors.html#hdma-mode-3-2reg_2x", null ],
           [ "Non-Repeat vs Repeat Mode", "examples_hdma_gradient_colors.html#non-repeat-vs-repeat-mode", null ]
         ] ],
         [ "Project Structure", "examples_hdma_gradient_colors.html#project-structure-2", null ],
         [ "Going Further", "examples_hdma_gradient_colors.html#going-further-1", null ],
-        [ "Modules Used", "examples_hdma_gradient_colors.html#modules-used-27", null ],
+        [ "Modules Used", "examples_hdma_gradient_colors.html#modules-used-31", null ],
         [ "Further: the \"9-bit\" backdrop (two channels, one visual)", "examples_hdma_gradient_colors.html#further-the-9-bit-backdrop-two-channels-one-visual", null ]
       ] ]
     ] ],

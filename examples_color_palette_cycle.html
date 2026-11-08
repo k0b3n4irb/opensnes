@@ -130,7 +130,7 @@ Why it matters for your game</h2>
 <img src="palette_cycle.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-8"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-9"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>CGRAM is a live lookup table.</b> Rewrite one colour entry during VBlank and every pixel that indexes it changes colour on the very next frame — no tiles touched, no map redrawn. This rung rests on what you already know: solid tiles, a tilemap, and <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> from earlier colour rungs.</p>
 <p>The scene is a noodle bar's sign and a coolant pipe on a brick wall (<span class="tt">res/sign.png</span>), and it was drawn for the cycle. Each letter of NOODLES is painted with its own colour index, 8 to 14 of BG palette 0; the coolant uses indices 8 to 15 of BG palette 1, which follow one another along the pipe. The wall, the frame and the pipe's metal use the other indices. Every fourth frame, entries 8-15 of both palettes are rotated by one slot (each colour moves to the next index) and pushed back to CGRAM: a wave of light runs along the letters and the coolant flows. Because each wheel closes the loop (entry 15 flows into entry 8), the cycle is seamless.</p>
@@ -151,7 +151,7 @@ Build &amp; run</h2>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="assets-9"></a>
 Assets</h2>
 <p><span class="tt">res/sign.png</span> is drawn by <span class="tt">devtools/art_assets/build.py</span> (<span class="tt">neon_sign</span>), with the library's font scaled three times for the letters; the build converts it with its two palettes (<span class="tt">colors = 32</span>: each tile gets the bank of its colours).</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-18"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-21"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span></p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-3"></a>

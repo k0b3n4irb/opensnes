@@ -11,6 +11,8 @@ var vramqueue_8h =
     [ "vramQueueFlushUntil", "vramqueue_8h.html#a66aa4f3ecc260342ce2284c32b2878b1", null ],
     [ "vramQueuePush", "vramqueue_8h.html#ade39bb80a8d7cf72a11075c930410086", null ],
     [ "vramQueuePushSprite", "vramqueue_8h.html#a910d5040c609176a6d5518da95567518", null ],
+    [ "vramQueuePushSpriteWithin", "vramqueue_8h.html#a2b33f7bc8659910dd49e9db114248e6e", null ],
+    [ "vramQueuePushWithin", "vramqueue_8h.html#aa2245e616396408d7f09eefd20a96466", null ],
     [ "vram_queue_addr", "vramqueue_8h.html#a2a5ee7ba048d1b5463825d1aa75f723e", null ],
     [ "vram_queue_bank", "vramqueue_8h.html#a315d78677e4433a2634b66a078ccd5c5", null ],
     [ "vram_queue_cost", "vramqueue_8h.html#aa60c70a83627b2e80a32d3bc7ee6656d", null ],

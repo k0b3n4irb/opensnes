@@ -13,7 +13,7 @@ var searchData=
   ['message_10',['message',['../fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e',1,'main.c']]],
   ['mode_11',['mode',['../structAnimClip.html#a141343eb22d0ef950eee467dcd3578a9',1,'AnimClip']]],
   ['mode_5ftable_12',['mode_table',['../mode7_2perspective_2main_8c.html#a5ad802b73906cc4b18f6228b7d61b77b',1,'main.c']]],
-  ['moving_13',['moving',['../basics_2game__skeleton_2main_8c.html#a0926d61f9fd634c0718604427e5c02eb',1,'main.c']]],
+  ['moving_13',['moving',['../basics_2game__skeleton_2main_8c.html#a0926d61f9fd634c0718604427e5c02eb',1,'moving:&#160;main.c'],['../play_8c.html#a0926d61f9fd634c0718604427e5c02eb',1,'moving:&#160;play.c']]],
   ['msg_5fcolor_14',['msg_color',['../render_8c.html#a469f97fefc467199cf6aff4660f44a64',1,'render.c']]],
   ['msg_5fcolor_5fdirty_15',['msg_color_dirty',['../render_8c.html#ad5580510b96399f26c9b790102375a05',1,'render.c']]],
   ['msg_5fcolors_16',['msg_colors',['../games_2blocks_2main_8c.html#a941373ea86f8c3a624bbac3e0f4502fb',1,'main.c']]],

@@ -125,10 +125,10 @@ $(function(){initNavTree('tutorial_interrupts.html','',''); });
 <div class="textblock"><p>Two kinds of interrupt reach your code. The <b>NMI</b> fires at the start of every VBlank; the SDK's handler owns it and lets you add a C callback. The <b>IRQ</b> fires when the PPU reaches a horizontal and/or vertical position you choose; it goes straight to an assembly handler you write. Both come from <span class="tt">&lt;<a class="el" href="interrupt_8h.html" title="SNES Interrupt Handling.">snes/interrupt.h</a>&gt;</span> (module <span class="tt">console</span>).</p>
 <h2 class="doxsection"><a class="anchor" id="running-c-at-every-vblank-nmiset"></a>
 Running C at every VBlank: <span class="tt">nmiSet</span></h2>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ticks;</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="audio_2sample__swap_2main_8c.html#a2a8688bb8cd46f1e0682cd9f11d94c1e">ticks</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> on_vblank(<span class="keywordtype">void</span>) {</div>
-<div class="line">    ticks++;                     <span class="comment">/* keep it short */</span></div>
+<div class="line">    <a class="code hl_function" href="audio_2sample__swap_2main_8c.html#a2a8688bb8cd46f1e0682cd9f11d94c1e">ticks</a>++;                     <span class="comment">/* keep it short */</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
@@ -138,6 +138,7 @@ Running C at every VBlank: <span class="tt">nmiSet</span></h2>
 <div class="line">    <a class="code hl_function" href="interrupt_8h.html#a4a0a4690d2c70b58584eed95377325a1">nmiClear</a>();                  <span class="comment">/* same as nmiSet(NULL) */</span></div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:73</div></div>
+<div class="ttc" id="aaudio_2sample__swap_2main_8c_html_a2a8688bb8cd46f1e0682cd9f11d94c1e"><div class="ttname"><a href="audio_2sample__swap_2main_8c.html#a2a8688bb8cd46f1e0682cd9f11d94c1e">ticks</a></div><div class="ttdeci">static void ticks(u8 n)</div><div class="ttdoc">Wait n frames.</div><div class="ttdef"><b>Definition</b> main.c:134</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="ainterrupt_8h_html_a4a0a4690d2c70b58584eed95377325a1"><div class="ttname"><a href="interrupt_8h.html#a4a0a4690d2c70b58584eed95377325a1">nmiClear</a></div><div class="ttdeci">void nmiClear(void)</div><div class="ttdoc">Clear the VBlank callback.</div></div>

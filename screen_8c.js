@@ -1,0 +1,25 @@
+var screen_8c =
+[
+    [ "FADE_SPEED", "screen_8c.html#ae4591a251e14fee4c9c2b8bce811aa5e", null ],
+    [ "fade", "screen_8c.html#a8e12d4dec17200518cd46ead717cfb93", null ],
+    [ "primePads", "screen_8c.html#a99c1c4cc117825f9f6fb980375c99ce2", null ],
+    [ "pump", "screen_8c.html#a5f7778c42828f5ddb907706658b382e8", null ],
+    [ "readPads", "screen_8c.html#a2cdd809d63ee87e6098ad0f4ff621791", null ],
+    [ "screenClose", "screen_8c.html#a1176ab1b05accd8fb580c1af3c0a7e30", null ],
+    [ "screenFadeSkip", "screen_8c.html#a5de18f050e509d76e820336d66e0c595", null ],
+    [ "screenFrame", "screen_8c.html#a4d9d1c95615e639cf5a1c7e2877d5f99", null ],
+    [ "screenLoad", "screen_8c.html#a4a09a6e515a60665efb27818d71c8ab1", null ],
+    [ "screenPressed", "screen_8c.html#a8cde877e5840dc773b9016acbe34dd9e", null ],
+    [ "screenSetClose", "screen_8c.html#af05404ba0a15302dcdd72259be8059f2", null ],
+    [ "screenSetPump", "screen_8c.html#aed1707fe0db4c8239145fab7ab798465", null ],
+    [ "screenShow", "screen_8c.html#a6c8778279fd6e180d76f08fae6637d02", null ],
+    [ "screenWait", "screen_8c.html#aadc6a8ef36c739ff74a7fb9334308a04", null ],
+    [ "close_fn", "screen_8c.html#a1fb7b5b6d2d2baf67329273a1e7fb490", null ],
+    [ "held0", "screen_8c.html#a429a128d03aca6bbe3b8dbc4cb676c75", null ],
+    [ "held1", "screen_8c.html#a2215191214596bd48b3a40a3c273ddbf", null ],
+    [ "prev0", "screen_8c.html#ac0bf35821a44eb530c01689e63343029", null ],
+    [ "prev1", "screen_8c.html#a91078b02c059c6c383d2f2fb65eb38a2", null ],
+    [ "pump_fn", "screen_8c.html#a7e6a40da9b5988a89d9a6c3fa49e85fa", null ],
+    [ "screen_fade_frames", "screen_8c.html#ac640605871e7126646c050617e1e39b2", null ],
+    [ "screen_fade_skip", "screen_8c.html#a13c19e3c165b8d761b71b3200fe8b7c0", null ]
+];

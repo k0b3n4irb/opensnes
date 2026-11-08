@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_sprites_dynamic_sprite.html','',''); });
 <img src="dynamic_sprite.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-7"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-8"></a>
 What This Example Shows</h2>
 <p>How to use the <b>dynamic sprite system</b> to stream sprite tile data into VRAM every frame. Unlike static sprites (where all frames live in VRAM permanently), dynamic sprites upload only the current animation frame, saving VRAM space when sprites have many frames.</p>
 <p>This demo displays four data shards, 16x16 sprites, each turning through 24 frames of animation. SELECT switches to the next step of the same engine: <b>metasprites</b> — Kit, built from several OBJ at 16x16, 32x48 and 64x64 — streamed the same way under the three OBJSEL size pairs.</p>
@@ -144,12 +144,12 @@ Controls</h2>
 <td class="markdownTableBodyNone">D-PAD Up/Down  </td><td class="markdownTableBodyNone">(metasprite scene) switch the OBJSEL size pair: 8/16, 8/32, 16/32  </td></tr>
 </table>
 <p>At boot the four sprites animate by themselves.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-33"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/dynamic_sprite</div>
 </div><!-- fragment --><p>Then open <span class="tt">dynamic_sprite.sfc</span> in luna (<span class="tt">luna-gui dynamic_sprite.sfc</span>) or any emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-12"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-13"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-initialize-the-dynamic-sprite-engine"></a>
 1. Initialize the dynamic sprite engine</h3>
@@ -217,7 +217,7 @@ The Metasprite Scene</h2>
 <div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_ae2ffd37454763f04bc54b520f8e8c323"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero16_frame0[]</div><div class="ttdoc">16x16 metasprite: Kit 32x48 (2x3 grid of 16x16)</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
 <div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:570</div></div>
 </div><!-- fragment --><p><span class="tt">oamMetaDrawDyn(id, x, y, meta, gfx, size_class)</span> streams each piece's tiles with the dynamic engine; <span class="tt"><a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a" title="Sprite size selection.">OBJ_SMALL</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></span> say which half of the OBJSEL pair the pieces use. Changing the pair (UP/DOWN) re-runs <span class="tt"><a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit()</a></span> with a new <span class="tt">sizeMode</span> under force blank, and <span class="tt"><a class="el" href="sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410" title="Block until the dynamic-sprite VRAM tile queue is empty.">oamDynamicDrainQueue()</a></span> uploads both heroes before the screen comes back on. The menu is text on BG1 (Mode 0, font at VRAM $3000, map at $3800); the engine's tiles stay at $0000 (large) and $1000 (small). The scene was the <span class="tt">dynamic_metasprite</span> example, a port of PVSnesLib's DynamicEngineMetaSprite.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-30"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-33"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="vram-budget-during-vblank"></a>
 VRAM Budget During VBlank</h3>
@@ -258,7 +258,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-46"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-51"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_dynamic_meta</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">text</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
