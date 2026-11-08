@@ -4,6 +4,13 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.55.0] — 2026-11-08
+
+`ppuReset()`, `lzssDecodeRam()`, `audioLoadSampleAt()`, `oamSetBatch()` and the
+`vramQueue*Within` guards join the library, `opensnes budget --frame` measures a
+frame in luna, plain LoROM goes up to 4 MB, and the compiler folds constant
+divisions. Everything below is what `[Unreleased]` held.
+
 ### Added
 - feat(lib): `ppuReset()` (console.h, module `ppu_reset`) puts the PPU back to its power-on state between two screens: HDMA stopped, every write-only register from `$2100` to `$2133` at the value crt0's InitHardware writes (forced blank, BG mode 0, all bases 0, horizontal scrolls 0 and vertical -1, the identity Mode 7 matrix, windows and color math off, TM = BG1), the library's shadows back to their value at `main()` (brightness 15, scrolls, BG12NBA/BG34NBA, SETINI, mosaic, color math, windows, Mode 7 scale and angle, HDMA state, a running fade stopped), `oamClear()`. VRAM, CGRAM and OAM contents, NMITIMEN and the audio are not touched. COLDATA gets `$E0` (fixed colour black), not crt0's 0, which selects no plane. 283 bytes of ROM, 167,832 master cycles a call (145,816 of them `oamClear()`); a ROM that lists the module without calling it is byte-identical to one that does not list it (the table sits in the function's SUPERFREE section: a C `const` table goes to a SEMISUPERFREE section, which `wlalink -d` never discards). New example `basics/ppu_reset` and manifest `basics_ppu_reset`: the PPU registers and the shadows read at `main()` and right after the reset are equal; without the call, 80 asserts fail. The shadows of the window module (`window_w12sel` …, were `static w12sel` …), `bg34nba_shadow`, `m7_scale_x/y` and `console_fade_active` (was `static fade_active`) are no longer `static`, so that the reset can reach them.
 - feat(build): `ROM_BANKS` goes up to 128 on plain LoROM (4 MB). The code has been addressed from `$80` since 2026-10-26, so banks 126 and 127 sit at `$FE:` and `$FF:`, clear of the WRAM at `$7E`/`$7F`; the cap of 126 dated from the `$00` addressing. A 128-bank build of `audio/apu_switch` shows the same frame hash and the same audio as the 8-bank one, `opensnes-rom inspect` and `luna cart-check` find the checksum right. New fixture `libtests_bigrom` and manifest: a const table in bank 127 (`$FF:8000`) read back. Counts between that are not 2^k or 2^k + 2^j (126) leave a remainder that is not a power of two: the linker's checksum then differs from the emulators' (`$6013` against `$08FE`); `docs/tools/build.md` says which counts to prefer.
@@ -138,6 +145,25 @@ All notable changes to OpenSNES are documented in this file.
   Eight `luna test` manifests play it: each screen, the real fade (16 images,
   the pump running), a lost round with a key held across screens, and a save
   round trip (write, reload, corrupted copy).
+
+### Fixed
+- fix(lib): the DMA screen check also reads the end of the transfer. It counted a
+  transfer started with the screen on outside VBlank, not one started inside VBlank
+  and too big to finish there: a 0xF000-byte `dmaFillVRAM` with the screen on, called
+  after `WaitForVBlank()`, lost its second pass to active display and
+  `dma_unsafe_count` stayed at 0. The CPU is stopped until a general DMA is over, so
+  `HVBJOY` read right after the `MDMAEN` write gives the line the transfer ended on;
+  the same count and `WDM $02` follow.
+- fix(build): the `dma` module declares `console`, and the module dependencies
+  resolve four levels deep. A ROM listing `dma` without `console` no longer linked
+  (`make test-link-modules`: 11 of 51 modules failed alone).
+- fix(tools): `opensnes-rom budget` reads a section's bank from its ROM offset, not
+  the CPU window. On a FastROM LoROM image past 64 banks, bank 64 (at `$C0`) was taken
+  for bank 0 and showed 200 % with a false asset warning.
+- fix(build): `install-luna` retries the download three times, five seconds apart,
+  after a CI job failed on a network drop.
+- fix(build): `test-sanitizers` and `coverage-host` restore the normal compiler
+  binaries when they end, so a run does not leave instrumented binaries in `bin/`.
 
 ### Changed
 - perf(compiler): a division or remainder of two integer constants is
