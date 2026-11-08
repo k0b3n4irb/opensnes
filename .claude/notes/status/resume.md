@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-11-08)
+# Where the work stands (resume note, 2026-11-08, evening)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -100,16 +100,31 @@ and the CHANGELOG.
   math/fixed32 +577 B, sprite +512, math_ease/mode7 +256, hdma +64, text+dma +38; all in asset banks, none in bank $00.
   Fixing it for all = compiler emits discardable const (Class A, ~1.7 KB): not started, waits for the author.
 
-## PAUSE (author, 2026-11-08)
+## Audit of 2026-11-08: OpenSNES lots (the audit's synthesis and its report A3)
 
-All work stops for the independent audit once the release is out. Nothing is half done here.
-Waits for the author, after the audit: a cache for the CI downloads (Doxygen, MSYS2:
-three 504s in one morning; retries exist on the Doxygen and cppcheck curls only) with its
-lesson in the kit's `lecons/`; the `ppuReset` COLDATA question (Class A); the
-discardable const data of linked modules (Class A).
-Waits for luna: a tag that carries `281485c` (`[checkpoint.dsp]`) and `de03dd8` (DMA per
-byte); then bump the pin, replay the corpus queries, the DMA/HDMA timing tests and the
-ENVX-after-KOFF manifest.
+- **Q2 done** (`2a33b048`, `ccbb7e5a`): the private corpus name and its four tool names are gone from the tip
+  (109 files; the French word for the physical cartridge is written Game Pak). `hardware_claims.md`
+  now says the evidence sentences decide alone and uses the renamed verify verdicts.
+- **L9 done** (`76adcdb0`, CI green: Build & Release 42489059646, Lint 42489059649): 32-bit mul/div/rem safe in
+  an NMI/lag callback (software path in `mul32.asm`, result slots saved and restored by the NMI
+  handler, `div32.asm` saves its working words); fixture `testing/fixtures/stress/rt32_nmi`
+  (red on the old runtime: 208 / 121 / 278 / 378 / 521 wrong of 10 000, green after); +50 master cycles per
+  `tcc_mul32`, +60 per divide; the WRAM map of every ROM changed (16 bytes), baseline renewed;
+  `make test-bin-clean` in `make tests`. An `irqSet` handler stays unprotected (documented, 9 369 of
+  10 000 products wrong when it multiplies per scanline). Lesson in the kit (`396f24c`). Neighbours told.
+  A3 C3 is documentation only: the bank-blind read check itself still does not see a pointer that travels
+  between files (a check that refuses it is not written).
+- **Still mine from the plan**: the CI download cache + a check that refuses a `curl` without a fallback
+  (lesson `2026-11-08-opensnes-un-telechargement-de-ci-…` stays open until then); L8 `opensnes --version`
+  exposing the commit; L13 (the rule is aligned); the vitrine of tags and release notes (the conductor's tool).
+- Open threads: `ordres de musique datés` (a partner port; answered once, a prototype proposed: dated music orders in the SPC
+  driver, a moyen request); the five ci-rouge threads wait for the cache lesson.
+- Waits for the author: the `ppuReset` COLDATA question (Class A); discardable const data of linked modules
+  (Class A). Waits for luna: a tag carrying `281485c` and `de03dd8` (then bump the pin, replay the corpus
+  queries, the DMA/HDMA timing tests and the ENVX-after-KOFF manifest).
+- Machine: the btrfs `/home` has its metadata nearly full (1.67 of 2.01 GiB): writes fail with ENOSPC
+  while `df` shows free space, when several heavy jobs run; reported to the conductor. An orphan
+  `.git/index.lock` (0 bytes, no git process) was removed after checking.
 
 ## In progress
 
