@@ -3,7 +3,7 @@
 **Kind of review:** a *gaps* review. Not a grade of what exists (see
 `2026-05-10_sdk_review.md` for that) but an inventory of what is missing —
 for the project and for an AI agent working in it — on three axes the owner
-named: development information, SNES documentation (the Cartouche corpus),
+named: development information, SNES documentation (the reference corpus),
 and tooling (coverage, sanitizers, profiling, static analysis, fuzzing).
 
 **Project under review:** OpenSNES SDK
@@ -30,7 +30,7 @@ before any issue is filed.
 6. [Compiler test surface](#6-compiler-test-surface)
 7. [ROM-side (luna)](#7-rom-side-luna)
 8. [Docs & agent knowledge](#8-docs--agent-knowledge)
-9. [Cartouche corpus](#9-cartouche-corpus)
+9. [Reference corpus](#9-reference-corpus)
 10. [Backlog](#10-backlog)
 11. [Recommended ordering](#11-recommended-ordering)
 12. [Verification of this review](#12-verification-of-this-review)
@@ -91,7 +91,7 @@ small-to-medium effort with high reliability return:
 
 What is healthy and should be left alone: 85/85 example READMEs plus a
 template; 17 auto-loaded rules and 3 hooks; `docs/tutorials/debugging.md`
-covers the luna MCP surface well; the Cartouche corpus holds 195 sources with
+covers the luna MCP surface well; the reference corpus holds 195 sources with
 arbitration and covers the hardware side thoroughly; zero `TODO`/`FIXME`
 markers in `lib/`, `templates/`, `make/`.
 
@@ -115,8 +115,8 @@ What was done (2026-09-10/11, read-only):
   `tools/luna-test/bin/luna <cmd> --help` for `run`, `state`, `diff`,
   `profile`, `test`, `frames`, `bench`. Every flag named in this review was
   checked against that output.
-- The Cartouche corpus was probed with `snes_sources` and eight
-  `snes_search` queries, each with
+- The Reference corpus was probed with `corpus sources` and eight
+  `corpus search` queries, each with
   `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]` so the SDK's
   own docs could not answer for the corpus.
 
@@ -483,8 +483,8 @@ v1.14.0; `docs/tutorials/debugging.md` anchors on "since luna v1.6.0";
 `status/luna_stress_campaign.md` works against v1.17.0. Every session
 rediscovers flag semantics from `--help`.
 
-**K7 — the Cartouche corpus is undocumented in-repo.**
-`.claude/rules/hardware_claims.md` mandates `snes_search` with
+**K7 — the reference corpus is undocumented in-repo.**
+`.claude/rules/hardware_claims.md` mandates `corpus search` with
 `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` for every hardware
 claim, but nothing lists the corpus contents, and the audit's "golden
 queries" live in an external artifact
@@ -537,9 +537,9 @@ open debt, when it lives entirely in `.claude/` prose.
 
 ---
 
-## 9. Cartouche corpus
+## 9. Reference corpus
 
-State on 2026-09-10 (`snes_sources`): 195 sources captured of 218 listed;
+State on 2026-09-10 (`corpus sources`): 195 sources captured of 218 listed;
 7 general arbiters (snesdev-wiki, fullsnes, anomie-regs, anomie-timing,
 anomie-sdsp, anomie-spc700, undisbeliever-snesdev), 9 domain arbiters. The
 hardware side is thorough and arbitrated; toolchain-side coverage includes
@@ -670,7 +670,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 
 | D4 | `docs/README.md` index + header → tutorial map | K2 K3 | M | L | **done 2026-09-15** — the index now lists all 24 tutorials (grouped by what you are doing), the 6 craft guides, the 9 tool pages, the hardware reference and the contributor docs, with every link checked to resolve. The header → tutorial map is measured, not asserted: each header's declared functions were matched against the prose, which is how the gaps got their honest state — `object.h` (15 functions) and `text.h` (14) have no tutorial at all, `input.h` documents the button masks but none of the pad/mouse/Super Scope API, `console.h` and `interrupt.h` are partial, `fixed32.h`, `gameloop.h`, `asset.h`, `lzss.h`, `debug.h` are uncovered. That list is the documentation backlog |
 | D5 | "How to profile" guide | K4 | S | L | **done 2026-09-15** — `docs/tutorials/profiling.md`: the master-cycle unit (≈357 400 per NTSC frame, ≈51 800 in VBlank), how to read every column of a `luna profile` report (why max/frame decides and the average does not, what idle% means), `--from-frame` and `--input` to profile the game rather than the boot, `--budget SYMBOL=MCLK` with its exit codes (0/1/2) as the CI gate, the `profile.h` colour-bar and scanline instruments, and a decision table between them. Worked numbers are measured on `sprite_swarm`. Carries the R4 caveat explicitly: budgeting `NmiHandler` today measures the 652-mclk entry stub |
-| D6 | Corpus source list + golden queries in repo | K7 | S | M | **done 2026-09-12** (`5ea11467`: `.claude/notes/tech/cartouche_corpus.md`) — `.claude/notes/tech/cartouche_corpus.md` from §9 |
+| D6 | Corpus source list + golden queries in repo | K7 | S | M | **done 2026-09-12** (`5ea11467`: `.claude/notes/tech/reference_corpus.md`) — `.claude/notes/tech/reference_corpus.md` from §9 |
 | D7 | ROADMAP "in flight" table for the five `wip/*` chantiers | K8 | S | M | **done 2026-09-14** — the premise had expired: no `wip/hicolor*`, `interlace`, `mode7-perspective` or `spc700` branch exists; the four `wip/*` on origin (three CI hygiene branches of 09-07, one harness branch of 06-22) were all superseded by develop and are deleted. ROADMAP has a "Work in flight" section that says so and points at this backlog |
 
 | D8 | PVSnesLib migration guide + FAQ | K10 | M | L | **done 2026-09-15** — `docs/MIGRATING_FROM_PVSNESLIB.md` (what is the same, the difference table, the Makefile and `LIB_MODULES` habit, the five traps that fail silently — argument push order, `setScreenOn` last, CGRAM 128, the vertical-scroll -1, const-in-asset-banks — the refused constructs with their workarounds, a PVSnesLib → OpenSNES API map built from the real headers, and the asset pipeline) and `docs/FAQ.md` (getting started, the language, the silent failures, building and shipping, contributing). Both wired into the Doxygen inputs and the main page |

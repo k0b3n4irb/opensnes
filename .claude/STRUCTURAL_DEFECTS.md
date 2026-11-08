@@ -88,7 +88,7 @@ load-bearing for cross-session continuity).
 >   `text4bpp.asm` hold the font data and two DMA/fill inner loops. The
 >   "C API + ASM inner loop" shape C2 asked for is what the tree has.
 > - **D2 🟢** — the SIWP polarity was arbitrated against four sources
->   (`KNOWN_LIMITATIONS.md`, 2026-09; corpus `snes_verify`), the crt0
+>   (`KNOWN_LIMITATIONS.md`, 2026-09; corpus `corpus verify`), the crt0
 >   comment no longer says "maybe". A run on real hardware would be a
 >   bonus, not the closing condition.
 > - Still open: **A5 🟡** (fork divergence — now 21 cproc / 60 QBE / 2 wla-dx
@@ -2242,7 +2242,7 @@ conventions and snes9x's ROM-load path.
 **Status update 2026-09-13**: the premise ("unsourced") is gone. The
 polarity was arbitrated against the official Nintendo manual, fullsnes,
 nocash's notes and the SFC dev wiki (the one dissenting source) — see the
-🟢 entry in `KNOWN_LIMITATIONS.md` and the `snes_verify` sweep of
+🟢 entry in `KNOWN_LIMITATIONS.md` and the `corpus verify` sweep of
 2026-09-12 (`.claude/notes/reviews/2026-09-12_hardware_claims_verify.md`).
 `templates/crt0.asm` says "bit=1 = write-enable, $FF = fully writable"
 with the reference, not "maybe". A hardware run on an FXPak Pro would be a

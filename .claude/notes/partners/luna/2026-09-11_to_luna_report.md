@@ -67,7 +67,7 @@ flags). Happy to run those if useful.
 ### R-A. `power_on` key in the `luna test` manifest schema — WITHDRAWN 2026-09-12
 
 > **Correction (2026-09-12):** already shipped. The luna docs (now in the
-> Cartouche corpus as `luna-docs`) state that `luna test` manifests take
+> Reference corpus as `luna-docs`) state that `luna test` manifests take
 > `power_on = "random"` plus `seed` (default 1). Verified on the pinned
 > v1.18.0: a manifest with `power_on = "random"` / `seed = 7` runs and prints
 > `power-on: random (seed=0x0000000000000007)`. We missed it because

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop`) |
-| **Corpus seen** | `snes_sources`: 207 captured of 234; index **30848 chunks**, built 2026-09-25T18:28:45Z, chunker v7, fingerprint `e2a738a553ec` |
+| **Corpus seen** | `corpus sources`: 207 captured of 234; index **30848 chunks**, built 2026-09-25T18:28:45Z, chunker v7, fingerprint `e2a738a553ec` |
 | **Status** | written 2026-09-26; every query below was run that day with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` and can be replayed as is |
 
 ## 1. What the corpus made possible since our 2026-09-24 report
@@ -38,16 +38,16 @@
 ### 2.1 The six sources of 2026-09-24 seem listed but not indexed
 
 `ultrastarfox`, `argsfx-sasm-docs`, `peterlemon-gsu`, `sd2snes-changelog`,
-`cartouche-fiches`, `cartouche-fiches-jeux` are listed as captured
+`corpus-notes`, `corpus-game-notes` are listed as captured
 2026-09-24. But the index holds **30848 chunks — the count of the
 2026-09-12 build, which had 201 sources** — and the fingerprint is still
 `e2a738a553ec`, although the build date and the chunker (v6 → v7) changed.
 Reproduce (each returns zero chunks from those four GSU sources):
 
-1. `snes_search("ultrastarfox Star Fox source SFX interrupt vectors $0108 NMI handler WRAM", k=8)` — `ultrastarfox` appears only as a mention inside `superfx3-rp2350` (`50162d8e8c76a181`)
-2. `snes_search("Star Fox source code ARGSFX macro assembler GSU interrupt handler NMI WRAM stub", k=6)`
-3. `snes_search("sd2snes firmware changelog: which version added SuperFX (GSU) support and SA-1 support", k=6)` — `sd2snes-blog` answers, `sd2snes-changelog` (domain arbiter) never
-4. `snes_search("PeterLemon SNES GSU test ROM CHIP/GSU plot pixel", k=6)`
+1. `corpus search("ultrastarfox Star Fox source SFX interrupt vectors $0108 NMI handler WRAM", k=8)` — `ultrastarfox` appears only as a mention inside `superfx3-rp2350` (`50162d8e8c76a181`)
+2. `corpus search("Star Fox source code ARGSFX macro assembler GSU interrupt handler NMI WRAM stub", k=6)`
+3. `corpus search("sd2snes firmware changelog: which version added SuperFX (GSU) support and SA-1 support", k=6)` — `sd2snes-blog` answers, `sd2snes-changelog` (domain arbiter) never
+4. `corpus search("PeterLemon SNES GSU test ROM CHIP/GSU plot pixel", k=6)`
 
 **Ask:** index them, or tell us why they did not chunk. These are the
 sources our next phases need (double buffer, IRQ on STOP in a real game,
@@ -55,7 +55,7 @@ the ARGSFX conventions).
 
 ### 2.2 A fingerprint that moves when the corpus moves
 
-Our note `cartouche_corpus.md` used the fingerprint as "the corpus changed,
+Our note `reference_corpus.md` used the fingerprint as "the corpus changed,
 rerun the golden queries". It did not move across 6 sources and a chunker
 change. **Ask:** make it cover the source set and the chunker version, or
 tell us which field to watch instead.
@@ -66,7 +66,7 @@ Still the 2026-09-12 capture; luna has tagged v1.25.0, v1.26.0 and v1.27.0
 (v1.27.0: `gsu` state block, `bus_violations` / `bus_vector_fetches`,
 `--gsu-bus-trace`, per-job GSU profile, `--gsu-pc-set`, MCP
 `run_until_gsu_stop` / `go`; v1.26.0: `--stack-floor`, `--port1/--port2
-none`). Reproduce: `snes_sources()` → `luna-docs — arbitre-domaine —
+none`). Reproduce: `corpus sources()` → `luna-docs — arbitre-domaine —
 2026-09-12`. **Ask:** re-capture at v1.27.0 (our 3.3 of 09-24 asked for
 every tag).
 

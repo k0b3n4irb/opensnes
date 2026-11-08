@@ -15,7 +15,7 @@ Each entry: `[count] [data0_lo][data0_hi] [data1_lo][data1_hi] ...`
 - Max count = 127 (7 bits)
 - Tested with 112+112 split — produced no visible effect (straight lines)
 - ~~Root cause unknown — may be assembler/linker issue with table layout~~
-- **Root cause (Cartouche audit): the format above is wrong.** Per
+- **Root cause (Corpus audit): the format above is wrong.** Per
   anomie-regs: non-repeat = count + **one** scanline of data, written
   once and held; only repeat mode (bit 7 set) carries per-line data.
   A [112][112×data] table makes the hardware write the first group,

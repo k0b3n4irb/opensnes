@@ -81,7 +81,7 @@ eba331a8dfb8a6bdf3d42d50780acb329eb04cd366936632d8e43d237c605ea3  luna_v1.33.1_l
 753fa41149620eacaf474dd3b73a03196e53179ae691abcb090a5cba3f3e49ee  luna_v1.33.1_windows_x86_64.zip
 ```
 
-### D3 — `--power-on random` ne remplit pas la RAM de la cartouche
+### D3 — `--power-on random` ne remplit pas la RAM du Game Pak
 
 **Nature :** capacité de test. **Coût estimé :** moyen.
 
@@ -103,7 +103,7 @@ Une lecture d'un framebuffer Super FX ou d'un octet d'I-RAM jamais écrit ne
 peut donc pas se voir sur luna, alors que c'est exactement la classe de
 défaut que `--power-on random` nous attrape en WRAM (notre passe de vivacité
 la joue à chaque `make tests`). Souhaité : le même remplissage, de la même
-graine, sur la RAM de cartouche sans pile (RAM du Game Pak, BW-RAM, I-RAM),
+graine, sur la RAM de Game Pak sans pile (RAM du Game Pak, BW-RAM, I-RAM),
 par défaut ou derrière un `--power-on-cart`. La RAM sauvegardée par pile
 chargée depuis un `.srm` doit évidemment rester ce que dit le fichier.
 
@@ -113,7 +113,7 @@ chargée depuis un `.srm` doit évidemment rester ce que dit le fichier.
 |---|---|---|---|
 | D1 | nom de `static` sans suffixe | le développeur de jeu, à son premier test | haute |
 | D2 | sommes des archives | tout consommateur épinglé | moyenne |
-| D3 | RAM de cartouche aléatoire | nos tests des puces | moyenne |
+| D3 | RAM de Game Pak aléatoire | nos tests des puces | moyenne |
 
 ## 4. Observations sans demande
 

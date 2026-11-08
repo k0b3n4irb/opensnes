@@ -25,7 +25,7 @@ luna state gsu_ms0.sfc --until-frame 120 \
 donne `"cfgr": 160, "clsr": true, "bus_violations": 0, "instructions_executed": 37`
 et rien d'autre ; les deux produits valent `$4000` et `$4800`, justes. Les
 références disent que ce couple est interdit : fullsnes, CFGR, « MS0 must be
-zero in 21MHz mode » (cartouche `1adef8e33ff3c4e9`) ; ares : les produits
+zero in 21MHz mode » (corpus `1adef8e33ff3c4e9`) ; ares : les produits
 « may sometimes be invalid » dans ce mode (`06c6d2324e3c6d01`). Un programme
 qui écrit CFGR lui-même est donc vert chez luna et peut multiplier faux sur
 une console.

@@ -217,7 +217,7 @@ oamSet:
     sta.l oamMemory,x
     ; y is stored as given: a sprite at OAM y = 0 begins on the first visible
     ; line (snesdev-wiki, Sprites / OAM: "a sprite with Y=0 will appear to
-    ; begin on the first visible line"; cartouche 9dd075095fd0d965). The
+    ; begin on the first visible line"; corpus 9dd075095fd0d965). The
     ; library stored y - 1 from 2026-04-27 to 2026-10-09, which drew every
     ; sprite one line too high — one line above a background scrolled to the
     ; same y since bgSetScroll() got its own, correct, - 1 (2026-09-12).

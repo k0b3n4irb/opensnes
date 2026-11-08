@@ -3185,7 +3185,7 @@ made at run time, and luna v1.30.2.
   columns: the sub screen draws the even ones, the main screen the odd ones
   — `mode5_hires`'s comment and the graphics tutorial had them inverted
   (snesdev-wiki's Backgrounds page carries the same error). The hardware
-  claims rule now reads `snes_verify`'s evidence sentences, never its
+  claims rule now reads `corpus verify`'s evidence sentences, never its
   verdict.
 - fix(lib): **`superfx_3d` dropped a third of its framebuffer bytes.**
   `gsuDmaFullFrame()` read OPVCT (`$213D`) once per poll iteration and never
@@ -3663,8 +3663,8 @@ drives the next releases.
   tables and gets a `.checks` file (`MAX_UNCHECKED` 56 → 55).
 - docs(claude): **`.claude/notes/reviews/2026-09-11_gaps_review.md`** —
   a review of what the project and its AI agent lack on three axes
-  (development information, the Cartouche SNES corpus, tooling), 43
-  backlog items in three tiers; and `.claude/notes/tech/cartouche_corpus.md`,
+  (development information, the SNES reference corpus, tooling), 43
+  backlog items in three tiers; and `.claude/notes/tech/reference_corpus.md`,
   the in-repo list of corpus sources, index fingerprint and golden
   queries behind the hardware-claims rule.
 
@@ -4027,7 +4027,7 @@ behaviour changed** (ROMs are byte-identical — WRAM oracle 84/84).
   hdma tutorials.
 - docs(rules): new auto-loaded rule `hardware_claims.md` — new hardware
   claims in the docs must be verified against the arbitrated SNES
-  corpus (Cartouche MCP) before landing; unverifiable claims are
+  corpus (reference-corpus MCP) before landing; unverifiable claims are
   written as hypotheses.
 
 ### Changed

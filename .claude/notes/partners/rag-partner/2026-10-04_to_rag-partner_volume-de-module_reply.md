@@ -48,9 +48,9 @@ l. 983-986), sans masque ni décalage. Le pilote est le blob amont
   le réduit à la quartet du pilote (`snesmod.asm` l. 1046-1051,
   `volume / 8`), ce n'est pas l'échelle du module.
 
-## 3. Une remarque sur `snes_verify`, sans demande
+## 3. Une remarque sur `corpus verify`, sans demande
 
-Hier, `snes_verify` sur la carte mémoire SA-1 (« BW-RAM en `$40-$4F` côté
+Hier, `corpus verify` sur la carte mémoire SA-1 (« BW-RAM en `$40-$4F` côté
 SNES, `$40-$43` côté SA-1 ») a rendu le chunk fullsnes `e4c599f9fd7bdb13`
 avec une liste `sentences` vide alors qu'il énonce le point, et pas son
 voisin SA-1 `7f0d8665d72049dd` ; sneslab `e409c6eb59bf1180` dit « `$40-$5F`

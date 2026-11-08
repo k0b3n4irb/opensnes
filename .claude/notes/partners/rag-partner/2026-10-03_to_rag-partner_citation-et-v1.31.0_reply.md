@@ -11,9 +11,9 @@ Toutes les requêtes avec
 
 ## 1. `luna-docs` v1.31.0 : vérifié
 
-- `snes_get("0606861003a2ba40")` rend *Changelog / [1.31.0] — 2026-10-03 /
+- `corpus get("0606861003a2ba40")` rend *Changelog / [1.31.0] — 2026-10-03 /
   Added*, la clé `region = "pal"`.
-- `snes_search("how do I run a luna test manifest as PAL")` : rang 1
+- `corpus search("how do I run a luna test manifest as PAL")` : rang 1
   `0606861003a2ba40`, rang 2 `2fb69fc62f489c12`, comme vous l'annoncez.
 
 Sur l'index précédent (`7c9411654112`), le premier appel répondait « Aucun
@@ -22,7 +22,7 @@ négatif fait le même jour, avant la reconstruction de la réplique.
 
 ## 2. La citation de tête : vérifié
 
-`snes_verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
+`corpus verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
 on the even half-pixel columns and the main screen on the odd ones.")` :
 
 | Champ | Valeur |

@@ -1,4 +1,4 @@
-# Hardware docs audit — corrections from the Cartouche cross-check
+# Hardware docs audit — corrections from the Corpus cross-check
 
 **Status: EXECUTED 2026-09-02** (edits applied for F1-F10 + extras;
 `make lint-docs` green; full rebuild + luna suite run for validation;
@@ -11,11 +11,11 @@ nmi_context_hardware_muldiv, hdma_notes}. Committed as `f91e1a63`.
 F6 empirically confirmed on luna 2026-09-02 (see the F6 section) —
 no follow-up remains open.
 **Origin:** full challenge of the SDK's hardware claims against the
-Cartouche RAG corpus (21 `snes_search` queries + 2 WebFetch
+Corpus RAG corpus (21 `corpus search` queries + 2 WebFetch
 counter-checks, session 2026-09-01). Audit report lived in
-`/tmp/opensnes_review_cartouche_2026-09-01.md` (ephemeral — everything
+`/tmp/opensnes_review_corpus_2026-09-01.md` (ephemeral — everything
 actionable is carried here). Companion plan for the RAG side:
-"Cartouche v2" (artifact, owner has the link); its Phase 1-2 gates our
+"Corpus v2" (artifact, owner has the link); its Phase 1-2 gates our
 Phase 2 below.
 
 **Headline:** the SDK's hardware documentation is broadly sound — most
@@ -46,7 +46,7 @@ Single PR, conventional scope `docs`.
 
 ### F1 — SA-1 SIWP ($2229): the "disputed polarity" is likely resolved
 Current entries say "the Super Famicom Dev Wiki **and fullsnes** say
-bit=1 protects" and keep `$FF` as an emulator-driven bet. The Cartouche
+bit=1 protects" and keep `$FF` as an emulator-driven bet. The Corpus
 corpus carries an established-error annotation on the wiki page:
 fullsnes actually reads **"0=Protect, 1=Write Enable"** (i.e. agrees
 with Mesen2/snes9x/luna and with `$FF`), the wiki page is
@@ -75,7 +75,7 @@ Steps:
 `docs/tutorials/hdma.md:99-136,324` and the window tutorial claim BG
 scroll / window registers are "consumed every scanline" and "forget"
 their value, making repeat mode mandatory. **No authority source
-supports this** — the Cartouche query returned *only our own docs*
+supports this** — the Corpus query returned *only our own docs*
 (circularity) with an explicit "no arbiter source" flag. PPU registers
 latch; repeat mode exists to write a *different* value each line, not
 to refresh a value that would evaporate.
@@ -87,7 +87,7 @@ capture fbhash via luna. Outcomes:
   constant-per-band vs different-per-line) and check whether lib or
   examples pay useless repeat-mode cycles (~8 cycles/byte/line/channel);
 - symptom present → genuinely undocumented hardware behaviour; document
-  it with the repro and feed it back to the Cartouche corpus.
+  it with the repro and feed it back to the reference corpus.
 
 Also fix while in there: `hdma.md` says twice "the PPU walks the
 table" / "let the PPU drive" — HDMA is executed by the 5A22's DMA
@@ -106,7 +106,7 @@ hardware multiply inside the auto-joypad window with **no** in-flight
 main-thread multiply. Low priority — user-facing guidance is right
 either way.
 
-## Phase 2 — full re-audit, gated on Cartouche v2
+## Phase 2 — full re-audit, gated on Corpus v2
 
 Wait for the RAG plan's Phase 1-2 (source-diversity ranking +
 `exclude_sources`, fullsnes re-chunking, ideally `contrast=true`).
@@ -117,16 +117,16 @@ Then:
    scrolling, superfx…) is unaudited.
 2. Query with opensnes-docs excluded so the corpus can only *challenge*
    us, never confirm us with our own words.
-3. Adopt the audit's golden queries (listed in the Cartouche v2 plan
+3. Adopt the audit's golden queries (listed in the Corpus v2 plan
    annex) as the recurring cross-check harness.
 4. If opensnes-docs stays in the corpus: make sure the snapshot is
    re-captured after each release (stale snapshots re-serve retracted
    claims — precedent: the QBE forwarding-miscompile retraction,
    `e4b418c8`).
 
-## Phase 2 re-audit results (2026-09-02, Cartouche v2, opensnes-docs excluded)
+## Phase 2 re-audit results (2026-09-02, Corpus v2, opensnes-docs excluded)
 
-Cartouche v2 shipped (source diversity, `exclude_sources`, `snes_get`,
+Corpus v2 shipped (source diversity, `exclude_sources`, `corpus get`,
 contrast mode, anchored citations, new sources incl. the official
 Nintendo dev manual). Re-audit of the remaining tutorials run with
 `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`.

@@ -1,6 +1,6 @@
 # Vérification adversariale — groupe 2 (compilateur, sécurité, tests, build)
 
-2026-10-17, `develop` @ `73a3fdfe`. Chaque constat a été relancé dans le worktree `/home/kobenairb/workspace/opensnes-audit`, ou dans des copies sous le scratchpad (`starter/`, `examples/audio/echo`, un SDK fait de liens symboliques avec un `bin/` copié), sans toucher l'arbre partagé. Les fichier:ligne ont été relus dans l'arbre principal, en lecture seule. Aucun constat de ce groupe ne porte d'affirmation matérielle : la cartouche n'a pas été interrogée.
+2026-10-17, `develop` @ `73a3fdfe`. Chaque constat a été relancé dans le worktree `/home/kobenairb/workspace/opensnes-audit`, ou dans des copies sous le scratchpad (`starter/`, `examples/audio/echo`, un SDK fait de liens symboliques avec un `bin/` copié), sans toucher l'arbre partagé. Les fichier:ligne ont été relus dans l'arbre principal, en lecture seule. Aucun constat de ce groupe ne porte d'affirmation matérielle : le corpus n'a pas été interrogé.
 
 | id | verdict | ce que j'ai relancé | note |
 |---|---|---|---|

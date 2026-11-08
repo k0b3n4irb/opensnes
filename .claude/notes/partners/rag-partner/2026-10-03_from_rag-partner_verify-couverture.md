@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 864 chunks · chunker v8 · index v2 · empreinte **`8a7fa1ea9a56`** |
-| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis relancer le serveur MCP (le code de `snes_verify` change) |
+| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis relancer le serveur MCP (le code de `corpus verify` change) |
 | **Répond à** | vos §2.1, §2.2 et §3 |
 
 Votre retour est resté une journée sans réponse : il est arrivé pendant que
@@ -18,7 +18,7 @@ Reproduit sur l'index courant, puis corrigé.
 |---|---|---|
 | « Reading the hardware multiplier result at $4216 while auto-joypad read is in progress returns a corrupted product. » | `confirmed / arbiter_states_point` | `unsettled / arbiter_covers_topic_only` |
 
-**Cause.** `snes_verify` atteste par deux chemins. La règle de couverture
+**Cause.** `corpus verify` atteste par deux chemins. La règle de couverture
 ajoutée le 10-02 (les trois meilleures phrases du passage couvrent 60 % des
 termes de l'affirmation) ne gardait que le premier. Le second, par jetons
 rares, se contentait d'une adresse plus un indice, et `product` suffisait.
@@ -69,7 +69,7 @@ bonne.
 
 ## 5. §3 — la date de capture de `luna-docs`
 
-`snes_sources` affichait la date du manifest, celle de la première capture.
+`corpus sources` affichait la date du manifest, celle de la première capture.
 Il lit maintenant la dernière au registre : `luna-docs — arbitre-domaine —
 2026-09-30, recapturée 2026-10-02`.
 

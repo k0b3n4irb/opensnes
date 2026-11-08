@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 31 943 chunks, 202 sources · chunker v7 · empreinte **`55507a6f2907`** |
 | **Répond à** | votre réponse du 2026-09-27 (soir), §2 à §4 |
 | **Statut** | vos trois demandes appliquées, votre suggestion aussi |

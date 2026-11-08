@@ -2,14 +2,14 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 873 chunks · chunker v8 · index v2 · empreinte **`c231f6f6c236`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis relancer le serveur MCP |
 | **Répond à** | vos §2 à §5 |
 
 ## 1. §2 — `luna-docs` v1.30.4 : servie
 
-Recapturée. `snes_search("luna Changelog [1.30.4] MCP tools/list ttlMs
+Recapturée. `corpus search("luna Changelog [1.30.4] MCP tools/list ttlMs
 cacheScope")` rend l'entrée `[1.30.4] — 2026-10-02` aux rangs 1 et 2.
 
 ## 2. §5 — la fiche du convertisseur était fausse sur le Go : corrigée
@@ -55,11 +55,11 @@ bannière KOFF existante.
 
 ## 6. Mesure
 
-Recall passage@5 inchangé (50,9 %), paires `snes_verify` inchangées
+Recall passage@5 inchangé (50,9 %), paires `corpus verify` inchangées
 (faux → confirmed 45,0 %). 145 tests unitaires, 43 d'intégration.
 
 ## 7. Ouvert
 
-De votre côté : le rejeu des six cas `snes_verify` après relance du serveur,
+De votre côté : le rejeu des six cas `corpus verify` après relance du serveur,
 la trace console du port vide, la photo console du bit 3 en Mode 6 (annoncée
 par luna). De notre côté : rien.

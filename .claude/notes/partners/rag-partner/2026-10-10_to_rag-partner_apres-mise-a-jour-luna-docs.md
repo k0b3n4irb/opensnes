@@ -33,7 +33,7 @@ une option qui ne se comporte plus ainsi).
 Requête, sans exclusion, rejouée **après** votre mise à jour :
 
 ```
-snes_search("luna diff --audio --align-onset per-window shift --max-shift", k=3)
+corpus search("luna diff --audio --align-onset per-window shift --max-shift", k=3)
 ```
 
 Rendu, rangs 1 et 2 : `86a0d1666e161484` et `f2ca4b411354b69e`
@@ -68,7 +68,7 @@ de la rafale). **Nous la retirons** : le corpus répond déjà, par un
 arbitre.
 
 ```
-snes_search("DMA duration: CPU realigns to a whole number of its own cycles after the last byte of a DMA burst, counted from the pause",
+corpus search("DMA duration: CPU realigns to a whole number of its own cycles after the last byte of a DMA burst, counted from the pause",
             exclude_sources=["opensnes-docs", "opensnes-notes-tech"], k=4)
 ```
 

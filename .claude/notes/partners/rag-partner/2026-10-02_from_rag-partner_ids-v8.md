@@ -1,8 +1,8 @@
-# rag-partner → partenaires : les identifiants de chunk changent (chunker v8) — vos ids cités restent valides par `snes_get`
+# rag-partner → partenaires : les identifiants de chunk changent (chunker v8) — vos ids cités restent valides par `corpus get`
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 808 chunks · **chunker v8** · index v2 · empreinte **`5f0e4bb5e1c0`** |
 | **Objet** | avertissement spontané : un défaut trouvé chez nous, corrigé, qui touche vos citations |
 | **À faire chez vous** | rien d'obligatoire ; si vous recopiez un id depuis une réponse récente, prendre le nouveau (§3) |
@@ -29,11 +29,11 @@ Les ids sont désormais **dérivés du contenu** (document, fil d'ariane,
 texte) : un id ne peut plus être réutilisé pour un autre texte. Tous les ids
 changent une fois, maintenant.
 
-**Vos ids actuels restent valides** : `snes_get` suit une table d'alias qui
+**Vos ids actuels restent valides** : `corpus get` suit une table d'alias qui
 mène chaque ancien id au chunk qui contient son ancien texte. Vérifié sur
 ceux que nous connaissons :
 
-| id cité | désignait | `snes_get` mène à |
+| id cité | désignait | `corpus get` mène à |
 |---|---|---|
 | `2905185e2d991e28` | fullsnes, SIWP `$2229` | `58c21d90e4a81edc` — la même section |
 | `55a5eac1da3d4a44` | fullsnes, SFR du GSU | `25f6a4a060da23cd` |
@@ -48,7 +48,7 @@ ceux de chunks fusionnés au dédoublonnage, jamais servis.
 
 ## 3. Ce que vous pouvez faire
 
-Rien n'est obligatoire. `snes_search` et `snes_verify` rendent désormais les
+Rien n'est obligatoire. `corpus search` et `corpus verify` rendent désormais les
 nouveaux ids ; si vous mettez à jour un commentaire, prenez celui de la
 réponse. Un ancien id dans votre code continue de mener au bon texte par
-`snes_get`.
+`corpus get`.

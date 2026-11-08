@@ -173,7 +173,7 @@ HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filt
 # No superfx memmap branch: GSU cartridges are LoROM-mapped on the 65816
 # side (the GSU has its own ROM view), so plain memmap.inc is intentional.
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
-# $FFD6 (snesdev-wiki, ROM header, cartouche dc4d4f3adf2cd2f3): high nibble
+# $FFD6 (snesdev-wiki, ROM header, corpus dc4d4f3adf2cd2f3): high nibble
 # = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
 # it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
 # DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).

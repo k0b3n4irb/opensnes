@@ -614,8 +614,8 @@ FastStart:
     ; 40.9 ms = 2.5 frames, visible on first launch, gone on "reload"
     ; (memory kept). luna zero-fills everything, so it could not show it.
     ; Long addressing: DBR is not set up yet. InitHardware writes $8F
-    ; again; that is fine. Arbitrated against the SNES corpus (Cartouche,
-    ; 2026-09-08): "most of the PPU registers start in an unknown state"
+    ; again; that is fine. Arbitrated against the SNES corpus
+    ; (2026-09-08): "most of the PPU registers start in an unknown state"
     ; and "the first registers to reset should be the NMITIMEN and HDMAEN
     ; registers. This will prevent Interrupts or HDMA from erroneously
     ; changing the PPU registers in the middle of the routine"
@@ -870,7 +870,7 @@ FastStart:
 
     ; 1b. Let the SNES CPU write BW-RAM (the SA-1 cart's battery RAM, seen at
     ;     $40-$4F): SBWE ($2226) bit 7, 0 = protect, 1 = write enable
-    ;     (fullsnes, SA-1 memory control, cartouche 9521b0ad16facd8b; initial
+    ;     (fullsnes, SA-1 memory control, corpus 9521b0ad16facd8b; initial
     ;     value $00). Without it the sram module's writes to $40:xxxx were
     ;     dropped — measured on luna 2026-09-26 — and USE_SRAM was refused.
     lda #$80

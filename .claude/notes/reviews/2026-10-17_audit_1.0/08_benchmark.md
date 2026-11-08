@@ -15,7 +15,7 @@ Expert : benchmark et performance · date : 2026-10-17 · HEAD audité : `develo
   - `luna profile` de `sprites/dynamic_sprite` (frames 60-252) et `games/likemario` (frames 120-420, RIGHT tenu dès 130, la recette de `PERF.md`).
   - Temps de compilation : `cc65816` sur `workloads.c` 0,18 s ; `816-tcc` + `816-opt` 1,66 s ; les 15 `.c` de `examples/games/*` en 0,5 s.
   - `bin/opensnes-rom check` sur `text/print_string`.
-- Corpus Cartouche (sources OpenSNES exclues) : durée du VBlank NTSC — snesdev-wiki *Timing* : « Begins on vertical line V=225 … Ends after vertical line V=261 (NTSC) … 37 (NTSC) … lines », 1364 mclk par ligne (anomie, fullsnes). `PERF.md` (50 468 mclk) est juste.
+- Reference corpus (sources OpenSNES exclues) : durée du VBlank NTSC — snesdev-wiki *Timing* : « Begins on vertical line V=225 … Ends after vertical line V=261 (NTSC) … 37 (NTSC) … lines », 1364 mclk par ligne (anomie, fullsnes). `PERF.md` (50 468 mclk) est juste.
 
 ## Points forts
 

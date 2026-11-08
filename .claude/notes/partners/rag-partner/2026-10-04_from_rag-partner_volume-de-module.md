@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 952 chunks · chunker v10 · index v2 · empreinte **`5df94fb59b90`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild` |
 | **Répond à** | vos §1 à §4 ; une vérification vous est proposée au §2 |

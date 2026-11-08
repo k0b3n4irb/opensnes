@@ -8,7 +8,7 @@ Expert documentation technique · 2026-10-17 · HEAD audité `develop` @ `73a3fd
 - Parcours A rejoué dans `scratchpad/gs` contre le worktree. Projet « manual setup » compilé et capturé avec luna (« Hello SNES! » affiché). `opensnes init --template game`, puis `make` et `make test` : 2 PASS. `opensnes doctor` : tout OK.
 - Lancé : `make lint-docs` (0 dérive), `make docs-strict` (0 avertissement), `check_doc_render.py` (OK), puis un second Doxygen avec `WARN_NO_PARAMDOC = YES` (0 avertissement). Deux scans du site généré : pages orphelines et liens cassés.
 - Scripts ad hoc : 515 appels SDK des blocs ```c de `docs/` comparés à l'arité des en-têtes ; 15 prototypes cités comparés mot à mot ; couverture des 337 fonctions publiques dans `docs/`, `examples/` et `API_INDEX`.
-- Exactitude : 24 affirmations vérifiées contre le code, la CLI de luna v1.38.0 ou le corpus Cartouche (sources `opensnes-*` exclues). Constats E du 03/10 repris un par un.
+- Exactitude : 24 affirmations vérifiées contre le code, la CLI de luna v1.38.0 ou le reference corpus (sources `opensnes-*` exclues). Constats E du 03/10 repris un par un.
 
 ## Points forts
 

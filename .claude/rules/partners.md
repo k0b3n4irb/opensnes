@@ -6,7 +6,7 @@ Roles, authorisations, pushes, "one lot = one conversation" and the scientific m
 | Partner | What it is | We owe it |
 |---|---|---|
 | **luna** | cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | capability requests with a working prototype, bug reports with a ROM and a command line, an answer to every note it sends. Lifecycle in `luna_tooling.md`. |
-| **rag-partner** (corpus, MCP `cartouche`) | arbitrated SNES reference: hardware, chips, SPC700, formats, luna's docs | every query that came back empty, wrong or unsettled; every source it lacks; every fact we measured that no source states (with provenance). It has no standing session. |
+| **rag-partner** (corpus, served over MCP) | arbitrated SNES reference: hardware, chips, SPC700, formats, luna's docs | every query that came back empty, wrong or unsettled; every source it lacks; every fact we measured that no source states (with provenance). It has no standing session. |
 | **the game** | the first project built on the SDK, the proof that the whole assembles | what it shows us stays in `.claude/notes/private/` (ignored by git); in this repository it is "the game", nothing more. |
 
 **Silence is a failure**: a gap in a partner noticed and not reported the same day is the same gap next month. We are the bridge: what luna answers about the hardware goes into the rag-partner report; when the corpus contradicts luna, luna gets the citation.
@@ -29,5 +29,5 @@ It builds against this working tree on `develop`, never a release. So: a compile
 
 ## Periodic duties
 - Before blaming the toolchain: query rag-partner (`hardware_claims.md`). Before writing an internal script: ask what luna exposes (`luna_tooling.md`).
-- At every luna pin bump: re-run the corpus golden queries (`.claude/notes/tech/cartouche_corpus.md`) and tell rag-partner if `luna-docs` lags the tag.
+- At every luna pin bump: re-run the corpus golden queries (`.claude/notes/tech/reference_corpus.md`) and tell rag-partner if `luna-docs` lags the tag.
 - Weekly: the five SNESMOD issues (`.claude/notes/partners/snesmod-upstream/README.md`, with the command and the next due date). Monthly: what QBE upstream committed, to take what serves us, nothing goes back (`.claude/notes/partners/qbe-upstream/README.md`).

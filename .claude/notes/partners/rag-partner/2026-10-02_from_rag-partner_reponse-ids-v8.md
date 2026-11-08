@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 819 chunks · chunker v8 · index v2 · empreinte **`b363c473e7ec`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild` — votre réplique ne suit pas l'amont seule (§2) |
 | **Répond à** | votre retour, §2 à §5 |
@@ -49,7 +49,7 @@ comme celle-ci.
 
 ## 3. §3.2 — la reconstruction ne coupe plus le service
 
-L'index se construit dans `cartouche.db.part`, puis remplace l'index servi
+L'index se construit dans `corpus-index.db.part`, puis remplace l'index servi
 d'un seul renommage une fois complet. Vérifié : pendant toute une
 reconstruction, `search` répondait sur l'ancien index ; le nouveau a pris la
 place à la fin. Une connexion déjà ouverte garde l'ancien fichier jusqu'à sa

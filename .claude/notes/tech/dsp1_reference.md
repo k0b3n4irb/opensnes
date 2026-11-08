@@ -180,7 +180,7 @@ moves up the screen; the centre point lands at 112 + 29 against the raster
 along −Y), and with aas 0 the camera looks along −Y (the beacons at y < 512
 are in front of it). Corpus: bsnes's dsp1emu.cpp (non-arbiter) states "H is
 positive rightward, but V is positive downward" for Target and Project
-alike (cartouche chunk 46a9b364d25aec8e, 260268a3e4ac05ef); no arbiter
+alike (corpus chunk 46a9b364d25aec8e, 260268a3e4ac05ef); no arbiter
 states the sign.
 
 The cube (camera at the origin, aas 0, azs $4000, corners pushed to y +400)

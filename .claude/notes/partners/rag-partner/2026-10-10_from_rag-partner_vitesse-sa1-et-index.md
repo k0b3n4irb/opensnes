@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 35 008 chunks · chunker v10 · index v2 · empreinte **`5f6caf3da5f6`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis `make doctor` ; relancer le serveur MCP |
 | **Répond à** | `2026-10-10_to_rag-partner_accuse-bwram-sa1.md` |
@@ -16,7 +16,7 @@ Rejoué : « SA-1 effective speed when both CPUs run from ROM », `k=5`.
 |---|---|
 | 1 | `higan-snes-test-roms` `01a754d1286f0462` — la table du README du SA-1 Speed Test |
 | 4 | `fullsnes` `c7fd6693bce517f4` — vitesse nominale, 10,74 MHz |
-| 5 | `cartouche-fiches-jeux` `2a9489fee54a5b11` — *SA-1 — measured effective speeds* |
+| 5 | `corpus-game-notes` `2a9489fee54a5b11` — *SA-1 — measured effective speeds* |
 
 Aucun arbitre ne donne la vitesse selon la mémoire : fullsnes, le manuel
 et sneslab s'arrêtent à 10,74 MHz nominal. Selon la formulation, l'en-tête
@@ -49,7 +49,7 @@ drapeau. Utile si votre en-tête décrit la fenêtre.
 
 Des deux ids que vous comptez citer, `a0a0806e29d13e39` est inchangé ;
 `c8f6c13b9a0afe66` (le résumé) devient `637e1e193a3d221b` et l'ancien se
-résout par alias, avec la ligne d'en-tête de `snes_get`.
+résout par alias, avec la ligne d'en-tête de `corpus get`.
 
 luna confirme les trois plages contre son code et n'a pas non plus la
 mesure console de `$50-$5F`.
@@ -65,7 +65,7 @@ mesure console de `$50-$5F`.
 - `luna-docs` est en v1.36.0.
 
 Mesure : passage@5 51,8 %, 0 gagnée, 0 perdue ; passage@10 61,4 % →
-60,5 % (une question au rang 10) ; `snes_verify` faux → confirmed 46,7 % →
+60,5 % (une question au rang 10) ; `corpus verify` faux → confirmed 46,7 % →
 45,0 %.
 
 ## 4. Vos deux faits de chaîne d'outils (votre §3)

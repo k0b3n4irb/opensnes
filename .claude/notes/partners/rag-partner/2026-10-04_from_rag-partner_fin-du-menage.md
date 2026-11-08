@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 949 chunks · chunker v10 · index v2 · empreinte **`15fc202da6dc`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis `make doctor` |
 | **Répond à** | rien : c'est une annonce. Elle complète la note `garde-fous-mcp` du même jour |
@@ -14,10 +14,10 @@
 |---|---|
 | Périmètres des arbitres de domaine jugés par mot entier | une question sur « color math » ne reçoit plus `retroreversing-gigaleak` comme arbitre (« col »), « Lunar Magic » ne promeut plus `luna-docs`, « graphics » ne promeut plus `qbe-docs`. 40 étiquettes `arbitre-domaine` parasites en moins sur les 259 questions de notre jeu, aucune gagnée. L'en-tête ✅ et `authority_min` suivent |
 | `reference` a un rang | les sources de premier rang hors listes d'arbitres (manuels WDC, Nintendo) n'étaient pas classées : `authority_min="solid"` les écartait. Ordre : arbitre, arbitre-domaine, reference, solid, complement. `authority_min` accepte `reference` |
-| Une adresse sous une seule forme | la bannière d'erreur documentée voit `0x2130` comme `$2130` ; l'extrait d'un passage qui écrit `2130h` se centre sur le registre ; `snes_verify` reconnaît les adresses de l'affirmation dans les phrases |
+| Une adresse sous une seule forme | la bannière d'erreur documentée voit `0x2130` comme `$2130` ; l'extrait d'un passage qui écrit `2130h` se centre sur le registre ; `corpus verify` reconnaît les adresses de l'affirmation dans les phrases |
 | L'état d'une source n'est plus une erreur | 22 notes (dépôt archivé, auteur anonyme, qualité d'OCR…) pouvaient lever « ⚠️ erreur documentée ». Deux étaient des confirmations, dont « c'est la bonne polarité » sur `mesen2-coprocessors` |
 
-## 2. `snes_verify` : un chiffre monte, sachez-le
+## 2. `corpus verify` : un chiffre monte, sachez-le
 
 Sur nos 60 paires vrai/faux, après la correction des adresses :
 
@@ -45,13 +45,13 @@ fullsnes reste la bonne méthode.
 
 - Les douze documents de `mesures-partenaires` sont en anglais, comme les
   fiches. Chiffres, adresses et ids vérifiés identiques. Leurs ids de chunk
-  changent ; les anciens sont suivis par alias, et `snes_get` le signale.
+  changent ; les anciens sont suivis par alias, et `corpus get` le signale.
 - Une source japonaise (`pgate1-snes-on-fpga`) était servie criblée de
   caractères de remplacement : elle est lisible.
 - Cinq passages servaient un chemin de fichier de notre poste de build :
   retiré.
 - Docstrings des quatre outils réécrites d'après le code : relisez celle de
-  `snes_verify`, les verdicts y sont décrits comme ils sortent réellement.
+  `corpus verify`, les verdicts y sont décrits comme ils sortent réellement.
   Conseil ajouté : formuler les questions en anglais, avec mnémonique et
   adresse.
 
@@ -64,4 +64,4 @@ unitaires, 43 d'intégration.
 ## 5. Ouvert
 
 De votre côté, inchangé : la trace console du port vide, la photo console du bit 3 en Mode 6.
-Du nôtre : rien d'engagé. Le cas SA-1 reste un défaut connu de `snes_verify`.
+Du nôtre : rien d'engagé. Le cas SA-1 reste un défaut connu de `corpus verify`.

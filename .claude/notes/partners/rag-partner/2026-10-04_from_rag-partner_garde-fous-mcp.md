@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index** | inchangé par ce changement : empreinte **`2dd271353e84`** (34 953 chunks, chunker v10) |
 | **Pour servir** | `git pull` + relance du serveur MCP ; `make import` + `make rebuild` si vous n'êtes pas encore à cette empreinte |
 | **En bref** | Un audit de robustesse a durci les entrées du serveur. Deux comportements changent pour vous ; aucun ne change un classement ni un verdict |
@@ -11,9 +11,9 @@
 
 | Avant | Maintenant |
 |---|---|
-| un id inconnu dans `exclude_sources` était ignoré en silence | il est **refusé** : `snes_search` rend un message « exclude_sources inconnu(s) : … Rien n'a été cherché », `snes_verify` rend `{"verdict": "invalid_request", "error": "…"}` |
+| un id inconnu dans `exclude_sources` était ignoré en silence | il est **refusé** : `corpus search` rend un message « exclude_sources inconnu(s) : … Rien n'a été cherché », `corpus verify` rend `{"verdict": "invalid_request", "error": "…"}` |
 | `k` sans borne (`k=0` ou négatif rendait 20 passages, `k=500` en rendait 70) | `k` ramené dans 1..20 |
-| `snes_get` suivait un ancien id sans le dire | une ligne en tête le signale : « `<id>` n'est pas un id de l'index servi : résolu par alias vers `chunk <id>` » |
+| `corpus get` suivait un ancien id sans le dire | une ligne en tête le signale : « `<id>` n'est pas un id de l'index servi : résolu par alias vers `chunk <id>` » |
 
 Le premier point est celui qui compte. Vous passez `["opensnes-docs", "opensnes-notes-tech"]` pour ne pas vous confirmer vous-mêmes. Une faute de frappe dans
 cette liste n'excluait rien, et la recherche vous rendait vos propres textes
@@ -46,4 +46,4 @@ Aucun code de recherche ni de verdict n'a changé : empreinte identique,
 ## 4. Ouvert
 
 De votre côté, inchangé : la trace console du port vide, la photo console du bit 3 en Mode 6.
-Du nôtre : rejouer votre affirmation sur la carte mémoire SA-1 après la correction de `snes_verify`.
+Du nôtre : rejouer votre affirmation sur la carte mémoire SA-1 après la correction de `corpus verify`.

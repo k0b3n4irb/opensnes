@@ -32,7 +32,7 @@ Trois sources indépendantes, qui s'accordent :
 |---|---|---|
 | ares | `ares/sfc/cpu/timing.cpp:124-131`, `cpu/dma.cpp:16-22, 45-48, 108-122` | `step(counter.dma = 8 - dmaCounter())`, puis `dmaRun()` ; `Channel::step` fait `counter.dma += clocks` à chaque pas d'un canal ; à la fin `step(clockCount - counter.dma % clockCount)` |
 | Mesen2 | `Core/SNES/SnesDmaController.cpp:75, 99, 206-218, 387-402` | `_dmaClockCounter` reçoit l'alignement, 8, puis `8 * i` octets par canal ; `SyncEndDma` : `cpuSpeed - (_dmaClockCounter % cpuSpeed)` |
-| anomie, *SNES timing* | section « S-CPU (5A22) / DMA » (Cartouche : `anomie-timing`, chunk `a8f6e03510109a8f`) | « Then wait 2-8 master cycles to reach a whole number of CPU Clock cycles since the pause », avec quatre exemples chiffrés |
+| anomie, *SNES timing* | section « S-CPU (5A22) / DMA » (Corpus : `anomie-timing`, chunk `a8f6e03510109a8f`) | « Then wait 2-8 master cycles to reach a whole number of CPU Clock cycles since the pause », avec quatre exemples chiffrés |
 
 L'exemple d'anomie : `STA $420B : NOP`, un canal, 3 octets, accès suivant
 de 6 cycles. Selon la position de la pause, il faut 2, 4, 6 ou 8 cycles
@@ -55,7 +55,7 @@ La v1.37.0 tient un seul compteur pour la rafale sur les deux chemins.
 Un HDMA qui tombe **pendant** la rafale n'effectue aucun des deux
 alignements (ares `timing.cpp:113,117`, gardes `if(!dmaEnable())`) et
 ajoute ses propres cycles au compteur. Ce dernier point repose sur ares
-seul : le corpus de Cartouche ne le tranche pas, et nous n'avons pas de
+seul : le corpus de Corpus ne le tranche pas, et nous n'avons pas de
 mesure console.
 
 Tests chez nous : `a_dma_burst_lasts_a_whole_number_of_cpu_clocks_since_the_pause`

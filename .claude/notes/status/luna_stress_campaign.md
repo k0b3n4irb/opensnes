@@ -7,7 +7,7 @@
 >
 > **Status 2026-09-26:** dormant since the 2026-08-08 wave. The method below
 > dates from then: the pin is now v1.27.0 (not v1.13.0), Mesen2 is retired
-> (luna is the only emulator; a second opinion comes from the Cartouche
+> (luna is the only emulator; a second opinion comes from the Corpus
 > corpus), and findings go to luna directly as reports
 > (`.claude/rules/partners.md`), not through an owner sign-off.
 

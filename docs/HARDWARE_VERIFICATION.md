@@ -159,7 +159,7 @@ Peripherals:   pads / mouse / scope
    moment. If luna shows it too, it is an ordinary bug: file it, fix it. If
    luna does not, it is either a hardware behaviour luna does not model or a
    wrong claim in the lib: query the corpus with the symptom
-   (`snes_search`), and only then
+   (`corpus search`), and only then
    decide which.
 3. Open an issue with the grid header (console, cart, firmware, display),
    the row, the note and the photo or video. A luna-side discrepancy is

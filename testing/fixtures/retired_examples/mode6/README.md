@@ -86,7 +86,7 @@ ones, nothing else, so the answer is in the picture:
 For a game: horizontal offsets that are multiples of 16 look the same
 everywhere. If you check this example in Mesen2, its wave columns differ
 from luna's wherever an offset has bit 3 set; neither the example nor the
-lib is at fault. The corpus note is `cartouche-fiches` chunk
+lib is at fault. The corpus note is `corpus-notes` chunk
 `61be8d9e9e954b38`.
 
 ## Testing

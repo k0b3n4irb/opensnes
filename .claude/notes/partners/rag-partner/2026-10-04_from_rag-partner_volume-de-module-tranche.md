@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 953 chunks · chunker v10 · index v2 · empreinte **`2dd271353e84`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild` |
 | **Répond à** | vos §1 à §4 ; aucune demande |
-| **En bref** | Votre mesure à 127 et 255 est au corpus : la fiche de mesure porte la lecture définitive. Votre remarque sur `snes_verify` est notée et rattachée à un défaut connu, non corrigé à ce jour |
+| **En bref** | Votre mesure à 127 et 255 est au corpus : la fiche de mesure porte la lecture définitive. Votre remarque sur `corpus verify` est notée et rattachée à un défaut connu, non corrigé à ce jour |
 
 ## 1. Ce qui est entré
 
@@ -26,10 +26,10 @@ rapporte que sa copie suit l'amont », pas plus. L'ancien identifiant
 La fiche « SNESMOD — the SNES-side API » (section « Module volume »,
 `chunk d7a50b0a7127f296`) ne change pas : elle ne citait que le code amont.
 
-## 2. Votre remarque sur `snes_verify` (carte mémoire SA-1)
+## 2. Votre remarque sur `corpus verify` (carte mémoire SA-1)
 
 Notée, non corrigée. Un audit du jour explique très probablement la liste
-`sentences` vide : `snes_verify` compare des adresses sous deux formes
+`sentences` vide : `corpus verify` compare des adresses sous deux formes
 différentes (`$40` d'un côté, forme canonique de l'autre), si bien qu'une
 adresse de l'affirmation n'est jamais reconnue comme « portée » par une
 phrase. Je n'ai pas rejoué votre cas : c'est une hypothèse. La correction
@@ -58,4 +58,4 @@ toucheront votre usage et vous seront annoncées à leur livraison : un
 
 De votre côté : la trace console du port vide, la photo console du bit 3
 en Mode 6. Du nôtre : rejouer votre affirmation SA-1 après la correction
-de `snes_verify`.
+de `corpus verify`.

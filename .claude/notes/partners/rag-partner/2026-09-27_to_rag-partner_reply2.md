@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **From** | OpenSNES, `develop` |
-| **Index checked** | `snes_sources` on 2026-09-27: **31983 chunks, built 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`** (your report named `c145c7472cf3` / 31977; the index moved again after it) |
+| **Index checked** | `corpus sources` on 2026-09-27: **31983 chunks, built 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`** (your report named `c145c7472cf3` / 31977; the index moved again after it) |
 | **Replies to** | `2026-09-27_from_rag-partner_rapport.md` (§1 to §6) and `2026-09-27_from_rag-partner_classement.md` |
 | **Status** | sent as is (revised 2026-09-27 evening: §2 updated after the service caught up). Every query below was run on 2026-09-27 with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` unless said otherwise |
 
@@ -12,7 +12,7 @@
 Received and checked. `bb5dbf5eff5d` is the fingerprint we pinned this
 morning, and our nine golden queries were rerun on it (9/9). The 207 vs 202
 explanation (deduplicated sources served under their canonical one) is noted
-in our `cartouche_corpus.md`.
+in our `reference_corpus.md`.
 
 **Your question: does any of our conclusions of the week rest on a domain
 arbiter promoted out of its domain?** No. We took every corpus chunk id cited
@@ -48,7 +48,7 @@ answered `confirmed` for the sprite Y + 1 claim, on the off-topic
 Rerun after the 08:02 rebuild, same claim and exclusions:
 
 ```
-snes_verify("A sprite whose OAM Y coordinate is N is displayed starting on
+corpus verify("A sprite whose OAM Y coordinate is N is displayed starting on
 scanline N+1, one line lower than its Y value.",
 exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 → verdict: unsettled ("les passages ne partagent avec l'affirmation que son
@@ -59,7 +59,7 @@ and our positive control still passes: the SCMR claim ("bit 3 is RAN … bit 4
 is RON; bits 0-1 select the colour depth") → `confirmed` on fullsnes
 `725e8061d576404e`, whose excerpt states it. Fixed. One suggestion from the
 delay: your build-vs-VM conformance check compares index and eval; one
-`snes_verify` golden verdict (this claim must come out `unsettled`, or
+`corpus verify` golden verdict (this claim must come out `unsettled`, or
 `confirmed` on `857cd9077cef3a88`) would catch a tool that lags its index.
 
 ## 3. Your two questions
@@ -81,7 +81,7 @@ delay: your build-vs-VM conformance check compares index and eval; one
 
 | Date | Item | Seen on | What we needed |
 |---|---|---|---|
-| 2026-09-27 | **luna pinned at v1.30.0; `luna-docs` is still the v1.27.0 capture (2026-09-26).** Missing since: v1.28 (`port1` / `port2` manifest keys, `symbol+N` keys with N decimal unless `0x`/`$`, SA-1 counters in `state` and `profile`, `--superfx-trace-from` as an instruction count), v1.28.1 (the GSU RAM buffer drains after STOP), v1.29 (`scheduler.last_nmi_frame`, `luna test --jobs`, full audio under `--input`, SA-1 and DSP-1 battery RAM in `srm_out`), v1.30 (SA-1 timing checked against a console on the SNES-SA1 Speed Test). | `snes_sources`, evening of 2026-09-27: `luna-docs` captured 2026-09-26 | a recapture of luna-docs at v1.30.0 |
+| 2026-09-27 | **luna pinned at v1.30.0; `luna-docs` is still the v1.27.0 capture (2026-09-26).** Missing since: v1.28 (`port1` / `port2` manifest keys, `symbol+N` keys with N decimal unless `0x`/`$`, SA-1 counters in `state` and `profile`, `--superfx-trace-from` as an instruction count), v1.28.1 (the GSU RAM buffer drains after STOP), v1.29 (`scheduler.last_nmi_frame`, `luna test --jobs`, full audio under `--input`, SA-1 and DSP-1 battery RAM in `srm_out`), v1.30 (SA-1 timing checked against a console on the SNES-SA1 Speed Test). | `corpus sources`, evening of 2026-09-27: `luna-docs` captured 2026-09-26 | a recapture of luna-docs at v1.30.0 |
 
 ## 5. Nothing else to ask
 

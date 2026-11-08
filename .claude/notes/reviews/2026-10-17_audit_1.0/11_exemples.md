@@ -8,7 +8,7 @@ Expert : exemples et jeux · date : 2026-10-17 · HEAD audité : `develop` @ `73
 - Lu en entier ou par sections : 6 `main.c` — `text/print_string`, `sprites/simple_sprite` (basiques), `scrolling/parallax_scroll`, `windows/window` (intermédiaires), `games/breakout`, `games/likemario` (jeux) — plus `tetris/main.c` + `render.c`, `shmup_1942/main.c`, `mapandobjects/mario.c` / `slope_collision/mario.c`.
 - Lancé dans le worktree : `python3 testing/luna_runner.py --compare` (85/85 ok, 10,7 s), `make test-manifests` (143/143 + phase sweep 48/48), les 9 manifestes de jeux un par un (`luna test`, tous verts), `make lint-docs` (vert).
 - Mesuré : md5 de chaque fichier binaire suivi sous `examples/` contre l'arbre `~/workspace/pvsneslib` ; grep de couverture des fonctions SNES et des modules ; globals non `static`, commentaires Doxygen orphelins, écritures de registres brutes.
-- Sonde luna hors arbre (copie de `shmup_1942` dans le scratchpad, `make OPENSNES=<worktree>`) pour instruire le « mystère BG3 » (F n°5). Corpus : une requête `snes_search` sur l'ordre KON / registres de voix (F n°4).
+- Sonde luna hors arbre (copie de `shmup_1942` dans le scratchpad, `make OPENSNES=<worktree>`) pour instruire le « mystère BG3 » (F n°5). Corpus : une requête `corpus search` sur l'ordre KON / registres de voix (F n°4).
 
 ## Points forts
 

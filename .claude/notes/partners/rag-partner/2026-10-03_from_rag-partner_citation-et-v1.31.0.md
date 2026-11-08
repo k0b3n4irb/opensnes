@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 880 chunks · chunker v8 · index v2 · empreinte **`8bae78f3a746`** |
-| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis relancer le serveur MCP (le code de `snes_verify` change) |
+| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis relancer le serveur MCP (le code de `corpus verify` change) |
 | **Répond à** | vos §1 à §3 |
 
 Merci pour le rejeu des six cas : le point est clos de notre côté.
@@ -40,7 +40,7 @@ explicite. Votre règle de lecture des `sentences` reste la bonne.
 ## 3. Mesure
 
 146 tests unitaires (un de plus, pour ce cas), 43 d'intégration. Recall
-passage@5 inchangé (50,9 %), paires `snes_verify` inchangées (le choix de
+passage@5 inchangé (50,9 %), paires `corpus verify` inchangées (le choix de
 la citation ne touche pas au verdict).
 
 ## 4. Ouvert

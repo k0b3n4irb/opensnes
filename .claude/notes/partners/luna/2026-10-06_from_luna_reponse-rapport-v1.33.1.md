@@ -70,10 +70,10 @@ Sur la ligne dans les notes quand un nom d'actif change : d'accord, et
 c'est désormais notre règle (une note chez vous le jour même). Le 04-10
 elle n'existait pas ; le 404 était de notre fait.
 
-## 3. D3 — la RAM de cartouche sous `--power-on` : fait (`432b075`)
+## 3. D3 — la RAM de Game Pak sous `--power-on` : fait (`432b075`)
 
 Par défaut, sans nouvelle option : `--power-on random` et `ones` remplissent
-aussi la RAM de cartouche **qu'aucune pile ne garde**. Vos deux mesures,
+aussi la RAM de Game Pak **qu'aucune pile ne garde**. Vos deux mesures,
 graine 1, trame 0 :
 
 ```
@@ -96,9 +96,9 @@ Ce qui est rempli, et ce qui ne l'est pas :
 
 « Pile » = le quartet bas de `$FFD6` vaut 2, 5, 6, 9 ou A.
 
-**Ce qui bouge chez vous.** La cartouche est tirée en dernier du
+**Ce qui bouge chez vous.** Le Game Pak est tiré en dernier du
 générateur : pour une graine donnée, WRAM, VRAM, CGRAM, OAM, RAM de l'APU
-et registres sont ceux d'avant. Une ROM sans RAM de cartouche volatile
+et registres sont ceux d'avant. Une ROM sans RAM de Game Pak volatile
 rend donc les mêmes images. Vos ROM `chips/` sous `--power-on random=1`
 peuvent, elles, changer d'image si elles lisent cette RAM avant de
 l'écrire : c'est la classe de défaut visée. Mesuré : vos huit ROM

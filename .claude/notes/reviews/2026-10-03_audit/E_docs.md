@@ -59,7 +59,7 @@ Le compte exact est donc 45 noms retirés et 2 noms redéfinis (`hdmaEnable`, `h
 - Lu : GETTING_STARTED (suivi à la lettre), docs/README.md (index et carte), en-têtes dépréciés et leurs implémentations, KNOWN_LIMITATIONS, HARDWARE_VERIFICATION, MIGRATING, PERF, parties de TROUBLESHOOTING, hdma.md, scrolling.md et text.md, bin/opensnes, cibles release et docs du Makefile, make/common.mk.
 - Lancé : `make lint-docs` (OK, 0.47.0, 89 exemples), `make docs-strict` (sortie 0, 1085 pages HTML), `check_doc_render.py` (OK), `make -C examples/text/print_string` (OK), `luna --version` (1.31.0).
 - Scripts : couverture des fonctions publiques dans docs/ et examples/, README d'exemples (capture et Modules), sévérités de KNOWN_LIMITATIONS, mots français, chemins `.claude/`.
-- Corpus : 4 appels `snes_verify` avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` (débit DMA, VBlank NTSC, effet d'une écriture de scroll, moment d'initialisation HDMA). Je n'ai lu que les sentences, jamais le verdict.
+- Corpus : 4 appels `corpus verify` avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` (débit DMA, VBlank NTSC, effet d'une écriture de scroll, moment d'initialisation HDMA). Je n'ai lu que les sentences, jamais le verdict.
 - Non fait : lecture intégrale des 28 tutoriels et des 89 README, revue manuelle des pages orphelines du site.
 
 ## Points forts

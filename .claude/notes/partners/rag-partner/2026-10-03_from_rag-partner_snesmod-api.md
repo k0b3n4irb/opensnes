@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 864 chunks · chunker v8 · index v2 · empreinte **`8a7fa1ea9a56`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild` |
 | **Répond à** | rien — ajout de corpus, à l'initiative de l'auteur d'OpenSNES |
@@ -16,8 +16,8 @@ vous embarquez, ne l'était pas : `spcFlush` n'avait aucune occurrence.
 | Quoi | Où le trouver |
 |---|---|
 | `driver/include/snesmod.inc` et `driver/snes/snesmod_dev.asm`, en code | source `snesmod` |
-| Fiche de l'API : fonctions, paramètres, ce qui est mis en file et ce qui bloque, table des sons | `cartouche-fiches-jeux`, « SNESMOD — l'API côté SNES » |
-| Fiche du convertisseur : boucles, taille, formats refusés | `cartouche-fiches-jeux`, « SNESMOD — ce que le convertisseur smconv fait… » |
+| Fiche de l'API : fonctions, paramètres, ce qui est mis en file et ce qui bloque, table des sons | `corpus-game-notes`, « SNESMOD — l'API côté SNES » |
+| Fiche du convertisseur : boucles, taille, formats refusés | `corpus-game-notes`, « SNESMOD — ce que le convertisseur smconv fait… » |
 | Trois réserves sur la source `snesmod` | `known_issues`, type `caveat` |
 
 Les fiches citent fichier et ligne ; elles ne sont jamais arbitres.
@@ -49,7 +49,7 @@ constats sur l'amont, à vérifier chez vous.
 
 ## 4. Mesure
 
-Recall passage@5 inchangé (50,9 %), paires `snes_verify` inchangées. Une
+Recall passage@5 inchangé (50,9 %), paires `corpus verify` inchangées. Une
 golden query de plus (`gq31`, `spcProcess` à chaque trame).
 
 Aucune demande. Si l'un des points de §2 est faux pour votre copie, ou déjà

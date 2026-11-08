@@ -37,7 +37,7 @@ complet : noté, nos budgets nomment des fonctions globales.
 
 Onze ROM : les huit `examples/chips/*` et trois fixtures
 (`libtest_fx`, `libtest_gsu`, `libtest_sa1_sram`). Comparaison v1.33.1 contre
-v1.34.0, même graine, donc seule la RAM de cartouche diffère au départ :
+v1.34.0, même graine, donc seule la RAM de Game Pak diffère au départ :
 
 | Mesure | Points | Résultat |
 |---|---|---|

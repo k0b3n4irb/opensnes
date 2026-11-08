@@ -1,22 +1,22 @@
 ---
-name: cartouche_corpus
-description: What the Cartouche SNES corpus (MCP `cartouche`) contains, its index fingerprint, and the golden queries that prove the toolchain-side sources answer — the in-repo companion of .claude/rules/hardware_claims.md (gaps review item D6).
+name: reference_corpus
+description: What the SNES reference corpus (served over MCP) contains, its index fingerprint, and the golden queries that prove the toolchain-side sources answer — the in-repo companion of .claude/rules/hardware_claims.md (gaps review item D6).
 type: tech
 ---
 
-# Cartouche corpus — sources, index fingerprint, golden queries
+# Reference corpus — sources, index fingerprint, golden queries
 
-`.claude/rules/hardware_claims.md` mandates `snes_search` (and now
-`snes_verify`) for every hardware claim, always with
+`.claude/rules/hardware_claims.md` mandates `corpus search` (and now
+`corpus verify`) for every hardware claim, always with
 `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]` so our own docs
 cannot answer for the corpus. This note is what the rule does not say:
 what is in there, how to tell it moved, and which queries prove the
-toolchain-side sources are reachable. Refresh it when `snes_sources`
+toolchain-side sources are reachable. Refresh it when `corpus sources`
 reports a new index fingerprint.
 
 ## Index state (2026-10-18, read at the luna v1.39.0 pin: `4cc278d08305`)
 
-`snes_sources`: **35 021 chunks, 215 of 237 sources, built
+`corpus sources`: **35 021 chunks, 215 of 237 sources, built
 2026-10-10T18:43:03Z, chunker v10, fingerprint `4cc278d08305`**;
 `luna-docs` captured 2026-10-10, so it carries no v1.39.0 page (reported:
 `partners/rag-partner/2026-10-18_to_rag-partner_luna-docs-v1.39.0.md`). Golden
@@ -25,17 +25,17 @@ queries **10/10** (the nine below plus "per-window shift `--max-shift`",
 
 ## Index state (2026-10-05, later: `f8f11bcced91`)
 
-`snes_sources`: **34 955 chunks, 215 of 237 sources, built 2026-10-05T00:41:07Z,
+`corpus sources`: **34 955 chunks, 215 of 237 sources, built 2026-10-05T00:41:07Z,
 chunker v10, fingerprint `f8f11bcced91`** — the rebuild after the owner's
 "rag mis à jour"; six chunks more than `15fc202da6dc`. Golden queries **9/9**,
 negative control `opensnes-docs` at ranks 1 and 2. With the MCP server
 restarted, the guard-rails hold: a mistyped `exclude_sources` is refused by
-`snes_search` and gives `invalid_request` in `snes_verify`, `k=500` returns
-20 passages, `snes_get` prints the alias line.
+`corpus search` and gives `invalid_request` in `corpus verify`, `k=500` returns
+20 passages, `corpus get` prints the alias line.
 
 ## Index state (2026-10-05, chunker v10 — "fin du ménage")
 
-`snes_sources`: **34 949 chunks, 215 sources captured of 237, built
+`corpus sources`: **34 949 chunks, 215 sources captured of 237, built
 2026-10-05T00:01:28Z, chunker v10, index v2, fingerprint `15fc202da6dc`**
 (`2026-10-04_from_rag-partner_fin-du-menage.md`, after `…_volume-de-module-tranche.md`
 at `2dd271353e84` and `…_garde-fous-mcp.md`). What changed for us: domain
@@ -55,12 +55,12 @@ the refusal and the `k` bound were not active here (`exclude_sources=
 
 ## Index state (2026-10-02, v8)
 
-`snes_sources`: **34 808 chunks, 210 sources captured of 236, built
+`corpus sources`: **34 808 chunks, 210 sources captured of 236, built
 2026-10-02T05:26:41Z, chunker v8, index v2, fingerprint `5f0e4bb5e1c0`**
 (`2026-10-02_from_rag-partner_ids-v8.md`). **Chunk ids are now derived from
 the content** (document, breadcrumb, text) instead of `sha1(document:rank)`,
 so every id changed once; old ids still resolve through an alias table in
-`snes_get` — 17 of 17 of ours checked, same text. Cite the new id when you
+`corpus get` — 17 of 17 of ours checked, same text. Cite the new id when you
 touch a comment. fullsnes's prose (~400 KB) is indexed again. Golden
 queries 9/9. Serving it on the replica takes `git pull` + `make import
 SRC=/media/psf/Home/workspaces/SNES/rag-partner` + `make rebuild`; the index
@@ -68,7 +68,7 @@ is down for the ~2.5 min of the rebuild (reported).
 
 ## Index state (2026-10-02, evening)
 
-`snes_sources`: **34 220 chunks, 210 sources captured of 236, built
+`corpus sources`: **34 220 chunks, 210 sources captured of 236, built
 2026-10-02T03:47:47Z, chunker v7, index v2, fingerprint `0aeced38d56e`**
 (`2026-10-02_from_rag-partner_reponse.md`, answering our audit). New: an
 address alone no longer attests a point, and a passage listing more than 8
@@ -85,7 +85,7 @@ negative control: our ABI ranks 1-2, never qbe-docs.
 
 ## Index state (2026-10-02)
 
-`snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
+`corpus sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
 built 2026-10-02T02:57:24Z, chunker v7, index v2, fingerprint
 `31eb1726aa31`** (rag-partner's `2026-09-30_from_rag-partner_bilan-audit.md`,
 which supersedes their three earlier notes of the 30th). New: embedding
@@ -100,7 +100,7 @@ negative control: our ABI at ranks 1 and 2, never qbe-docs.
 
 ## Index state (2026-10-02, evening)
 
-`snes_sources`: **34 819 chunks, built 2026-10-02T11:54:22Z, chunker v8,
+`corpus sources`: **34 819 chunks, built 2026-10-02T11:54:22Z, chunker v8,
 fingerprint `b363c473e7ec`** (rag-partner's `…_reponse-ids-v8.md`; served after
 pull + import + rebuild). What moved:
 
@@ -108,7 +108,7 @@ pull + import + rebuild). What moved:
   hires columns, CGWSEL bits, SIWP polarity. A true claim is no longer
   refuted (their 60 pairs: 13 → 0 %); a passage from a page carrying a
   documented error is marked `documented_error` in `evidence`.
-- **`make rebuild` is atomic** (`cartouche.db.part`, then rename): the
+- **`make rebuild` is atomic** (`corpus-index.db.part`, then rename): the
   service answered during our rebuild.
 - **Attestation reads the whole passage** and accepts common terms, so more
   `states_point: true` — including two false ones we reported
@@ -123,7 +123,7 @@ Replica at rag-partner's fingerprint `ab7b05594e17` (34 946 chunks, chunker
 v10, 215 sources: `furryrpg`, `georgjz-snes-assembly-adventure`,
 `nova-the-squirrel-2`, `skipp-and-friends`, `space-rescue-squad` new).
 (2026-10-06, pin v1.33.1: `luna-docs` serves the `[1.33.0]` changelog — "luna state rom.checksum_computed" gives chunk `6c16d06712970f52`; 1.33.1 changes the Windows GUI only. No lag to report.)
-(Same day, pin v1.34.0: luna told rag-partner itself that `luna-docs` is to re-capture — `cartouche/2026-10-06_luna-vers-cartouche_v1.34.0…` in luna's exchange folder; the golden queries are due again once rag-partner confirms.)
+(Same day, pin v1.34.0: luna told rag-partner itself that `luna-docs` is to re-capture — `corpus/2026-10-06_luna-vers-corpus_v1.34.0…` in luna's exchange folder; the golden queries are due again once rag-partner confirms.)
 `luna-docs` serves v1.32.0: "how do I tell whether two builds sound the
 same when their audio hashes differ" gives the `[1.32.0]` changelog
 (`2153025ed4d5bb41`) then the `luna diff --audio` section
@@ -136,7 +136,7 @@ the old id `192d1bade86dc0dc` answers by alias.
 
 Replica at rag-partner's commit `9aaa3f3`, their fingerprint `8bae78f3a746`
 (34 880 chunks, their figures), MCP server restarted. `luna-docs` serves
-v1.31.0 (`0606861003a2ba40`, the `region` key). `snes_verify` no longer
+v1.31.0 (`0606861003a2ba40`, the `region` key). `corpus verify` no longer
 takes its headline `citation` from a page with a documented error when
 another passage exists: the pseudo-hires parity case cites fullsnes
 `61c70037e21beeb4` (which does not state the parity; anomie-regs
@@ -152,7 +152,7 @@ server restarted by the owner. Golden queries 4, 5, 6, 9 rerun with the
 exclusion set: green, same chunks. `luna-docs` serves 1.30.3, not 1.30.4
 nor 1.31.0 (published 2026-10-03T11:27Z): recapture asked.
 
-The six `snes_verify` reference cases of rag-partner's coverage rule, replayed:
+The six `corpus verify` reference cases of rag-partner's coverage rule, replayed:
 multiplier at `$4216` and over `$4202-$4217` both `unsettled /
 arbiter_covers_topic_only`; Mode 4 `confirmed` on `d594aeedde1b87c2`;
 pseudo-hires true form `confirmed`, inverted form `contradicted /
@@ -166,9 +166,9 @@ anomie-regs (`19acadfe6457f2ae`), not the headline.
 
 Replica updated to rag-partner's `8a7fa1ea9a56` (34 864 chunks, their figures).
 New: the 65816 side of SNESMOD as code (`snesmod` source, e.g.
-`6a7dcbf85c93ca2d`, `23669e7ecb9d204a`), two `cartouche-fiches-jeux` notes on
+`6a7dcbf85c93ca2d`, `23669e7ecb9d204a`), two `corpus-game-notes` notes on
 SNESMOD's API and on smconv, a KOF banner on the source. `luna-docs` serves
-1.30.3 (`b0c25f779e82f2bd`), not 1.30.4: asked. The new `snes_verify`
+1.30.3 (`b0c25f779e82f2bd`), not 1.30.4: asked. The new `corpus verify`
 coverage rule needs the MCP server restarted; not verified in the session
 that rebuilt (`partners/rag-partner/OPEN_rag-partner.md`).
 
@@ -176,7 +176,7 @@ that rebuilt (`partners/rag-partner/OPEN_rag-partner.md`).
 
 Index served: **34 829 chunks, 210 sources captured of 236, built
 2026-10-02T12:15:33Z, chunker v8, fingerprint `7d9495170d2f`** (a rebuild
-after `b363c473e7ec`; it adds the `cartouche-fiches` note on Mode 6
+after `b363c473e7ec`; it adds the `corpus-notes` note on Mode 6
 offset-per-tile bit 3 in hi-res, `61be8d9e9e954b38`). Golden queries 4, 5, 6
 and 9 rerun with the exclusion set: green, same chunks. `luna-docs` is still
 the 2026-09-30 capture: no 1.30.3 or 1.30.4 changelog entry is served (query
@@ -192,7 +192,7 @@ served); reported in `2026-10-02_to_rag-partner_ids-v8_reply.md` §5.
 
 ## Index state (2026-09-30)
 
-`snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
+`corpus sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
 built 2026-09-30T01:35:00Z, chunker v7, fingerprint `55507a6f2907`**
 (rag-partner's `2026-09-30_from_rag-partner_c8-luna.md`). What moved:
 
@@ -221,14 +221,14 @@ table below.
 Evening (rag-partner's `…_classement.md`, same fingerprint): ranking changed —
 `boost_follows` removed, a `consensus_floor` added (when BM25 and the vector
 leg both put a passage first, no source weight can bury it), recall@5
-78.9 → 83.3 %, recall@1 47.4 → 54.4 %. Three `snes_verify` fixes found by
+78.9 → 83.3 %, recall@1 47.4 → 54.4 %. Three `corpus verify` fixes found by
 luna (a mangled `65C816` token, `luna-docs` promoting itself to arbiter on
 any topic, a-f words taken for addresses). The 207 captured vs 202 indexed
 gap is deduplication: six sources are served under a canonical one (`also_in`
 on the chunk). Audit of our citations of the week: none rests on `luna-docs`
 as an arbiter (reply2 §0).
 
-Served on 2026-09-27 (`snes_sources`): **31983 chunks, built
+Served on 2026-09-27 (`corpus sources`): **31983 chunks, built
 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. rag-partner's
 report of that morning (`partners/rag-partner/2026-09-27_from_rag-partner_rapport.md`)
 announced `c145c7472cf3` (31977, the TMX recapture); the index moved again
@@ -236,7 +236,7 @@ after it (their consensus-floor ranking change). Golden queries rerun on
 `bb5dbf5eff5d`: 9 of 9 green, no. 7 (TMX flip flags) green for the first
 time; the negative control still never answered by qbe-docs.
 
-**`snes_verify` fixed on the service (checked later on 2026-09-27, index
+**`corpus verify` fixed on the service (checked later on 2026-09-27, index
 rebuilt 08:02, same fingerprint):** sprite Y + 1 now comes out `unsettled`
 on the off-topic 34-slivers passage, and a well-cited claim (SCMR bits,
 fullsnes `725e8061d576404e`) still comes out `confirmed`. Read the
@@ -248,11 +248,11 @@ return it (their granularity work, gq30).
 
 ## Index state (2026-09-27, first update)
 
-`snes_sources` → 207 sources captured of 234 listed; **31973 chunks, 202
+`corpus sources` → 207 sources captured of 234 listed; **31973 chunks, 202
 sources indexed, built 2026-09-27T06:19:02Z, chunker v7, fingerprint
 `c416932c0b34`** (rag-partner's report of 2026-09-26, revised 09-27,
 `partners/rag-partner/2026-09-26_from_rag-partner_rapport.md`; checked with
-`snes_sources` the same day).
+`corpus sources` the same day).
 
 **What went wrong on 2026-09-26, and what the fingerprint means now.** The
 instance we query is rag-partner's service VM; it had pulled the new ranking
@@ -262,7 +262,7 @@ fixed by rag-partner: `chunk_version` described the code, not the chunks (it
 now reads the ledger and says `6+7` on a mixed index), and the fingerprint
 covered chunk ids only (it now covers each chunk's content hash). So the
 fingerprint is again the trigger: **when it moves, rerun the golden
-queries.** Compare the indexed-source count (202) with `snes_sources`'
+queries.** Compare the indexed-source count (202) with `corpus sources`'
 captured count as a second check.
 
 Also new since 2026-09-25: an **authority prior** (`arbiter_boost = 1.80`
@@ -277,10 +277,10 @@ Previous states: 2026-09-25 (served) 30848 chunks, fingerprint
 
 Reachable since 2026-09-27 (our four reproduction queries of 09-26 replayed):
 domain arbiter **sd2snes-changelog**; solid `ultrastarfox` (via the fiche),
-`argsfx-sasm-docs`; complement `peterlemon-gsu`, `cartouche-fiches`,
-`cartouche-fiches-jeux`. `luna-docs` re-captured at v1.27.0.
+`argsfx-sasm-docs`; complement `peterlemon-gsu`, `corpus-notes`,
+`corpus-game-notes`. `luna-docs` re-captured at v1.27.0.
 
-**`snes_verify` caveat (2026-09-27):** it can answer `confirmed` with a
+**`corpus verify` caveat (2026-09-27):** it can answer `confirmed` with a
 citation that does not state the claim (sprite Y + 1: cited the 34-slivers
 passage). Read the citation before trusting the verdict; reported.
 
@@ -303,10 +303,10 @@ Still not captured (2026-09-12): Calypsi / WDC816CC / vbcc 65816 manuals
 
 ## The two tools
 
-- `snes_search(question, exclude_sources=[…], k, authority_min, contrast)` —
+- `corpus search(question, exclude_sources=[…], k, authority_min, contrast)` —
   passages with authority labels and documented-error warnings.
   `contrast=true` for disputed points (SIWP-class).
-- `snes_verify(claim, exclude_sources=[…])` — since 2026-09-30 it serves
+- `corpus verify(claim, exclude_sources=[…])` — since 2026-09-30 it serves
   `evidence_state` (`not_covered` · `no_arbiter` ·
   `arbiter_covers_topic_only` · `arbiter_states_point` ·
   `documented_error_on_point`), `limits`, and `evidence`: up to five
