@@ -77,8 +77,13 @@ typedef void (*VBlankCallback)(void);
  * The callback runs with the direct page on its own copy of the compiler's
  * scratch registers (`tcc__r0`..`tcc__r10`), so C code and every library
  * routine that reaches them direct-page-relative, as the compiler does,
- * are isolated from the interrupted main thread; plain `*`, `/` and `%`
- * take a software path there (`in_nmi_ctx`). What is NOT callback-safe,
+ * are isolated from the interrupted main thread. Plain `*`, `/` and `%`
+ * are callback-safe, here and in an nmiSetLag() callback, at both widths:
+ * the 16-bit ones take a software path (`in_nmi_ctx`) with no shared
+ * state; the 32-bit multiply takes a software path too, and the 32-bit
+ * helpers' result slots (`mul32_hi`, `div32_*`) and the divide's working
+ * words are saved by the callback's first 32-bit call and put back after
+ * it (fixture `testing/fixtures/stress/rt32_nmi`). What is NOT callback-safe,
  * and says so in its own header: the hardware-multiplier users
  * `fixMul()`, `fixLerp()`, `fix32Mul()`, `fix32Sin()`/`fix32Cos()`; every
  * DSP-1 call (a port protocol); `textLoadFont()`/`textLoadFont4bpp()` (DMA
@@ -159,6 +164,13 @@ void nmiSetLag(VBlankCallback callback);
  *   A C function pointer passed here WILL corrupt the main thread —
  *   cc65816 C prologues assume the tcc register file, which the raw
  *   vector does not bank-switch (unlike the NMI path's DP isolation).
+ *
+ * @warning The handler must not call the compiler's runtime (`tcc_mul32`,
+ *   `tcc_udivmod32`, ...) nor use the hardware multiplier/divider
+ *   ($4202-$4217): the interrupted main thread may be in the middle of a
+ *   multiply or a divide, and the runtime's interrupt protection covers the
+ *   NMI callbacks only. Measured: a handler doing a hardware multiply on every scanline
+ *   made 9 369 of 10 000 main-thread 32-bit products wrong.
  *
  * @warning A handler that fires general DMA owns that channel: don't call
  *   lib DMA helpers (dmaCopyVram etc.) from the main loop while such a

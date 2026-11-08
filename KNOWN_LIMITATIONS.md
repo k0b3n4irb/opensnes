@@ -327,12 +327,33 @@ They use the hardware multiplier ($4202-$4217) plus shared WRAM
 temporaries, and the unit is not reentrant: an NMI that lands between a
 main-thread multiply's write to `$4203` and its read of `$4216` and
 multiplies in the callback destroys the main thread's result. NMI is not
-maskable, so no wait fixes that. Plain C `*` / `/` / `%` **are** callback-safe —
-the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
-to software paths. Symptom if ignored: silently wrong fixed-point values,
+maskable, so no wait fixes that. Plain C `*` / `/` / `%` **are** callback-safe,
+in an `nmiSet()` or an `nmiSetLag()` callback, at both widths:
+
+- **16 bits** (`int`, `u16`, `s16`): the runtime detects the NMI context
+  (`in_nmi_ctx`) and takes a software path that touches neither the
+  hardware unit nor any shared RAM.
+- **32 bits** (`long`, `u32`, `s32`): the multiply takes the same kind of
+  software path; the multiply and the divide return their high half in RAM
+  slots (`mul32_hi`, `div32_qh`, `div32_rl`, `div32_rh`) that the callback's
+  first 32-bit call saves and the NMI handler puts back after the callback,
+  and the divide saves and restores its working words around the call. The
+  main thread finds its own values whether the NMI landed inside its
+  helper or between the helper's return and the read of the high half.
+  The fixture `testing/fixtures/stress/rt32_nmi` checks 10 000 iterations of
+  each operation against an `nmiSetLag()` callback doing the same.
+
+Symptom if ignored: silently wrong fixed-point values,
 only when computed inside the callback. Mitigation: compute fixed-point
 math in the main loop, or use plain integer operators in the callback.
 (The headers carry the same `@warning`.)
+
+An `irqSet()` handler is assembly and gets none of this: the runtime does
+not know it is running there. A handler that calls the compiler's runtime,
+or that uses the hardware multiplier/divider itself, corrupts the
+multiply or divide it interrupted (a handler multiplying on every scanline
+made 9 369 of 10 000 main-thread 32-bit products wrong). Keep `$4202-$4217` and
+the runtime out of IRQ handlers.
 
 ### 🟢 The SA-1 starts only in bank $00 (checked after every link)
 The SA-1 reset vector (CRV, `$2203-$2204`) is 16 bits ("Size: 16 bits",

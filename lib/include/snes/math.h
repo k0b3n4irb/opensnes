@@ -158,7 +158,7 @@ typedef s16 fixed;
  * @warning NOT safe inside an nmiSet() callback: uses the hardware
  *   multiplier, which is not reentrant (a callback multiply destroys a
  *   main-thread multiply it interrupted), plus shared WRAM temporaries. Plain C `*` / `/` / `%` ARE
- *   callback-safe (the runtime switches to a software path there).
+ *   callback-safe, 16 and 32 bits (interrupt.h, nmiSet()).
  *   fixLerp()
  *   carries the same restriction.
  */

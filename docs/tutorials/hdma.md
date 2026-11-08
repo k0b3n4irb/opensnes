@@ -346,8 +346,10 @@ the handler fires a general DMA whose source auto-advances across
 transfers. See `examples/color/hicolor_1792` (1792 colours
 from a 4bpp BG) and the loud contract in `<snes/interrupt.h>`: handlers
 are ASM-only (a C callback cannot afford per-scanline prologue latency),
-must ack `$4211`, and must save what they touch. Plain C `*`/`/`/`%` in
-*NMI* callbacks is safe (the runtime switches to software paths there),
+must ack `$4211`, and must save what they touch; they must not use the
+hardware multiplier/divider (`$4202-$4217`) nor call the compiler's runtime,
+which the interrupted code may be using. Plain C `*`/`/`/`%` in
+*NMI* callbacks is safe, 16 and 32 bits (the runtime protects itself there),
 but `fixMul()`/`fixLerp()` are not — see KNOWN_LIMITATIONS.
 
 ## Gotchas

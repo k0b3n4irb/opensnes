@@ -54,7 +54,7 @@ STRIP ?= strip
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels libtests_region libtests_region_pal libtests_bigrom
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals leaf_frame leaf_split static_dup
-FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
 FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
@@ -250,6 +250,9 @@ examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
 tests: test-compiler
+	@# A compiler binary left instrumented by test-sanitizers / coverage-host
+	@# would build every ROM below with ASan (2026-11-07: a partner build failed on it).
+	@$(MAKE) -s test-bin-clean
 	@# Corpus freshness guard (issue #105): incremental trees have produced
 	@# ROMs that differ from clean builds; baselines captured from them get
 	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
@@ -495,6 +498,16 @@ test-tools:
 # sanitized cproc-qbe left behind made a partner build fail on LeakSanitizer,
 # 2026-11-07), so the tree is usable again when it returns.
 SAN_ENV := ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1
+# No compiler binary of bin/ carries the ASan runtime. BIN_CLEAN_FILES is
+# overridable so that the check can be seen failing on a file that does.
+BIN_CLEAN_FILES ?= bin/qbe bin/cproc-qbe bin/cc65816 bin/wla-65816
+test-bin-clean:
+	@bad=0; for f in $(BIN_CLEAN_FILES); do \
+		[ -f "$$f" ] || continue; \
+		if grep -q -a __asan_init "$$f"; then echo "FAIL: $$f carries the ASan runtime (run make clean && make)"; bad=1; fi; \
+	done; \
+	[ $$bad -eq 0 ] && echo "OK: no instrumented compiler binary in bin/" || exit 1
+
 test-sanitizers:
 	@$(MAKE) test-sanitizers-pass; rc=$$?; \
 	  echo "test-sanitizers: restoring the normal binaries (make clean && make)"; \

@@ -234,13 +234,19 @@
     nmitimen_shadow dsb 1   ; Software copy of $4200 (write-only reg). ALL
                             ; NMITIMEN writes must go through this shadow so
                             ; nmiSet/irqEnable don't clobber each other's bits.
-    in_nmi_ctx      dsb 1   ; 1 while the user NMI callback runs. tcc_mul16 /
-                            ; tcc_div16 test it and take their software path:
-                            ; the hardware mul/div unit ($4202-$4217) is not
+    in_nmi_ctx      dsb 1   ; $80 while a user NMI callback (nmiSet or
+                            ; nmiSetLag) runs, 0 otherwise. The mul/div runtime
+                            ; tests it and takes a software path there: the
+                            ; hardware mul/div unit ($4202-$4217) is not
                             ; reentrant against a main-thread multiply the
-                            ; NMI interrupted (#113). (A second reason once
-                            ; given here — wrong results during auto-joypad —
-                            ; was retired 2026-10-02: a luna probe found none.)
+                            ; NMI interrupted (#113). Bit 6 is set by
+                            ; rt32_nmi_save once the callback has saved the
+                            ; 32-bit runtime's result slots; the handler then
+                            ; puts them back after the callback (Rt32NmiRestore).
+                            ; Bit 7 so that `bit` tests it in one instruction.
+                            ; (A second reason once given here — wrong results
+                            ; during auto-joypad — was retired 2026-10-02: a
+                            ; luna probe found none.)
     setini_shadow   dsb 1   ; Software copy of SETINI $2133 (write-only).
                             ; videoSetInterlace/ObjInterlace/Overscan/
                             ; PseudoHires compose their bits through it
@@ -251,6 +257,19 @@
                             ; rows BG3VOFS selects directly (snesdev-wiki,
                             ; Offset-per-tile), so the NMI writes its VOFS
                             ; raw instead of y - 1.
+    ; Result slots of the 32-bit runtime (lib/source/mul32.asm, div32.asm):
+    ; the helper returns its low half in A and leaves the rest here, which
+    ; the compiled caller reads with `lda.l` right after the call. They live
+    ; in crt0, not in the helpers' units, because the NMI handler must put
+    ; them back after a callback that used the helpers: a lag frame's NMI
+    ; can land between the helper's return and the caller's read, or inside
+    ; the helper. 16 bytes in every ROM.
+    mul32_hi        dsb 2   ; product, high 16
+    div32_qh        dsb 2   ; quotient, high 16
+    div32_rl        dsb 2   ; remainder, low 16
+    div32_rh        dsb 2   ; remainder, high 16
+    rt32_save       dsb 8   ; the main thread's four slots, saved by the
+                            ; callback's first 32-bit call (rt32_nmi_save)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -1128,7 +1147,7 @@ NmiHandler:                 ; where the handler runs: profiles name it here
     .ACCU 8
     lda.w nmi_has_lag_callback
     beq @lag_done
-    lda #1
+    lda #$80
     sta.w in_nmi_ctx
     rep #$30
     .ACCU 16
@@ -1145,7 +1164,10 @@ NmiHandler:                 ; where the handler runs: profiles name it here
     plb
     sep #$20
     .ACCU 8
-    stz.w in_nmi_ctx
+    bit.w in_nmi_ctx        ; V = bit 6: the callback saved the 32-bit slots
+    bvc +
+    jsr Rt32NmiRestore
++   stz.w in_nmi_ctx
 @lag_done:
     rep #$20
     .ACCU 16
@@ -1379,7 +1401,7 @@ NmiHandler:                 ; where the handler runs: profiles name it here
     ; unit (non-reentrancy — see in_nmi_ctx decl).
     sep #$20
     .ACCU 8
-    lda #1
+    lda #$80
     sta.w in_nmi_ctx
     rep #$20
     .ACCU 16
@@ -1402,7 +1424,10 @@ NmiHandler:                 ; where the handler runs: profiles name it here
 
     sep #$20
     .ACCU 8
-    stz.w in_nmi_ctx
+    bit.w in_nmi_ctx        ; V = bit 6: the callback saved the 32-bit slots
+    bvc +
+    jsr Rt32NmiRestore
++   stz.w in_nmi_ctx
     rep #$20
     .ACCU 16
 
@@ -1559,6 +1584,31 @@ DefaultNmiCallback:
     rtl
 
 ;------------------------------------------------------------------------------
+; Rt32NmiRestore - put the 32-bit runtime's result slots back
+;------------------------------------------------------------------------------
+; Called after a user callback when bit 6 of in_nmi_ctx says the callback's
+; first 32-bit multiply or divide saved the main thread's slots
+; (rt32_nmi_save). The main thread may have been inside tcc_mul32 or a
+; divide, or between its return and the `lda.l` that reads the high half:
+; it finds its own values again. Entered and left with A 8-bit, DB $00.
+;------------------------------------------------------------------------------
+Rt32NmiRestore:
+    .ACCU 8
+    rep #$20
+    .ACCU 16
+    lda.w rt32_save
+    sta.w mul32_hi
+    lda.w rt32_save+2
+    sta.w div32_qh
+    lda.w rt32_save+4
+    sta.w div32_rl
+    lda.w rt32_save+6
+    sta.w div32_rh
+    sep #$20
+    .ACCU 8
+    rts
+
+;------------------------------------------------------------------------------
 ; DefaultDynamicFlush - No-op stub for the dynamic sprite NMI flush hook.
 ;------------------------------------------------------------------------------
 ; The hook is JML-indirected from the VBlank handler. Until the dynamic
@@ -1603,6 +1653,43 @@ WaitForVBlank:
     plp
     rtl
 
+.ENDS
+
+;------------------------------------------------------------------------------
+; rt32_nmi_save - save the main thread's 32-bit result slots, once a callback
+;------------------------------------------------------------------------------
+; Called by tcc_mul32 / tcc_udivmod32 / tcc_sdivmod32 when they run inside
+; a user NMI callback (in_nmi_ctx bit 7), before they write a slot. The
+; first call of the callback copies the four slots to rt32_save and sets
+; bit 6; the NMI handler copies them back when the callback returns
+; (Rt32NmiRestore). Reached by `jsl` (any bank); A 16-bit in and out, X
+; and Y untouched. Its own section, so a ROM without 32-bit arithmetic
+; does not link it.
+;------------------------------------------------------------------------------
+.SECTION ".rt32_nmi_save" SUPERFREE
+rt32_nmi_save:
+    .ACCU 16
+    php
+    sep #$20
+    .ACCU 8
+    lda.l in_nmi_ctx
+    bit #$40
+    bne @done
+    ora #$40
+    sta.l in_nmi_ctx
+    rep #$20
+    .ACCU 16
+    lda.l mul32_hi
+    sta.l rt32_save
+    lda.l div32_qh
+    sta.l rt32_save+2
+    lda.l div32_rl
+    sta.l rt32_save+4
+    lda.l div32_rh
+    sta.l rt32_save+6
+@done:
+    plp
+    rtl
 .ENDS
 
 ;==============================================================================

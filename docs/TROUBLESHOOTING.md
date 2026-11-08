@@ -127,8 +127,10 @@ The `const` was cast away and the data read through a plain pointer. C const
 data lives in the asset banks and every C read of it is a far read; a plain
 pointer reads bank $00 instead. Keep the `const`, or hand the data to a library
 function that takes a far pointer. The build's bank-blind read check fails the
-link on this pattern; the bank $00 entry of @ref known_limitations has the
-details.
+link when the read names its symbol; it does not see a plain pointer that
+travels (stored, or passed to a function in another file, then read there),
+whose read is silently wrong. The bank $00 entry of @ref known_limitations has
+the details.
 
 ### ROM runs but crashes after a few seconds
 

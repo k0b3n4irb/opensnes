@@ -1,0 +1,23 @@
+# The 32-bit runtime against interrupts: a main loop of 32-bit multiplies,
+# divides and remainders, interrupted by an nmiSetLag callback that does
+# 32-bit arithmetic too, and by an H-timer IRQ on every scanline (main.c).
+# Every result is checked against the compiler's folded constant. Without
+# the in_nmi_ctx paths of mul32.asm / div32.asm and the slot restore of the
+# NMI handler, each bad count is in the hundreds (2026-11-08).
+rom = "rt32_nmi.sfc"
+steps = 30000000                 # the loop ends between 24 and 25 million instructions
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_iters" = 10000
+"r_bad_mul" = 0                  # 32 x 32 products, hardware path
+"r_bad_mul16" = 0                # u16 x u16 -> u32, the short hardware path
+"r_bad_div" = 0                  # u32 / 16-bit divisor
+"r_bad_rem" = 0                  # u32 % 16-bit divisor
+"r_bad_sdiv" = 0                 # s32 / 32-bit divisor
+"r_cb_bad" = 0                   # the callback's own results
+"r_cb_seen" = 1                  # the callback ran (>= 100 lag frames)
+"r_irq_seen" = 1                 # the IRQ ran (>= 10 000 scanlines)

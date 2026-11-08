@@ -5,6 +5,32 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- fix(runtime): a 32-bit multiply, divide or remainder in an `nmiSetLag()` or
+  `nmiSet()` callback no longer corrupts the 32-bit calculation the callback
+  interrupted. `KNOWN_LIMITATIONS.md` and `interrupt.h` said plain C `*` `/` `%`
+  were callback-safe; that held for 16 bits only: `tcc_mul32` and the 32-bit divides
+  used the hardware unit and shared RAM (`mul32_hi`, `div32_qh`, `div32_rl`,
+  `div32_rh`, the divide's working words) without looking at `in_nmi_ctx`. Measured
+  before, on 10 000 iterations with a callback doing the same operations: 208 wrong
+  32x32 products, 121 wrong 16x16 products, 278 wrong quotients, 378 wrong
+  remainders, 521 wrong signed quotients; after: 0 of each. Now, in a callback,
+  the multiply takes a software path (shift and add, no hardware unit), and the
+  first 32-bit call of the callback saves the four result slots, which the NMI
+  handler puts back when the callback returns; the divide also saves and restores its
+  working words. Cost outside a callback, measured with `luna profile` over 1 000
+  iterations: +50 master cycles per `tcc_mul32` call (4 154 to 4 204 per call, 1.2 %),
+  +60 per divide or remainder (0.75 %). The four result slots move to the startup
+  code (8 bytes there before only in a ROM that linked the helpers) with an 8-byte
+  save area: 16 bytes of WRAM in every ROM; the per-frame WRAM baseline
+  (`testing/baselines/wram.json`) is renewed for that new memory map, every frame
+  hash and every manifest unchanged. An `irqSet()` handler is assembly and is not
+  protected: it must not call the runtime nor use the hardware multiplier (measured:
+  a handler multiplying on every scanline made 9 369 of 10 000 main-thread products
+  wrong); `interrupt.h`, `KNOWN_LIMITATIONS.md` and the HDMA tutorial say so. New
+  fixture and manifest `testing/fixtures/stress/rt32_nmi`. The text of `CLAUDE.md`
+  and `docs/TROUBLESHOOTING.md` on the bank-blind read check now says what
+  `KNOWN_LIMITATIONS.md` already did: it does not see a plain pointer that travels
+  between files.
 - fix(ci): the cppcheck download of the Lint workflow retries five times, ten seconds apart, like the Doxygen one.
 
 ## [0.55.0] — 2026-11-08
