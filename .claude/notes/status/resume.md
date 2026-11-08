@@ -121,6 +121,12 @@ and the CHANGELOG.
   `--version` as `name 1.0.0 (OpenSNES 0.55.0, commit 0621c14c[+dirty])`, checked by
   `devtools/check_tool_versions.py` in `make test-tools`. The six ci-rouge threads are closed with the lesson
   (kit `6336448`). A first run after a tool version change has a cold cache and can still fail if GitHub is degraded.
+- **WaitForVBlank lost wake-up done** (`7802f85b`): a partner port found that an NMI between `sta vblank_flag` and
+  `wai` makes the `wai` sleep one frame too long. Reproduced by `testing/fixtures/stress/wait_race` (1 call lost in
+  9 600 phases before, 0 after), fixed in the NMI handler (it returns past the `wai` when it interrupted
+  `vblank_wai`). About +80 master cycles per NMI; every example identical frame by frame (65/65); the audio, WRAM
+  and `nmi_budget` references were re-captured with their evidence in the commit and the CHANGELOG. Lesson in
+  the kit (`7f59492`). Waits for the partner port's own replay of its long PAL run, then the thread closes.
 - **Still mine from the plan**: L13 is only the rule (aligned); the vitrine of tags and release notes is the
   conductor's tool; A3 C3 (a check that sees a plain pointer that travels between files) is not written.
 - Open threads: `ordres de musique datés` (a partner port; answered once, a prototype proposed: dated music orders in the SPC
