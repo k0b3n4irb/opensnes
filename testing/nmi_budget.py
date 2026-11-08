@@ -60,18 +60,22 @@ FRAMES = 150
 # the single ceiling alone let map_scroll go from 7298 to 11999 unnoticed.
 # Re-measure with --report after an intentional NMI change and update here,
 # saying why in the commit.
+# 2026-11-08: every reference re-measured after the NmiHandler learned to
+# skip a `wai` it interrupted (crt0.asm, vblank_wai): about +80 master cycles
+# per interrupt (11 CPU cycles of stack test), and a hook row can move by one
+# memory-refresh pause (40 mclk) when the phase of the interrupt shifts.
 DRIFT = 0.10
 SUBSET = [
-    ("games/breakout",        8490, "the corpus worst: sprites + tilemap + text"),
-    ("games/rooftop_run",       8648, "sprites, scrolling, text and audio together"),
-    ("demos/rpg",             8170, "map module, panel and text"),
-    ("sprites/dynamic_sprite", 7676, "the dynamic-sprite VRAM queue flush"),
-    ("maps/map_scroll",       7668, "the map module's scroll DMA"),
-    ("audio/snesmod_music",   5650, "the audio driver's per-frame work"),
+    ("games/breakout",        8684, "the corpus worst: sprites + tilemap + text"),
+    ("games/rooftop_run",       8724, "sprites, scrolling, text and audio together"),
+    ("demos/rpg",             8254, "map module, panel and text"),
+    ("sprites/dynamic_sprite", 7760, "the dynamic-sprite VRAM queue flush"),
+    ("maps/map_scroll",       7752, "the map module's scroll DMA"),
+    ("audio/snesmod_music",   5630, "the audio driver's per-frame work"),
     # Super FX builds (2026-10-03): the handler is reached through the WRAM
     # vector blob, and its cost is the same order as everywhere else.
-    ("chips/superfx_3d",      8272, "a Super FX build: the handler behind the WRAM vectors"),
-    ("chips/superfx_game_skeleton", 8224, "the handler while gsuPresent runs"),
+    ("chips/superfx_3d",      8348, "a Super FX build: the handler behind the WRAM vectors"),
+    ("chips/superfx_game_skeleton", 8636, "the handler while gsuPresent runs"),
 ]
 
 # Symbols other than NmiHandler that run in the vertical interrupt, with their
@@ -80,7 +84,7 @@ SUBSET = [
 # VBlank — it runs inside the 40 + 40 line letterbox blank, and that every
 # byte lands in blank is vram_dma_blank.py's check, not this one's.
 EXTRA = [
-    ("chips/superfx_game_skeleton", "gsu_present_step", 91956,
+    ("chips/superfx_game_skeleton", "gsu_present_step", 91540,
      "gsuPresent's half-frame upload, in the letterbox blank"),
     # The NmiHandler rows measure the handler's own time: the work it hands
     # to a hook (the text flush, the dynamic-sprite queue) runs in VBlank too
@@ -97,11 +101,11 @@ EXTRA = [
     # Since 2026-10-17 the NMI calls its own entry, tilemapFlushNmi
     # (channel 7; textInit's call keeps tilemapFlush, channel 0), and both
     # fall into tilemapFlushOn, the body luna credits: the row reads that.
-    ("basics/scene_stack", "tilemapFlushOn", 17652,
+    ("basics/scene_stack", "tilemapFlushOn", 18074,
      "the text module's full-map DMA from the NMI hook (a title redraw)", "state_scene_stack", 10),
-    ("sprites/dynamic_sprite", "oamDynamicNmiFlush", 296,
+    ("sprites/dynamic_sprite", "oamDynamicNmiFlush", 336,
      "the dynamic-sprite engine's NMI step under the sprite manifest", "oam_dynamic_sprite"),
-    ("sprites/dynamic_sprite", "oamVramQueueUpdate", 312,
+    ("sprites/dynamic_sprite", "oamVramQueueUpdate", 272,
      "the dynamic-sprite VRAM queue flush it calls", "oam_dynamic_sprite"),
 ]
 

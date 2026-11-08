@@ -1099,6 +1099,30 @@ NmiHandler:                 ; where the handler runs: profiles name it here
     phd
     phb                 ; Save data bank
 
+    ; Did this NMI land between WaitForVBlank's `sta vblank_flag` and its
+    ; `wai`? The flag is then 1, so this NMI does the VBlank work and clears
+    ; it, and the `wai` would sleep until the NEXT NMI, which finds the flag
+    ; at 0 and counts as a lag frame: a frame lost with the main thread on
+    ; time (a window of one instruction, found on a long run, 2026-11-08;
+    ; testing/fixtures/stress/wait_race). Return to the instruction after
+    ; the `wai` instead. The frame the interrupt pushed, from S: B(1) D(2)
+    ; Y(2) X(2) A(2), then P(1) PC(2) PBR(1): PC at 11,s, PBR at 13,s.
+    ; ~10 cycles per NMI when it did not (the usual case).
+    lda 11,s
+    cmp.w #vblank_wai
+    bne @not_in_wait
+    sep #$20
+    .ACCU 8
+    lda 13,s
+    cmp.b #:vblank_wai
+    rep #$20
+    .ACCU 16
+    bne @not_in_wait
+    lda 11,s
+    inc a
+    sta 11,s
+@not_in_wait:
+
     ; Set direct page to NMI register area (PVSnesLib-style DP isolation)
     ; D = tcc__nmi_registers (page-aligned, != 0)
     ; All dp-relative accesses in callback C code now hit NMI registers,
@@ -1647,9 +1671,10 @@ WaitForVBlank:
     .ACCU 8
     lda #$01
     sta.l vblank_flag       ; Signal: "main thread ready"
--   wai                     ; Halt until NMI
+vblank_wai:                 ; the NMI handler knows this address (see there)
+    wai                     ; Halt until NMI
     lda.l vblank_flag
-    bne -                   ; Loop until NMI clears flag to 0
+    bne vblank_wai          ; Loop until NMI clears flag to 0
     plp
     rtl
 

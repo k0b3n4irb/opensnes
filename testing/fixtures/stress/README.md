@@ -13,6 +13,7 @@ campaign is `.claude/notes/status/luna_stress_campaign.md`.
 | `openbus/` | open-bus / MDR reads of the `$2100` mirror through banks (`lda.l bb:2100` returns the bank byte) |
 | `bcd/` | 8-bit decimal-mode `ADC`/`SBC`: each case stores the result and `P` |
 | `rt32_nmi/` | the 32-bit runtime against interrupts: 32-bit multiplies, divides and remainders in the main loop, interrupted by an `nmiSetLag` callback that does 32-bit arithmetic too and by a per-scanline H-timer IRQ; every result against the compiler's folded constant, 0 wrong in 10 000 iterations |
+| `wait_race/` | `WaitForVBlank` against an NMI that lands between its store of `vblank_flag` and its `wai`: a sweep of the call over every phase of the frame, each call classified by the order of its work frame and its lag frame; 0 lost wake-ups |
 | `sprite_overflow/` | 40 small sprites on one scanline: STAT77 (`$213E`) range-over sets, time-over stays clear because range caps the evaluation at 32 sprites |
 
 The expected values were established against the references (fullsnes,

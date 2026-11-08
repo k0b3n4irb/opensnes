@@ -38,6 +38,12 @@ NMI handler: clears flag=0 when done ("acknowledged")
 Main thread: wakes from WAI, sees flag=0, proceeds
 ```
 
+If the NMI lands between the main thread's `sta vblank_flag` and its `wai`, the
+handler (`crt0.asm`, right after its pushes) sees that the interrupted address is
+`vblank_wai` and returns past the `wai`: otherwise the `wai` would sleep to the next
+NMI, a lost frame (`testing/fixtures/stress/wait_race`). Anything added before that
+test in `NmiHandler` must keep the frame layout it reads (`11,s` PC, `13,s` PBR).
+
 Lag frames increment `frame_count` but skip VRAM work. This is intentional.
 
 ## WRAM Data Port — CRITICAL
