@@ -114,9 +114,15 @@ and the CHANGELOG.
   10 000 products wrong when it multiplies per scanline). Lesson in the kit (`396f24c`). Neighbours told.
   A3 C3 is documentation only: the bank-blind read check itself still does not see a pointer that travels
   between files (a check that refuses it is not written).
-- **Still mine from the plan**: the CI download cache + a check that refuses a `curl` without a fallback
-  (lesson `2026-11-08-opensnes-un-telechargement-de-ci-…` stays open until then); L8 `opensnes --version`
-  exposing the commit; L13 (the rule is aligned); the vitrine of tags and release notes (the conductor's tool).
+- **L8 and the CI downloads done** (`0621c14c`, `2d020cca`; CI green: Build & Release 42501397641, Lint 42501397653):
+  Doxygen and cppcheck are cached (cppcheck built into the runner's home), the Windows legs use the runner's
+  MSYS2 (`release: false`), the remaining `curl`s retry; `devtools/check_ci_downloads.py` (in `make lint`) refuses
+  a `curl`/`wget` without a retry or a `# retried:` note; every `opensnes*` tool prints
+  `--version` as `name 1.0.0 (OpenSNES 0.55.0, commit 0621c14c[+dirty])`, checked by
+  `devtools/check_tool_versions.py` in `make test-tools`. The six ci-rouge threads are closed with the lesson
+  (kit `6336448`). A first run after a tool version change has a cold cache and can still fail if GitHub is degraded.
+- **Still mine from the plan**: L13 is only the rule (aligned); the vitrine of tags and release notes is the
+  conductor's tool; A3 C3 (a check that sees a plain pointer that travels between files) is not written.
 - Open threads: `ordres de musique datés` (a partner port; answered once, a prototype proposed: dated music orders in the SPC
   driver, a moyen request); the five ci-rouge threads wait for the cache lesson.
 - Waits for the author: the `ppuReset` COLDATA question (Class A); discardable const data of linked modules
