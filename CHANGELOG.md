@@ -4,6 +4,188 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.55.0] — 2026-11-08
+
+`ppuReset()`, `lzssDecodeRam()`, `audioLoadSampleAt()`, `oamSetBatch()` and the
+`vramQueue*Within` guards join the library, `opensnes budget --frame` measures a
+frame in luna, plain LoROM goes up to 4 MB, and the compiler folds constant
+divisions. Everything below is what `[Unreleased]` held.
+
+### Added
+- feat(lib): `ppuReset()` (console.h, module `ppu_reset`) puts the PPU back to its power-on state between two screens: HDMA stopped, every write-only register from `$2100` to `$2133` at the value crt0's InitHardware writes (forced blank, BG mode 0, all bases 0, horizontal scrolls 0 and vertical -1, the identity Mode 7 matrix, windows and color math off, TM = BG1), the library's shadows back to their value at `main()` (brightness 15, scrolls, BG12NBA/BG34NBA, SETINI, mosaic, color math, windows, Mode 7 scale and angle, HDMA state, a running fade stopped), `oamClear()`. VRAM, CGRAM and OAM contents, NMITIMEN and the audio are not touched. COLDATA gets `$E0` (fixed colour black), not crt0's 0, which selects no plane. 283 bytes of ROM, 167,832 master cycles a call (145,816 of them `oamClear()`); a ROM that lists the module without calling it is byte-identical to one that does not list it (the table sits in the function's SUPERFREE section: a C `const` table goes to a SEMISUPERFREE section, which `wlalink -d` never discards). New example `basics/ppu_reset` and manifest `basics_ppu_reset`: the PPU registers and the shadows read at `main()` and right after the reset are equal; without the call, 80 asserts fail. The shadows of the window module (`window_w12sel` …, were `static w12sel` …), `bg34nba_shadow`, `m7_scale_x/y` and `console_fade_active` (was `static fade_active`) are no longer `static`, so that the reset can reach them.
+- feat(build): `ROM_BANKS` goes up to 128 on plain LoROM (4 MB). The code has been addressed from `$80` since 2026-10-26, so banks 126 and 127 sit at `$FE:` and `$FF:`, clear of the WRAM at `$7E`/`$7F`; the cap of 126 dated from the `$00` addressing. A 128-bank build of `audio/apu_switch` shows the same frame hash and the same audio as the 8-bank one, `opensnes-rom inspect` and `luna cart-check` find the checksum right. New fixture `libtests_bigrom` and manifest: a const table in bank 127 (`$FF:8000`) read back. Counts between that are not 2^k or 2^k + 2^j (126) leave a remainder that is not a power of two: the linker's checksum then differs from the emulators' (`$6013` against `$08FE`); `docs/tools/build.md` says which counts to prefer.
+- feat(lib): `audioLoadSampleAt(id, spcAddr, brr, size, loop)` and
+  `audioLoadSampleBeginAt(...)` (then `audioLoadSampleStep()` as before) load a sample at an
+  address of the sound CPU's memory the game chooses: a resident set plus a swap area of
+  fixed places, replaced during play. Any byte from $0B00 to the end of the sample area (a
+  directory entry is two 16-bit addresses; no alignment); refused, with nothing sent, a place
+  below $0B00, at or past the end, past $FFFF, on another loaded sample or on the load in
+  steps (`AUDIO_ERR_NO_MEMORY`, as a size of 0, or under 3 in steps), a slot of 64 or more, the
+  slot being loaded in steps, a second load in steps (`AUDIO_ERR_INVALID_ID`); a slot may be
+  replaced in its own place, and is "not loaded" until its new entry is written. The bump
+  allocator never goes back: a sample placed above its point raises it to its end, so
+  `audioLoadSample()` always goes above; `audioUnloadSample()` gives back only what ends at
+  that point. CPU side only, no driver change. 749 bytes of ROM in a ROM that calls both (530
+  for `audioLoadSampleAt()` alone, 473 for the version in steps alone), about 20 scanlines to
+  check the place; a ROM that calls neither is byte-identical (`audio/sfx_voices`,
+  `audio/soundboard`, `audio/sfx_from_wav` rebuilt clean, and every other example). Measured
+  on luna for a game that overwrites a place a voice may be playing: the release after
+  `audioStopVoice()` lasts 133 scanlines (8 ms: E-8 a sample from $7FF), and the voice reads
+  its sample meanwhile, so a stop just before the first step is heard (output differs from a
+  control for 8 ms; stopped at scanline 200 then one VBlank, 2 ms); stop, then two VBlanks.
+  A note on another voice stays in its frame during a load in steps (twelve in twelve); sent
+  after a 192-byte step it goes 105 scanlines later, before it at its usual time. New example
+  `audio/sample_swap`; manifests `audio_sample_swap.toml` (fails on a load one byte off, an
+  overlap of one byte accepted, an allocator that goes back) and `audio_sample_swap_silence.toml`.
+- feat(lib): `lzssDecodeRam(source, dest)` expands an LZ77 (tag 0x10) stream into RAM of any
+  bank, $7E and $7F included, with the screen on: no PPU register written, interrupts left
+  enabled, references copied by MVN for banks $7E/$7F and by a byte loop for any other bank
+  (an overlapping reference gives the LZ77 result). Returns the bytes written; refuses (0,
+  nothing written) a tag other than 0x10, a length of 0 or above 65535, an output past the end
+  of the bank. Measured with `luna profile`, master cycles per output byte, SlowROM / FastROM:
+  104 / 88 for literals only, 101 / 87 for long references, 163 / 139 for 2 bpp tiles (32768
+  bytes from 17856; `lzssDecodeVram`, measured the same way on the 4 bpp tiles of
+  `backgrounds/mode1`: 709). 376 bytes of ROM in a
+  ROM that calls it, its own section: a ROM that calls only `lzssDecodeVram` is byte-identical
+  (`backgrounds/mode1` checked). New example `memory/lzss_ram` (tiles into $7F and $7E,
+  overlapping references, a reference cut at the end, the end of bank $7F, four refused streams;
+  manifest `memory_lzss_ram.toml`, which fails on a copy one byte short, a memmove-style copy of
+  overlapping references and a missing end cut).
+- test(lib): the region gate. `libtests_region` / `libtests_region_pal` read back the header
+  country byte (`$FFD9`, set by `ROM_REGION`) and `isPAL()`; three luna manifests assert NTSC build on
+  NTSC (`$01`, 0), NTSC build on a PAL console (`$01`, 1: `isPAL()` reads the console, not the
+  header) and `ROM_REGION=pal` on PAL (`$02`, 1). Header byte put back to the wrong value: the
+  manifest fails.
+- feat(lib): `vramQueuePushSpriteWithin(src, addr, size_px, budget)`: the budget guard of a
+  whole sprite frame in one call. It notes every strip of the frame only if `vramQueueCost() +
+  (size_px / 8) * (size_px * 4 + VRAM_QUEUE_ENTRY_COST) <= budget` (288 for 16x16, 832 for
+  32x32) and the strips all fit in the queue; otherwise it returns 0 and changes nothing. Unlike
+  `vramQueuePushSprite()`, it does not count a refusal in `vram_queue_refused` (a frame that
+  waits for the next one is not a full queue), and a sum past $FFFF is a refusal, never a wrap.
+  The budget is the caller's. Costs 140 bytes of ROM in a ROM that calls it; `libtests` asserts:
+  fits exactly (16x16 and 32x32), one byte short, strips that do not all fit, saturation, under
+  8 pixels.
+- feat(lib): `vramQueuePushWithin(src, addr, size, step, budget)`: `vramQueuePush()` with the
+  guard written once. It notes the transfer only if `vramQueueCost() + size +
+  VRAM_QUEUE_ENTRY_COST <= budget` and an entry is free, otherwise returns 0 and changes
+  nothing, and does not count a refusal in `vram_queue_refused` (a transfer that waits for the next
+  frame is not a full queue). The budget is the caller's, so the policy stays with the game (the
+  per-push budget refused in 01fe79bf decided by push order; this does not). Two games wrote the
+  same guard by hand ten times each. Costs 81 bytes of ROM in a ROM that links `vramqueue`;
+  `libtests` asserts: fits exactly, does not fit, full queue, the sum cannot wrap.
+- feat(tools): `opensnes budget --frame [--frames N]` adds the cost of a frame to the
+  report: luna profiles the ROM (20 frames of warm-up, then 300 by default) and
+  the report gives the busy master cycles of the mean and of the worst frame
+  (CPU, DMA, HDMA and DRAM refresh; the wait for the next frame is not counted)
+  against the 357,365 of a frame, and the frames that lagged. `--json` prints a
+  second object, `{"frame": {...}}`, after the report. Measured on the starter
+  (3 %, 0 lagging frames) and on `sprites/sprite_swarm` (23 % mean, 24 % worst).
+  `--from-frame F` starts the measure later, `--input SCRIPT` gives luna a joypad script
+  (to reach a scene behind a menu), `--top N` lists the N functions that cost most.
+  It also reports what the run wrote to VRAM and CGRAM from frame 0, the
+  loading included (`luna state --vram-writers`, luna 1.43: distinct words and
+  entries), which is what a scene really loads, where the static report adds
+  every asset "if all were loaded at once"; a luna without the totals leaves
+  those lines out. `sprites/sprite_swarm`: 15,264 VRAM words (47 %), 256 colours.
+- feat(lib): two more refusals fire the in-ROM assertion channel (luna `--wdm-out`,
+  a manifest's `wdm_empty`) besides being counted: every audio refusal
+  (`audio_refuse`: a sample slot of 64 or more, a voice that does not exist, no
+  SPC RAM left, a timeout) fires WDM $01, next to `audio_error_count`; and
+  `bgSetMapPtr()` / `bgSetGfxPtr()` given an address their register cannot
+  hold (a computed one: a constant is refused at compile time) round it down as
+  before but count it in `bg_address_refused` and fire WDM $03. The 60
+  examples fire none; `libtests` asserts both counts.
+- feat(lib): a DMA transfer made with the screen on, outside VBlank, is no longer
+  silent: `dmaCopyVram`, `dmaCopyCGram`, `dmaCopyOam`, `dmaCopyVramMode7` and
+  `dmaFillVRAM` count it in `dma_unsafe_count` and fire WDM $02, which luna
+  reports (`--wdm-out`, `wdm_empty`). The transfer runs as before. The test is the
+  `setScreenOn()`/`setScreenOff()` shadow and HVBJOY bit 7, read twice: before the
+  transfer starts, and right after the MDMAEN write, where the CPU resumes only
+  once the DMA is over (IRQs masked for those few cycles) — so a transfer started
+  in VBlank but too big for it is caught too, which the start alone missed:
+  `dmaFillVRAM(0, 0, 0xF000)` with the screen on, called in VBlank, lost
+  its second pass to active display and was not counted. A call counts once,
+  however many passes it makes; a single transfer longer than the whole active
+  display (about 38 KB) that ends in the next VBlank is not seen. Cost, libbench
+  row `dma` (2 KB): 17,866 to 18,142 master cycles (+276, +1.5 %; the start
+  check alone was +103), `vramc` (six 128-byte calls) +176 a call; the examples
+  fire nothing; `libtests` asserts the start (active display, screen off,
+  VBlank) and the end: started in VBlank with the screen on, a 0xF000-byte fill,
+  a 32 KB copy and Mode 7's two 16 KB passes count one each, the same fill with
+  the screen off, 2 KB and 4 KB count none (the 4 KB copy, from the line
+  `WaitForVBlank()` returns on, ends seven lines before VBlank does). Without the
+  end check the three long ones read 0. libbench's baseline is re-taken
+  (`vramc` was past the 10 % gate of its old figure; OpenSNES is now behind
+  PVSnesLib on `dma` and `vramc`, by 1.4 % and 1.3 %), and `baselines/audio.json`
+  for `apu_switch`, `speech_synth` and `superfx_game_skeleton`, whose sound
+  starts a few samples off (`luna diff --audio --align-onset`: MATCH, max delta
+  0.14 %, shift at most 4 samples); `baselines/wram.json` too: the new
+  `dma_end_armed` byte moves the RAM that follows it by one (`games/blocks`
+  at frame 290: `$0534` is now the flag, `$C0` = HVBJOY when armed, and
+  `hdma_enabled_state` moved to `$0535` with its value) and the stack holds
+  other return addresses (`backgrounds/mode1`: only `$1FA2-$1FFB` differ).
+- feat(lib): `oamSetBatch(&batch)` (opt-in module `sprite_batch`, header
+  `OamBatch`) writes the OAM entries of N alike objects from parallel arrays
+  (`x`, `y`, and `tile` / `attr` when given) in one assembly loop: no call per
+  sprite, the ninth x bit through `oam_ext_tab`, the size bits and the tile and
+  attribute bytes it is not given left alone. Measured on luna with the
+  stand-alone scene of 32 and 64 identical objects (update + emission, slow
+  ROM): emission of x and y only 2,256 to 741 mclk an object against
+  `oamSetXYFast` in a loop (-67 %), x, y, tile and attribute 3,250 to
+  1,098 against `oamSetFast` (-66 %); update and emission together 4,112 to
+  2,602 and 5,099 to 2,959 mclk an object (-37 % and -42 %). The movement of
+  the objects stays the game's. A ROM that does not list `sprite_batch` does
+  not carry it. `libtests` asserts the bytes (ninth bit both ways, kept size
+  bits, one pointer only, a start off a high-table byte, a cut at 127, count 0).
+- feat(examples): `games/shard_dash`, a short game written across several files:
+  one C file per screen (`title.c`, `play.c`, `result.c`), a screen layer
+  (`screen.c`: VBlank wait, VRAM queue flush with a budget, non-blocking fades,
+  pad edges, a per-image pump, a close hook), a versioned and checksummed save
+  (`save.c`: absent or corrupt SRAM gives the defaults) and text helpers.
+  Eight `luna test` manifests play it: each screen, the real fade (16 images,
+  the pump running), a lost round with a key held across screens, and a save
+  round trip (write, reload, corrupted copy).
+
+### Fixed
+- fix(lib): the DMA screen check also reads the end of the transfer. It counted a
+  transfer started with the screen on outside VBlank, not one started inside VBlank
+  and too big to finish there: a 0xF000-byte `dmaFillVRAM` with the screen on, called
+  after `WaitForVBlank()`, lost its second pass to active display and
+  `dma_unsafe_count` stayed at 0. The CPU is stopped until a general DMA is over, so
+  `HVBJOY` read right after the `MDMAEN` write gives the line the transfer ended on;
+  the same count and `WDM $02` follow.
+- fix(build): the `dma` module declares `console`, and the module dependencies
+  resolve four levels deep. A ROM listing `dma` without `console` no longer linked
+  (`make test-link-modules`: 11 of 51 modules failed alone).
+- fix(tools): `opensnes-rom budget` reads a section's bank from its ROM offset, not
+  the CPU window. On a FastROM LoROM image past 64 banks, bank 64 (at `$C0`) was taken
+  for bank 0 and showed 200 % with a false asset warning.
+- fix(build): `install-luna` retries the download three times, five seconds apart,
+  after a CI job failed on a network drop.
+- fix(ci): the Doxygen download of the Lint and docs-deploy workflows retries five times, ten seconds apart, after the release-asset CDN answered 504 twice in a row.
+- fix(build): `test-sanitizers` and `coverage-host` restore the normal compiler
+  binaries when they end, so a run does not leave instrumented binaries in `bin/`.
+
+### Changed
+- perf(compiler): a division or remainder of two integer constants is
+  computed by the compiler. `19391 / 3584`, `(7 * 32 + 3584 - 1) / 3584` or
+  `1800 / 60` called the division helper at run time, while `7 * 32` was
+  already folded. A zero divisor and the most negative value divided by -1
+  (16 or 32 bits) are left to run time. Two examples change:
+  `games/shard_dash` (one call gone) and `sprites/world_sprites` (six); the
+  library is byte-identical. New
+  fixture `const_div` (values written by hand, no helper called) and
+  compiler check `const_div_fold`.
+- perf(compiler): a function that calls nothing and needs more than the 16
+  words of the direct-page block `tcc__lf` keeps its costliest temporaries
+  there (use count weighted by loop depth) and only the rest on the stack.
+  Until now one word too many sent every temporary to the stack. A 16.16
+  path walk with five 32-bit locals went from 53 to 42 instructions per
+  loop turn and from a 40-byte to a 10-byte stack frame. No example and no
+  library function has such a function: the corpus is byte-identical. A
+  function with a local whose address is taken keeps its stack frame.
+  `QBE_NO_LEAF_SPLIT=1` turns it off.
+
 ## [0.54.0] — 2026-11-01
 
 The dynamic-sprite draw is 15.8 % cheaper, `budget` reports the SPC RAM of
@@ -2389,7 +2571,7 @@ header against luna's view. luna v1.32.0.
   `snesmod_music`): 127 halves the level, 255 leaves it unchanged, 63 leaves
   a quarter. `snesmod.h`, `docs/tutorials/audio.md` and the `snesmod_music`
   README said 0-127, and the example's volume variable started at 127 so the
-  first L press jumped from 255 to 117 (snes-rag, reading the SNESMOD
+  first L press jumped from 255 to 117 (rag-partner, reading the SNESMOD
   source; library audit D12). The effect volume stays 0-127: our wrapper
   reduces it to the driver's nibble.
 - docs: `fix32Sin()` / `fix32Cos()` carry the NMI warning of `fix32Mul()`:
@@ -2605,7 +2787,7 @@ header against luna's view. luna v1.32.0.
   dropped, the stray `cli` in `QueueMessage` / `snesmodInit` is gone and
   `snesmodGetPosition()` reads until two reads agree; commands with no
   parameter queue 0 in their unused bytes instead of what a scratch variable
-  held. Found by snes-rag
+  held. Found by rag-partner
   reading the upstream driver; measured and pinned by `libtest_snesmod`
   (before: latch flag `$40`, 3 lines, depth 44 after 100 sends, never
   drained; after: 0, 6, 255, drained in 40 frames).

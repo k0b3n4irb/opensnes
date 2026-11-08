@@ -39,7 +39,8 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 5_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
+STEPS = 6_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth;
+                    # 5 M until 2026-11-07: the DMA end check's frames reach r_done at ~5.3 M under PAL
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -243,9 +244,34 @@ CASES = [
     # sprite 7), visible[] by sprite, then order bytes out of range
     ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
+    # oamSetBatch: x/y only keeps tile, attr and size bits; the ninth bit set
+    # and cleared; tile and attr from an unaligned id; one pointer only; cut at
+    # 127; count 0 and a bad id write nothing
+    ("r_batch", 22, sum(w << (16 * i) for i, w in enumerate([
+        0x050A, 0x062C, 0x07FF, 0x08FF, 0xBBAA, 0x01FE, 0xAAAA, 0x7F, 7, 3, 3]))),
+    # the screen-on check of the DMA routines: one transfer in active display with the
+    # screen on is counted (and fires WDM $02), screen off and VBlank are not
+    ("r_dmachk", 8, sum(w << (16 * i) for i, w in enumerate([1, 0, 0, 0x0D4A]))),
+    # the end check: started in VBlank, screen on — a 0xF000-byte fill runs out
+    # of VBlank (1, its two passes count once), screen off (0), 2 KB fits (0),
+    # a 32 KB copy runs out (1), 4 KB fits (0), Mode 7's two 16 KB passes (1)
+    ("r_dmaend", 14, sum(w << (16 * i) for i, w in enumerate([1, 0, 0, 1, 0, 1, 0x0E4D]))),
+    # a refused audio call is counted: +1, code 2 (AUDIO_ERR_INVALID_ID)
+    ("r_audtrip", 4, 0x0201 | (0x0A02 << 16)),
+    # a computed BG address the register cannot hold: 2 counted, none for aligned ones
+    ("r_bgaddr", 4, 2 | ((0x0A02) << 16)),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (40 << 32) | (0x0A51 << 48)),   # free: VRAM_QUEUE_MAX := 40 in the Makefile
     ("r_vqcap", 2, 40),
+    # vramQueuePushWithin: fits exactly (1, count 1; cost 252), does not fit (0, count 1; no refusal
+    # counted), full queue (0, count 40), the sum cannot wrap (0, cost kept: $FFF0 << 4 = $FF00 in 16 bits)
+    ("r_vqw", 12, sum(w << (16 * i) for i, w in enumerate([0x0101, 0x00FC, 0x0100, 0x0000, 0x2800, 0xFF00]))),
+    # vramQueuePushSpriteWithin: a 16x16 frame at a budget of exactly 288 (1, two strips; cost 288,
+    # strips 512 bytes / 256 words apart), one byte short (0, count 2; no refusal counted), the
+    # strips do not both fit (0, count 39), a sum past $FFFF (0, cost kept), a 32x32 frame at
+    # exactly 832 (1, four strips), under 8 pixels (0, nothing noted, no refusal)
+    ("r_vqsw", 18, sum(w << (16 * i) for i, w in enumerate(
+        [0x0201, 0x0120, 0x0200, 0x0000, 0x2700, 0x0000, 0x0000, 0x0401, 0x0000]))),
     ("r_vqref", 4, 2 | (3 << 16)),   # refusals counted, ignored return values or not
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit

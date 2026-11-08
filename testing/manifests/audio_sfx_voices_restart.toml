@@ -1,0 +1,22 @@
+# examples/audio/sfx_voices - the DSP side of "stop then play on one voice in
+# one frame". Frame 212 is inside the restart phase (the 11th pair has run,
+# measured: restart_pitch 0x1400, restarts_ok 11): voice 3 holds the NEW pitch
+# 0x1400 (not the 0x0800 of the note it cut), the sample it was given, the
+# instant-attack envelope, and is sounding (ENVX 0x7F). One frame later the
+# next pair has set 0x0800 (frame 213 measured: PITCHH 0x08, restarts_ok 12).
+rom = "../../examples/audio/sfx_voices/sfx_voices.sfc"
+frames = 212
+
+[asserts.values]
+phase        = { eq = 3, width = 1 }
+restarts_ok  = { eq = 11, width = 1 }
+restart_pitch = { eq = 0x1400, width = 2 }
+audio_error_count = { eq = 0, width = 2 }
+
+[asserts.dsp]
+V3_PITCHL = 0x00
+V3_PITCHH = 0x14
+V3_SRCN   = 0x00
+V3_ADSR1  = 0x8F
+V3_ADSR2  = 0xE0
+V3_ENVX   = 0x7F

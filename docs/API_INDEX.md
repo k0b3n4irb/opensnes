@@ -87,11 +87,13 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | darken or colour-cast a whole scene (night/underwater/sunset) | `colorMathShadow`, `colorMathTint` | `colormath` | [color/shadow_tint](../examples/color/shadow_tint/) |
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
+| structure a game in several files (a screen layer, a checksummed save, a test per screen) | `fadeStart`, `fadeStep`, `vramQueuePush`, `sramLoad`, `sramSave` | `vramqueue`, `sram` | [games/shard_dash](../examples/games/shard_dash/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
-| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
+| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushWithin` (the push that checks a budget you give), `vramQueuePushSprite`, `vramQueuePushSpriteWithin` (a whole sprite frame within your budget), `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
+| write the OAM entries of N alike objects (bullets, particles) from arrays, in one call | `oamSetBatch`, `OamBatch` | `sprite_batch` (opt-in) | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
-| decompress | `lzssDecodeVram` | `lzss` | |
+| decompress LZ77 tiles (into VRAM under forced blank, or into RAM of any bank with the screen on) | `lzssDecodeVram`, `lzssDecodeRam` | `lzss` | [memory/lzss_ram](../examples/memory/lzss_ram/) — about 100 master cycles per byte, 160 for tiles |
 | copy, fill or compare memory and strings | `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`, `strcpy`, `strncpy` | `string` | [FAR RAM: copying](tutorials/far_ram.md) |
 
 ## 3D math on the DSP-1 coprocessor
@@ -125,12 +127,14 @@ its header.
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio_samples.md) |
 | `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio_samples.md) |
+| `audio.h` | `audioLoadSampleAt`, `audioLoadSampleBeginAt` | [audio: a swap area](tutorials/audio_samples.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
 | `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |
 | `console.h` | `rngNext`, `rngSeed` | [math: random numbers](tutorials/math.md) |
 | `console.h` | `resetFrameCount` | [animation](tutorials/animation.md) |
 | `console.h` | `isInVBlank` | [DMA](tutorials/dma.md) |
+| `console.h` | `ppuReset` | [game states: registers the previous screen left](tutorials/game_states.md) |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` (behind `SNES_BREAK`, `SNES_NOCASH`) | [debugging](tutorials/debugging.md) |
 | `hdma.h` | `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaBrightnessGradientStop`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWindowShape`, `hdmaGetEnabled`, `hdmaDisableAll` | [HDMA: ready-made effects](tutorials/hdma.md) |
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |

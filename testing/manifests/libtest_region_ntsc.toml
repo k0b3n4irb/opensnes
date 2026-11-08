@@ -1,0 +1,13 @@
+# The region a ROM declares and the region it runs on (the SDK's two views of
+# NTSC/PAL, 2026-11-06). Build side: `make ROM_REGION=ntsc|pal|jp` sets the
+# header country byte $FFD9. Run side: isPAL() reads the console's PPU STAT78
+# bit 4 once, in consoleInit(). The fixture records both.
+# Here: the NTSC build (header $01) on an NTSC console: isPAL() == 0.
+rom = "../fixtures/libtests_region/libtest_region.sfc"
+frames = 30
+region = "ntsc"
+
+[asserts.values]
+r_header_country = 1
+r_ispal = 0
+r_done = 0xBEEF

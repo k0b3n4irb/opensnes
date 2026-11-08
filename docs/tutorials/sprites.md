@@ -330,6 +330,37 @@ oamPlaceWorld(&actors, cam_x, cam_y);
   than the unsorted call, 36,400 a frame for the same 19 sprites; the C
   loop with the same indirection costs 136,700 with PVSnesLib's compiler.
 
+## Many alike objects: `oamSetBatch`
+
+Bullets, particles, a swarm: N objects that move the same way and are drawn
+the same way. The movement is the game's code; the emission, four OAM bytes
+and a ninth x bit a sprite, is a loop that `oamSetBatch()` runs in assembly
+over the game's arrays. It is an opt-in module: add `sprite_batch` to
+`LIB_MODULES`.
+
+```c
+static s16 bx[32], by[32];                       // moved by the game
+static const OamBatch shots = { bx, by, 0, 0, 0, 32 };   // x, y, tile, attr, first id, count
+
+oamSetBatch(&shots);                             // every frame, after the move
+```
+
+`tile` and `attr` are optional: objects that never change picture are set
+once with `oamSet()` and passed as 0, and only x, y and the ninth x bit are
+written. Give `tile`, `attr`, or both, for what changes. The size bit is
+never touched (`oamSetSize()`).
+
+It pays when the arrays already exist: a game that moves and masks each
+object in its own loop, and would build the x and y arrays only to hand them
+over, measured 1.4 % worse than writing the entries in that loop.
+
+Cost, measured on luna with 32 and 64 identical objects (slow ROM; the
+update loop of the game, about 1,870 master cycles an object, is not in these
+figures): x and y only, 741 master cycles an object against 2,256 for
+`oamSetXYFast()` in a loop; with tile and attribute, 1,098 against 3,250 for
+`oamSetFast()`. With the update loop of the scene added, 4,112 to 2,602 and
+5,099 to 2,959 master cycles an object.
+
 ## Performance Tips
 
 1. **Minimize oamUpdate() calls** - Only call once per frame

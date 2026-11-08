@@ -180,6 +180,35 @@ static void transition_to_gameplay(void) {
 
 The key rule: call `setScreenOff()` before bulk VRAM/CGRAM writes, and `setScreenOn()` after. This is the forced blank pattern used throughout the OpenSNES examples.
 
+### Registers the previous screen left
+
+VRAM is not the only thing a screen leaves behind. The PPU registers are
+write-only and keep their value until something writes them, and
+`consoleInit()` rewrites only a few (BG mode, BG1's map and tiles, mosaic,
+the palettes). A game-over screen set up after the game inherits the game's
+sprite size, the maps and scrolls of the layers it does not use, the main
+and sub screen, the windows, color math, Mode 7's matrix, a running HDMA.
+
+`ppuReset()` (module `ppu_reset`) puts every PPU register from `$2100` to
+`$2133` back to the value it had at power-on, stops HDMA, resets the
+library's shadows (scrolls, mosaic, color math, windows, Mode 7, brightness,
+a running fade) and hides every sprite. It leaves VRAM, CGRAM, the audio and
+the NMI settings alone. Call it between two screens, before the setup of the
+next one, which then starts like a first screen:
+
+```c
+static void transition_to_game_over(void) {
+    ppuReset();                         /* screen black, PPU as at power-on */
+    setMode(BG_MODE1, 0);               /* mode 0 after the reset */
+    /* load the game-over tiles, map and palette, set the layers ... */
+    setScreenOn();
+    game_state = STATE_GAME_OVER;
+}
+```
+
+`examples/basics/ppu_reset` shows the difference: built without the call,
+its second screen keeps the first one's scroll and tint.
+
 ## Title Screen Implementation
 
 A title screen waits for the player to press START, then transitions to gameplay. A minimal form of the title state of `examples/games/blocks/main.c`:

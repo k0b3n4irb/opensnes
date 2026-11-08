@@ -54,7 +54,7 @@ NOT_IN_ALL = set(MODE)                            # chip modes are exclusive; sn
 DYNAMIC = {"sprite_dynamic", "sprite_dynamic_dispatch", "sprite_dynamic_helpers",
            "sprite_dynamic_meta", "object"}       # ~2.9 KB of plain RAM
 GROUPS = {                                        # name -> modules excluded from that all-in-one ROM
-    "all_but_hdma": {"hdma"},
+    "all_but_hdma": {"hdma", "ppu_reset"},       # ppu_reset depends on hdma (_DEP_ppu_reset): it would bring hdma's 2.7 KB of tables back
     "all_but_dynamic": DYNAMIC,
 }
 

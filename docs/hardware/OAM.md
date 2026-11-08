@@ -90,15 +90,15 @@ For direct OAM writes without a shadow buffer, you must respect the pair-write r
 
 | Register | Address | Description |
 |----------|---------|-------------|
-| OAMADDL | $2102 | OAM address (low byte) |
-| OAMADDH | $2103 | OAM address (high byte) + priority rotation |
+| OAMADDL | $2102 | OAM word address (low byte) |
+| OAMADDH | $2103 | OAM word address (bit 8) + priority rotation |
 | OAMDATA | $2104 | OAM data write |
 
 ### Setting OAM Address
 
 ```c
 // Set OAM address to sprite N (N = 0-127)
-REG_OAMADDL = N * 4;  // Each sprite is 4 bytes
+REG_OAMADDL = N * 2;  // OAMADD is a WORD address: a sprite is 4 bytes = 2 words
 REG_OAMADDH = 0;
 ```
 
@@ -121,7 +121,7 @@ To hide a sprite, set its Y position to 240 **and** set its X-position
 high bit (placing it at X=256, off-screen to the right):
 
 ```c
-REG_OAMADDL = sprite_id * 4;
+REG_OAMADDL = sprite_id * 2;  // word address (4 bytes = 2 words)
 REG_OAMADDH = 0;
 REG_OAMDATA = 0;    // X low byte (don't care)
 REG_OAMDATA = 240;  // Y = 240

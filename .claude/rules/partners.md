@@ -1,141 +1,33 @@
-# The two shoulders: luna and snes-rag (Auto-loaded)
+# luna, rag-partner and the game: working jointly (always loaded)
 
-CRITICAL, owner decision (2026-09-22): OpenSNES does not work alone. It
-stands on two partners, and the three of us work **jointly** — each one
-helps the other two, and each one owes the other two its feedback.
+Roles, authorisations, pushes, "one lot = one conversation" and the scientific method are in the tree's `CLAUDE.md`, not here. This file is what is specific to OpenSNES.
 
-| Partner | What it is | What it gives us | What we give it |
-|---|---|---|---|
-| **luna** | the cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | the one source of truth for running, inspecting and judging ROMs (`.claude/rules/luna_tooling.md`) | capability requests specified by a working prototype, bug reports with a ROM and a command line, and the answer to every note it sends us |
-| **snes-rag** (the Cartouche corpus, MCP `cartouche`) | the arbitrated SNES reference corpus: hardware, chips, SPC700, formats, toolchain docs, luna's own docs | the arbiter for every hardware claim and every "is this the hardware or the toolchain?" question (`.claude/rules/hardware_claims.md`) | every query that came back empty, wrong or unsettled; every source it is missing; every fact we established that no source states |
+## The partners
+| Partner | What it is | We owe it |
+|---|---|---|
+| **luna** | cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | capability requests with a working prototype, bug reports with a ROM and a command line, an answer to every note it sends. Lifecycle in `luna_tooling.md`. |
+| **rag-partner** (corpus, MCP `cartouche`) | arbitrated SNES reference: hardware, chips, SPC700, formats, luna's docs | every query that came back empty, wrong or unsettled; every source it lacks; every fact we measured that no source states (with provenance). It has no standing session. |
+| **the game** | the first project built on the SDK, the proof that the whole assembles | what it shows us stays in `.claude/notes/private/` (ignored by git); in this repository it is "the game", nothing more. |
 
-This rule is the contract between the three. The two rules it cites say
-*how* to use each partner; this one says that using them is not optional,
-and that **silence is a failure**: a gap noticed and not reported is the
-same gap next month.
+**Silence is a failure**: a gap in a partner noticed and not reported the same day is the same gap next month. We are the bridge: what luna answers about the hardware goes into the rag-partner report; when the corpus contradicts luna, luna gets the citation.
 
-## The duty of feedback
+## How to talk
+- `ListAgents`, then `SendMessage` to `luna` and to the game's session (recognised by working directory). No GitHub issue between the three. First line: what it is about; then weight (`léger` / `moyen` / `lourd`; **anything touching code generation is `lourd`**), whether it blocks, the fact with its piece, what is asked, when it closes. A message is read at a natural break; only what blocks goes ahead of the work in hand.
+- **A claim comes with its piece** (measurement, command, ROM, test) and is provoked before it is stated to a neighbour. Two round trips without agreement: the persistent disagreement goes to the conductor.
+- **What is decided is written down** (notes, `CHANGELOG`); a long piece is a dated report under `.claude/notes/partners/<partner>/YYYY-MM-DD_{to,from}_<topic>.md`, announced by message, copied by the receiver. An unfinished report is `OPEN_<partner>.md`, one line per item (date, asked, came back, needed). Every claim in a report was re-checked the day it is sent. rag-partner's folder is reached by files only: ours are delivered to the `opensnes/` folder of its partner notes (location in the user memory).
 
-Do not hesitate — the owner has said so explicitly. If something is
-missing, wrong, or merely inconvenient in a partner, write it down for them
-the same day, with what you tried and what you needed. Concretely:
+## The SDK learns from the game; it does not bend to it
+A request lands only if it passes four checks, written in the reply:
+1. **The need is general**: a second game would hit it (a game reading the lib's internals is the usual sign the SDK lacks something). One case is not enough: it waits for a second.
+2. **The API speaks the SDK's terms** (bytes, entries, frames, banks), from a stand-alone reproducer, never the game's sources.
+3. **Policy stays with the game**: the SDK gives the measure and the mechanism (precedent: `vramQueueCost()` yes; a budget imposed by `vramQueuePush()` no, `01fe79bf`; `vramQueuePushWithin()` yes, the budget is an argument).
+4. **The cost to every other user is small and stated**, measured in the commit.
+A justified no closes a request; the asker finds another way or brings a new fact.
 
-- **To luna** (active partner, answers and ships): when a measurement,
-  flag, device, oracle or diagnostic is missing; when its output
-  contradicts a reference; when a note it sent us needs an answer.
-  Lifecycle in `luna_tooling.md`: prototype → we validate it in writing →
-  a direct message to luna's session with the prototype (`exchanges.md`;
-  no GitHub issue since 2026-10-10) → luna ships → we delete the prototype. A *report* (several requests, priorities, what luna
-  made possible since the last one) is a file luna's engineers read as is.
-- **To snes-rag** (passive partner: it waits for our feedback and luna's,
-  it does not come to us): when `snes_search` / `snes_verify` returns
-  nothing, the wrong source, an `unsettled` on a point some reference does
-  settle, a passage that is truncated where it matters, a documented-error
-  flag that is wrong; when a source we need is not captured; when a fact we
-  had to *measure* (on luna, on a console, on a real firmware) is stated by
-  no source — that is a fact the corpus should carry, with its provenance;
-  when luna ships a version whose docs the corpus has not re-captured.
-- **luna ↔ snes-rag** — we are the bridge. When luna answers a hardware
-  question (an unplugged port, the `$4017` tied bits, the DSP-1 firmware's
-  real `Distance`), that answer and its arbitration status go into the
-  snes-rag report so the corpus can carry it. When the corpus contradicts
-  luna, luna gets the citation.
+## The game lives on this tree
+It builds against this working tree on `develop`, never a release. So: a compiler chantier, a change to a public header or to `make/common.mk` is made in a **separate worktree** (an uncommitted edit here is seen by the game's next build); what lands on `develop` is announced to it; a full rebuild (`make clean && make`, `bin/` incomplete for minutes) is announced before and after; during a Class A validation, give it the compiler binary in a separate directory. Nothing of the game enters a commit, test, note, document or commit message: name, rights holder, paths, source file or function names, measurements tied to its sources. What must enter is a stand-alone example written by us. A worktree opened by a sub-agent starts from the last release, not from `develop`: say `git checkout -B work develop` first.
 
-## Where the exchanges live
-
-`.claude/notes/partners/<partner>/YYYY-MM-DD_<direction>_<topic>.md`, with
-`direction` = `to` (ours) or `from` (theirs). Versioned in the repo, not in
-`/tmp` or on one machine: a report that lives only in `/tmp` is lost with
-the session, and the *answers* to it are project knowledge. Since
-2026-10-10 the owner no longer carries them: a report to luna is announced
-to luna's session directly (`exchanges.md`); snes-rag, which has no standing
-session, is reached by its folder only.
-
-This folder is the archive, and it is versioned on purpose: on 2026-10-25
-the shared `~/workspace/partner-reports/` went in a clean-up of the
-workspace, and luna rebuilt its own archive from ours (86 files). Nothing of
-a game goes in it (`exchanges.md`), so nothing in it needs hiding.
-
-**luna** (since 2026-10-25): a report to luna is written here and announced
-to luna's session by message, which names the file; luna copies it into its
-own archive (`luna/.claude/notes/partners/opensnes/`, ignored by its git).
-A note luna sends arrives the same way and is copied here as `from_luna_…`.
-We write nothing in luna's tree. From 2026-10-06 to 2026-10-25 both sides
-delivered into `~/workspace/partner-reports/opensnes/`, which no longer
-exists.
-
-**snes-rag's exchange folder** (on this machine): the `opensnes/` folder of
-snes-rag's partner notes, `.claude/notes/partners/opensnes/` in its clone
-on this machine (where that clone sits relative to this tree depends on the
-owner's workspace layout; the maintainer's sessions keep it in their user
-memory, not here). Their `from_` reports land there, and **ours are always
-delivered there** (owner instruction, 2026-10-02): write the `to_` file in
-the repo, then copy it into that folder. Check which `to_` files they
-already have first, so an outdated report is folded into the current one
-instead of sent late. Until 2026-10-25 this rule named a path under
-`/media/psf/Home/workspaces/SNES/`, which no longer exists.
-
-**The game** is not a partner in the sense of this rule — it is the first
-project built on the SDK, and since 2026-10-10 it speaks to us directly and
-we to it (`exchanges.md`). What it shows us is kept out of the history, in
-`.claude/notes/private/` (ignored by git): the game is under licence and is
-never named in what is committed.
-
-Every `to_` report has the same spine: header (who, which pin / index
-fingerprint, status: sent as is, or still accumulating), what the
-partner made possible since the last report (first — it is the context for
-the asks), the requests **simplest first** with kind, cost and the exact
-I/O contract we would use, a priority table, small observations without an
-ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
-`partners/snes-rag/`.
-
-## What each session does
-
-1. **Before blaming the toolchain**, query snes-rag (`hardware_claims.md`
-   step 4). **Before writing an internal script**, ask what luna already
-   exposes (`luna_tooling.md`).
-2. **When a partner falls short**, append the item to the *open* report for
-   that partner (`partners/<partner>/OPEN_<partner>.md`, created on first
-   need) — one line is enough: date, what was asked, what came back, what
-   was needed. A sent report is renamed to its date. **Nobody validates
-   it for us** — the owner has said so (2026-09-22: "je ne valide rien,
-   j'attends à ce que vous parliez entre vous"). The engineers of
-   the three projects read these reports as engineers: every claim in one
-   must have been re-checked the day it is sent, with the exact query,
-   command or chunk id that lets them reproduce it, and a claim we cannot
-   reproduce is not sent.
-3. **When a partner sends something**, answer it in full and in writing
-   (`to_..._reply.md`), correction by correction: what we take, what we
-   withdraw, what we still need. Their corrections of *us* go into our
-   notes the same day (precedent: R1 and R4 of the 2026-09-20 exchange
-   changed two of our conclusions).
-4. **At every luna pin bump**: re-run the corpus golden queries
-   (`.claude/notes/tech/cartouche_corpus.md`) and tell snes-rag if
-   `luna-docs` lags the tag.
-
-5. **Once a week**: check whether Mukunda Johnson answered the five SNESMOD
-   issues we filed on 2026-10-03 (`mukunda-/snesmod` #6 to #10) and log the
-   check in `.claude/notes/partners/snesmod-upstream/README.md`, which has
-   the command and the date the next check is due. PVSnesLib is told about
-   the KOF bug only after he and we agree (owner decision).
-
-6. **Once a month**: read what QBE upstream committed since the last tip we
-   read, and take what serves us — nothing goes back to them (owner
-   decision, 2026-10-13: we keep our fork, we do not contribute upstream).
-   Policy, command and the date the next check is due:
-   `.claude/notes/partners/qbe-upstream/README.md`.
-
-## When this rule does NOT apply
-
-- Non-SNES, non-toolchain questions (git, Python, CI syntax): no partner
-  owns those.
-- Re-reporting an item already on the open report — add evidence to the
-  existing line instead.
-
-## Cross-references
-
-- `.claude/rules/luna_tooling.md` — Luna-First and the prototype lifecycle.
-- `.claude/rules/hardware_claims.md` — arbitration of hardware claims.
-- `.claude/notes/tech/cartouche_corpus.md` — what the corpus holds, its
-  fingerprint, the golden queries.
-- `.claude/notes/partners/` — the exchanges themselves.
+## Periodic duties
+- Before blaming the toolchain: query rag-partner (`hardware_claims.md`). Before writing an internal script: ask what luna exposes (`luna_tooling.md`).
+- At every luna pin bump: re-run the corpus golden queries (`.claude/notes/tech/cartouche_corpus.md`) and tell rag-partner if `luna-docs` lags the tag.
+- Weekly: the five SNESMOD issues (`.claude/notes/partners/snesmod-upstream/README.md`, with the command and the next due date). Monthly: what QBE upstream committed, to take what serves us, nothing goes back (`.claude/notes/partners/qbe-upstream/README.md`).

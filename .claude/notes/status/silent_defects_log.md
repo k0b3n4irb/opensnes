@@ -161,7 +161,7 @@ weekly line is written by 2026-10-24 and 2026-10-31.
 
 | Week | Date | (a) suites | (b) header read | (c) partners |
 |---|---|---|---|---|
-| 1 | 2026-10-07 | `make clean && make`, `make tests` green; `--coverage --power-on random=2026`: 84 OK / 2 INPUT-DEP / 0 dead of 86; `make luna-bench`: 0 bug; `make hardware-preflight`: 26 of 26 rows; `make test-pal` **failed** at its last step (the PAL-header manifest path still assumed the harness three levels deep, wrong since the move of 2026-10-05, `75d0d942`) — a loud recipe fault, fixed, then green (84 OK / 2 INPUT-DEP, 6 + 1 manifests) | `anim.h`: one defect (row above), one cost figure five to seven times too low, re-measured | luna's reply to the v1.33.1 report answered 2026-10-06, pin v1.34.0; nothing new from snes-rag |
+| 1 | 2026-10-07 | `make clean && make`, `make tests` green; `--coverage --power-on random=2026`: 84 OK / 2 INPUT-DEP / 0 dead of 86; `make luna-bench`: 0 bug; `make hardware-preflight`: 26 of 26 rows; `make test-pal` **failed** at its last step (the PAL-header manifest path still assumed the harness three levels deep, wrong since the move of 2026-10-05, `75d0d942`) — a loud recipe fault, fixed, then green (84 OK / 2 INPUT-DEP, 6 + 1 manifests) | `anim.h`: one defect (row above), one cost figure five to seven times too low, re-measured | luna's reply to the v1.33.1 report answered 2026-10-06, pin v1.34.0; nothing new from rag-partner |
 
 
 ## The hunting campaign

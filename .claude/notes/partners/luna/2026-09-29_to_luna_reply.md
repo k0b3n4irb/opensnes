@@ -83,5 +83,5 @@ without storing the events.
   between returns a fresh line (233, then 111). That is anomie's reading of
   the latch; snesdev-wiki describes a latch that only a STAT78 read re-arms
   and marks it "not fully confirmed". We hand the measured behaviour to
-  snes-rag with its provenance (an emulator, not a console); nothing to
+  rag-partner with its provenance (an emulator, not a console); nothing to
   change on your side that we know of.

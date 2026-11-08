@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 60 examples organized by topic. For a progressive learning path, see
+All 65 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -151,6 +151,8 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls, sound effects over the music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
 | @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample |
+| @subpage examples_audio_sfx_voices | Effects voice by voice: looped waveform with per-frame pitch, stop+play in one frame, piecewise sample load, with the scanline cost of each |
+| @subpage examples_audio_sample_swap | Samples at addresses the game chooses: a resident set, a swap area replaced during play, the refusals, the silence a replacement needs |
 | @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
 | @subpage examples_audio_speech_synth | BRR speech playback: the SNES says "OPEN SNES" (krom port) |
 
@@ -177,6 +179,7 @@ The reusable logic toolbox.
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |
 | @subpage examples_basics_game_skeleton | The smallest complete game: title → play → game-over state machine |
+| @subpage examples_basics_ppu_reset | `ppuReset()` between two screens: every PPU register back to power-on |
 
 ---
 
@@ -188,6 +191,7 @@ Persistence and ROM mapping.
 |---------|-------------|
 | @subpage examples_memory_hirom_demo | HiROM vs LoROM memory mapping |
 | @subpage examples_memory_save_game | SRAM battery-backed saves |
+| @subpage examples_memory_lzss_ram | LZ77 decompression into RAM ($7E, $7F), screen on |
 
 ---
 
@@ -245,4 +249,5 @@ Complete games, from the title screen to the game over.
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
 | @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
+| @subpage examples_games_shard_dash | A game in several files: one C file per screen, a screen layer, a checksummed save, a test per screen |
 | @subpage examples_games_rooftop_run | Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal |

@@ -241,6 +241,16 @@ apart in VRAM. `vramQueuePushSprite(src, addr, size_px)` notes them all
 in one call (two strips for 16x16, four for 32x32), or none if they do
 not all fit.
 
+To spend a budget, `vramQueuePushWithin(src, addr, size, step, budget)` is the push
+with the guard inside: it returns 0, and changes nothing, when the transfer would
+take `vramQueueCost()` past `budget`, so a module streams what fits and tries the
+rest next frame. The budget is yours; no refusal is counted for it.
+`vramQueuePushSpriteWithin(src, addr, size_px, budget)` is the same guard for a
+whole sprite frame: every strip, or none when the frame would take
+`vramQueueCost()` past `budget` (288 for 16x16, 832 for 32x32) or its strips do
+not all fit. Unlike `vramQueuePushSprite`, a frame it refuses is not counted in
+`vram_queue_refused`.
+
 Be clear about what it buys. Six 128-byte transfers, measured
 (`devtools/libbench`):
 
@@ -320,7 +330,9 @@ vramQueueFlushUntil(262);   /* NTSC: the blank ends after line 261; 312 in PAL *
 
 Put per-frame transfers after `WaitForVBlank()` and wrap heavy bulk
 transfers in `setScreenOff()`/`setScreenOn()`; a write during active
-display is ignored with no error. Detail in
+display is ignored with no error. The library's DMA calls count such a
+transfer in `dma_unsafe_count` and fire WDM $02 (luna `--wdm-out`): one started
+outside VBlank, and one started inside it but too big to finish there. Detail in
 [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md).
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame

@@ -32,6 +32,20 @@ bg_scroll_bit:
 ; void bgSetScroll(u8 bg, u16 x, u16 y)
 ;   8,s bg   6,s x   4,s y
 ;------------------------------------------------------------------------------
+; void bgAddressTrip(void): WDM $03, called by bgSetGfxPtr() / bgSetMapPtr() (background.c)
+; with a VRAM address the register cannot hold (its low bits are dropped).
+.SECTION ".text.bgAddressTrip" SUPERFREE
+
+bgAddressTrip:
+    php
+    sep #$20
+    .ACCU 8
+    .db $42, $03            ; WDM $03
+    plp
+    rtl
+
+.ENDS
+
 .SECTION ".text.bgSetScroll" SUPERFREE
 
 bgSetScroll:

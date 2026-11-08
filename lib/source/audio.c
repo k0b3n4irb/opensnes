@@ -140,7 +140,10 @@ extern u16 audio_stream_blocks(const u8 *data, u16 full, u16 tail);
 u16 audio_error_count;          /**< refusals since power-on (wraps at 65536) */
 u8 audio_error_last;            /**< the code of the latest one (AUDIO_ERR_*) */
 
+extern void audioRefusedTrip(void);   /* audio_vset.asm: WDM $01 */
+
 static u8 audio_refuse(u8 code) {
+    audioRefusedTrip();
     audio_error_count++;
     audio_error_last = code;
     return code;
@@ -520,6 +523,116 @@ u16 audioLoadSampleStep(u16 maxBytes) {
     sample_mirror[step_id].flags = 1;
     step_id = 0xFF;
     return 0;
+}
+
+/*----------------------------------------------------------------------------
+ * Samples at an address the game chooses (a resident core plus a swap area
+ * of fixed places). Only these two functions and at_place_free() /
+ * at_place_take() are new: a ROM that does not call them links none of it
+ * (one section per function, wlalink -d), and the functions above are
+ * unchanged.
+ *
+ * The allocator's one invariant: every loaded sample (and the load in
+ * steps) ends at or below sample_next_free. A load at an address raises the
+ * pointer to its end when it ends higher, and never lowers it, so an
+ * ordinary load (always placed at the pointer) cannot land on it, and the
+ * LIFO reclaim of audioUnloadSample() / step_cancel() — the pointer goes
+ * back to the start of the freed sample when that sample ends exactly at
+ * the pointer — cannot uncover a sample that is still loaded.
+ *--------------------------------------------------------------------------*/
+
+/* Is [addr, addr + size) inside the sample area and clear of every loaded
+ * sample but slot id's own (a sample may be replaced in its old place) and
+ * of the load in steps? addr < sample_ceil and size <= sample_ceil - addr:
+ * the end cannot pass $FFFF. Every sample ends at or below sample_ceil
+ * (audioSetEcho() refuses a ring under the pointer), so the sums below do
+ * not wrap either. */
+static u8 at_place_free(u8 id, u16 addr, u16 size) {
+    u16 i;              /* u16: the loop then needs no byte masking */
+    u16 end, s;
+
+    if (addr < SAMPLE_BASE || addr >= sample_ceil
+            || (u16)(sample_ceil - addr) < size) {
+        return 0;
+    }
+    end = (u16)(addr + size);
+    for (i = 0; i < AUDIO_MAX_SAMPLES; i++) {
+        if (!sample_mirror[i].flags || i == id) {
+            continue;
+        }
+        s = sample_mirror[i].spcAddress;
+        if (addr < (u16)(s + sample_mirror[i].size) && s < end) {
+            return 0;
+        }
+    }
+    if (step_id != 0xFF) {
+        s = sample_mirror[step_id].spcAddress;
+        if (addr < (u16)(s + sample_mirror[step_id].size) && s < end) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/* Record slot id at [addr, addr + size), not playable yet (flags 0), and
+ * raise the pointer past it if it ends higher. */
+static void at_place_take(u8 id, u16 addr, u16 size, u16 loopPoint) {
+    u16 end = (u16)(addr + size);
+
+    sample_mirror[id].spcAddress = addr;
+    sample_mirror[id].size = size;
+    sample_mirror[id].loopPoint = loopPoint;
+    sample_mirror[id].flags = 0;
+    sample_mirror[id].reserved = 0;
+    if (end > sample_next_free) {
+        sample_next_free = end;
+    }
+}
+
+u8 audioLoadSampleAt(u8 id, u16 spcAddr, const u8 *brrData, u16 size,
+                     u16 loopPoint) {
+    if (id >= AUDIO_MAX_SAMPLES || id == step_id) {
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
+    }
+    if (!audio_ready) {
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
+    }
+    if (size == 0 || !at_place_free(id, spcAddr, size)) {
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
+    }
+    /* Taken before the first byte: the slot's old bytes may be the ones
+     * overwritten, so it is "not loaded" until its new entry is written,
+     * and stays so if the driver stops answering half-way. */
+    at_place_take(id, spcAddr, size, loopPoint);
+    if (load_block(spcAddr, brrData, size) != AUDIO_OK ||
+        cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
+    }
+    sample_mirror[id].flags = 1;
+    return AUDIO_OK;
+}
+
+u8 audioLoadSampleBeginAt(u8 id, u16 spcAddr, const u8 *brrData, u16 size,
+                          u16 loopPoint) {
+    if (id >= AUDIO_MAX_SAMPLES || step_id != 0xFF) {
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
+    }
+    if (!audio_ready) {
+        return audio_refuse(AUDIO_ERR_TIMEOUT);
+    }
+    if (size < 3 || !at_place_free(id, spcAddr, size)) {
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
+    }
+    /* From here on, audioLoadSampleStep() and audioUnloadSample() treat it
+     * as any load in steps: the directory entry is written by the last
+     * step, from spcAddress. */
+    at_place_take(id, spcAddr, size, loopPoint);
+    step_id = id;
+    step_src = brrData;
+    step_left = size;
+    step_dst = spcAddr;
+    step_loop = loopPoint;
+    return AUDIO_OK;
 }
 
 void audioUnloadSample(u8 id) {

@@ -158,6 +158,12 @@ void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)
  * @note BG1/BG2 share one register, BG3/BG4 share another.
  *       Setting one does not affect the other in the pair.
  */
+/** @brief Addresses bgSetMapPtr() / bgSetGfxPtr() were given that their register
+ *  cannot hold (not a multiple of 0x400 / 0x1000 words), rounded down: counted
+ *  here and fired as WDM $03 (luna `--wdm-out`). 0 on a healthy run. A constant
+ *  address is refused at compile time; this catches the computed ones. */
+extern u16 bg_address_refused;
+
 void bgSetGfxPtr(u8 bg, u16 vramAddr)
     OPENSNES_CHECK_ARGS((vramAddr & 0x0FFF) != 0,
                         "bgSetGfxPtr: the tile address must be a multiple of 0x1000 words; BG12NBA/BG34NBA keep vramAddr >> 12");

@@ -23,6 +23,72 @@
 .SECTION ".dma_asm" SUPERFREE
 
 ;------------------------------------------------------------------------------
+; The screen-on check. A transfer made while the screen is on and outside
+; VBlank writes nothing: the PPU ignores VRAM, CGRAM and OAM writes during
+; active display, and the DMA reports no error. REG_INIDISP cannot be read
+; back, so "screen on" is the shadow setScreenOn()/setScreenOff() keep
+; (console_force_blanked); "in VBlank" is HVBJOY ($4212) bit 7, which can.
+; A transfer that breaks the rule counts itself in dma_unsafe_count (the
+; transfer still runs, as it always has) and fires WDM $02, the in-ROM
+; assertion channel luna reports (its `--wdm-out`, a manifest's
+; `wdm_empty`): the first transfer that would have been lost is found, not
+; the garbage it leaves two screens later.
+; Two checks. DMA_SCREEN_CHECK, at the start: the screen is on and VBlank is
+; not. DMA_START, which writes MDMAEN: the transfer ran past the end of
+; VBlank (started inside it, too big to fit) — the CPU is stopped until the
+; DMA is over, so the HVBJOY read that follows the MDMAEN write sees the
+; line the transfer ended on. The start check, when the screen is on, arms
+; the end check (dma_end_armed) if VBlank is open and disarms it if it
+; trips; the end check also reads the shadow, so with the screen off the
+; flag is never written nor read; a trip at the end disarms too: a call
+; counts once, however many passes it makes.
+; Not seen: a single transfer longer than the active display (about 38 KB
+; NTSC) that ends in the NEXT VBlank.
+; Code that writes REG_INIDISP itself, not through setScreenOn()/Off(), leaves
+; the shadow behind: it is reported on its next transfer outside VBlank.
+; Cost in CPU cycles a call, both checks: screen off 15 at the start, then
+; 17 (the DMA ended in VBlank) or 24 (outside it); screen on, in VBlank, 29
+; then 17. libbench row `dma` (2 KB, screen off): +276 master cycles.
+; Entered with an 16-bit accumulator, leaves it 16-bit.
+;------------------------------------------------------------------------------
+.MACRO DMA_SCREEN_CHECK
+    sep #$20
+    .ACCU 8
+    lda.l console_force_blanked
+    bne ++                  ; screen off: nothing to check, flag left alone
+    lda.l $004212           ; HVBJOY: bit 7 = in VBlank
+    bmi +                   ; in VBlank: arm the end check (A is non-zero)
+    jsr dma_screen_trip
+    lda #$00                ; counted: disarm
++   sta.l dma_end_armed
+++  rep #$20
+    .ACCU 16
+.ENDM
+
+;------------------------------------------------------------------------------
+; Start the DMA of the channels in A (8-bit) and check its end. IRQs are
+; masked from the MDMAEN write to the end of the check, so that an IRQ
+; taken as the DMA ends cannot move the HVBJOY read past the end of VBlank
+; (the NMI cannot be masked; it only comes at the start of a VBlank, so a
+; transfer that meets it has crossed a whole active display). Leaves A
+; 8-bit, clobbered. Balanced php/plp: the stack offsets after it are those
+; before it.
+;------------------------------------------------------------------------------
+.MACRO DMA_START
+    php
+    sei
+    sta.l $420B             ; MDMAEN: the CPU waits here until the DMA is over
+    lda.l $004212           ; HVBJOY, on the line the transfer ended on
+    bmi +                   ; still in VBlank: fine
+    lda.l console_force_blanked
+    bne +                   ; screen off: fine
+    lda.l dma_end_armed     ; started in VBlank, screen on, not yet counted
+    beq +
+    jsr dma_end_trip
++   plp
+.ENDM
+
+;------------------------------------------------------------------------------
 ; void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)
 ;
 ; Post-A6+A7 (v0.19.0): pointers are 4 bytes (24-bit address + 1 pad
@@ -45,6 +111,7 @@ dmaCopyVram:
     ; width is not touched (6 CPU cycles a call, 2026-10-09).
     rep #$20
     .ACCU 16
+    DMA_SCREEN_CHECK
     lda 6,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
@@ -67,7 +134,7 @@ dmaCopyVram:
 
     lda #$01
     sta.l $4300             ; DMA mode: 2-register write (word)
-    sta.l $420B             ; Start DMA channel 0 (the same $01)
+    DMA_START               ; channel 0 (the same $01)
 
     rep #$20
     .ACCU 16
@@ -89,6 +156,9 @@ dmaCopyVram:
 dmaCopyCGram:
     php
 
+    rep #$20
+    .ACCU 16
+    DMA_SCREEN_CHECK
     sep #$20
     .ACCU 8
     lda 7,s                 ; startColor (low byte = color index)
@@ -114,7 +184,7 @@ dmaCopyCGram:
     sta.l $4301             ; Destination: CGDATA ($2122)
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
+    DMA_START               ; channel 0
 
     plp
     rtl
@@ -131,6 +201,7 @@ dmaCopyOam:
 
     rep #$20
     .ACCU 16
+    DMA_SCREEN_CHECK
     lda #$0000
     sta.l $2102             ; REG_OAMADDL/H: OAM address = 0
 
@@ -155,7 +226,7 @@ dmaCopyOam:
     sta.l $4301             ; Destination: OAMDATA ($2104)
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
+    DMA_START               ; channel 0
 
     plp
     rtl
@@ -189,6 +260,7 @@ dmaCopyVramMode7:
     php
     rep #$20                ; 16-bit accumulator
     .ACCU 16
+    DMA_SCREEN_CHECK
 
     ; Step 1: Load tilemap to VRAM low bytes (VMDATAL)
     lda #$0000
@@ -215,7 +287,7 @@ dmaCopyVramMode7:
     sta.l $4304             ; DMA source bank
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
+    DMA_START               ; channel 0
 
     ; Step 2: Load tile pixels to VRAM high bytes (VMDATAH)
     rep #$20
@@ -245,12 +317,48 @@ dmaCopyVramMode7:
     sta.l $4304             ; DMA source bank
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
+    DMA_START               ; channel 0
 
     ; Restore VMAIN for normal word access (already $80)
 
     plp
     rtl
+
+;------------------------------------------------------------------------------
+; void dmaCheckScreen(void)   (for the DMA that dma.c starts itself)
+;------------------------------------------------------------------------------
+dmaCheckScreen:
+    php
+    rep #$20
+    .ACCU 16
+    DMA_SCREEN_CHECK
+    plp
+    rtl
+
+; The end check of dma.c's fill passes: starts channel 0 and checks the end.
+dmaStartCheckEnd:
+    php
+    sep #$20
+    .ACCU 8
+    lda #$01
+    DMA_START
+    plp
+    rtl
+
+; The failing paths, shared; reached by jsr with an 8-bit accumulator.
+; dma_end_trip disarms the end check, so a call counts once.
+dma_end_trip:
+    lda #$00
+    sta.l dma_end_armed
+dma_screen_trip:
+    rep #$20
+    .ACCU 16
+    inc.w dma_unsafe_count
+    sep #$20
+    .ACCU 8
+    .db $42, $02            ; WDM $02: a DMA made with the screen on, outside VBlank
+    rts
+
 
 ;------------------------------------------------------------------------------
 ; void clearNmiFlag(void)

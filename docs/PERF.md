@@ -105,23 +105,23 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,852 | -18.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,435 | 9,742 | -14.8 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,544 | 27,356 | -30.8 % |
-| `oamset` | `oamSet` on 32 sprites | 81,074 | 64,978 | -19.9 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,059 | 42,475 | -5.7 % |
-| `oamsize` | the size of 32 sprites | 48,741 | 28,886 | -40.7 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,899 | 17,866 | -0.2 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,435 | 9,729 | -14.9 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,544 | 27,358 | -30.8 % |
+| `oamset` | `oamSet` on 32 sprites | 81,074 | 64,956 | -19.9 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,059 | 42,477 | -5.7 % |
+| `oamsize` | the size of 32 sprites | 48,741 | 28,884 | -40.7 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,899 | 18,142 | +1.4 % |
 | `text` | 20 characters printed and shown | 82,796 | 17,366 | -79.0 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 167,840 | 91,387 | -45.6 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,336 | 53,414 | -58.7 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 31,741 | -75.5 % |
-| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,916 | -8.5 % |
-| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,576 | -39.2 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,311 | -73.4 % |
-| `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,586 | -44.6 % |
-| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,824 | -82.2 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 167,840 | 91,385 | -45.6 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,336 | 53,409 | -58.7 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 31,747 | -75.5 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 17,626 | +1.3 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,545 | -39.4 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,309 | -73.4 % |
+| `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,588 | -44.6 % |
+| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,820 | -82.2 % |
 
-OpenSNES costs no more than PVSnesLib on **16 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
+OpenSNES costs no more than PVSnesLib on **14 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library
@@ -136,18 +136,22 @@ is that handler alone, in a ROM that only waits.
 
 **Reading it.**
 
-- **`oamxy` and `dma` are level**, within a few %, and move to either side
-  of PVSnesLib's figure from one compiler change to the next although the
-  library routines do not change: a row is the difference between a loop
+- **`oamxy` is level**, within a few %, and moves to either side of
+  PVSnesLib's figure from one compiler change to the next although the
+  library routine does not change: a row is the difference between a loop
   with the calls and the same loop empty, and a compiler improvement that
   helps the empty loop more than the loop around a call moves the row.
-  Read these two as ties. PVSnesLib's `oamSetXY` checks nothing and marks
+  Read it as a tie. PVSnesLib's `oamSetXY` checks nothing and marks
   nothing; ours refuses an id that is not a sprite, marks the table dirty
   and records the highest sprite written, which is what lets the handler
   skip the upload on a frame where no sprite moved and send only the
-  sprites in use otherwise — the `idle` row is where that is paid back. A
-  2 KB `dmaCopyVram` is the transfer itself (16,384 of its master cycles)
-  under either SDK.
+  sprites in use otherwise — the `idle` row is where that is paid back.
+- **`dma` and `vramc` are the two rows behind**, by about 1.4 %: each
+  `dmaCopyVram` checks the screen state before the transfer and HVBJOY
+  after it, and counts a transfer made with the screen on outside VBlank
+  (`dma_unsafe_count`, WDM $02), about 276 master cycles a call that
+  PVSnesLib's routine does not spend. A 2 KB `dmaCopyVram` is the transfer
+  itself (16,384 of its master cycles) under either SDK.
 - **`frame` is the row to read for a whole game**: everything in one
   frame, uploads included.
 

@@ -20,6 +20,8 @@ roots. The root `Makefile` holds the one list (`FIXTURES_LIB`,
 | `libtests_sa1_sram/` | the sram module on SA-1: BW-RAM at `$40:0000`, writable once crt0 sets SBWE (2026-09-26) | `test_libtest_sa1_sram.py`; `d_`/`e_sa1_bwram_*.toml` power-cycle chain |
 | `libtests_gsu/` | the Super FX job path: cache-resident job, RAM job, ROM job, a save while a job runs | `libtest_gsu_cached*.toml`, `f_`/`g_gsu_save_*.toml` |
 | `libtests_dma_channels/` | the DMA channels the library takes: a Super FX letterbox, the game's HDMA on 2-6, the NMI's text flush and dynamic sprite uploads together; the channels' registers read back | `libtest_dma_channels.toml` |
+| `libtests_region/`, `libtests_region_pal/` | the region a ROM declares (header byte $FFD9, `ROM_REGION`) and the one it runs on (`isPAL()`), read back; the PAL twin includes the same `main.c` | `libtest_region_ntsc.toml`, `libtest_region_ntsc_on_pal.toml`, `libtest_region_pal.toml` |
+| `libtests_bigrom/` | a 4 MB LoROM image (`ROM_BANKS=128`): a const table in bank 127 (`$FF:8000`) read back, the header size byte `$0C` | `libtest_bigrom.toml` |
 | `libtests_aram/` | the sound CPU's memory. A sample loaded in steps (`audioLoadSampleBegin` / `Step`): refusals, a voice command and another load between two steps, the bytes and the directory entry read back, a load given up. The echo ring's place: refused when 48 KB of samples reach into it, accepted when they do not, a shorter delay giving memory back; the sample still loaded whole after a 12 KB ring is replaced by a 2 KB one (the driver's wait) | `test_libtest_aram.py` |
 | `libtests_snesmod/` | the SNESMOD stop / pause / fade queue and what the driver leaves of the machine | `libtest_snesmod.toml` |
 
@@ -34,8 +36,11 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `a7_32bit/` | 32-bit arithmetic: add/sub carry, mul, div, mod, shifts, signed folds |
 | `b2_far_ram/` | `FAR` objects in bank $7E with bank-honouring codegen |
 | `c_features/` | switch forms, function pointers, struct members, the C features a game uses |
+| `const_div/` | a divide or remainder of two constants folded at compile time (signed and unsigned, 16 and 32 bits, negatives, limits, a numerator folded just before): no division helper called, every value against one written by hand; INT_MIN / -1, INT_MIN % -1 and a zero divisor kept as run-time calls |
 | `debug_channel/` | the debug channel to luna (nocash / WDM) |
 | `d_quals/` | `volatile`, `const` and the qualifiers' codegen |
+| `leaf_frame/` | a leaf's direct-page frame (`tcc__lf`): the same leaf in the main loop and in the NMI callback, no wrong result on either side |
+| `leaf_split/` | leaves above the 16 words of `tcc__lf`, split between it and a stack frame: results against a host model, and the main loop against the NMI callback |
 | `static_dup/` | two sources each defining `static u16 k` and `static u16 tag()`: the link succeeds and each reads its own (statics are emitted `name.<source>`) |
 
 Each is rebuilt from clean before its test: a stale `.sfc` built with an

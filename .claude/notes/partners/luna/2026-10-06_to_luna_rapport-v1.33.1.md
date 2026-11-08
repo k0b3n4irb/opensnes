@@ -125,5 +125,5 @@ chargée depuis un `.srm` doit évidemment rester ce que dit le fichier.
   v1.33.0 qui porte l'étiquette « Latest » sur la page des releases
   (`gh release list --repo k0b3n4irb/luna --limit 3`). Nous avons épinglé
   la v1.33.1.
-- Le corpus snes-rag sert déjà votre changelog `[1.33.0]`
+- Le corpus rag-partner sert déjà votre changelog `[1.33.0]`
   (`6c16d06712970f52`) : rien à leur signaler de notre côté.

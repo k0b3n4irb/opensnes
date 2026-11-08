@@ -929,4 +929,60 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
     oam_update_flag = 1; \
 } while(0)
 
+/**
+ * @brief A batch of sprites in screen coordinates, for oamSetBatch()
+ *
+ * Structure of arrays, as OamWorldBatch. The arrays may live in ROM, in
+ * plain RAM or in `FAR` RAM.
+ */
+typedef struct {
+    const s16 *x;        /**<  0: screen x of each sprite, 0-511 as oamSetXY() takes it */
+    const s16 *y;        /**<  4: screen y (the low byte is the OAM byte) */
+    const u8  *tile;     /**<  8: tile number, low byte. May be 0: the tile bytes stay as they are */
+    const u8  *attr;     /**< 12: attribute byte (vhoopppc), as OAM_ATTR() builds it. May be 0 */
+    u8   first_id;       /**< 16: OAM id of the first sprite of the batch */
+    u8   count;          /**< 17: number of sprites */
+} OamBatch;
+
+#ifndef __clang__
+_Static_assert(__builtin_offsetof(OamBatch, y) == 4, "OamBatch.y offset (sprite_batch.asm)");
+_Static_assert(__builtin_offsetof(OamBatch, tile) == 8, "OamBatch.tile offset (sprite_batch.asm)");
+_Static_assert(__builtin_offsetof(OamBatch, attr) == 12, "OamBatch.attr offset (sprite_batch.asm)");
+_Static_assert(__builtin_offsetof(OamBatch, first_id) == 16, "OamBatch.first_id offset (sprite_batch.asm)");
+_Static_assert(__builtin_offsetof(OamBatch, count) == 17, "OamBatch.count offset (sprite_batch.asm)");
+#endif
+
+/**
+ * @brief Write the OAM entries of N sprites from parallel arrays, in one call
+ *
+ * The emission half of a game with many alike objects: the game moves its
+ * objects (its code, its policy: movement, respawn, how many), and this
+ * writes the result, a loop in assembly with no call per sprite.
+ *
+ * - **x and y are screen coordinates**, with oamSetXY()'s meaning: x of
+ *   0-511 (or a negative s16, whose ninth bit is the OAM's), y low byte.
+ * - **`tile` and `attr` are optional.** A game whose objects never change
+ *   tile writes them once (oamSet()) and passes 0 for both: only x, y and
+ *   the ninth x bit are then written, the cheapest path. Give one, the
+ *   other or both for what changes.
+ * - **The size bit is not touched**: set it once with oamSetSize().
+ * - A batch that runs past sprite 127 stops there; `count` 0 does nothing.
+ * - **It pays when the arrays already exist.** A game whose objects move
+ *   and mask one by one in their own loop, and would have to build x and y
+ *   arrays only to hand them over, measured +1.4 % a step: write them with
+ *   oamSet() / oamSetXYFast() in that loop instead.
+ * - **Opt-in module**: add `sprite_batch` to `LIB_MODULES`. A ROM that does
+ *   not call it does not carry it.
+ *
+ * @param batch The sprites (see OamBatch)
+ *
+ * @code
+ * static s16 bx[32], by[32];              // moved by the game
+ * static const OamBatch shots = { bx, by, 0, 0, 0, 32 };
+ *
+ * oamSetBatch(&shots);                    // every frame, after the game moved them
+ * @endcode
+ */
+void oamSetBatch(const OamBatch *batch);
+
 #endif /* OPENSNES_SPRITE_H */

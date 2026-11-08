@@ -1,0 +1,221 @@
+# basics/ppu_reset — ppuReset() puts the PPU back to its power-on state.
+#
+# The example runs screen A (Mode 1, and nearly every PPU register changed:
+# OBJSEL, the four layers' maps, tiles and scrolls, TM/TS, two windows, color
+# math, mosaic, Mode 7, SETINI, the brightness, an HDMA wave on BG3), then
+# calls ppuReset() and screen_b_setup(). Two checkpoints read the same table:
+#   * at main(), before the program wrote anything: the state crt0's
+#     InitHardware leaves (the reference);
+#   * at the first instruction of screen_b_setup(), right after ppuReset().
+# The PPU registers (luna's own read of them, `[checkpoint.ppu]`) and the
+# library's shadows (`[checkpoint.values]`) must be equal at both. That is the
+# proof the register table of lib/source/ppu_reset.asm and InitHardware agree:
+# a value that differs fails the second checkpoint and names the register.
+# An HDMA left running would show at the second one too: it is read in the
+# middle of a frame, where the wave would have rewritten BG3's scroll.
+#
+# Negative control (2026-11-07, luna v1.40.0): the same main.c built without
+# the ppuReset() call fails 80 asserts: at the second checkpoint 50 PPU
+# registers (all of the table but bgs.2's tile base and map size, which screen
+# A keeps at 0) and 29 shadows (all but bg_scroll_dirty, which the NMI
+# clears, and bg3_opt and the two HDMA buffer indices, which screen A leaves
+# at 0), and at the end screen B's BG1 scroll.
+#
+# Values measured with `luna state --until-pc main --out -` on luna v1.40.0;
+# what is left out of the comparison is what ppuReset() does not claim to
+# reset: the VRAM address and the contents of VRAM, CGRAM and OAM.
+rom = "../../examples/basics/ppu_reset/ppu_reset.sfc"
+frames = 400                   # the horizon: screen B is reached near frame 128
+render = false
+
+[[checkpoint]]                 # the reference: nothing written since crt0
+at_symbol = "main"
+hit = 1
+[checkpoint.ppu]
+inidisp = 0x8F                  # forced blank, brightness 15
+bgmode = 0
+obsel = 0
+tm = 0x01                       # BG1 on the main screen
+ts = 0
+tmw = 0
+tsw = 0
+w12sel = 0
+w34sel = 0
+wobjsel = 0
+wbglog = 0
+wobjlog = 0
+"windows.0" = 0
+"windows.1" = 0
+"windows.2" = 0
+"windows.3" = 0
+cgwsel = 0
+cgadsub = 0
+coldata_r = 0
+coldata_g = 0
+coldata_b = 0
+mosaic = 0
+setini = 0
+m7sel = 0
+m7a = 256                       # the identity matrix
+m7b = 0
+m7c = 0
+m7d = 256
+m7x = 0
+m7y = 0
+m7_hofs = 0
+m7_vofs = -1
+"bgs.0.tilemap_addr_words" = 0
+"bgs.0.char_addr_words" = 0
+"bgs.0.tilemap_size" = 0
+"bgs.0.h_scroll" = 0
+"bgs.0.v_scroll" = 1023                # -1 on 10 bits
+"bgs.1.tilemap_addr_words" = 0
+"bgs.1.char_addr_words" = 0
+"bgs.1.tilemap_size" = 0
+"bgs.1.h_scroll" = 0
+"bgs.1.v_scroll" = 1023
+"bgs.2.tilemap_addr_words" = 0
+"bgs.2.char_addr_words" = 0
+"bgs.2.tilemap_size" = 0
+"bgs.2.h_scroll" = 0
+"bgs.2.v_scroll" = 1023
+"bgs.3.tilemap_addr_words" = 0
+"bgs.3.char_addr_words" = 0
+"bgs.3.tilemap_size" = 0
+"bgs.3.h_scroll" = 0
+"bgs.3.v_scroll" = 1023
+[checkpoint.values]
+console_brightness = { eq = 15, width = 1 }
+console_force_blanked = { eq = 1, width = 1 }
+console_fade_active = { eq = 0, width = 1 }
+"bg_scroll_x+0" = { eq = 0, width = 2 }
+"bg_scroll_x+2" = { eq = 0, width = 2 }
+"bg_scroll_x+4" = { eq = 0, width = 2 }
+"bg_scroll_x+6" = { eq = 0, width = 2 }
+"bg_scroll_y+0" = { eq = 0, width = 2 }
+"bg_scroll_y+2" = { eq = 0, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+"bg_scroll_y+6" = { eq = 0, width = 2 }
+bg_scroll_dirty = { eq = 0, width = 1 }
+setini_shadow = { eq = 0, width = 1 }
+bg3_opt = { eq = 0, width = 1 }
+bg12nba_shadow = { eq = 0, width = 1 }
+bg34nba_shadow = { eq = 0, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+colormath_cgwsel = { eq = 0, width = 1 }
+colormath_cgadsub = { eq = 0, width = 1 }
+window_w12sel = { eq = 0, width = 1 }
+window_w34sel = { eq = 0, width = 1 }
+window_wobjsel = { eq = 0, width = 1 }
+window_wbglog = { eq = 0, width = 1 }
+window_wobjlog = { eq = 0, width = 1 }
+m7_scale_x = { eq = 0, width = 2 }
+m7_scale_y = { eq = 0, width = 2 }
+m7_sin = { eq = 0, width = 1 }
+m7_cos = { eq = 0, width = 1 }
+hdma_enabled_state = { eq = 0, width = 1 }
+hdma_wave_enabled = { eq = 0, width = 1 }
+hdma_active_buffer = { eq = 0, width = 1 }
+hdma_iris_buffer = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # after screen A and ppuReset(): the same values
+at_symbol = "screen_b_setup"
+hit = 1
+[checkpoint.ppu]
+inidisp = 0x8F                  # forced blank, brightness 15
+bgmode = 0
+obsel = 0
+tm = 0x01                       # BG1 on the main screen
+ts = 0
+tmw = 0
+tsw = 0
+w12sel = 0
+w34sel = 0
+wobjsel = 0
+wbglog = 0
+wobjlog = 0
+"windows.0" = 0
+"windows.1" = 0
+"windows.2" = 0
+"windows.3" = 0
+cgwsel = 0
+cgadsub = 0
+coldata_r = 0
+coldata_g = 0
+coldata_b = 0
+mosaic = 0
+setini = 0
+m7sel = 0
+m7a = 256                       # the identity matrix
+m7b = 0
+m7c = 0
+m7d = 256
+m7x = 0
+m7y = 0
+m7_hofs = 0
+m7_vofs = -1
+"bgs.0.tilemap_addr_words" = 0
+"bgs.0.char_addr_words" = 0
+"bgs.0.tilemap_size" = 0
+"bgs.0.h_scroll" = 0
+"bgs.0.v_scroll" = 1023                # -1 on 10 bits
+"bgs.1.tilemap_addr_words" = 0
+"bgs.1.char_addr_words" = 0
+"bgs.1.tilemap_size" = 0
+"bgs.1.h_scroll" = 0
+"bgs.1.v_scroll" = 1023
+"bgs.2.tilemap_addr_words" = 0
+"bgs.2.char_addr_words" = 0
+"bgs.2.tilemap_size" = 0
+"bgs.2.h_scroll" = 0
+"bgs.2.v_scroll" = 1023
+"bgs.3.tilemap_addr_words" = 0
+"bgs.3.char_addr_words" = 0
+"bgs.3.tilemap_size" = 0
+"bgs.3.h_scroll" = 0
+"bgs.3.v_scroll" = 1023
+[checkpoint.values]
+console_brightness = { eq = 15, width = 1 }
+console_force_blanked = { eq = 1, width = 1 }
+console_fade_active = { eq = 0, width = 1 }
+"bg_scroll_x+0" = { eq = 0, width = 2 }
+"bg_scroll_x+2" = { eq = 0, width = 2 }
+"bg_scroll_x+4" = { eq = 0, width = 2 }
+"bg_scroll_x+6" = { eq = 0, width = 2 }
+"bg_scroll_y+0" = { eq = 0, width = 2 }
+"bg_scroll_y+2" = { eq = 0, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+"bg_scroll_y+6" = { eq = 0, width = 2 }
+bg_scroll_dirty = { eq = 0, width = 1 }
+setini_shadow = { eq = 0, width = 1 }
+bg3_opt = { eq = 0, width = 1 }
+bg12nba_shadow = { eq = 0, width = 1 }
+bg34nba_shadow = { eq = 0, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+colormath_cgwsel = { eq = 0, width = 1 }
+colormath_cgadsub = { eq = 0, width = 1 }
+window_w12sel = { eq = 0, width = 1 }
+window_w34sel = { eq = 0, width = 1 }
+window_wobjsel = { eq = 0, width = 1 }
+window_wbglog = { eq = 0, width = 1 }
+window_wobjlog = { eq = 0, width = 1 }
+m7_scale_x = { eq = 0, width = 2 }
+m7_scale_y = { eq = 0, width = 2 }
+m7_sin = { eq = 0, width = 1 }
+m7_cos = { eq = 0, width = 1 }
+hdma_enabled_state = { eq = 0, width = 1 }
+hdma_wave_enabled = { eq = 0, width = 1 }
+hdma_active_buffer = { eq = 0, width = 1 }
+hdma_iris_buffer = { eq = 0, width = 1 }
+
+# Screen B itself, set up after the reset like any first screen.
+[asserts.ppu]
+inidisp = 0x0F
+bgmode = 0
+tm = 0x01
+"bgs.0.h_scroll" = 0
+
+[asserts.dma]
+unsafe_writes = 0

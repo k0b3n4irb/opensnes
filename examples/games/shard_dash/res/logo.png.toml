@@ -1,0 +1,7 @@
+tool = "opensnes-tileset"
+
+# BG2, the logo of the title and game-over screens, palette slot 1
+[convert]
+colors = 16
+palette-entry = 1
+flip = true

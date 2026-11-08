@@ -24,7 +24,7 @@
  * presentation step (superfx.asm, gsu_present_step) swaps BG1's nibble in
  * the NMI and keeps this copy right for the next bgSetGfxPtr(). */
 u8 bg12nba_shadow;
-static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
+u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C); not static: ppuReset() zeroes it */
 
 extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */
 extern u16 bg_scroll_y[4]; /* Synced to hardware by NMI handler */
@@ -49,7 +49,17 @@ u16 bgGetScrollY(u8 bg) {
  * Memory Configuration Functions
  *============================================================================*/
 
+/** Addresses the BGnSC / BGnNBA registers could not hold, and were rounded down
+ *  (bgSetMapPtr: not a multiple of 0x400 words; bgSetGfxPtr: of 0x1000). Counted
+ *  and fired as WDM $03 (background_scroll.asm). 0 on a healthy run. */
+u16 bg_address_refused;
+extern void bgAddressTrip(void);
+
 void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize) {
+    if (vramAddr & 0x03FF) {
+        bg_address_refused++;
+        bgAddressTrip();
+    }
     /* BGnSC format: aaaaaayx
      * aaaaaa = tilemap address / 0x400 (bits 2-7)
      * y = vertical size (0=32, 1=64)
@@ -66,6 +76,10 @@ void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize) {
 }
 
 void bgSetGfxPtr(u8 bg, u16 vramAddr) {
+    if (vramAddr & 0x0FFF) {
+        bg_address_refused++;
+        bgAddressTrip();
+    }
     /* BG12NBA format: bbbbaaaa
      * aaaa = BG1 character base / 0x1000 (bits 0-3)
      * bbbb = BG2 character base / 0x1000 (bits 4-7)

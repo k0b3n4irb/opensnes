@@ -17,7 +17,7 @@ offset was always 0 and the writes were real but constant).
    frame: 19 products read with HVBJOY bit 0 set, all correct, 1981
    outside, all correct (`muldiv_autojoypad_probe/`; negative control: a
    wrong expected value flags all 2000). No reference states the
-   coupling either (snes-rag found it only in our docs, 2026-09-30).
+   coupling either (rag-partner found it only in our docs, 2026-09-30).
    Hazard 2 explains the 2026-07 observation. Kept below as written then,
    for the record:
    while HVBJOY bit 0 is set (V≈225-227, ~4K

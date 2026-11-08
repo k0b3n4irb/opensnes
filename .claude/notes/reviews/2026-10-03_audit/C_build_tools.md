@@ -61,7 +61,7 @@ Tous construits avec `rc=0`, sans message d'erreur, sauf mention contraire.
 ## Risques
 
 - **La campagne de défauts silencieux ne regarde pas encore `make/` et `tools/`** : le journal (`silent_defects_log.md`) n'a que des défauts lib/runtime ; les S1-S11 ci-dessus sont tous dans son champ (« `lib/`, `templates/`, `compiler/` ou `make/` ») ou à sa frontière (outils). Quinze candidats en une journée dans ce seul périmètre dit que le critère 7 n'est pas proche.
-- **luna rend vert ce que la console rendrait faux** : il mappe le fichier entier (S5 passe `MATCH`) et ne recalcule pas la somme (S6 `checksum_valid: true`). Un oracle « header vs fichier » côté luna (ou dans `symmap.py`) manque — à remonter dans `partners/luna/OPEN_luna.md`. Côté snes-rag : les requêtes « SA-1 memory map » et « LoROM $7E-$7F » ne renvoient **aucun arbitre** (vitor *solid*, wikibooks *complement*) — à remonter aussi.
+- **luna rend vert ce que la console rendrait faux** : il mappe le fichier entier (S5 passe `MATCH`) et ne recalcule pas la somme (S6 `checksum_valid: true`). Un oracle « header vs fichier » côté luna (ou dans `symmap.py`) manque — à remonter dans `partners/luna/OPEN_luna.md`. Côté rag-partner : les requêtes « SA-1 memory map » et « LoROM $7E-$7F » ne renvoient **aucun arbitre** (vitor *solid*, wikibooks *complement*) — à remonter aussi.
 - **Les combinaisons ne sont testées qu'à l'unité** : aucun exemple n'utilise `ROM_BANKS`, `GSU_RAM_KB`, `ROM_REGION=jp`, ni une bascule incrémentale ; la matrice des boutons n'a pas de test (seul `test-link-modules` balaie un axe).
 - **Le prochain outil appelé par `$(shell python3 …)`** reproduira S11 tant que le motif « traceback → variable vide → build vert » existe.
 - **`smconv` hérite d'avertissements formatés en « error »** (S9) : l'utilisateur apprend à ignorer le rouge.
@@ -77,7 +77,7 @@ Tous construits avec `rc=0`, sans message d'erreur, sauf mention contraire.
 | 5 | Un test d'en-tête dans la CI : somme de contrôle + `$FFD7` ≥ taille du fichier + aucun symbole dans une banque non-ROM du mapping, pour chaque `.sfc` | 🟠 S1, S5, S6 | S | Étendre `symmap.py --check-overlap` (déjà bloquant dans `release.yml:186-191`) ; capable de voir S1 à la place de luna |
 | 6 | Convertisseurs : erreur (exit ≠ 0) sur > 1024 tuiles BG, > 256 tuiles mode 7, index ≥ 2^bpp, > 8 canaux IT ; wav2brr : avertissement toujours imprimé au-delà de 32 kHz et sens corrigé (« plus grave »), ou rééchantillonnage | 🟠 S7-S10, 🟡 S12 | S | `tools/smconv/src/it2spc.c:337` : propager l'échec jusqu'au `main` ; un golden négatif par cas (fixtures `big.png`, `m7b.png`, `ch12.it` du scratchpad) |
 | 7 | Remplacer les `$(shell python3 -c …)` de calcul par de l'arithmétique shell validée, ou vérifier la sortie non vide ; valider `GSU_RAM_KB` ∈ {puissances de 2, 2..128} | 🟠 S11 | S | `common.mk:130` : `ifeq ($(GSU_RAM_SIZE_VAL),) $(error …)` + arrondi vers le haut comme `ROMSIZE` |
-| 8 | Remonter aux partenaires : luna (`checksum_valid` ne recalcule pas ; pas d'avertissement quand `$FFD7` < taille), snes-rag (cartes mémoire SA-1 / LoROM sans arbitre) | Risques | S | Une ligne dans `partners/luna/OPEN_luna.md` et `partners/snes-rag/OPEN_snes-rag.md` avec les ROM et commandes de ce rapport |
+| 8 | Remonter aux partenaires : luna (`checksum_valid` ne recalcule pas ; pas d'avertissement quand `$FFD7` < taille), rag-partner (cartes mémoire SA-1 / LoROM sans arbitre) | Risques | S | Une ligne dans `partners/luna/OPEN_luna.md` et `partners/rag-partner/OPEN_rag-partner.md` avec les ROM et commandes de ce rapport |
 | 9 | Inscrire S1-S11 au journal `silent_defects_log.md` au fil des correctifs | Risques | S | Une ligne par défaut, date 2026-10-03, « audit C » |
 | 10 | Nettoyages 🟡 : `SLOT 0` → `SLOT 0` sans ambiguïté (ou `.SLOT` nommé) ; `GSU_BANK=0` refusé ; `ROM_NAME` validé (ASCII `$20-$7E`, ≤ 21, échappement `sed`) ; `doctor` complet ; libellés gfx4snes ; commentaire `hdr_hirom.asm:62` ; exemple `ASSET_SECTION` dans le README wav2brr | 🟡 8-10, S13, S15 | S | `common.mk:514` : `sed "s|__ROM_NAME__|…|"` avec échappement de `&` et `|`, et `$(error)` si `ROM_NAME` contient un octet hors ASCII |
 
@@ -144,7 +144,7 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   « valide »), ligne ajoutée à `OPEN_luna.md` avec la commande. « Aucun
   symbole dans une banque non-ROM » reste à faire dans `symmap.py`.
 - **Rec 8 (lignes partenaires)** : luna, `checksum_valid` ci-dessus ;
-  snes-rag, la carte mémoire SA-1 était déjà dans `OPEN_snes-rag.md`
+  rag-partner, la carte mémoire SA-1 était déjà dans `OPEN_rag-partner.md`
   depuis le 10-04.
 - **Rec 5, suite (même jour)** : luna a ajouté `rom.checksum_computed` sur
   son `develop` (`39359de`) le jour même de la demande ; `header_problem`

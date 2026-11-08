@@ -9,6 +9,7 @@ battery-backed SRAM for persistent save data.
 |---------|------------|-------------|
 | [hirom_demo](hirom_demo/) | Intermediate | HiROM mode with 64KB banks (vs LoROM's 32KB) |
 | [save_game](save_game/) | Intermediate | Battery-backed SRAM for saving and loading game state |
+| [lzss_ram](lzss_ram/) | Intermediate | LZ77 tiles decompressed into RAM (banks $7E and $7F) with the screen on |
 
 ## Key Concepts
 

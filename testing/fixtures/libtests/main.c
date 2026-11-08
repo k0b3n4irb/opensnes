@@ -54,6 +54,8 @@ static FAR u8 vq_sheet[576];
 u16 r_vqc[8];
 /* vramQueueFlushUntil: a cut in the middle, what is left kept in order */
 u16 r_vqu[8];
+u16 r_vqw[6];     /* vramQueuePushWithin: fits exactly, does not fit, full queue, saturation; no refusal counted */
+u16 r_vqsw[9];    /* vramQueuePushSpriteWithin: fits exactly (16x16, 32x32), does not fit, queue too small, saturation, under 8 px; no refusal counted */
 u16 r_vqref[2];   /* vram_queue_refused since the sprite refusals: 2, then 3 after the full queue */
 u16 r_vqcap;      /* entries pushed before the queue refused one -> 40 */
 
@@ -822,6 +824,52 @@ static void coverage_lot_b(void) {
     vram_queue_count = 0;
     vramQueueFlush();
     r_vqc[7] = vramQueueCost();                                /* 0 */
+    /* vramQueuePushWithin: a budget of 252 takes a 172-byte entry exactly (172 + 80), refuses
+     * the next, a full queue refuses whatever the budget, and the sum cannot wrap; no refusal is
+     * counted, and a refused push changes nothing */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    vram_queue_refused = 0;
+    r_vqw[0] = vramQueuePushWithin(lotb_vram, 0x6700, 172, VRAM_QUEUE_ROW, 252) | (vram_queue_count << 8);   /* 1, count 1 */
+    r_vqw[1] = vramQueueCost() | (vram_queue_addr[0] == 0x6700 ? 0 : 0x8000);                                /* 252 */
+    r_vqw[2] = vramQueuePushWithin(lotb_vram, 0x6710, 2, VRAM_QUEUE_ROW, 252) | (vram_queue_count << 8);     /* 0, count 1 */
+    r_vqw[3] = vram_queue_refused | (vramQueueCost() == 252 ? 0 : 0x8000);                                    /* 0 */
+    vram_queue_count = VRAM_QUEUE_MAX;
+    r_vqw[4] = vramQueuePushWithin(lotb_vram, 0x6710, 2, VRAM_QUEUE_ROW, 0xFFFF) | (vram_queue_count << 8); /* 0, 40 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0xFFF0;
+    r_vqw[5] = vramQueuePushWithin(lotb_vram, 0x6710, 0x20, VRAM_QUEUE_ROW, 0xFFFF) | (vram_queue_cost << 4); /* 0, cost kept */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    /* vramQueuePushSpriteWithin: a 16x16 frame costs 2 * (64 + 80) = 288 and takes a budget of
+     * 288 exactly, refuses one byte short of a second, refuses when its two strips do not both
+     * fit (whatever the budget), refuses a sum past $FFFF, takes a 32x32 frame (4 * (128 + 80) =
+     * 832) at 832, and refuses under 8 pixels; a refusal notes nothing and counts nothing */
+    vram_queue_refused = 0;
+    r_vqsw[0] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 288) | (vram_queue_count << 8);           /* 1, count 2 */
+    r_vqsw[1] = vramQueueCost()
+              | ((vram_queue_src[1] - vram_queue_src[0] == 512 && vram_queue_addr[1] == 0x6500
+                  && vram_queue_size[0] == 64 && vram_queue_step[1] == VRAM_QUEUE_ROW
+                  && vram_queue_cum[0] == 144) ? 0 : 0x8000);                                          /* 288 */
+    r_vqsw[2] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 288 + 287) | (vram_queue_count << 8);     /* 0, count 2 */
+    r_vqsw[3] = vram_queue_refused | (vramQueueCost() == 288 ? 0 : 0x8000);                              /* 0 */
+    vram_queue_count = VRAM_QUEUE_MAX - 1;
+    vram_queue_cost = 0;
+    r_vqsw[4] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 16, 0xFFFF) | (vram_queue_count << 8);       /* 0, count 39 */
+    r_vqsw[5] = vram_queue_refused | (vramQueueCost() == 0 ? 0 : 0x8000);                                /* 0 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0xFF00;
+    r_vqsw[6] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 32, 0xFFFF) | (vram_queue_count << 8)
+              | (vram_queue_cost == 0xFF00 ? 0 : 0x8000);                                              /* 0, cost kept */
+    vram_queue_cost = 0;
+    r_vqsw[7] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 32, 832) | (vram_queue_count << 8)
+              | (vram_queue_cost == 832 ? 0 : 0x8000);                                                 /* 1, count 4 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
+    r_vqsw[8] = vramQueuePushSpriteWithin(vq_sheet, 0x6400, 4, 0xFFFF) | (vram_queue_count << 8)
+              | (vram_queue_refused << 12);                                                            /* 0 */
+    vram_queue_count = 0;
+    vram_queue_cost = 0;
     /* vramQueueFlushUntil. The second entry is made dear by hand (its
      * running cost past any VBlank), so the cut does not depend on the
      * line the call lands on: the first entry goes, the second and third
@@ -1288,6 +1336,25 @@ u16 r_fast[16];
  * the screen, camera at (100, 50) */
 u16 r_world[12];
 u16 r_worldo[8];
+/* a computed VRAM address a BG register cannot hold is counted (and fires WDM $03) */
+u16 r_bgaddr[2];
+extern u16 bg_address_refused;
+/* a refused audio call is counted (and fires WDM $01): slot 64 does not exist -> delta 1, code AUDIO_ERR_INVALID_ID */
+u16 r_audtrip[2];
+extern u16 audio_error_count;
+extern u8 audio_error_last;
+/* The screen-on check of the DMA routines: dma_unsafe_count moves by one for a transfer
+ * started with the screen on in active display, and by none with the screen off or in VBlank */
+u16 r_dmachk[4];
+/* ...and by one for a transfer started in VBlank that runs past its end (the
+ * end check), once per call however many passes the call makes */
+u16 r_dmaend[7];
+extern u8 console_force_blanked;
+static const u16 dmachk_color = 0x7FFF;
+/* oamSetBatch: x/y only (tile and attribute bytes kept, size bits kept), the
+ * ninth bit set and cleared, tile and attr, one of them, a start that is not
+ * on a byte of the high table, a batch cut at 127, count 0 and a bad id */
+u16 r_batch[11];
 static const u8 w_rev[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 static const u8 w_bad[8] = { 0, 200, 1, 8, 3, 3, 6, 255 };
 static s16 w_x[8];
@@ -1830,6 +1897,165 @@ int main(void) {
         wb.order = 0;
         for (i = 108; i < 128; i++) oamHide(i);
         oam_update_flag = flag;
+    }
+    {
+        /* Sprites 100-107: bytes 25 and 26 of the high table start at $AA (size
+         * bits set, x bits clear); tile $AA, attribute $BB. */
+        static OamBatch bt;
+        static s16 bt_x[8], bt_y[8];
+        static u8 bt_tile[8], bt_attr[8];
+        u8 flag = oam_update_flag;
+        u8 before;
+        u16 i;
+        for (i = 100; i < 108; i++) {
+            oamMemory[i * 4 + 2] = 0xAA;
+            oamMemory[i * 4 + 3] = 0xBB;
+        }
+        oamMemory[512 + 25] = 0xAA;
+        oamMemory[512 + 26] = 0xAA;
+        bt.x = bt_x; bt.y = bt_y; bt.tile = 0; bt.attr = 0;
+        bt.first_id = 100; bt.count = 4;
+        bt_x[0] = 10; bt_x[1] = 300; bt_x[2] = -1; bt_x[3] = 511;
+        bt_y[0] = 5; bt_y[1] = 6; bt_y[2] = 7; bt_y[3] = 8;
+        oam_update_flag = 0;
+        oamSetBatch(&bt);
+        r_batch[0] = oamMemory[400] | (oamMemory[401] << 8);          /* 10, 5 */
+        r_batch[1] = oamMemory[404] | (oamMemory[405] << 8);          /* 300 & $FF, 6 */
+        r_batch[2] = oamMemory[408] | (oamMemory[409] << 8);          /* -1: $FF, 7 */
+        r_batch[3] = oamMemory[412] | (oamMemory[413] << 8);          /* 511: $FF, 8 */
+        r_batch[4] = oamMemory[402] | (oamMemory[403] << 8);          /* tile and attr kept: $AA, $BB */
+        r_batch[5] = oamMemory[512 + 25] | ((oam_update_flag != 0) << 8);   /* $AA | x bits of 1, 2, 3 = $FE, flag */
+        bt_x[0] = 1; bt_x[1] = 2; bt_x[2] = 3; bt_x[3] = 4;
+        oamSetBatch(&bt);
+        r_batch[6] = oamMemory[512 + 25] | (oamMemory[512 + 26] << 8);   /* x bits cleared, size bits and the next byte kept: $AA, $AA */
+        /* tile and attr, from sprite 102: two bytes of the high table */
+        bt.tile = bt_tile; bt.attr = bt_attr; bt.first_id = 102;
+        bt_x[0] = 261; bt_x[1] = 6; bt_x[2] = 300; bt_x[3] = 7;
+        bt_y[0] = 9; bt_y[1] = 10; bt_y[2] = 11; bt_y[3] = 12;
+        bt_tile[0] = 1; bt_tile[1] = 2; bt_tile[2] = 3; bt_tile[3] = 4;
+        bt_attr[0] = 0x10; bt_attr[1] = 0x20; bt_attr[2] = 0x30; bt_attr[3] = 0x40;
+        oamSetBatch(&bt);
+        r_batch[7] = (oamMemory[410] == 1 && oamMemory[411] == 0x10 && oamMemory[408] == 5 && oamMemory[409] == 9)
+                   | ((oamMemory[414] == 2 && oamMemory[415] == 0x20) << 1)
+                   | ((oamMemory[422] == 4 && oamMemory[423] == 0x40) << 2)
+                   | ((oamMemory[512 + 25] == 0xBA) << 3)
+                   | ((oamMemory[512 + 26] == 0xAB) << 4)
+                   | ((oamMemory[404] == 2) << 5)                     /* sprite 101: not in the batch */
+                   | ((oamMemory[426] == 0xAA) << 6);                 /* sprite 106 too */
+        /* one of the two pointers */
+        bt.first_id = 100; bt.count = 2; bt.attr = 0;
+        bt_tile[0] = 7; bt_tile[1] = 8; bt_x[0] = 50; bt_x[1] = 60;
+        oamSetBatch(&bt);
+        r_batch[8] = (oamMemory[402] == 7 && oamMemory[403] == 0xBB)
+                   | ((oamMemory[406] == 8 && oamMemory[407] == 0xBB) << 1);
+        bt.tile = 0; bt.attr = bt_attr; bt.count = 1; bt_attr[0] = 0x21;
+        oamSetBatch(&bt);
+        r_batch[8] |= (oamMemory[402] == 7 && oamMemory[403] == 0x21) << 2;   /* 7 */
+        /* a batch from 126 of five stops at 127; count 0 and an id that is
+         * not a sprite write nothing and do not raise the flag */
+        bt.tile = 0; bt.attr = 0; bt.first_id = 126; bt.count = 5;
+        bt_x[1] = 77;
+        before = oamMemory[512 + 32];
+        oamSetBatch(&bt);
+        r_batch[9] = (oamMemory[127 * 4] == 77 && oamMemory[512 + 32] == before)
+                   | ((oam_max_id == 127) << 1);                      /* 3 */
+        oam_update_flag = 0;
+        bt.count = 0; bt.first_id = 100;
+        oamSetBatch(&bt);
+        bt.count = 3; bt.first_id = 128;
+        oamSetBatch(&bt);
+        r_batch[10] = (oam_update_flag == 0) | ((oamMemory[402] == 7) << 1);   /* 3 */
+        for (i = 100; i < 108; i++) oamHide(i);
+        oamHide(126);
+        oamHide(127);
+        oam_update_flag = flag;
+    }
+    {
+        /* In active display (REG_HVBJOY bit 7 clear) with the shadow saying screen on,
+         * then screen off, then in VBlank. Colour 255, two bytes: the same transfer. */
+        u8 shadow = console_force_blanked;
+        u16 before;
+
+        WaitForVBlank();
+        while (REG_HVBJOY & 0x80) { }
+        console_force_blanked = 0;
+        WaitForVBlank();
+        while (REG_HVBJOY & 0x80) { }
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[0] = dma_unsafe_count - before;           /* 1 */
+        console_force_blanked = 1;
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[1] = dma_unsafe_count - before;           /* 0: screen off */
+        console_force_blanked = 0;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyCGram((const u8 *)&dmachk_color, 255, 2);
+        r_dmachk[2] = dma_unsafe_count - before;           /* 0: in VBlank */
+        r_dmachk[3] = 0x0D4A;
+        console_force_blanked = shadow;
+    }
+    {
+        /* The END of the transfer: each one starts in VBlank, after
+         * WaitForVBlank(), so the start check passes; the long ones run past
+         * the end of VBlank and lose their tail. Destinations leave words
+         * $6000-$67FF alone (VRAM_CASES of test_libtest.py): a 0xF000-byte
+         * fill is 0x7800 words, from $6800 it wraps round to $5FFF.
+         * Overscan off for the block (part_ppu turned it on, test_libtest.py
+         * reads it back): the 37-line VBlank of a 224-line display. */
+        u8 shadow = console_force_blanked;
+        u16 before;
+
+        videoSetOverscan(0);
+        console_force_blanked = 0;
+        WaitForVBlank();
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaFillVRAM(0, 0x6800, 0xF000);
+        r_dmaend[0] = dma_unsafe_count - before;           /* 1: two passes, counted once */
+        console_force_blanked = 1;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaFillVRAM(0, 0x6800, 0xF000);
+        r_dmaend[1] = dma_unsafe_count - before;           /* 0: screen off */
+        console_force_blanked = 0;
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 2048);
+        r_dmaend[2] = dma_unsafe_count - before;           /* 0: fits in VBlank */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 0x8000);
+        r_dmaend[3] = dma_unsafe_count - before;           /* 1: too big */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVram((const u8 *)&dmachk_color, 0x6800, 4096);
+        r_dmaend[4] = dma_unsafe_count - before;           /* 0: 4 KB still fits */
+        WaitForVBlank();
+        before = dma_unsafe_count;
+        dmaCopyVramMode7((const u8 *)&dmachk_color, 0x4000, (const u8 *)&dmachk_color, 0x4000);
+        r_dmaend[5] = dma_unsafe_count - before;           /* 1: two passes, counted once */
+        r_dmaend[6] = 0x0E4D;
+        console_force_blanked = shadow;
+        videoSetOverscan(1);
+    }
+    {
+        u16 before = audio_error_count;
+        u8 rc = audioLoadSample(64, (const u8 *)&before, 9, 0);
+        r_audtrip[0] = (audio_error_count - before) | ((u16)rc << 8);    /* 1, AUDIO_ERR_INVALID_ID */
+        r_audtrip[1] = audio_error_last | 0x0A00;
+    }
+    {
+        volatile u16 odd = 0x1010;
+        u16 before = bg_address_refused;
+        bgSetGfxPtr(3, odd);                                  /* BG4 base: not a multiple of 0x1000 */
+        bgSetMapPtr(3, odd, 0);                               /* nor of 0x400 */
+        r_bgaddr[0] = bg_address_refused - before;            /* 2 */
+        odd = 0x2000;
+        bgSetGfxPtr(3, odd);
+        bgSetMapPtr(3, (u16)(odd + 0x400), 0);
+        r_bgaddr[1] = (bg_address_refused - before) | 0x0A00; /* still 2 */
     }
     /* pads: no button is down in this ROM. The macros, the functions behind
      * them, and an index out of range (functions only) */

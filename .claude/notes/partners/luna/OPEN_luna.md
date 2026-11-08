@@ -235,3 +235,16 @@ verdict should be 🔑 firmware, whatever the CPU then does. Our side,
 `make luna-bench` skips the DSP-1 examples when the firmware is absent, as
 the manifests do. Small rub also sent: `bench` ignores `HDMADEMO.SMC`
 (upper-case extension) where `luna test` takes it — the 42nd file.
+
+**2026-11-03 — what a scene really loads (for `opensnes budget`).** `budget` adds
+every converted asset ("if all were loaded at once"): many times the 64 KB of
+VRAM for a game that loads one screen at a time, a figure that helps nobody.
+What a scene needs is the VRAM and CGRAM it actually received. Asked of luna:
+over a profiled window (`luna profile --from-frame/--until-frame`, or at a
+symbol), the set of VRAM words and CGRAM entries written (by DMA and by port),
+as byte ranges in the JSON report, plus a per-window total. With that,
+`budget --frame` can say "this scene wrote 14.2 KB of VRAM and 96 colours".
+Prototype on our side: none (the ROM cannot see it; `peek_vram` snapshots give
+the occupied extent, not what was written). Weight: moyen. Not blocking.
+
+**2026-11-03 (later the same day) — delivered.** luna 76a641c: `state --vram-writers` carries the CGRAM writes and the window totals (`vram_writers.totals`); `opensnes budget --frame` reads them (from frame 0, loading included). Not asked, not needed: `profile` carrying it too.

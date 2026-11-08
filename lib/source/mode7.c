@@ -39,8 +39,10 @@
 #define REG_SETINI (*(volatile u8 *)0x2133)
 
 /* Module state (WRAM) — mirrors the ASM's .mode7vars */
-static u16 m7_scale_x;
-static u16 m7_scale_y;
+/* Not static: ppuReset() (ppu_reset.asm) brings them back to their
+ * power-on value. */
+u16 m7_scale_x;
+u16 m7_scale_y;
 /* The sine and cosine of the current angle. Nothing in the module reads
  * them back: they are what a debugger or a test looks at (the
  * mode7_rotate_scale manifest asserts them at each angle). Not `static` for

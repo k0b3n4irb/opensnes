@@ -166,7 +166,7 @@ void fadeIn(u8 speed) {
  * same wait of `speed` frames after each as fadeOut() / fadeIn(), the frames
  * left to the caller's loop. fade_step counts the levels written (1 to 16:
  * 16 is the last level, whose wait is still to be served). */
-static u8 fade_active;
+u8 console_fade_active;     /* not static: ppuReset() stops a running fade */
 static u8 fade_dir;
 static u8 fade_speed;
 static u8 fade_wait;
@@ -183,21 +183,21 @@ void fadeStart(u8 direction, u8 speed) {
     fade_wait = speed;
     /* speed 0 waits for nothing: the end level at once, no fade to run */
     if (speed == 0) {
-        fade_active = 0;
+        console_fade_active = 0;
         setBrightness(fade_level(15));
         return;
     }
-    fade_active = 1;
+    console_fade_active = 1;
     setBrightness(fade_level(0));
 }
 
 u8 fadeStep(void) {
-    if (!fade_active) {
+    if (!console_fade_active) {
         return 0;
     }
     if (--fade_wait == 0) {
         if (fade_step == 16) {
-            fade_active = 0;
+            console_fade_active = 0;
             return 0;
         }
         setBrightness(fade_level(fade_step));
@@ -208,7 +208,7 @@ u8 fadeStep(void) {
 }
 
 u8 fadeRunning(void) {
-    return fade_active;
+    return console_fade_active;
 }
 
 u8 getBrightness(void) {

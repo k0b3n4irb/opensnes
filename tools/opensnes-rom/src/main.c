@@ -267,7 +267,9 @@ static int run_budget(cli_ctx *ctx)
     if (nbanks > MAXBANK) nbanks = MAXBANK;
     long rom_used = 0;
     for (size_t i = 0; i < s.nsections; i++) {
-        int b = s.sections[i].bank;
+        /* the bank is the ROM offset over the bank size: the CPU window (FastROM
+         * $80+, HiROM $C0+) cannot tell linker bank 64 from bank 0 on an 80-bank ROM */
+        int b = (int)(s.sections[i].romoff / (unsigned)h.bank_size);
         if (b < 0 || b >= MAXBANK) continue;
         used[b] += (long)s.sections[i].size;
         rom_used += (long)s.sections[i].size;

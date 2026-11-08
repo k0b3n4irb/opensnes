@@ -872,7 +872,7 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   puissance de deux) ; `make test-project` et `release-smoke` jouent les deux
   commandes (le zip les joue sur les trois OS : c'est le seul endroit où un
   chemin cité traverse `cmd.exe`). En-tête et règle de somme arbitrés par
-  snes-rag (snesdev-wiki `d4220903ea0b00c4`, `726edb3e9c251ff5` ; fullsnes
+  rag-partner (snesdev-wiki `d4220903ea0b00c4`, `726edb3e9c251ff5` ; fullsnes
   `6ae28ab5da901c53`). Hors rapport pour l'instant : le temps de VBlank et la
   taille des données SPC700 (un link ne les connaît pas ; luna mesure le
   premier). Choix assumé : `release` n'a pas de `--version` propre au projet

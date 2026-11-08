@@ -243,9 +243,9 @@ endif
 # dsp1 module drives is the 1 MB LoROM one (fullsnes, DSP-1 LoROM: data and
 # status in $30-$3F:8000-$FFFF). Lower bound 8: the prebuilt library pins
 # its asset sections to banks 7-1.
-ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,126))))
+ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,128))))
 ifeq ($(shell [ "$(ROM_BANKS)" -ge 8 ] && [ "$(ROM_BANKS)" -le "$(ROM_BANKS_MAX)" ] 2>/dev/null && echo ok),)
-$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 126 banks of 32 KB before WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
+$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 128 banks of 32 KB, addressed from $$80 so the last two sit at $$FE and $$FF, clear of the WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
 endif
 ifeq ($(filter 1,$(USE_SUPERFX)),1)
 ifeq ($(filter 32 64 128,$(GSU_RAM_KB)),)
@@ -311,6 +311,7 @@ endif
 _DEP_sprite          := dma sprite_oamset sprite_world sprite_meta
 _DEP_sprite_meta     := sprite_oamset                                           # oam_ext_tab
 _DEP_sprite_world    := sprite_oamset                                           # oam_ext_tab
+_DEP_sprite_batch    := sprite_oamset                                           # oam_ext_tab
 # The seven entries marked L2a were found by devtools/link_modules.py
 # (2026-09-13), which links every module ALONE: each of these modules
 # referenced a symbol of a module it never declared, and only linked in
@@ -322,6 +323,7 @@ _DEP_text            := dma background console                                  
 _DEP_text4bpp        := dma
 _DEP_object          := map sprite sprite_dynamic                               # L2a: oambuffer (sprite_dynamic's)
 _DEP_map             := dma
+_DEP_dma             := console                                                 # console_force_blanked: the screen-on check of the DMA routines
 _DEP_background      := dma background_scroll                                                     # L2a: dmaCopyVram
 _DEP_fixed32         := math                                                    # L2a: sine_table
 _DEP_snesmod         := console
@@ -341,6 +343,7 @@ _DEP_hdma            := dma math_sqrt
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
 _DEP_panel           := dma console
+_DEP_ppu_reset       := console background colormath mosaic window mode7 hdma sprite   # ppuReset: the shadows of each, oamClear
 _DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
@@ -349,7 +352,8 @@ _DEP_audio           := apu audio_blob audio_stream audio_vset
 _DEP_audio_vset      := audio                                                   # audioSetVoiceVolumePitch (asm): audio.c's pending command, sequence and voice mirror
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
-_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
+# four rounds: sprite_dynamic_dispatch -> sprite_dynamic -> sprite -> dma -> console
+_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1))))))
 LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
 
 #------------------------------------------------------------------------------

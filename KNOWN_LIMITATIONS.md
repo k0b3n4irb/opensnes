@@ -38,7 +38,13 @@ everything written after it.
 **Mitigation:** wrap heavy VRAM work between `setScreenOff()` / `setScreenOn()`
 during init, and use `WaitForVBlank()` before per-frame DMA. The `1-page-per-VBlank`
 pattern (split tilemap DMAs into 2 KB chunks) is the canonical solution for
-large transfers.
+large transfers. The library's DMA calls (`dmaCopyVram`, `dmaCopyCGram`,
+`dmaCopyOam`, `dmaCopyVramMode7`, `dmaFillVRAM`) count a transfer made with
+the screen on outside VBlank in `dma_unsafe_count` and fire WDM $02, which luna
+reports: one started outside VBlank, and one started inside it that is still
+running when it ends (the CPU is stopped until a DMA completes, so the call
+reads HVBJOY right after it). A single transfer longer than the whole active
+display that ends in the next VBlank is not seen.
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 VBlank lasts 37 scanlines on NTSC with the standard 224-line display —

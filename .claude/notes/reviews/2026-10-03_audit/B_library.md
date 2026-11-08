@@ -130,7 +130,7 @@ La bibliothèque a fermé la classe la plus dangereuse de septembre : il ne rest
 Captures luna des passes : `/tmp/claude-1000/-home-kobenairb-workspace-opensnes/e33d7b0e-5fea-4b39-854f-2296e1506ce0/scratchpad/{iris,iris2,bright}/`.
 
 Signalements partenaires relevés pendant l'audit, à reporter (non faits, lecture seule) :
-- **snes-rag** : la requête « DMA transfer rate master cycles per byte » ne remonte aucun arbitre SNES ; les registres arithmétiques SA-1 (côté d'usage) restent à arbitrer.
+- **rag-partner** : la requête « DMA transfer rate master cycles per byte » ne remonte aucun arbitre SNES ; les registres arithmétiques SA-1 (côté d'usage) restent à arbitrer.
 - **luna** : un mode `--budget` inclusif des appelés.
 
 ---

@@ -1,0 +1,38 @@
+# shard_dash: the REAL fade, with the pump running through it. No
+# screen_fade_skip: START at frame 40 closes the title with a 16-image
+# fade-out, the round's map loads, and a 16-image fade-in opens it.
+# screen_fade_frames is the image count of the LAST fade, and pump_frames
+# counts every image the game pump ran, in fades and waits included: a fade
+# that froze the pump (a blocking fadeIn/fadeOut) would leave pump_frames
+# behind the PPU frame count.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 120
+input = "40:0x1000,44:0"
+
+[asserts]
+wdm_empty = true
+
+[asserts.dma]
+unsafe_writes = 0
+
+[[checkpoint]]                 # title settled after its fade-in
+at_frame = 38
+[checkpoint.values]
+game_screen = { eq = 0, width = 1 }
+screen_fade_frames = { eq = 16, width = 2 }
+console_brightness = { eq = 15, width = 1 }
+
+[[checkpoint]]                 # mid fade-out: the screen is dimmer, still the title
+at_frame = 50
+[checkpoint.values]
+game_screen = { eq = 0, width = 1 }
+console_brightness = { lt = 15, width = 1 }
+console_force_blanked = { eq = 0, width = 1 }   # a fade is NOT forced blank
+
+[[checkpoint]]                 # the round is open, full brightness, after 16 more images
+at_frame = 110
+[checkpoint.values]
+game_screen = { eq = 1, width = 1 }
+screen_fade_frames = { eq = 16, width = 2 }
+console_brightness = { eq = 15, width = 1 }
+pump_frames = { eq = 104, width = 2 }   # 110 images minus the 6 before the first pump

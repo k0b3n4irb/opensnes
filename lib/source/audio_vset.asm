@@ -57,6 +57,22 @@
 .DEFINE AV_SENT     8
 .DEFINE AV_PAN_DRV  9
 
+; void audioRefusedTrip(void): WDM $01, called by audio_refuse() (audio.c) on every
+; refusal that is counted. The in-ROM assertion channel of luna (--wdm-out,
+; a manifest's wdm_empty): a refused load or play that the caller does not
+; check is found at the call, not when a sound is missing.
+.SECTION ".text.audioRefusedTrip" SUPERFREE
+
+audioRefusedTrip:
+    php
+    sep #$20
+    .ACCU 8
+    .db $42, $01            ; WDM $01
+    plp
+    rtl
+
+.ENDS
+
 .SECTION ".text.audioSetVoiceVolumePitch" SUPERFREE
 
 audioSetVoiceVolumePitch:

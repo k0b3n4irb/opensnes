@@ -224,9 +224,13 @@ multiply, function pointers, and similar idioms. Treat all `tcc__r*` slots
 as **caller-saved**: any function call may clobber them.
 
 **`tcc__lf` is caller-saved too, and a callee may use it.** The compiler
-keeps there the temporaries of a function that calls nothing, and, in a
+keeps there the temporaries of a function that calls nothing (all of them
+when they fit in its 16 words; otherwise the costliest ones — use count
+weighted by loop depth — and the rest in a stack frame), and, in a
 function that calls, only the temporaries no call crosses (a value that
-must survive a call is on the stack). So nothing in `tcc__lf` is expected
+must survive a call is on the stack). A function with an object on the
+stack (a local whose address is taken, a dynamic allocation) and no call
+keeps all its temporaries on the stack. So nothing in `tcc__lf` is expected
 to survive a `jsl`, and hand-written assembly called from C may use its 32
 bytes as scratch for the length of the call, like the `tcc__r*` slots.
 First user in the library: `oamPlaceWorld()` with an `order` array

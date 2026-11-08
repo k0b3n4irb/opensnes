@@ -80,14 +80,31 @@
  *          silently lost.
  *
  *          Forced blank means setScreenOff() — INIDISP bit 7.
+ *
+ *          **Since this version the call tells you.** A transfer made
+ *          with the screen on outside VBlank — started outside it, or
+ *          started inside it and still running when it ends — still runs
+ *          (it always did) but is counted in `dma_unsafe_count` and fires
+ *          WDM $02, which luna reports (`--wdm-out`; a manifest's
+ *          `wdm_empty = true` fails on it). One call counts once, even
+ *          dmaFillVRAM() and dmaCopyVramMode7(), which make two passes. The
+ *          end is read from HVBJOY right after the transfer (the CPU is
+ *          stopped while it runs), with IRQs masked for those few cycles.
+ *          Not seen: a single transfer longer than the whole active
+ *          display (about 38 KB) that ends in the next VBlank. The screen
+ *          state is the shadow setScreenOn() / setScreenOff() keep: write
+ *          REG_INIDISP yourself and the shadow is behind. Applies to
+ *          dmaCopyVram(), dmaCopyCGram(), dmaCopyOam(), dmaCopyVramMode7()
+ *          and dmaFillVRAM(). Cost, measured (libbench row `dma`, 2 KB):
+ *          +276 master cycles a call, both checks.
  *          setBrightness(0) blacks the screen but leaves the PPU
  *          fetching, so it does NOT open the write window.
  *
  * @warning **VBlank fits roughly 4 KB.** A larger transfer has its tail
  *          dropped during active display, and the failure is partial:
- *          the first few KB land, so the screen is half right. Anything
- *          bigger than a few KB belongs between setScreenOff() and
- *          setScreenOn(), not in VBlank.
+ *          the first few KB land, so the screen is half right (such a
+ *          transfer is counted, above). Anything bigger than a few KB
+ *          belongs between setScreenOff() and setScreenOn(), not in VBlank.
  *
  * @note The bank is taken from @p source's own bank byte, so the data
  *       may live in ANY bank — a SUPERFREE section, a bank you pinned
@@ -95,6 +112,9 @@
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
+
+/** @brief DMA calls that wrote with the screen on outside VBlank, started outside it or run past its end (see dmaCopyVram()): 0 on a healthy run. Wraps at 65536. */
+extern u16 dma_unsafe_count;
 
 /**
  * @brief Load Mode 7 interleaved data to VRAM.

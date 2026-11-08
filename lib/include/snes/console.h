@@ -88,6 +88,58 @@
  */
 void consoleInit(void);
 
+/**
+ * @brief Put every PPU register, and the library's PPU shadows, back to
+ *        their power-on state
+ *
+ * crt0 writes all the PPU registers once, at boot; consoleInit() rewrites
+ * only a few of them. A screen set up after another one therefore inherits
+ * whatever the first left: sprite size and tile base (OBJSEL), BG2-4 maps
+ * and tiles, scrolls, main and sub screen (TM/TS), windows, color math,
+ * mosaic, the BG mode, Mode 7's matrix, a running HDMA. ppuReset() undoes
+ * all of it, in this order:
+ * - HDMA stopped (HDMAEN = 0, the HDMA module's state cleared);
+ * - every write-only PPU register from $2100 to $2133 set to the value crt0
+ *   writes at boot: forced blank, BGMODE 0, all map and tile bases 0,
+ *   horizontal scrolls 0 and vertical scrolls -1 (tilemap row 0 on the
+ *   first line), the identity Mode 7 matrix, windows and color math off,
+ *   TM = BG1, TS = 0, fixed colour black, SETINI 0;
+ * - the shadows of the console, background, mosaic, color math, window,
+ *   Mode 7 and HDMA modules set to their value at main(): brightness 15,
+ *   screen marked blanked, a running fadeStart() stopped, scrolls 0;
+ * - oamClear(): every sprite hidden, uploaded at the next WaitForVBlank().
+ *
+ * After it the screen is black (forced blank) and the next screen is set up
+ * as after consoleInit(): mode, palettes, tiles, maps, setScreenOn().
+ *
+ * @par When to call it
+ * Between two screens, before the setup of the next one: leaving the title
+ * for the game, the game for its game-over screen, a level for the next
+ * when the next uses another layout. Call it from the main loop, never from
+ * an NMI callback: the screen is blanked the moment it starts.
+ *
+ * @par Module and cost
+ * Module `ppu_reset` (add it to `LIB_MODULES`; it brings console, background,
+ * colormath, mosaic, window, mode7, hdma and sprite with it). It costs 283
+ * bytes of ROM (a 140-byte register table and its loop), at most 31 bytes
+ * of RAM (the shadows of those modules, for a ROM that did not link them
+ * already), and 167,832 master cycles a call on luna, under half a frame, of
+ * which 145,816 are oamClear() (examples/basics/ppu_reset). A ROM that lists
+ * the module and never calls ppuReset() is byte for byte the ROM that does
+ * not list it.
+ *
+ * @warning It does not touch the contents of VRAM, CGRAM or OAM (only their
+ *          address registers; the OAM buffer is cleared and uploaded by the
+ *          next NMI as usual), the audio (SPC700), NMITIMEN (NMI, joypad and
+ *          IRQ settings stay), an NMI callback set with nmiSet(), the text
+ *          module's buffer, the VRAM queue, nor the dynamic sprite engine's
+ *          state: reinitialise those that the next screen uses with their own
+ *          init function (textInit(), oamDynamicInit(), ...).
+ * @warning The BG mode after it is 0, not consoleInit()'s Mode 1: call
+ *          setMode() in the next screen's setup.
+ */
+void ppuReset(void);
+
 /*============================================================================
  * Screen Control
  *============================================================================*/

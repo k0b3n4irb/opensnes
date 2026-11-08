@@ -1,13 +1,15 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.40.0 · `luna state --until-frame <N>` per ROM · 65 ROMs · **63 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
 > Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the latest NMI within one frame of the capture) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored, or the ROM header's size byte does not cover the file or its checksum complement does not match. PNGs: `$OPENSNES_TMP/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
 | Example | Status | Detail |
 |---|---|---|
 | `audio/apu_switch` | OK | live (200f/198nmi) |
+| `audio/sample_swap` | OK | live (200f/198nmi) |
 | `audio/sfx_from_wav` | OK | live (200f/198nmi) |
+| `audio/sfx_voices` | OK | live (200f/198nmi) |
 | `audio/snesmod_music` | OK | live (200f/190nmi) |
 | `audio/soundboard` | OK | live (200f/198nmi) |
 | `audio/speech_synth` | OK | live (200f/198nmi) |
@@ -20,6 +22,7 @@ luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `basics/collision_demo` | OK | live (200f/198nmi) |
 | `basics/game_skeleton` | OK | live (200f/198nmi) |
 | `basics/panel_hud` | OK | live (200f/198nmi) |
+| `basics/ppu_reset` | OK | live (200f/198nmi) |
 | `basics/scene_stack` | OK | live (200f/198nmi) |
 | `chips/sa1_starfield` | OK | live (400f/398nmi) |
 | `chips/superfx_3d` | OK | live (400f/397nmi) |
@@ -36,6 +39,7 @@ luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `games/blocks` | OK | live (400f/390nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
 | `games/rooftop_run` | OK | live (200f/190nmi) |
+| `games/shard_dash` | OK | live (200f/198nmi) |
 | `hdma/gradient_colors` | OK | live (200f/198nmi) |
 | `hdma/hdma_helpers` | OK | live (200f/198nmi) |
 | `hdma/hdma_wave` | OK | live (400f/398nmi) |
@@ -44,6 +48,7 @@ luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `input/superscope` | INPUT-DEP | live (200f/198nmi) |
 | `maps/map_scroll` | OK | live (200f/198nmi) |
 | `memory/hirom_demo` | OK | live (200f/198nmi) |
+| `memory/lzss_ram` | OK | live (400f/398nmi) |
 | `memory/save_game` | OK | live (200f/198nmi) |
 | `mode7/dsp1_ground` | OK | live (400f/398nmi) |
 | `mode7/extbg` | OK | live (400f/398nmi) |

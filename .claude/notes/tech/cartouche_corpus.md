@@ -19,7 +19,7 @@ reports a new index fingerprint.
 `snes_sources`: **35 021 chunks, 215 of 237 sources, built
 2026-10-10T18:43:03Z, chunker v10, fingerprint `4cc278d08305`**;
 `luna-docs` captured 2026-10-10, so it carries no v1.39.0 page (reported:
-`partners/snes-rag/2026-10-18_to_snes-rag_luna-docs-v1.39.0.md`). Golden
+`partners/rag-partner/2026-10-18_to_rag-partner_luna-docs-v1.39.0.md`). Golden
 queries **10/10** (the nine below plus "per-window shift `--max-shift`",
 `2dda265e2f4d3aa9`).
 
@@ -37,14 +37,14 @@ restarted, the guard-rails hold: a mistyped `exclude_sources` is refused by
 
 `snes_sources`: **34 949 chunks, 215 sources captured of 237, built
 2026-10-05T00:01:28Z, chunker v10, index v2, fingerprint `15fc202da6dc`**
-(`2026-10-04_from_snes-rag_fin-du-menage.md`, after `…_volume-de-module-tranche.md`
+(`2026-10-04_from_rag-partner_fin-du-menage.md`, after `…_volume-de-module-tranche.md`
 at `2dd271353e84` and `…_garde-fous-mcp.md`). What changed for us: domain
 arbiters are matched on whole words (no more `luna-docs` promoted by "Lunar
 Magic"), `reference` is a rank between arbitre-domaine and solid and
 `authority_min="reference"` is accepted, addresses are matched under one
 form (`0x2130` = `$2130` = `2130h`, four-digit only — two-digit bank ranges
 such as fullsnes's `40h-4Fh` are still not matched, the SA-1 case of
-`OPEN_snes-rag.md`), the `mesures-partenaires` fiches are in English with
+`OPEN_rag-partner.md`), the `mesures-partenaires` fiches are in English with
 new chunk ids (old ones resolve by alias), a mistyped `exclude_sources` id
 is refused instead of ignored and `k` is bounded to 1..20. Golden queries
 **9/9**; negative control: `opensnes-docs` at ranks 1 and 2, no toolchain
@@ -57,20 +57,20 @@ the refusal and the `k` bound were not active here (`exclude_sources=
 
 `snes_sources`: **34 808 chunks, 210 sources captured of 236, built
 2026-10-02T05:26:41Z, chunker v8, index v2, fingerprint `5f0e4bb5e1c0`**
-(`2026-10-02_from_snes-rag_ids-v8.md`). **Chunk ids are now derived from
+(`2026-10-02_from_rag-partner_ids-v8.md`). **Chunk ids are now derived from
 the content** (document, breadcrumb, text) instead of `sha1(document:rank)`,
 so every id changed once; old ids still resolve through an alias table in
 `snes_get` — 17 of 17 of ours checked, same text. Cite the new id when you
 touch a comment. fullsnes's prose (~400 KB) is indexed again. Golden
 queries 9/9. Serving it on the replica takes `git pull` + `make import
-SRC=/media/psf/Home/workspaces/SNES/snes-rag` + `make rebuild`; the index
+SRC=/media/psf/Home/workspaces/SNES/rag-partner` + `make rebuild`; the index
 is down for the ~2.5 min of the rebuild (reported).
 
 ## Index state (2026-10-02, evening)
 
 `snes_sources`: **34 220 chunks, 210 sources captured of 236, built
 2026-10-02T03:47:47Z, chunker v7, index v2, fingerprint `0aeced38d56e`**
-(`2026-10-02_from_snes-rag_reponse.md`, answering our audit). New: an
+(`2026-10-02_from_rag-partner_reponse.md`, answering our audit). New: an
 address alone no longer attests a point, and a passage listing more than 8
 addresses (a register map) attests nothing by its register names — our
 multiplier claim now comes out `arbiter_covers_topic_only`, with their
@@ -87,7 +87,7 @@ negative control: our ABI ranks 1-2, never qbe-docs.
 
 `snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
 built 2026-10-02T02:57:24Z, chunker v7, index v2, fingerprint
-`31eb1726aa31`** (snes-rag's `2026-09-30_from_snes-rag_bilan-audit.md`,
+`31eb1726aa31`** (rag-partner's `2026-09-30_from_rag-partner_bilan-audit.md`,
 which supersedes their three earlier notes of the 30th). New: embedding
 windows under 512 tokens, query-centred excerpts, a reserved place for
 arbiters instead of the ×1.8 multiplier, emulator source code (Mesen2
@@ -101,7 +101,7 @@ negative control: our ABI at ranks 1 and 2, never qbe-docs.
 ## Index state (2026-10-02, evening)
 
 `snes_sources`: **34 819 chunks, built 2026-10-02T11:54:22Z, chunker v8,
-fingerprint `b363c473e7ec`** (snes-rag's `…_reponse-ids-v8.md`; served after
+fingerprint `b363c473e7ec`** (rag-partner's `…_reponse-ids-v8.md`; served after
 pull + import + rebuild). What moved:
 
 - **`contradicted` only on a documented false form** (`forme_fausse`): the
@@ -119,11 +119,11 @@ pull + import + rebuild). What moved:
 
 ## Index state (2026-10-03, night)
 
-Replica at snes-rag's fingerprint `ab7b05594e17` (34 946 chunks, chunker
+Replica at rag-partner's fingerprint `ab7b05594e17` (34 946 chunks, chunker
 v10, 215 sources: `furryrpg`, `georgjz-snes-assembly-adventure`,
 `nova-the-squirrel-2`, `skipp-and-friends`, `space-rescue-squad` new).
 (2026-10-06, pin v1.33.1: `luna-docs` serves the `[1.33.0]` changelog — "luna state rom.checksum_computed" gives chunk `6c16d06712970f52`; 1.33.1 changes the Windows GUI only. No lag to report.)
-(Same day, pin v1.34.0: luna told snes-rag itself that `luna-docs` is to re-capture — `cartouche/2026-10-06_luna-vers-cartouche_v1.34.0…` in luna's exchange folder; the golden queries are due again once snes-rag confirms.)
+(Same day, pin v1.34.0: luna told rag-partner itself that `luna-docs` is to re-capture — `cartouche/2026-10-06_luna-vers-cartouche_v1.34.0…` in luna's exchange folder; the golden queries are due again once rag-partner confirms.)
 `luna-docs` serves v1.32.0: "how do I tell whether two builds sound the
 same when their audio hashes differ" gives the `[1.32.0]` changelog
 (`2153025ed4d5bb41`) then the `luna diff --audio` section
@@ -134,7 +134,7 @@ the old id `192d1bade86dc0dc` answers by alias.
 
 ## Index state (2026-10-03, evening)
 
-Replica at snes-rag's commit `9aaa3f3`, their fingerprint `8bae78f3a746`
+Replica at rag-partner's commit `9aaa3f3`, their fingerprint `8bae78f3a746`
 (34 880 chunks, their figures), MCP server restarted. `luna-docs` serves
 v1.31.0 (`0606861003a2ba40`, the `region` key). `snes_verify` no longer
 takes its headline `citation` from a page with a documented error when
@@ -147,12 +147,12 @@ replica needs `git pull`, `make import SRC=…`, `make rebuild`.
 
 ## luna pin v1.31.0 (2026-10-03)
 
-Replica at snes-rag's `7c9411654112` (34 878 chunks, their figure), MCP
+Replica at rag-partner's `7c9411654112` (34 878 chunks, their figure), MCP
 server restarted by the owner. Golden queries 4, 5, 6, 9 rerun with the
 exclusion set: green, same chunks. `luna-docs` serves 1.30.3, not 1.30.4
 nor 1.31.0 (published 2026-10-03T11:27Z): recapture asked.
 
-The six `snes_verify` reference cases of snes-rag's coverage rule, replayed:
+The six `snes_verify` reference cases of rag-partner's coverage rule, replayed:
 multiplier at `$4216` and over `$4202-$4217` both `unsettled /
 arbiter_covers_topic_only`; Mode 4 `confirmed` on `d594aeedde1b87c2`;
 pseudo-hires true form `confirmed`, inverted form `contradicted /
@@ -164,13 +164,13 @@ anomie-regs (`19acadfe6457f2ae`), not the headline.
 
 ## Index state (2026-10-03, afternoon)
 
-Replica updated to snes-rag's `8a7fa1ea9a56` (34 864 chunks, their figures).
+Replica updated to rag-partner's `8a7fa1ea9a56` (34 864 chunks, their figures).
 New: the 65816 side of SNESMOD as code (`snesmod` source, e.g.
 `6a7dcbf85c93ca2d`, `23669e7ecb9d204a`), two `cartouche-fiches-jeux` notes on
 SNESMOD's API and on smconv, a KOF banner on the source. `luna-docs` serves
 1.30.3 (`b0c25f779e82f2bd`), not 1.30.4: asked. The new `snes_verify`
 coverage rule needs the MCP server restarted; not verified in the session
-that rebuilt (`partners/snes-rag/OPEN_snes-rag.md`).
+that rebuilt (`partners/rag-partner/OPEN_rag-partner.md`).
 
 ## luna pin v1.30.4 (2026-10-03)
 
@@ -182,19 +182,19 @@ and 9 rerun with the exclusion set: green, same chunks. `luna-docs` is still
 the 2026-09-30 capture: no 1.30.3 or 1.30.4 changelog entry is served (query
 "luna changelog v1.30.4 MCP ttlMs cacheScope; v1.30.3 Super FX battery
 save" returns only the `luna mcp` usage page). Two versions behind; added to
-`OPEN_snes-rag.md`.
+`OPEN_rag-partner.md`.
 
 ## luna pin v1.30.3 (2026-10-02)
 
 Golden queries 4, 5, 6 and 9 (the `luna-docs` ones) rerun on `5f0e4bb5e1c0`:
 green. `luna-docs` stops at 1.30.2 (the 1.30.3 Super FX battery entry is not
-served); reported in `2026-10-02_to_snes-rag_ids-v8_reply.md` §5.
+served); reported in `2026-10-02_to_rag-partner_ids-v8_reply.md` §5.
 
 ## Index state (2026-09-30)
 
 `snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
 built 2026-09-30T01:35:00Z, chunker v7, fingerprint `55507a6f2907`**
-(snes-rag's `2026-09-30_from_snes-rag_c8-luna.md`). What moved:
+(rag-partner's `2026-09-30_from_rag-partner_c8-luna.md`). What moved:
 
 - **C8 bounded to hardware** (`audited_scope = "hardware"`): the 0.7
   handicap on audited sources stays on every hardware question, drops where
@@ -202,7 +202,7 @@ built 2026-09-30T01:35:00Z, chunker v7, fingerprint `55507a6f2907`**
   convention: push order and pointer size`, k=3, no exclusion) answers our
   ABI at ranks 1 and 2 again, `wdc-65816-manual` 3rd; never qbe-docs.
 - **`luna-docs` recaptured at v1.30.2** (it had stayed at v1.27.0: luna's
-  history rewrite made snes-rag's `git pull --ff-only` fail silently;
+  history rewrite made rag-partner's `git pull --ff-only` fail silently;
   their capture clones now fetch + reset).
 - **v0.46.0 in `opensnes-docs`**: the ABI return row we reported is served
   corrected. A chunk id follows the **position** in its document, not the
@@ -218,7 +218,7 @@ table below.
 
 ## Index state (2026-09-27, second update)
 
-Evening (snes-rag's `…_classement.md`, same fingerprint): ranking changed —
+Evening (rag-partner's `…_classement.md`, same fingerprint): ranking changed —
 `boost_follows` removed, a `consensus_floor` added (when BM25 and the vector
 leg both put a passage first, no source weight can bury it), recall@5
 78.9 → 83.3 %, recall@1 47.4 → 54.4 %. Three `snes_verify` fixes found by
@@ -229,8 +229,8 @@ on the chunk). Audit of our citations of the week: none rests on `luna-docs`
 as an arbiter (reply2 §0).
 
 Served on 2026-09-27 (`snes_sources`): **31983 chunks, built
-2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. snes-rag's
-report of that morning (`partners/snes-rag/2026-09-27_from_snes-rag_rapport.md`)
+2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. rag-partner's
+report of that morning (`partners/rag-partner/2026-09-27_from_rag-partner_rapport.md`)
 announced `c145c7472cf3` (31977, the TMX recapture); the index moved again
 after it (their consensus-floor ranking change). Golden queries rerun on
 `bb5dbf5eff5d`: 9 of 9 green, no. 7 (TMX flip flags) green for the first
@@ -250,15 +250,15 @@ return it (their granularity work, gq30).
 
 `snes_sources` → 207 sources captured of 234 listed; **31973 chunks, 202
 sources indexed, built 2026-09-27T06:19:02Z, chunker v7, fingerprint
-`c416932c0b34`** (snes-rag's report of 2026-09-26, revised 09-27,
-`partners/snes-rag/2026-09-26_from_snes-rag_rapport.md`; checked with
+`c416932c0b34`** (rag-partner's report of 2026-09-26, revised 09-27,
+`partners/rag-partner/2026-09-26_from_rag-partner_rapport.md`; checked with
 `snes_sources` the same day).
 
 **What went wrong on 2026-09-26, and what the fingerprint means now.** The
-instance we query is snes-rag's service VM; it had pulled the new ranking
+instance we query is rag-partner's service VM; it had pulled the new ranking
 policy by git but not the chunks (`make import`), so it served the corpus
 of 09-12 under a chunker label of 09-25. Two metadata bugs hid it, both
-fixed by snes-rag: `chunk_version` described the code, not the chunks (it
+fixed by rag-partner: `chunk_version` described the code, not the chunks (it
 now reads the ledger and says `6+7` on a mixed index), and the fingerprint
 covered chunk ids only (it now covers each chunk's content hash). So the
 fingerprint is again the trigger: **when it moves, rerun the golden
@@ -347,8 +347,8 @@ generic compiler words; the lexical side of the ranking is strong.
 - `.claude/rules/hardware_claims.md` — the rule this note serves.
 - `.claude/notes/chantiers/hardware_docs_audit.md` — the 2026-09 audit
   whose golden queries lived outside the repo until this note.
-- `.claude/notes/partners/snes-rag/` — the request and validation reports
+- `.claude/notes/partners/rag-partner/` — the request and validation reports
   sent to the corpus team (2026-09-11, 2026-09-12; moved into the repo from
-  the owner's machine on 2026-09-22) and `OPEN_snes-rag.md`, the report
+  the owner's machine on 2026-09-22) and `OPEN_rag-partner.md`, the report
   being accumulated for the next send. The contract with the corpus team
   is `.claude/rules/partners.md`.

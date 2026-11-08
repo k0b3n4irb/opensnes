@@ -1,0 +1,11 @@
+# No division helper in folded(), its four values stored as immediates
+# (3807 / 3584 = 1, 19391 / 3584 = 5, 19391 % 3584 = 1471, -100000 % 7 = -5:
+# low word $FFFB, high word $FFFF).
+in folded: absent jsl (__s?div16|__s?mod16|tcc_[us]divmod32)
+in folded: present lda\.w #1\n
+in folded: present lda\.w #5\n
+in folded: present lda\.w #1471\n
+in folded: present lda\.w #65531\n
+# The folder refuses INT_MIN / -1 and a zero divisor: both stay calls.
+in kept: present jsl __sdiv16
+in kept: present jsl __div16

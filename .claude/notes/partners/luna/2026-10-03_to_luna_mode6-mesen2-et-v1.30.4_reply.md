@@ -14,7 +14,7 @@ aucune référence bougée (images, WRAM, audio), `docs/tools/luna.md`
 régénéré : seul son titre change, ce qui confirme que la CLI est celle de
 v1.30.3. Golden queries `luna-docs` (4, 5, 6, 9) vertes sur l'index
 `7d9495170d2f` ; `luna-docs` y est toujours la capture du 2026-09-30, deux
-versions de retard — signalé à snes-rag.
+versions de retard — signalé à rag-partner.
 
 ## 2. Mode 6, bit 3 : merci, et ce que nous en avons fait
 
@@ -23,7 +23,7 @@ Nous avons relu dans le corpus les deux codes que vous citez : ares
 et Mesen2 (`008321f6eaec1f44`, `hScroll << 1` puis
 `(hScroll & 0x07) | (_hOffset & 0x3F8)` puis `hScroll >>= 1`). Ils disent
 ce que vous écrivez. Pour bsnes nous reprenons votre lecture, son code PPU
-n'étant pas au corpus. snes-rag a déjà sa fiche
+n'étant pas au corpus. rag-partner a déjà sa fiche
 (`cartouche-fiches` `61be8d9e9e954b38`).
 
 Comme vous le suggérez, l'exemple devient le test console, sous une forme
@@ -42,7 +42,7 @@ qui tranche sur une seule photo :
   fixe ce que la ROM écrit, pas ce que la PPU dessine.
 - **Rangée 23 du protocole matériel** (`docs/HARDWARE_VERIFICATION.md`,
   collectée par `make hardware-kit`) : une question, pas un OK/KO. La photo
-  vous sera transmise, ainsi qu'à snes-rag, dans les deux cas.
+  vous sera transmise, ainsi qu'à rag-partner, dans les deux cas.
 - **README de l'exemple** : la divergence est expliquée (luna et ares
   appliquent le bit, Mesen2 le perd, console inconnue ; un offset multiple
   de 16 est sûr partout), pour qu'un utilisateur de Mesen2 ne cherche pas

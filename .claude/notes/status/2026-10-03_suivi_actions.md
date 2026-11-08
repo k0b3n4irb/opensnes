@@ -25,7 +25,7 @@ day (summarised at the end of this note).
 | 10 | `padIsConnected` validity flag | 🟠 | done | `2caa6894` |
 | 11 | `gsuSetProgram` in the lib; Mesen2 out of chip sources | 🟠 | done | `7e7fa817` |
 | 12 | `nmi_budget.py --report`, per-example baseline | 🟡 | done | `f7367cdf`, `6fcb10e1`; `superfx_3d`, the skeleton and `gsu_present_step` added 2026-10-03 (9 rows) |
-| 13 | `OPEN_luna.md`, `OPEN_snes-rag.md`, corpus note | 🟠 | done | `b55494ee`, `012c11d6`; both lists empty on 2026-10-03 |
+| 13 | `OPEN_luna.md`, `OPEN_rag-partner.md`, corpus note | 🟠 | done | `b55494ee`, `012c11d6`; both lists empty on 2026-10-03 |
 | 14 | `ATTRIBUTION.md`: cmdparser, stb_image, cute_tiled, LodePNG | 🟠 | done | `f984cfe4` |
 | 15 | Stale example comments, `port-example/SKILL.md` | 🟠 | done | `38c4b7ed` |
 | 16 | Governance cleanup | 🟡 | done | `e9ecf489`, `cdba4544` |
@@ -65,7 +65,7 @@ day (summarised at the end of this note).
 | `fixSqrt` stays at 4 fractional bits by choice (one 16-bit root, ~80 cycles; 8 bits need a 32-bit root). Comment and tutorial say so since 2026-10-03; widen only if a user needs it | `lib/source/math_sqrt.c` |
 | "The C RAM budget does not know the stack"; `check_lib_rodata.py` "looks stale" (owner call) | `status/api_audit_findings.md` |
 | Five issues at `mukunda-/snesmod` (#6-#10), weekly check, PVSnesLib after his answer | `partners/snesmod-upstream/README.md`, next check 2026-10-10 |
-| Console photos owed to luna and snes-rag: empty port trace, Mode 6 bit 3 card | `docs/HARDWARE_VERIFICATION.md` rows 14 and 23 |
+| Console photos owed to luna and rag-partner: empty port trace, Mode 6 bit 3 card | `docs/HARDWARE_VERIFICATION.md` rows 14 and 23 |
 
 ## The freeze criteria (sheet `2026-09-26_fiche_decision_D1-D5.md`)
 

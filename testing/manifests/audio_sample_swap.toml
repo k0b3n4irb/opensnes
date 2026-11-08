@@ -1,0 +1,81 @@
+# examples/audio/sample_swap - samples at addresses the game chooses
+# (audioLoadSampleAt / audioLoadSampleBeginAt), the end state of the run.
+#
+# What this pins (read from `luna state --until-frame 450` on this ROM):
+#  * placing: lead at $2000 and pad at $3000 raise the allocator's pointer
+#    to their ends (free 62656 -> 57208 -> 53112); an ordinary load then goes
+#    to $3048, above them (free 53040); a sample placed at $1FB8, ending
+#    where lead starts (touching is not overlapping), leaves the pointer
+#    alone, and unloading it gives nothing back; unloading the ordinary one,
+#    on top, gives its 72 bytes back.
+#  * refusals, each with its code and nothing changed: slot 64 (INVALID_ID
+#    = 2); $0AF8 below the area, $FFC0 at its end, $FFB0 + 72 past $FFFF,
+#    one byte on lead, size 0, a load in steps of 2 bytes, a place on the
+#    load in steps (NO_MEMORY = 1); the slot being loaded in steps, a second
+#    load in steps (INVALID_ID). Ten refusals, ten counted.
+#  * replacing during play: bell takes pad's place in three steps of 24
+#    bytes while voice 0 holds lead; the slot cannot be played meanwhile
+#    (AUDIO_VOICE_NONE = 0xFF), voice 0 is still sounding after, and the
+#    slot plays on voice 1 once whole.
+#  * the sound CPU's memory: the directory entries of slots 1-5 and the
+#    bytes at each boundary (data.asm's patterns), so a sample one byte off
+#    its place, or a place that overlapped its neighbour, shows.
+#  * a note on another voice during a load in steps: twelve notes in twelve
+#    frames running; sent before the frame's step, at the line it goes alone
+#    (230); sent after a 192-byte step, 105 lines later (73-74 of the next
+#    picture: the step's time, 143 000 master cycles).
+rom = "../../examples/audio/sample_swap/sample_swap.sfc"
+frames = 450
+
+[asserts.values]
+phase              = { eq = 6, width = 1 }
+place_errs         = { eq = 0, width = 1 }
+free_start         = { eq = 62656, width = 2 }
+free_lead          = { eq = 57208, width = 2 }
+free_swap          = { eq = 53112, width = 2 }
+free_above         = { eq = 53040, width = 2 }
+free_below         = { eq = 53040, width = 2 }
+free_unload_below  = { eq = 53040, width = 2 }
+free_unload_above  = { eq = 53112, width = 2 }
+addr_above         = { eq = 0x3048, width = 2 }
+"refusals+0"       = { eq = 2, width = 1 }
+"refusals+1"       = { eq = 1, width = 1 }
+"refusals+2"       = { eq = 1, width = 1 }
+"refusals+3"       = { eq = 1, width = 1 }
+"refusals+4"       = { eq = 1, width = 1 }
+"refusals+5"       = { eq = 1, width = 1 }
+"refusals+6"       = { eq = 1, width = 1 }
+"refusals+7"       = { eq = 1, width = 1 }
+"refusals+8"       = { eq = 2, width = 1 }
+"refusals+9"       = { eq = 2, width = 1 }
+free_refused       = { eq = 53112, width = 2 }
+errors_refused     = { eq = 10, width = 2 }
+audio_error_count  = { eq = 10, width = 2 }
+replace_steps      = { eq = 3, width = 1 }
+replace_play_during = { eq = 0xFF, width = 1 }
+lead_active        = { eq = 1, width = 1 }
+swap_play_after    = { eq = 1, width = 1 }
+begin_lines        = { le = 24, width = 2 }
+bulk_steps         = { eq = 9, width = 1 }
+kon_steady         = { eq = 1, width = 1 }
+"kon_line+0"       = { ge = 225, le = 240, width = 2 }
+"kon_line+6"       = { ge = 225, le = 240, width = 2 }
+"kon_line+8"       = { ge = 50, le = 100, width = 2 }
+"kon_line+14"      = { ge = 50, le = 100, width = 2 }
+"kon_line+16"      = { ge = 225, le = 240, width = 2 }
+"kon_line+22"      = { ge = 225, le = 240, width = 2 }
+
+[asserts.blocks]
+# directory: slot 0 never loaded; 1 lead $2000; 2 pad then bell $3000;
+# 3 the ordinary load $3048 (unloaded, its entry stays); 4 $1FB8; 5 bulk $4000
+sample_dir   = { space = "aram", offset = "0A00", hex = "00000000002000200030003048304830b81fb81f00400040" }
+# bell's tail (placed at $1FB8) then lead's head at $2000
+below_lead   = { space = "aram", offset = "1FF8", hex = "77779999777799999011111111ffffffff" }
+# lead's tail, then nothing above it until $3000
+lead_tail    = { space = "aram", offset = "2040", hex = "77777777999999990000000000000000" }
+# nothing below $3000, then bell's head where pad was
+swap_head    = { space = "aram", offset = "2FF8", hex = "0000000000000000b01111ffff1111ff" }
+# bell's tail, then the ordinary load's bytes (lead's) at $3048
+swap_tail    = { space = "aram", offset = "3040", hex = "77779999777799999011111111ffffffff" }
+bulk_head    = { space = "aram", offset = "4000", hex = "8000000000000000008001030507" }
+bulk_tail    = { space = "aram", offset = "46B0", hex = "3ab6322aa69e1a83000000000000000000" }

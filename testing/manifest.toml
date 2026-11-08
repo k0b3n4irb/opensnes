@@ -93,6 +93,11 @@ frames = [200, 400]
 [examples."chips/superfx_game_skeleton"]
 frames = [200, 400]
 
+# Two screens, not an animation: screen A (frame 100, everything changed and
+# the HDMA wave running) and screen B after ppuReset() (from frame 128).
+[examples."basics/ppu_reset"]
+frames = [100, 200]
+
 [examples."demos/shmup"]
 frames = [200, 400]
 
@@ -112,3 +117,16 @@ frames = [200, 400]
 # 260, not 400: the shard turning in 24 frames shows the same picture at 200
 # and 400 (2026-10-21, the Néo-Lumen sheet)
 frames = [200, 260]
+
+[examples."memory/lzss_ram"]
+# one point, after the tests: they run screen on for about 290 frames (the C
+# fills and compares of 32 KB buffers), and the result lines appear then
+frames = [400]
+
+# audio/sample_swap trips the WDM channel on purpose: it shows the refusals of
+# audioLoadSampleAt / audioLoadSampleBeginAt, and each refused audio call fires
+# WDM $01 (the module's refusal trace, beside audio_error_count). The count is
+# exact (`wdm_expected`): one refusal more or less still fails the pass; the
+# manifest audio_sample_swap.toml pins the ten codes.
+[examples."audio/sample_swap"]
+wdm_expected = 10

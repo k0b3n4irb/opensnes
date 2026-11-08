@@ -680,7 +680,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 
 | id | title | gaps | eff | rel | first step |
 |---|---|---|---|---|---|
-| RAG1 | Missing-sources list handed to the owner | K7 (corpus side) | S (the list) | M | **done 2026-09-11/12** — handed over as `opensnes_report_snes-rag_2026-09-11.md` and validated in `opensnes_report_snes-rag_2026-09-12_validation.md` (owner-side, `~/opensnes_reports/`); the corpus note in the repo is D6 |
+| RAG1 | Missing-sources list handed to the owner | K7 (corpus side) | S (the list) | M | **done 2026-09-11/12** — handed over as `opensnes_report_rag-partner_2026-09-11.md` and validated in `opensnes_report_rag-partner_2026-09-12_validation.md` (owner-side, `~/opensnes_reports/`); the corpus note in the repo is D6 |
 
 
 ---

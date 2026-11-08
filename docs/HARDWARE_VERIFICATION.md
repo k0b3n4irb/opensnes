@@ -98,7 +98,7 @@ before it is filed against the SDK. Rows 19 and 20 are the integration rows:
 they fail last and tell you least, but they are what a user will run first.
 Row 23 asks the console a question no reference answers and emulators answer
 differently (bit 3 of a hi-res offset-per-tile offset, see the example's
-README); whichever way it comes out, the photo goes to the luna and snes-rag
+README); whichever way it comes out, the photo goes to the luna and rag-partner
 reports.
 Row 24 is the Super FX presentation path (`gsuPresent`, the code cache) with
 SNESMOD running at the same time; a torn cube is a blanking claim of the

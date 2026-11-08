@@ -1,0 +1,17 @@
+# shard_dash, save round trip, leg 1 of 3: a won round writes the record to
+# SRAM ($70:0000): 'S' 'D', version 1, best 108 (6C 00), wins 1, 0, and the
+# XOR checksum of the seven bytes (7B). The next leg reloads this file.
+rom = "../../examples/games/shard_dash/shard_dash.sfc"
+frames = 150
+input = "20:0x1000,24:0,30:0x0100,46:0x0800,62:0x0200,78:0x0400,110:0x0100,134:0"
+srm_out = "shard_dash_save.srm"
+
+[asserts]
+wdm_empty = true
+
+[asserts.blocks]
+"70:0000" = "5344016c0001007b"
+
+[[poke]]
+at_symbol = "titleRun"
+values = { screen_fade_skip = 1 }

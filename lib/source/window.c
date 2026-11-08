@@ -51,12 +51,14 @@
  * $212F - TSW: Sub screen window mask designation
  *============================================================================*/
 
-/* Internal register copies */
-static u8 w12sel;
-static u8 w34sel;
-static u8 wobjsel;
-static u8 wbglog;
-static u8 wobjlog;
+/* Shadows of the write-only window registers. Not static, and prefixed,
+ * since ppuReset() (ppu_reset.asm) brings them back to their power-on value
+ * with the registers. */
+u8 window_w12sel;
+u8 window_w34sel;
+u8 window_wobjsel;
+u8 window_wbglog;
+u8 window_wobjlog;
 
 /*============================================================================
  * Core Window Functions
@@ -64,11 +66,11 @@ static u8 wobjlog;
 
 void windowInit(void) {
     /* Clear all window settings */
-    w12sel = 0;
-    w34sel = 0;
-    wobjsel = 0;
-    wbglog = 0;
-    wobjlog = 0;
+    window_w12sel = 0;
+    window_w34sel = 0;
+    window_wobjsel = 0;
+    window_wbglog = 0;
+    window_wobjlog = 0;
 
     REG_W12SEL = 0;
     REG_W34SEL = 0;
@@ -103,38 +105,38 @@ void windowEnable(u8 window, u8 layers) {
 
     /* BG1 */
     if (layers & LAYER_BG1) {
-        w12sel |= mask;
+        window_w12sel |= mask;
     }
 
     /* BG2 */
     if (layers & LAYER_BG2) {
-        w12sel |= (mask << 4);
+        window_w12sel |= (mask << 4);
     }
 
     /* BG3 */
     if (layers & LAYER_BG3) {
-        w34sel |= mask;
+        window_w34sel |= mask;
     }
 
     /* BG4 */
     if (layers & LAYER_BG4) {
-        w34sel |= (mask << 4);
+        window_w34sel |= (mask << 4);
     }
 
     /* OBJ */
     if (layers & LAYER_OBJ) {
-        wobjsel |= mask;
+        window_wobjsel |= mask;
     }
 
     /* MATH */
     if (layers & WINDOW_MATH) {
-        wobjsel |= (mask << 4);
+        window_wobjsel |= (mask << 4);
     }
 
     /* Write to hardware */
-    REG_W12SEL = w12sel;
-    REG_W34SEL = w34sel;
-    REG_WOBJSEL = wobjsel;
+    REG_W12SEL = window_w12sel;
+    REG_W34SEL = window_w34sel;
+    REG_WOBJSEL = window_wobjsel;
 }
 
 void windowDisable(u8 window, u8 layers) {
@@ -145,33 +147,33 @@ void windowDisable(u8 window, u8 layers) {
     mask = 0x03 << shift;  /* Both enable and invert bits */
 
     if (layers & LAYER_BG1) {
-        w12sel &= ~mask;
+        window_w12sel &= ~mask;
     }
     if (layers & LAYER_BG2) {
-        w12sel &= ~(mask << 4);
+        window_w12sel &= ~(mask << 4);
     }
     if (layers & LAYER_BG3) {
-        w34sel &= ~mask;
+        window_w34sel &= ~mask;
     }
     if (layers & LAYER_BG4) {
-        w34sel &= ~(mask << 4);
+        window_w34sel &= ~(mask << 4);
     }
     if (layers & LAYER_OBJ) {
-        wobjsel &= ~mask;
+        window_wobjsel &= ~mask;
     }
     if (layers & WINDOW_MATH) {
-        wobjsel &= ~(mask << 4);
+        window_wobjsel &= ~(mask << 4);
     }
 
-    REG_W12SEL = w12sel;
-    REG_W34SEL = w34sel;
-    REG_WOBJSEL = wobjsel;
+    REG_W12SEL = window_w12sel;
+    REG_W34SEL = window_w34sel;
+    REG_WOBJSEL = window_wobjsel;
 }
 
 void windowDisableAll(void) {
-    w12sel = 0;
-    w34sel = 0;
-    wobjsel = 0;
+    window_w12sel = 0;
+    window_w34sel = 0;
+    window_wobjsel = 0;
 
     REG_W12SEL = 0;
     REG_W34SEL = 0;
@@ -188,53 +190,53 @@ void windowSetInvert(u8 window, u8 layers, u8 invert) {
     invertBit = invert ? (0x01 << shift) : 0;
 
     if (layers & LAYER_BG1) {
-        w12sel = (w12sel & ~(0x01 << shift)) | invertBit;
+        window_w12sel = (window_w12sel & ~(0x01 << shift)) | invertBit;
     }
     if (layers & LAYER_BG2) {
-        w12sel = (w12sel & ~(0x10 << shift)) | (invertBit << 4);
+        window_w12sel = (window_w12sel & ~(0x10 << shift)) | (invertBit << 4);
     }
     if (layers & LAYER_BG3) {
-        w34sel = (w34sel & ~(0x01 << shift)) | invertBit;
+        window_w34sel = (window_w34sel & ~(0x01 << shift)) | invertBit;
     }
     if (layers & LAYER_BG4) {
-        w34sel = (w34sel & ~(0x10 << shift)) | (invertBit << 4);
+        window_w34sel = (window_w34sel & ~(0x10 << shift)) | (invertBit << 4);
     }
     if (layers & LAYER_OBJ) {
-        wobjsel = (wobjsel & ~(0x01 << shift)) | invertBit;
+        window_wobjsel = (window_wobjsel & ~(0x01 << shift)) | invertBit;
     }
     if (layers & WINDOW_MATH) {
-        wobjsel = (wobjsel & ~(0x10 << shift)) | (invertBit << 4);
+        window_wobjsel = (window_wobjsel & ~(0x10 << shift)) | (invertBit << 4);
     }
 
-    REG_W12SEL = w12sel;
-    REG_W34SEL = w34sel;
-    REG_WOBJSEL = wobjsel;
+    REG_W12SEL = window_w12sel;
+    REG_W34SEL = window_w34sel;
+    REG_WOBJSEL = window_wobjsel;
 }
 
 void windowSetLogic(u8 layer, u8 logic) {
     switch (layer) {
         case LAYER_BG1:
-            wbglog = (wbglog & 0xFC) | (logic & 0x03);
+            window_wbglog = (window_wbglog & 0xFC) | (logic & 0x03);
             break;
         case LAYER_BG2:
-            wbglog = (wbglog & 0xF3) | ((logic & 0x03) << 2);
+            window_wbglog = (window_wbglog & 0xF3) | ((logic & 0x03) << 2);
             break;
         case LAYER_BG3:
-            wbglog = (wbglog & 0xCF) | ((logic & 0x03) << 4);
+            window_wbglog = (window_wbglog & 0xCF) | ((logic & 0x03) << 4);
             break;
         case LAYER_BG4:
-            wbglog = (wbglog & 0x3F) | ((logic & 0x03) << 6);
+            window_wbglog = (window_wbglog & 0x3F) | ((logic & 0x03) << 6);
             break;
         case LAYER_OBJ:
-            wobjlog = (wobjlog & 0xFC) | (logic & 0x03);
+            window_wobjlog = (window_wobjlog & 0xFC) | (logic & 0x03);
             break;
         case WINDOW_MATH:
-            wobjlog = (wobjlog & 0xF3) | ((logic & 0x03) << 2);
+            window_wobjlog = (window_wobjlog & 0xF3) | ((logic & 0x03) << 2);
             break;
     }
 
-    REG_WBGLOG = wbglog;
-    REG_WOBJLOG = wobjlog;
+    REG_WBGLOG = window_wbglog;
+    REG_WOBJLOG = window_wobjlog;
 }
 
 void windowSetMainMask(u8 layers) {

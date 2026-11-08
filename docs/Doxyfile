@@ -82,6 +82,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
                          ../examples/basics/game_skeleton \
+                         ../examples/basics/ppu_reset \
                          ../examples/basics/panel_hud \
                          ../examples/basics/scene_stack \
                          ../examples/games/breakout \
@@ -91,6 +92,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/demos/rpg \
                          ../examples/demos/shmup \
                          ../examples/games/blocks \
+                         ../examples/games/shard_dash \
                          ../examples/scrolling/continuous_scroll \
                          ../examples/scrolling/mixed_scroll \
                          ../examples/backgrounds/mode0 \
@@ -129,6 +131,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/input/superscope \
                          ../examples/maps/map_scroll \
                          ../examples/memory/hirom_demo \
+                         ../examples/memory/lzss_ram \
                          ../examples/chips/sa1_starfield \
                          ../examples/memory/save_game \
                          ../examples/fundamentals/text_glyphs \

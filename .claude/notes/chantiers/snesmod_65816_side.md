@@ -2,8 +2,8 @@
 
 Status: points 1, 2, 3, 4, 5, 6 FIXED on 2026-10-03 (same day), Class B
 (`lib/source/snesmod.asm`); NMITIMEN fixed the same day. One item left open at the end of this note, plus the owner's call on upstream.
-Opened by snes-rag's reading of the upstream driver
-(`partners/snes-rag/2026-10-03_from_snes-rag_snesmod-api.md`); each point was
+Opened by rag-partner's reading of the upstream driver
+(`partners/rag-partner/2026-10-03_from_rag-partner_snesmod-api.md`); each point was
 then checked in our copy, which descends from PVSnesLib's port.
 
 ## Findings in our copy

@@ -622,6 +622,40 @@ def check_example_stale_claims() -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# Check: OAM address and HDMA count byte are taught right
+#
+# OAMADD ($2102/$2103) is a WORD address: sprite N starts at word 2N, so
+# `REG_OAMADDL = N * 4` aims at sprite 2N (and overflows from N >= 64).
+# The HDMA count byte is not "bit 7 = repeat, bits 0-6 = count": $80 is 128
+# lines without repeat (rag-partner finding, 2026-11-04, both in the docs).
+# --------------------------------------------------------------------------
+
+_OAMADD_BYTES_RE = re.compile(r"OAMADD[LH]?\s*=\s*[^;\n]*\*\s*4\b")
+_HDMA_COUNT_RE = re.compile(r"bit 7 = repeat mode, bits 0-6 = count")
+
+
+def check_oam_hdma_claims() -> list[str]:
+    drifts: list[str] = []
+    files: list[Path] = []
+    for sub, pats in (("docs", ("*.md",)), ("lib/include", ("*.h",)),
+                      ("lib/source", ("*.c", "*.h")), ("examples", ("*.c", "*.h", "*.md"))):
+        root = repo_path(sub)
+        for pat in pats:
+            files += [f for f in root.rglob(pat)
+                      if "build" not in f.relative_to(root).parts
+                      and (sub != "examples" or not _example_build_output(f))]
+    for path in sorted(set(files)):
+        for i, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines()):
+            if _OAMADD_BYTES_RE.search(line):
+                drifts.append(f"{path.relative_to(repo_path())}:{i + 1}: OAMADD is a word "
+                              f"address (sprite N = word N * 2), not N * 4 bytes")
+            if _HDMA_COUNT_RE.search(line):
+                drifts.append(f"{path.relative_to(repo_path())}:{i + 1}: HDMA count byte: "
+                              f"$01-$80 no repeat (1-128 lines), $81-$FF repeat (1-127)")
+    return drifts
+
+
+# --------------------------------------------------------------------------
 # Check: example screenshot basenames must be unique across READMEs
 #
 # Doxygen flattens every markdown-referenced image into the single html/
@@ -1445,6 +1479,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_roadmap_footer_date(canonical_date))
     all_drifts.extend(check_asm_bank_comments())
     all_drifts.extend(check_example_stale_claims())
+    all_drifts.extend(check_oam_hdma_claims())
     all_drifts.extend(check_screenshot_basenames())
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())

@@ -136,7 +136,7 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
   skeleton.
 - WRAM oracle drift is explained per phase (phase A: `.system` moved).
 - Partner asks in flight: luna R1-R4 (`partners/luna/2026-09-24_to_luna_report.md`),
-  snes-rag §2 (`partners/snes-rag/2026-09-24_to_snes-rag.md`). Phase B's
+  rag-partner §2 (`partners/rag-partner/2026-09-24_to_rag-partner.md`). Phase B's
   manifest can only assert on WRAM until luna's `gsu` block exists.
 
 ## 5. Log

@@ -17,7 +17,7 @@ The table below counts them per folder.
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
-| [basics/](basics/) | 5 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
+| [basics/](basics/) | 6 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton, resetting the PPU between screens |
 | [backgrounds/](backgrounds/) | 5 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
@@ -27,12 +27,12 @@ The table below counts them per folder.
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 6 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground and objects, EXTBG, a racing camera with sprites on the plane |
 | [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
-| [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
+| [audio/](audio/) | 7 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
-| [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
+| [memory/](memory/) | 3 | HiROM mode, battery-backed saves, LZ77 decompression into RAM |
 | [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
 | [demos/](demos/) | 3 | Playable demonstrations: several modules in one scene, without a game's rules (map engine + object engine, a vertical shmup, Tiled-driven RPG) |
-| [games/](games/) | 3 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer) |
+| [games/](games/) | 4 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer, a small game built across several files) |
 
 ## Building
 

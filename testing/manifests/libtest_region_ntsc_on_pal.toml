@@ -1,0 +1,11 @@
+# The same NTSC-marked ROM (header $01) started on a PAL console: isPAL() == 1.
+# isPAL() reads the console, not the header, so a cartridge sold in one region
+# and plugged into the other still knows which frame rate it has.
+rom = "../fixtures/libtests_region/libtest_region.sfc"
+frames = 30
+region = "pal"
+
+[asserts.values]
+r_header_country = 1
+r_ispal = 1
+r_done = 0xBEEF

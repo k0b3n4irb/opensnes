@@ -120,6 +120,10 @@ windows, the Mode 7 plane, and sound.
 
 @subpage examples_audio_soundboard
 
+@subpage examples_audio_sfx_voices
+
+@subpage examples_audio_sample_swap
+
 ## Stage 5 — "Can I hold it all together?"
 
 *Confidence: architecture, not spaghetti.* Stop hand-rolling the main loop
@@ -131,6 +135,8 @@ every game needs.
 @subpage examples_basics_panel_hud
 
 @subpage examples_basics_game_skeleton
+
+@subpage examples_basics_ppu_reset
 
 @subpage examples_basics_aim_target
 
@@ -144,9 +150,13 @@ everything above, and three complete games.
 
 @subpage examples_memory_hirom_demo
 
+@subpage examples_memory_lzss_ram
+
 @subpage examples_games_breakout
 
 @subpage examples_games_blocks
+
+@subpage examples_games_shard_dash
 
 @subpage examples_games_rooftop_run
 

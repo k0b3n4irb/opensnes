@@ -40,6 +40,7 @@ doc/
 # wav2brr output generated from a committed .wav (see make/common.mk %.brr: %.wav).
 # Targeted, not a global *.brr: examples that ship a hand-made .brr commit it.
 examples/audio/sfx_from_wav/res/*.brr
+examples/audio/sfx_voices/res/*.brr
 *.brr
 *.pc7
 *.mp7

@@ -205,8 +205,8 @@ def sha256_file(path: Path) -> str:
 
 
 def render(luna: str, rom: Path, frame: int, out_png: Path, *,
-           steps: int | None = None, extra: list[str] | None = None) -> tuple[str, bool]:
-    """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
+           steps: int | None = None, extra: list[str] | None = None) -> tuple[str, int]:
+    """Render `rom` at PPU frame `frame`; return (fbhash, wdm_count).
 
     `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
     `frame` (no caller in the harness since user-project tests became luna
@@ -214,8 +214,10 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
 
     fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
     as cross-architecture-stable) — the regression key, immune to PNG-encoder
-    drift. wdm_fired = whether the SDK's in-ROM `SNES_ASSERT`/WDM channel tripped
-    during the run (`--wdm-out` non-empty, feature L3) — a free assertion oracle.
+    drift. wdm_count = how many times the SDK's in-ROM `SNES_ASSERT`/WDM channel
+    tripped during the run (lines of `--wdm-out`, feature L3) — a free assertion
+    oracle: any trip fails, unless the example declares the exact count it
+    trips on purpose (`wdm_expected`, see wdm_expected()).
     The PNG is written for human diffing."""
     out_png.parent.mkdir(parents=True, exist_ok=True)
     wdm = out_png.with_suffix(".wdm.txt")
@@ -231,7 +233,16 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
     m = re.search(r"fbhash=([0-9a-fA-F]+)", proc.stdout)
     if not m:
         raise RuntimeError(f"no fbhash from luna for {rom.name}: {proc.stdout.strip()[:200]}")
-    return m.group(1), (wdm.is_file() and wdm.stat().st_size > 0)
+    count = len(wdm.read_text().splitlines()) if wdm.is_file() else 0
+    return m.group(1), count
+
+
+def wdm_expected(key: str, manifest: dict) -> int:
+    """WDM trips an example makes on purpose by its capture frame (`wdm_expected
+    = N` in testing/manifest.toml): an example that shows the audio module's
+    refusals fires WDM $01 once per refusal. The count is exact, so a refusal
+    more or less still fails the pass. 0 for every other example."""
+    return int(manifest["examples"].get(key, {}).get("wdm_expected", 0))
 
 
 def run(update: bool, only: str | None) -> int:
@@ -281,13 +292,13 @@ def run(update: bool, only: str | None) -> int:
             # overwrite them before the refusal).
             stage = TMP_ROOT / "luna-test-staging" / label
             stage.mkdir(parents=True, exist_ok=True)
-            hashes, wdm_any, staged = [], False, []
+            hashes, wdm_any, staged = [], 0, []
             for i, frame in enumerate(points):
                 png = _png_for(stage, label, frame, i == 0)
                 fbhash, wdm = render(luna, rom, frame, png, extra=res_args(key, manifest))
                 hashes.append(fbhash)
                 staged.append((png, _png_for(BASELINE_DIR, label, frame, i == 0)))
-                wdm_any = wdm_any or wdm
+                wdm_any = max(wdm_any, wdm)
             if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
                 return [f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
                         f"(ALLOW_BLANK_BASELINE=1 to override)"], 1, 1, None
@@ -306,7 +317,7 @@ def run(update: bool, only: str | None) -> int:
                      "frames": points[0] if single else points,
                      "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
             return [f"  BASELINE  {label}  fbhash={','.join(hashes)}"
-                    + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any else "")], 1, 0, (label, entry)
+                    + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any != wdm_expected(key, manifest) else "")], 1, 0, (label, entry)
         ref = db.get(label)
         if not ref:
             return [f"  MISS  {label}: no baseline — run --update first"], 1, 1, None
@@ -316,7 +327,7 @@ def run(update: bool, only: str | None) -> int:
         ref_points = frame_points(ref["frames"])
         ref_hashes = ref["fbhash"] if isinstance(ref["fbhash"], list) else [ref["fbhash"]]
         bad = []
-        wdm_any = False
+        wdm_any = 0
         err = None
         for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
             actual_png = _png_for(TMP_ROOT / "luna-test-actual", label, frame, i == 0)
@@ -325,13 +336,14 @@ def run(update: bool, only: str | None) -> int:
             except RuntimeError as e:
                 err = str(e)
                 break
-            wdm_any = wdm_any or wdm
+            wdm_any = max(wdm_any, wdm)
             if fbhash != want:
                 bad.append(f"@frame {frame}: {fbhash} != {want} ({actual_png})")
         if err:
             return [f"  ERROR {label}: {err}"], 1, 1, None
-        if wdm_any:
-            return [f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run"], 1, 1, None
+        if wdm_any != wdm_expected(key, manifest):
+            return [f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run "
+                    f"({wdm_any} time(s), {wdm_expected(key, manifest)} expected)"], 1, 1, None
         if not bad and len(ref_hashes) > 1 and len(set(ref_hashes)) == 1:
             return [f"  FAIL  {label}: the baseline holds the same frame at every "
                     f"capture point {ref_points} — re-capture it with --update"], 1, 1, None
