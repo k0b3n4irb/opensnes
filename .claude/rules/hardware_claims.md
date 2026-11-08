@@ -46,19 +46,22 @@ moment of doubt*.
    cherché", `corpus verify` returns `verdict: invalid_request`); before, it
    was ignored in silence and our own docs could answer. Read the first
    line of a result before reading the rest.
-   **Never trust its `verdict`.** `confirmed` means "an arbiter deals
+   **Never trust its `verdict`, nor its `evidence_state`.** `arbiter_covers_point`
+   (the verdict renamed from `confirmed` on 2026-11-08) means "an arbiter deals
    with this point", not "this sentence is true": it checks neither
    **polarity** (0/1, enable/protect, active high/low) nor **value**
-   (address, bit count, cycles) — two opposite claims both come out
-   `confirmed` (rag-partner measured 55 % of false claims `confirmed`,
-   2026-09-30). The claim may be written only if `evidence_state ==
-   "arbiter_states_point"` **and** one of the arbiter `evidence[].sentences`
-   states the polarity or value word for word. The two failure shapes seen
-   on 2026-10-02: a false `arbiter_states_point` whose sentences said
-   nothing about the claim (the multiplier during auto-joypad), and a false
+   (address, bit count, cycles). Measured by the corpus on a sealed set of 30
+   pairs drawn from the code of an emulator it never indexed: a false claim
+   comes out `arbiter_covers_point` 40 % of the time (95 % interval 25-58 %),
+   a true one 53 %. The other verdicts are `documented_false_form`,
+   `no_arbiter_on_point`, `not_covered` and `invalid_request`. A claim may be
+   written only if one of the arbiter `evidence[].sentences` states the
+   polarity or the value word for word: **the sentences decide, alone**; the
+   verdict and the state only say where to read. The two failure shapes seen
+   on 2026-10-02: a false `arbiter_states_point` whose sentences said nothing
+   about the claim (the multiplier during auto-joypad), and a false
    `arbiter_covers_topic_only` whose sentences stated it exactly (the empty
-   window, VMADD incrementing on an ignored write) — the sentences decide,
-   both ways.
+   window, VMADD incrementing on an ignored write).
 2. **When sources conflict** — `contrast=true` lays every source's
    position side by side, ordered by authority, with anchored
    citations. This is the tool for disputed polarities and timings.
