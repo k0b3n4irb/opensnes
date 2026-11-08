@@ -316,6 +316,12 @@ tests: test-compiler
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
+	@# The three measured benches the CI runs after `make tests` (opensnes_build.yml):
+	@# they were not here, so a green `make tests` could be red there (2026-11-08: a new
+	@# label in WaitForVBlank read as 357 226 cycles of "idle" in libbench). About 20 s.
+	@python3 devtools/cyclecount/bench.py
+	@python3 devtools/sdkbench/run.py --check
+	@python3 devtools/libbench/run.py --check
 	@$(MAKE) -s clean-tmp
 	@echo "ALL CHECKS PASSED (luna)"
 

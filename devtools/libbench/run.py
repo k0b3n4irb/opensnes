@@ -70,7 +70,10 @@ FRAMES = 300
 DONE = 0x600D
 BASELINE = HERE / "baseline.json"
 REFERENCE = HERE / "pvsneslib_reference.json"
-IDLE_SYMBOLS = ("main", "WaitForVBlank")
+# vblank_wai is the label of the `wai` inside WaitForVBlank (crt0.asm): luna folds the
+# cycles onto the nearest label, so the halted cycles of a frame that only waits are
+# credited to it, not to WaitForVBlank (the 2026-11-08 CI read 357 226 for "idle").
+IDLE_SYMBOLS = ("main", "WaitForVBlank", "vblank_wai")
 
 OPENSNES_MAKEFILE = """OPENSNES := {repo}
 TARGET   := bench.sfc
