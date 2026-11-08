@@ -16,6 +16,14 @@
 #define cli_mkdir(p) mkdir(p, 0777)
 #endif
 
+/* `--version`: the tool's own version, then the SDK release and the commit
+ * that built it (tools/tool.mk defines both; a build outside it prints none). */
+#if defined(TOOL_SDK_VERSION) && defined(TOOL_SDK_COMMIT)
+#define SDK_BUILD " (OpenSNES " TOOL_SDK_VERSION ", commit " TOOL_SDK_COMMIT ")"
+#else
+#define SDK_BUILD ""
+#endif
+
 /* ------------------------------------------------------------------ help */
 
 static void help_tool(const cli_tool *t, FILE *o)
@@ -615,7 +623,7 @@ int cli_main(const cli_tool *tool, int argc, char **argv)
     if (argc < 2) { help_tool(tool, stderr); return CLI_USAGE; }
     const char *first = argv[1];
     if (!strcmp(first, "-h") || !strcmp(first, "--help")) { help_tool(tool, stdout); return CLI_OK; }
-    if (!strcmp(first, "--version")) { printf("%s %s\n", tool->name, tool->version); return CLI_OK; }
+    if (!strcmp(first, "--version")) { printf("%s %s%s\n", tool->name, tool->version, SDK_BUILD); return CLI_OK; }
     for (int i = 0; i < tool->ncmds; i++)
         if (strcmp(tool->cmds[i].name, first) == 0) ctx.cmd = &tool->cmds[i];
     if (!ctx.cmd) {
@@ -634,7 +642,7 @@ int cli_main(const cli_tool *tool, int argc, char **argv)
         }
         if (!strcmp(a, "--")) { only_args = 1; continue; }
         if (!strcmp(a, "-h") || !strcmp(a, "--help")) { help_cmd(tool, ctx.cmd, stdout); return CLI_OK; }
-        if (!strcmp(a, "--version")) { printf("%s %s\n", tool->name, tool->version); return CLI_OK; }
+        if (!strcmp(a, "--version")) { printf("%s %s%s\n", tool->name, tool->version, SDK_BUILD); return CLI_OK; }
         if (!strcmp(a, "--json")) { ctx.json = 1; continue; }
         if (!strcmp(a, "-q") || !strcmp(a, "--quiet")) { ctx.quiet = 1; continue; }
         if (!strcmp(a, "-v") || !strcmp(a, "--verbose")) { ctx.verbose = 1; continue; }

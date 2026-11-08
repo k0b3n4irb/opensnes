@@ -35,8 +35,14 @@ ifeq ($(origin CC),default)
 CC := clang
 endif
 DATESTRING := $(shell date +%Y%m%d)
+# Which SDK, which commit built this binary (`--version` prints both, so that
+# a report names the build; the tool's own VERSION stays what the goldens carry).
+SDK_ROOT    := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
+SDK_VERSION := $(shell sed -n 's/^\#define OPENSNES_VERSION_STRING "\(.*\)"/\1/p' $(SDK_ROOT)/lib/include/snes.h)
+SDK_COMMIT  := $(shell c=$$(git -C "$(SDK_ROOT)" rev-parse --short=8 HEAD 2>/dev/null) && { git -C "$(SDK_ROOT)" diff --quiet HEAD -- 2>/dev/null || c=$$c+dirty; echo $$c; } || echo unknown)
 CFLAGS      = -g -Wall -Wextra -O2 -pedantic $(TOOL_CFLAGS) \
-              -DTOOL_VERSION=\"$(VERSION)\" -DTOOL_BUILD_DATE=\"$(DATESTRING)\"
+              -DTOOL_VERSION=\"$(VERSION)\" -DTOOL_BUILD_DATE=\"$(DATESTRING)\" \
+              -DTOOL_SDK_VERSION=\"$(SDK_VERSION)\" -DTOOL_SDK_COMMIT=\"$(SDK_COMMIT)\"
 
 ifeq ($(SANITIZE),1)
 CFLAGS += -O1 -fsanitize=address,undefined -fno-omit-frame-pointer

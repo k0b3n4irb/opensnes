@@ -471,6 +471,7 @@ test-difftest:
 # against committed goldens — needs `make tools` first. Also the CI job
 # `tools-golden` (lint.yml) runs exactly this target (review P4).
 test-tools:
+	@python3 devtools/check_tool_versions.py
 	@python3 tools/opensnes-sample/tests/run_golden.py
 	@python3 tools/opensnes-music/tests/run_golden.py
 	@python3 tools/opensnes-rom/tests/run_golden.py
