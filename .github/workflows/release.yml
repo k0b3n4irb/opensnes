@@ -73,6 +73,10 @@ jobs:
         if: matrix.name == 'windows'
         uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
         with:
+          # The runner image ships MSYS2: `release: false` uses it instead of
+          # downloading the installer, which answered 504/503 twice on
+          # 2026-11-08 (the packages below still come from the pacman mirrors).
+          release: false
           update: true
           msystem: UCRT64
           install: >-

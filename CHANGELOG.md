@@ -5,6 +5,7 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- fix(ci): the CI no longer needs GitHub's download servers when its caches are warm. The Lint and docs-deploy workflows cache the Doxygen archive, the Lint workflow caches the cppcheck it builds (into the runner's home, no `sudo`), and the Windows legs of the build and release workflows use the MSYS2 that ships with the runner (`release: false`) instead of downloading its installer. On 2026-11-08 release assets and source archives answered 502/503/504 for about an hour: seven runs red, a release held back. New check `devtools/check_ci_downloads.py`, part of `make lint` with unit tests that see it fail: any `curl` or `wget` in `.github/workflows/` or `scripts/` needs `--retry`/`--tries`, or a `# retried: <what>` note when a loop retries it (`install-luna.sh`).
 - fix(runtime): a 32-bit multiply, divide or remainder in an `nmiSetLag()` or
   `nmiSet()` callback no longer corrupts the 32-bit calculation the callback
   interrupted. `KNOWN_LIMITATIONS.md` and `interrupt.h` said plain C `*` `/` `%`

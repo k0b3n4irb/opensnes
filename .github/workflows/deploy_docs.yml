@@ -13,6 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Cache the Doxygen archive
+        # A warm cache needs no download (GitHub answered 5xx on release assets for an hour on 2026-11-08).
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/doxygen.tgz
+          key: doxygen-1.16.1-linux-bin
+
       - name: Install Doxygen 1.16.1 (pinned)
         # ubuntu-latest ships Doxygen 1.9.8, whose Markdown parser mangles inline
         # code/emphasis spans inside "..." quotes across the tutorials (literal
@@ -20,7 +27,9 @@ jobs:
         # Fetched from the official GitHub release (doxygen.nl 403s GitHub
         # runners) and SHA-256-verified, same pattern as install-luna.sh.
         run: |
-          curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          if [ ! -s /tmp/doxygen.tgz ]; then
+            curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          fi
           echo "a56f885d37e3aae08a99f638d17bbb381224c03a878d9e2dda4f9fa4baf1d8bd  /tmp/doxygen.tgz" | sha256sum -c -
           tar xzf /tmp/doxygen.tgz -C /tmp
           sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/

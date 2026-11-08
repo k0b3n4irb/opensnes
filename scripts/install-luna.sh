@@ -94,6 +94,7 @@ echo "install-luna: fetching ${ARCHIVE} (${VERSION})"
 # an older pinned version has its tag but no asset. Say so instead of leaving a
 # bare download error.
 no_asset_hint() {
+    # retried: a diagnostic probe run once, after the retry loop below gave up
     code="$(curl -sIL -o /dev/null -w '%{http_code}' "$BASE/${ARCHIVE}" 2>/dev/null || echo 000)"
     if [ "$code" = "404" ]; then
         cat >&2 <<EOM
@@ -110,6 +111,7 @@ EOM
 # on 2026-11-04): three attempts, five seconds apart, curl then gh each time.
 fetched=0
 for attempt in 1 2 3; do
+    # retried: this loop, three attempts
     if curl -fsSL "$BASE/${ARCHIVE}" -o "$TMP/${ARCHIVE}"; then
         fetched=1; break
     elif command -v gh >/dev/null 2>&1 \

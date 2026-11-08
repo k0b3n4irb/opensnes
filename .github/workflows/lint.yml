@@ -77,6 +77,17 @@ jobs:
             fi
           fi
 
+      - name: Cache cppcheck (pinned)
+        # A warm cache needs nothing from GitHub: on 2026-11-08 the tag archive
+        # answered 502/503/504 for an hour and three Lint runs went red. The
+        # version in the path and the key is the one of the install step below:
+        # change both together.
+        id: cppcheck-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cppcheck-2.22.0
+          key: cppcheck-2.22.0-${{ runner.os }}-${{ runner.arch }}
+
       - name: Install cppcheck (pinned)
         # `make lint` runs lint-cppcheck (gaps review H4): the asset tools'
         # sources and the lib's C, vendored decoders suppressed. The target
@@ -86,6 +97,8 @@ jobs:
         # image's 2.13 did not (about 180 unchecked allocations, 2026-10-17),
         # so a contributor with a recent cppcheck saw a red lint on a green CI.
         # The sha256 is the tag archive's, the same on two downloads that day.
+        # Built into the user's home (no sudo) so that the cache can restore it.
+        if: steps.cppcheck-cache.outputs.cache-hit != 'true'
         env:
           CPPCHECK_VERSION: 2.22.0
           CPPCHECK_SHA256: d74945deb2d50393430e07596b766f8a779512c7f60dac2a30ea64e059ece57b
@@ -93,10 +106,13 @@ jobs:
           curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/cppcheck.tgz "https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
           echo "${CPPCHECK_SHA256}  /tmp/cppcheck.tgz" | sha256sum -c -
           tar xzf /tmp/cppcheck.tgz -C /tmp
-          make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" -j"$(nproc)" FILESDIR=/opt/cppcheck/share CXXOPTS=-O2 >/dev/null
-          sudo make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" install FILESDIR=/opt/cppcheck/share PREFIX=/opt/cppcheck >/dev/null
-          echo /opt/cppcheck/bin >> "$GITHUB_PATH"
-          /opt/cppcheck/bin/cppcheck --version
+          make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" -j"$(nproc)" FILESDIR="$HOME/.cppcheck-${CPPCHECK_VERSION}/share" CXXOPTS=-O2 >/dev/null
+          make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" install FILESDIR="$HOME/.cppcheck-${CPPCHECK_VERSION}/share" PREFIX="$HOME/.cppcheck-${CPPCHECK_VERSION}" >/dev/null
+
+      - name: cppcheck on the PATH
+        run: |
+          echo "$HOME/.cppcheck-2.22.0/bin" >> "$GITHUB_PATH"
+          "$HOME/.cppcheck-2.22.0/bin/cppcheck" --version
 
       - name: make lint
         # No build here: check_corpus_fresh.py passes trivially on a tree with
@@ -203,13 +219,22 @@ jobs:
         # one fails the build under WARN_AS_ERROR (gaps review P7).
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Cache the Doxygen archive
+        # See the cppcheck cache above: a warm cache needs no download.
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/doxygen.tgz
+          key: doxygen-1.16.1-linux-bin
+
       - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
         # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test
         # the SAME version that publishes the docs, so it pins 1.16.1 too.
         # Fetched from the official GitHub release (doxygen.nl 403s GitHub
         # runners) and SHA-256-verified, same pattern as install-luna.sh.
         run: |
-          curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          if [ ! -s /tmp/doxygen.tgz ]; then
+            curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          fi
           echo "a56f885d37e3aae08a99f638d17bbb381224c03a878d9e2dda4f9fa4baf1d8bd  /tmp/doxygen.tgz" | sha256sum -c -
           tar xzf /tmp/doxygen.tgz -C /tmp
           sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/

@@ -222,6 +222,7 @@ lint: lint-docs
 	@python3 devtools/lint_asm.py
 	@$(MAKE) -s test-devtools
 	@python3 devtools/check_bank_reads.py --selftest
+	@python3 devtools/check_ci_downloads.py
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
