@@ -162,6 +162,7 @@ divisions. Everything below is what `[Unreleased]` held.
   for bank 0 and showed 200 % with a false asset warning.
 - fix(build): `install-luna` retries the download three times, five seconds apart,
   after a CI job failed on a network drop.
+- fix(ci): the Doxygen download of the Lint and docs-deploy workflows retries five times, ten seconds apart, after the release-asset CDN answered 504 twice in a row.
 - fix(build): `test-sanitizers` and `coverage-host` restore the normal compiler
   binaries when they end, so a run does not leave instrumented binaries in `bin/`.
 

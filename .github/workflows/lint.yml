@@ -209,7 +209,7 @@ jobs:
         # Fetched from the official GitHub release (doxygen.nl 403s GitHub
         # runners) and SHA-256-verified, same pattern as install-luna.sh.
         run: |
-          curl -fsSL -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
           echo "a56f885d37e3aae08a99f638d17bbb381224c03a878d9e2dda4f9fa4baf1d8bd  /tmp/doxygen.tgz" | sha256sum -c -
           tar xzf /tmp/doxygen.tgz -C /tmp
           sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/
