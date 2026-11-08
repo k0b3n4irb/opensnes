@@ -127,6 +127,10 @@ and the CHANGELOG.
   `vblank_wai`). About +80 master cycles per NMI; every example identical frame by frame (65/65); the audio, WRAM
   and `nmi_budget` references were re-captured with their evidence in the commit and the CHANGELOG. Lesson in
   the kit (`7f59492`). Waits for the partner port's own replay of its long PAL run, then the thread closes.
+  Side effect found by the CI, not by `make tests`: the new label `vblank_wai` split `WaitForVBlank` and libbench
+  read 357 226 cycles of "idle" (5 852 before); fixed (`6fdd06bc`: libbench counts `vblank_wai` as idle) and the three
+  CI-only benches (`cyclecount/bench.py`, `sdkbench/run.py --check`, `libbench/run.py --check`, 20 s) now run in
+  `make tests`. CI green on `6fdd06bc` (Lint 42523930952, Build & Release 42523931151).
 - **Still mine from the plan**: L13 is only the rule (aligned); the vitrine of tags and release notes is the
   conductor's tool; A3 C3 (a check that sees a plain pointer that travels between files) is not written.
 - Open threads: `ordres de musique datés` (a partner port; answered once, a prototype proposed: dated music orders in the SPC
