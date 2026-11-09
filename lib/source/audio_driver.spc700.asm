@@ -55,6 +55,33 @@
 
 .DEFINE DRIVER_VERSION 2
 
+; How long cmd_koff holds the KOFF mask before it clears it, in turns of its
+; `dbnz y` loop. The S-DSP reads KOFF ($5C) once every OTHER sample (anomie's
+; S-DSP doc; snesdev wiki: clearing KOFF too early can leave the voice
+; playing). A sample is 32 SPC700 cycles (1.024 MHz / 32 kHz), so a read
+; falls inside the hold whatever its phase only if the mask stays set for
+; MORE than 2 samples = 64 cycles. Hold, from the write of the mask to the
+; write of 0 (both writes land on the last cycle of their `mov $F3, a`):
+;   mov y,#n (2) + dbnz: (n-1) x 6 taken + 4 not taken + mov a,#0 (2)
+;   + mov $F3,a (4)  =  6n + 6 cycles
+; n = 21: 132 cycles = 4.1 samples, twice the 64 the DSP needs (n = 10, 66
+; cycles, would be the bare minimum). Measured with luna's --dsp-trace: the
+; KOFF and the clear are 132 SPC cycles apart (582 with the former n = 96).
+; testing/fixtures/stress/koff_hold sweeps the KOFF write over the 64 phases:
+; voices left playing out of 4181 stopped: 653 with n = 8 (54 cycles), 326
+; with 9 (60), 0 with 10 (66), 0 with 21.
+; Overridable at build time for that proof only: make -C lib
+; AUDIO_KOFF_HOLD_TURNS=8 (lib/Makefile passes -D KOFF_HOLD_TURNS).
+.IFNDEF KOFF_HOLD_TURNS
+.DEFINE KOFF_HOLD_TURNS 21
+.ENDIF
+.IF KOFF_HOLD_TURNS < 1
+.FAIL "KOFF_HOLD_TURNS must be 1-255"
+.ENDIF
+.IF KOFF_HOLD_TURNS > 255
+.FAIL "KOFF_HOLD_TURNS must be 1-255"
+.ENDIF
+
 .BANK 0 SLOT 0
 .ORG $0200
 
@@ -189,13 +216,14 @@ cmd_kon:
 
 ;------------------------------------------------------------------------------
 ; $03 KOFF — p0 = voice MASK (CPU computes 1<<voice, $FF = all).
-; Pulse: set the mask, let the DSP latch it, clear it again.
+; Pulse: set the mask, hold it past one KOFF read of the DSP, clear it again
+; (KOFF_HOLD_TURNS above: 132 cycles, about 2 scanlines of the CPU).
 ;------------------------------------------------------------------------------
 cmd_koff:
     mov $F2, #$5C       ; KOFF
     mov a, ZP_P0
     mov $F3, a
-    mov y, #96          ; ~2 DSP sample periods so the release latches
+    mov y, #KOFF_HOLD_TURNS  ; 6n + 6 cycles of hold: > 64, two DSP KOFF reads apart
 -   dbnz y, -
     mov a, #$00
     mov $F3, a          ; KOFF clear (F2 still $5C)

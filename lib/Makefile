@@ -185,9 +185,20 @@ all: lorom hirom sa1 superfx
 DRIVER_BIN = $(SRCDIR)/audio_driver.spc700.bin
 DRIVER_BUDGET = 2048
 
-$(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc
+# Test knob, not a setting: the turns cmd_koff holds the KOFF mask
+# (KOFF_HOLD_TURNS in the driver, 21 when empty). The stress fixture
+# testing/fixtures/stress/koff_hold is built against a library made with a
+# hold too short (AUDIO_KOFF_HOLD_TURNS=8) to show that it counts the voices
+# a short hold leaves playing. The stamp rebuilds the driver when it changes.
+AUDIO_KOFF_HOLD_TURNS ?=
+KOFF_STAMP := build/.audio_koff_hold
+$(KOFF_STAMP): FORCE_COMPILER_ID
+	@mkdir -p build
+	@if [ "$$(cat $@ 2>/dev/null)" != "turns=$(AUDIO_KOFF_HOLD_TURNS)" ]; then echo "turns=$(AUDIO_KOFF_HOLD_TURNS)" > $@; fi
+
+$(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc $(KOFF_STAMP)
 	@echo "[SPC] $< -> $@"
-	@$(SPC_AS) -I ../templates -o $(SRCDIR)/audio_driver.spc700.o $<
+	@$(SPC_AS) -I ../templates $(if $(AUDIO_KOFF_HOLD_TURNS),-D KOFF_HOLD_TURNS=$(AUDIO_KOFF_HOLD_TURNS)) -o $(SRCDIR)/audio_driver.spc700.o $<
 	@echo "[objects]" > $(SRCDIR)/audio_driver.link
 	@echo "$(SRCDIR)/audio_driver.spc700.o" >> $(SRCDIR)/audio_driver.link
 	@$(LD) -b $(SRCDIR)/audio_driver.link $@
