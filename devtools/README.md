@@ -32,6 +32,7 @@ README; a script that none of them names is an orphan and is deleted
 | `check_corpus_fresh.py` | testing a corpus older than the lib outputs | `tests`, `lint` |
 | `check_bank_reads.py` | a bank-blind C read of bank $01+ data (silent failure) — also on every user link | `lint` (selftest), `common.mk` |
 | `check_ci_downloads.py` | a `curl`/`wget` in the workflows or `scripts/` with no retry and no `# retried:` note (GitHub answered 5xx for an hour on 2026-11-08) | `lint` |
+| `rom_hashes.py`, `compare_rom_hashes.py` | the sha256 of every example ROM, printed by each CI platform after its build, and the comparison of the lists (do clang and MSYS2 produce the same bytes?) | `opensnes_build.yml` |
 | `check_tool_versions.py` | a compiled tool of `bin/` whose `--version` lacks the SDK release or the build commit (a stale or foreign binary) | `test-tools` |
 | `check_nmi_wram_race.py` | the WRAM port (`$2180`) reached from an NMI callback (silent failure) — also on every user link | `common.mk` |
 | `symmap/symmap.py` | WRAM overlaps, bank $00 overflow, RAM-band budget, the data-init terminator — on every user link and on the release ROMs | `common.mk`, the build workflows |

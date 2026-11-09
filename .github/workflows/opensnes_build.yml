@@ -251,6 +251,18 @@ jobs:
           echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
+      # The ROMs of every platform, hashed, to compare them (devtools/compare_rom_hashes.py): nothing
+      # had checked that clang on Linux and macOS and the MSYS2 toolchain produce the same bytes.
+      # Measurement only for now; the lists go out with the build logs (*.log).
+      - name: Hash the example ROMs (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
+
+      - name: Hash the example ROMs (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
+
       # Validate the starter project builds via the OPENSNES= consumption path
       # a downstream user follows (proves the release-consumption contract).
       - name: Build starter project (Linux/macOS)
@@ -419,6 +431,15 @@ jobs:
         run: |
           export OPENSNES_HOME=$(pwd)
           make TOOLCHAIN_WERROR=1
+
+      - name: Hash the example ROMs
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.arch }}.log
+
+      - name: Upload the ROM hashes
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ROM hashes (${{ matrix.arch }})
+          path: rom_hashes_${{ matrix.arch }}.log
 
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
