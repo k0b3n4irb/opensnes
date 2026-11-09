@@ -54,7 +54,7 @@ STRIP ?= strip
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels libtests_region libtests_region_pal libtests_bigrom
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals leaf_frame leaf_split static_dup
-FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race koff_hold
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
 FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
