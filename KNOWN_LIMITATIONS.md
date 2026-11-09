@@ -514,6 +514,19 @@ cproc has no `asm` statement: `__asm__("nop")` stops the build with
 ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
 pattern. Pinned by `cases/negative/inline_asm.c`.
 
+### 🟠 The GNU attributes `mode` and `vector_size` are accepted and ignored
+cproc skips every attribute it does not know, which is right for `noinline` or
+`unused` and wrong for the two that change a type. Measured on the target:
+`typedef unsigned int u8 __attribute__((mode(QI)))` has `sizeof` 2 (GNU C: 1),
+and `typedef short v4 __attribute__((vector_size(8)))` has `sizeof` 2 (GNU C: 8),
+with no message. `aligned` is refused (`GNU attribute 'aligned' is not supported
+here`) and `packed` is honoured. Found by `testing/torture`
+(`20020108-1`, `scal-to-vec2`).
+
+**Mitigation:** write the type you mean (`unsigned char`, an array or a struct).
+Code ported from a GNU C source that uses `mode` or vector types needs the type
+spelled out; grep for `__attribute__` first.
+
 ## Where to add new entries
 
 When you discover a new silent failure or hard-to-debug constraint:

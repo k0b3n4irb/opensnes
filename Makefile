@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -515,6 +515,12 @@ test-bin-clean:
 		if grep -q -a __asan_init "$$f"; then echo "FAIL: $$f carries the ASan runtime (run make clean && make)"; bad=1; fi; \
 	done; \
 	[ $$bad -eq 0 ] && echo "OK: no instrumented compiler binary in bin/" || exit 1
+
+# C conformance on the target: the programs of gcc.c-torture/execute, built by cc65816
+# and run on luna (about 25 minutes, so weekly in torture.yml and not in `make tests`).
+# The first time: python3 testing/torture/run.py --fetch  (clones the tests, GPL, never committed).
+test-torture:
+	@python3 testing/torture/run.py
 
 test-sanitizers:
 	@$(MAKE) test-sanitizers-pass; rc=$$?; \

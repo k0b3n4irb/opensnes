@@ -34,6 +34,7 @@ python3 testing/luna_runner.py --coverage --power-on random=1   # same liveness 
 python3 testing/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
 python3 testing/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
 python3 testing/audio_regress.py            # APU output hashed for every audio example (those that need a button pressed with their manifest scripts), the retired SNESMOD large-bank fixture and the Super FX skeleton (luna --audio-out); baselines/audio.json
+make test-torture                           # C conformance on the target: gcc.c-torture/execute built by cc65816 and run on luna, against testing/torture/expected.txt (about 25 min; weekly torture.yml, not in make tests; first: python3 testing/torture/run.py --fetch)
 python3 testing/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
 python3 testing/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
 make hardware-preflight                              # before a console session: the 26 protocol ROMs (docs/HARDWARE_VERIFICATION.md) alive from random RAM (3 seeds) and under PAL, VRAM DMA in blank (hardware_preflight.py; ROWS=1-7 for the gate rows; not in make tests)
