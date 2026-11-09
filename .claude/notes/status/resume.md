@@ -144,7 +144,19 @@ and the CHANGELOG.
   fails; shown to fail with `fdcda7c8` undone (10 pinned refusals change, two tests fail at run time) and with
   `ee5b8636` undone (`own/hex-escape-stops`, our own test: no gcc test exercises it). Needs the network the first
   time (fetches the gcc tests; skipped offline outside CI).
-- **In flight**: an Opus agent in a worktree makes cproc REFUSE the GNU attributes `mode` and `vector_size`
+- **ROM hashes across platforms (measured 2026-11-09, run 42675444869)**: Linux x86_64 = Linux arm64 = a local aarch64
+  build on all 65 examples; macOS and Windows each differ from Linux (and from each other) on all 65, by 41 to 51
+  isolated operand bytes: 8 console-module RAM variables get other addresses. Cause: `_sections_sort` in the wla-dx
+  fork's `wlalink/write.c` returns -1 for two sections of equal priority and size in BOTH directions (not a valid
+  order); `qsort` then orders them as its implementation likes. Fix to make (Class A, fork + PINS.md): a stable sort
+  (ties keep the original order); glibc already gives that order, so the 65 Linux ROMs must stay identical and the
+  five hash lists of the CI must become equal. `rom_sha256` of `baselines.json` is stale for all 65 and read by nothing.
+- **Torture refusals triaged** (`6434c224`): 14 `compiler-internal` (8 assertions in `emitdata`, one SIGSEGV...), mostly
+  from `vector_size`/`mode` being ignored; the cproc lot below turns most into clean refusals.
+- **luna v1.43.0 is published** (`--inject-nmi-at`/`--inject-irq-at`, `[checkpoint.dsp]`, S-DSP stepped per SPC cycle):
+  next lot = bump the pin from v1.40.0 (audio hashes will move: prove with `luna diff --audio --align-onset`), then the
+  interrupt gate (it must fail for certain on the defects of `7802f85b` and `76adcdb0`).
+- **Waiting for a go (the system stopped my checks for lack of memory)**: the cproc lot, committed in a worktree (`work-attr`, fork commit `82e1c1d`, OpenSNES `7a343a98..9c68f2d1`), nothing pushed; my own gates are green, the A/B proof and the 2000-seed hunts must be replayed before the fork and OpenSNES are pushed. It makes cproc REFUSE the GNU attributes `mode` and `vector_size`
   (and whichever others it can justify) — a Class A lot (fork commit, PINS.md, negative cases, torture
   `expected.txt`: 20020108-1 and scal-to-vec2 go from FAIL to REFUSED). I re-validate every gate before merging.
 - **Finding to fix (Class A, cproc fork + PINS.md)**: the GNU attributes `mode` and `vector_size` are accepted and
