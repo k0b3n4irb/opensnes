@@ -369,7 +369,11 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    # The x86_64 runner is slower and noisier than the arm64 one: this job took 10 to 12 minutes on
+    # most pushes and 15, 16, 19, 19 and then more than 20 on others (2026-11-09: cancelled at the
+    # limit, red badges). 35 minutes leaves room for the suite as it grows (the frozen torture subset
+    # fetches and builds about a minute of tests).
+    timeout-minutes: 35
     steps:
       - name: Check out OpenSNES (with submodules)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
