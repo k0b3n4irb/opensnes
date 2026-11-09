@@ -131,8 +131,24 @@ and the CHANGELOG.
   read 357 226 cycles of "idle" (5 852 before); fixed (`6fdd06bc`: libbench counts `vblank_wai` as idle) and the three
   CI-only benches (`cyclecount/bench.py`, `sdkbench/run.py --check`, `libbench/run.py --check`, 20 s) now run in
   `make tests`. CI green on `6fdd06bc` (Lint 42523930952, Build & Release 42523931151).
-- **Still mine from the plan**: L13 is only the rule (aligned); the vitrine of tags and release notes is the
-  conductor's tool; A3 C3 (a check that sees a plain pointer that travels between files) is not written.
+- **Done 2026-11-09 (develop `dfaa6eb6`)**: `audioStopVoices(mask)` and the KOFF hold cut from 582 to 132 SPC
+  cycles (a partner port asked; `testing/fixtures/stress/koff_hold` red at 8 turns, green at 21; lesson kit
+  `36c0921`); a doc-drift anchor 22 (headline = table), front page says what the CI does; audio oracle covers every
+  audio example; `testing/torture` (gcc.c-torture/execute on luna, `make test-torture`, weekly `torture.yml`,
+  `expected.txt`: 714 pass, 17 fail all explained, 18 no build, 952 refused; lesson kit `8b869a9`);
+  SNESMOD upstream checked (nothing moved; next due 2026-11-16).
+- **Finding to fix (Class A, cproc fork + PINS.md)**: the GNU attributes `mode` and `vector_size` are accepted and
+  ignored (`sizeof` 2 where GNU C gives 1 and 8); recorded in `KNOWN_LIMITATIONS.md`; refusing them is a lot of its own.
+- **Still mine from an independent review of 2026-11-09**: a request to luna to force an NMI/IRQ before an
+  address (thread open, prototype `wait_race`), then a gate that sweeps the critical sections; journal for
+  `wram_regress.py --update` (a reason required, the count of drifted examples, the `diff_corpus` result); a
+  hold-out set of workloads never cited by a `perf` commit; measure whether the 65 ROM hashes agree across
+  Linux, macOS and Windows; triage of the K&R and "other" refusals of the torture run; check that reverting
+  the string-literal fixes makes a torture test fail; the audio follow-ups of the partner port (non-blocking
+  "command taken?" test, a note on calls from an `nmiSetLag` callback with one sender, a note start in two
+  handshakes, `audio_queue`); a one-page note on TAD against SNESMOD. The second-opinion emulator job waits
+  for the scope the conductor sets; then the doc-drift rule 11 gets a `# second-opinion:` marker.
+- The A3 C3 check (a plain pointer that travels between files) is still only documented.
 - Open threads: `ordres de musique datés` (a partner port; answered once, a prototype proposed: dated music orders in the SPC
   driver, a moyen request); the five ci-rouge threads wait for the cache lesson.
 - Waits for the author: the `ppuReset` COLDATA question (Class A); discardable const data of linked modules
