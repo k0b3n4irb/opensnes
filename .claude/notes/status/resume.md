@@ -137,6 +137,16 @@ and the CHANGELOG.
   audio example; `testing/torture` (gcc.c-torture/execute on luna, `make test-torture`, weekly `torture.yml`,
   `expected.txt`: 714 pass, 17 fail all explained, 18 no build, 952 refused; lesson kit `8b869a9`);
   SNESMOD upstream checked (nothing moved; next due 2026-11-16).
+- **CI limit raised** (`cf248f0e`): the functional job (Linux) was cancelled at its 20-minute limit on 2026-11-09
+  (x86_64: 10-12 min usually, 15-19 on others); now 35. CI green on `cf248f0e` (Build & Release 42601318649:
+  x86_64 14 min, arm64 15 min; Lint 42601318912). A duration/limit report (alert at 70 %) is proposed to the CI watch, not written.
+- **Torture subset in `make tests`** (`c5ea804b`): 26 tests, about a minute, any difference from `expected.txt`
+  fails; shown to fail with `fdcda7c8` undone (10 pinned refusals change, two tests fail at run time) and with
+  `ee5b8636` undone (`own/hex-escape-stops`, our own test: no gcc test exercises it). Needs the network the first
+  time (fetches the gcc tests; skipped offline outside CI).
+- **In flight**: an Opus agent in a worktree makes cproc REFUSE the GNU attributes `mode` and `vector_size`
+  (and whichever others it can justify) — a Class A lot (fork commit, PINS.md, negative cases, torture
+  `expected.txt`: 20020108-1 and scal-to-vec2 go from FAIL to REFUSED). I re-validate every gate before merging.
 - **Finding to fix (Class A, cproc fork + PINS.md)**: the GNU attributes `mode` and `vector_size` are accepted and
   ignored (`sizeof` 2 where GNU C gives 1 and 8); recorded in `KNOWN_LIMITATIONS.md`; refusing them is a lot of its own.
 - **Still mine from an independent review of 2026-11-09**: a request to luna to force an NMI/IRQ before an
