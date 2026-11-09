@@ -263,6 +263,20 @@ jobs:
         shell: msys2 {0}
         run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
 
+      # TEMPORARY (2026-11-09): the ROM lists of macOS and Windows differ from Linux's on all 65
+      # examples while Linux x86_64, Linux arm64 and a local build agree; two ROMs go out whole so that
+      # the first differing byte can be found. Remove once the cause is known.
+      - name: Keep two ROMs to find where the platforms differ
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ROM samples (${{ matrix.name }})
+          path: |
+            examples/text/print_string/print_string.sfc
+            examples/text/print_string/print_string.sym
+            examples/sprites/animated_sprite/animated_sprite.sfc
+          if-no-files-found: warn
+
       # Validate the starter project builds via the OPENSNES= consumption path
       # a downstream user follows (proves the release-consumption contract).
       - name: Build starter project (Linux/macOS)
