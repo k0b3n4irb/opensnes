@@ -31,3 +31,14 @@ refusal of the frontend, like the `__far` assignment: an address above
 `$FFFF` cast to a plain pointer lost its bank on an indexed access.
 `far_address_expr` is the same cast written as a base macro plus an
 offset, which reaches the cast unfolded. `cases/far_address_cast` pins the casts that must keep compiling.
+
+`gnu_attr_*` (2026-11-09) pin the GNU attributes the frontend refuses
+because skipping them, as it does every attribute it does not know, would
+compile a different program without a word: `mode` (`sizeof` of a
+`mode(QI)` type was 2) and `vector_size` / `ext_vector_type` change a
+type's width; `alias`, `cleanup`, `section`, `noinit`, `persistent` where
+and how an object lives; `ms_struct` and `scalar_storage_order` a
+structure's layout and byte order. `gnu_attr_mode_c23` is the C23
+spelling with underscores. They are refusals of the frontend, not features
+waiting to land; the hints (`noinline`, `unused`, `noreturn`, `may_alias`,
+`weak`...) keep compiling.
