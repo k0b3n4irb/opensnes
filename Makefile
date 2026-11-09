@@ -283,7 +283,7 @@ tests: test-compiler
 	@# asserts below).
 	@$(MAKE) -s fixtures
 	@python3 testing/rom_coverage.py
-	@# APU output hashed for the ten audio examples (luna
+	@# APU output hashed for every audio example (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 testing/audio_regress.py

@@ -12,6 +12,16 @@
       "samples": 159936,
       "peak": 23167
     },
+    "audio/sample_swap": {
+      "sha256": "c9d6fe30bc1a4602cde81b3ae854a2726af2e982708f981a6ed604a2c3a1bd0c",
+      "samples": 159936,
+      "peak": 6546
+    },
+    "audio/sfx_voices": {
+      "sha256": "fa57a34b6474e37ddeb940f36f24bb292badde58f2e1d1d60e2056512a1edf79",
+      "samples": 159936,
+      "peak": 26631
+    },
     "fixtures/snesmod_music_large": {
       "sha256": "ba00520aaf87cbed119de17f94e1bf6dba86c9b7f9ef09837280553e1b3d67ce",
       "samples": 159936,
