@@ -4,8 +4,8 @@
     "rom_sha256": "54dc0b674ddbc95b7555937afdf10958b3f61e432abdf149047bc571ee5f9800"
   },
   "audio_sample_swap": {
-    "stream": "c54b34d59a405ab7dfdb0f5b205f0c6930e71b551cb03adb4d715641629495d6",
-    "rom_sha256": "4c6ac7b1425b57e9e3bee2b349b0799bcf31e33aa2e6a2b1d139798b81954369"
+    "stream": "db5619534a9a62e98e6de8b541a475fa39901793b5899c48ccd3c9afd169e6db",
+    "rom_sha256": "af502d4a4c436e4eb69d468815de68f8f4da411c61acbe52c8cd2c84c250be51"
   },
   "audio_sfx_from_wav": {
     "stream": "518569f23d4ae49369bfd06f5df8099df9ac2fe810a9b26dd7f6b13dd5da4cfc",
