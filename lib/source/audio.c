@@ -292,15 +292,23 @@ u8 audioGetVolume(void) {
  * Voice control
  *============================================================================*/
 
+u8 audioStopVoices(u8 mask) {
+    if (!mask) {
+        return AUDIO_OK;        /* nothing to stop: no command, no handshake */
+    }
+    /* The driver's KOFF takes a mask: one command for any set of voices. */
+    return cmd_post(OP_KOFF, mask, 0);
+}
+
 u8 audioStopVoice(u8 voice) {
     if (voice >= AUDIO_MAX_VOICES) {
         return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
-    return cmd_post(OP_KOFF, (u8)(1 << voice), 0);
+    return audioStopVoices((u8)(1 << voice));
 }
 
 u8 audioStopAll(void) {
-    return cmd_post(OP_KOFF, 0xFF, 0);
+    return audioStopVoices(0xFF);
 }
 
 u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {

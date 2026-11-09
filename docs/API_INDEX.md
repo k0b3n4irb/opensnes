@@ -122,7 +122,7 @@ its header.
 | Header | Functions | Where it is explained |
 |---|---|---|
 | `anim.h` | `animRestart` | [animation](tutorials/animation.md) |
-| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio_samples.md) |
+| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopVoices`, `audioStopAll` | [audio: choosing the voice](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch`, `audioSetVoiceVolumePitch`, `audioSetVoicePan` | [audio: volume and pitch](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio_samples.md) |

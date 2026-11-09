@@ -193,6 +193,23 @@ audioStopVoice(VOICE_ENGINE);                          /* key-off */
 `audioStopAll()` keys off all eight voices. Passing `AUDIO_VOICE_AUTO`
 as the voice gives the round-robin choice.
 
+To stop several voices at once, give `audioStopVoices()` a mask, one bit
+per voice number: it is one command to the sound CPU, where a loop of
+`audioStopVoice()` sends one per voice and waits for each to be taken
+before the next. The driver holds each key-off about 2 scanlines (the
+S-DSP reads KOFF only every other sample, 64 of the sound CPU's cycles, and
+a KOFF cleared before that read can leave the voice playing: fullsnes,
+KON/KOFF notes; anomie's S-DSP doc; the driver holds it 132), so on a frame
+that stops four voices:
+
+```c
+audioStopVoices((1 << 0) | (1 << 1) | (1 << 2) | (1 << 3));   /* voices 0-3 */
+```
+
+Measured on luna up to the end of a state read that follows: the read alone
+7 scanlines, four voices by one `audioStopVoices()` then the read 11, by
+four `audioStopVoice()` then the read 25. A mask of 0 sends nothing.
+
 ### Volume and pitch
 
 ```c
@@ -236,8 +253,8 @@ pitch you send is the note you hear. One update costs 3 scanlines at most
 **Stop, then play, on the same voice in one frame.** `audioStopVoice(v)`
 followed at once by `audioPlaySampleOn(v, …)` is accepted: the voice takes the
 new sample, pitch and volume, and sounds from the next sample period (the
-example checks the DSP registers one frame later). The pair costs 18
-scanlines at most (about 24 000 master cycles), most of it the play command.
+example checks the DSP registers one frame later). The pair costs 12
+scanlines at most (about 16 400 master cycles), most of it the play command.
 This is the rule "the last sound to arrive cuts the one in progress".
 
 **A sample sent in pieces.** `audioLoadSampleBegin()` then

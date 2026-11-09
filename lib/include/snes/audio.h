@@ -555,13 +555,55 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
 u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch);
 
 /**
+ * @brief Stop several voices with one command
+ *
+ * Keys off every voice whose bit is set in @p mask: bit 0 is voice 0, bit 7
+ * voice 7 (`0x05` stops voices 0 and 2). One command to the sound CPU,
+ * whatever the number of voices, where a loop of audioStopVoice() sends one
+ * per voice and waits for each to be taken before sending the next: stopping
+ * four voices this way is one handshake instead of four.
+ *
+ * Like every key-off it starts the voices' release, it does not cut them: the
+ * S-DSP takes 8 off the envelope every sample, so a voice at full envelope is
+ * silent about 8 ms later (see audioLoadSampleBeginAt()).
+ *
+ * Cost: the call itself is the port writes (the acknowledgement is awaited by
+ * the next command). The sound CPU holds the key-off 132 of its cycles,
+ * about 2 scanlines, the same for one voice or eight, so a command sent
+ * right after waits for it. Measured on luna
+ * (`testing/fixtures/stress/koff_hold`), up to the end of a state read that
+ * follows: the read alone 7 scanlines; four voices stopped by one
+ * audioStopVoices() then the read, 11; by four audioStopVoice() then the
+ * read, 25.
+ *
+ * @param mask Voices to stop, one bit per voice number (0-7)
+ * @return AUDIO_OK (also for a @p mask of 0, which sends nothing), or
+ *         AUDIO_ERR_TIMEOUT when the previous command was never
+ *         acknowledged (nothing is sent then), as for audioStopVoice()
+ *
+ * @code
+ * audioStopVoices((1 << 0) | (1 << 2) | (1 << 5));   // voices 0, 2 and 5
+ * @endcode
+ */
+u8 audioStopVoices(u8 mask);
+
+/**
  * @brief Stop a specific voice
+ *
+ * audioStopVoices() with the one bit of @p voice.
+ *
  * @param voice Voice number (0-7)
+ * @return AUDIO_OK, AUDIO_ERR_INVALID_ID for a voice of 8 or more (nothing
+ *         is sent), or AUDIO_ERR_TIMEOUT as for audioStopVoices()
  */
 u8 audioStopVoice(u8 voice);
 
 /**
  * @brief Stop all audio playback
+ *
+ * audioStopVoices(0xFF): every voice in one command.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT as for audioStopVoices()
  */
 u8 audioStopAll(void);
 
