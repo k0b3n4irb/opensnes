@@ -48,7 +48,7 @@
 20000717-3 REFUSED k-and-r
 20000717-4 PASS
 20000717-5 REFUSED struct-by-value
-20000722-1 REFUSED other
+20000722-1 REFUSED const-qualifier
 20000726-1 REFUSED k-and-r
 20000731-1 REFUSED other
 20000731-2 PASS
@@ -62,7 +62,7 @@
 20000819-1 PASS
 20000822-1 REFUSED nested-function
 20000910-1 PASS
-20000910-2 REFUSED other
+20000910-2 REFUSED const-qualifier
 20000914-1 REFUSED k-and-r
 20000917-1 REFUSED struct-by-value
 20001009-1 PASS
@@ -94,7 +94,7 @@
 20010118-1 REFUSED other
 20010119-1 PASS
 20010122-1 REFUSED k-and-r
-20010123-1 REFUSED other
+20010123-1 REFUSED const-qualifier
 20010129-1 PASS
 20010206-1 PASS
 20010209-1 REFUSED vla
@@ -118,16 +118,16 @@
 20010904-1 REFUSED gnu-attribute
 20010904-2 REFUSED gnu-attribute
 20010910-1 PASS
-20010915-1 REFUSED other
-20010924-1 REFUSED other
+20010915-1 REFUSED const-qualifier
+20010924-1 REFUSED const-qualifier
 20010925-1 REFUSED k-and-r
 20011008-3 NOBUILD
 20011019-1 PASS
 20011024-1 REFUSED k-and-r
 20011109-1 PASS
-20011109-2 REFUSED other
+20011109-2 REFUSED const-qualifier
 20011113-1 REFUSED k-and-r
-20011114-1 REFUSED other
+20011114-1 REFUSED const-qualifier
 20011115-1 PASS
 20011121-1 PASS
 20011126-1 REFUSED long-long
@@ -203,7 +203,7 @@
 20021120-2 PASS
 20021120-3 REFUSED other
 20021127-1 REFUSED long-long
-20021204-1 REFUSED other
+20021204-1 REFUSED const-qualifier
 20021219-1 PASS
 20030105-1 PASS
 20030109-1 REFUSED other
@@ -234,7 +234,7 @@
 20030626-1 NOBUILD
 20030626-2 REFUSED struct-by-value
 20030714-1 REFUSED other
-20030715-1 REFUSED other
+20030715-1 REFUSED const-qualifier
 20030717-1 PASS
 20030718-1 PASS
 20030811-1 REFUSED other
@@ -248,7 +248,7 @@
 20030914-1 REFUSED float
 20030914-2 REFUSED struct-by-value
 20030916-1 PASS
-20030920-1 REFUSED other
+20030920-1 REFUSED const-qualifier
 20030928-1 PASS
 20031003-1 PASS
 20031010-1 PASS
@@ -311,7 +311,7 @@
 20041212-1 REFUSED other
 20041213-2 PASS
 20041214-1 REFUSED other
-20041218-1 REFUSED other
+20041218-1 REFUSED const-qualifier
 20041218-2 REFUSED vla
 20050104-1 REFUSED other
 20050106-1 REFUSED other
@@ -342,7 +342,7 @@
 20050929-1 PASS
 20051012-1 REFUSED other
 20051021-1 PASS
-20051104-1 REFUSED other
+20051104-1 REFUSED const-qualifier
 20051110-1 PASS
 20051110-2 PASS
 20051113-1 REFUSED k-and-r
@@ -422,7 +422,7 @@
 20100430-1 REFUSED gnu-attribute
 20100708-1 PASS
 20100805-1 PASS
-20100827-1 REFUSED other
+20100827-1 REFUSED const-qualifier
 20101011-1 REFUSED other
 20101013-1 REFUSED other
 20101025-1 PASS
@@ -439,7 +439,7 @@
 20120808-1 PASS
 20120817-1 REFUSED long-long
 20120919-1 REFUSED other
-20121108-1 REFUSED other
+20121108-1 REFUSED const-qualifier
 20131127-1 REFUSED struct-by-value
 20140212-1 REFUSED long-long
 20140212-2 PASS
@@ -552,7 +552,7 @@
 930208-1 REFUSED k-and-r
 930406-1 REFUSED other
 930408-1 PASS
-930429-1 REFUSED other
+930429-1 REFUSED const-qualifier
 930429-2 REFUSED k-and-r
 930513-1 REFUSED k-and-r
 930513-2 REFUSED k-and-r
@@ -575,7 +575,7 @@
 930713-1 REFUSED k-and-r
 930718-1 REFUSED k-and-r
 930719-1 REFUSED k-and-r
-930725-1 REFUSED other
+930725-1 REFUSED const-qualifier
 930818-1 REFUSED k-and-r
 930916-1 REFUSED k-and-r
 930921-1 REFUSED k-and-r
@@ -680,7 +680,7 @@
 961112-1 REFUSED k-and-r
 961122-1 REFUSED long-long
 961122-2 PASS
-961125-1 REFUSED other
+961125-1 REFUSED const-qualifier
 961206-1 REFUSED long-long
 961213-1 REFUSED long-long
 961223-1 REFUSED struct-by-value
@@ -759,7 +759,7 @@
 991216-2 REFUSED varargs
 991216-4 PASS
 991221-1 PASS
-991227-1 REFUSED other
+991227-1 REFUSED const-qualifier
 991228-1 REFUSED k-and-r
 alias-1 REFUSED other
 alias-2 NOBUILD
@@ -801,7 +801,7 @@ bswap-2 REFUSED k-and-r
 bswap-3 REFUSED other
 built-in-setjmp REFUSED other
 builtin-bitops-1 REFUSED other
-builtin-constant REFUSED other
+builtin-constant REFUSED const-qualifier
 builtin-prefetch-1 REFUSED other
 builtin-prefetch-2 REFUSED other
 builtin-prefetch-3 REFUSED other
@@ -829,7 +829,7 @@ complex-5 REFUSED other
 complex-6 REFUSED k-and-r
 complex-7 REFUSED float
 compndlit-1 PASS
-const-addr-expr-1 REFUSED other
+const-addr-expr-1 REFUSED const-qualifier
 conversion REFUSED k-and-r
 cvt-1 REFUSED other
 dbra-1 REFUSED k-and-r
@@ -871,7 +871,7 @@ longlong REFUSED long-long
 loop-1 PASS
 loop-10 PASS
 loop-11 PASS
-loop-12 REFUSED other
+loop-12 REFUSED const-qualifier
 loop-13 PASS
 loop-14 PASS
 loop-15 PASS
@@ -1050,7 +1050,7 @@ pr20100-1 PASS
 pr20187-1 REFUSED long-long
 pr20466-1 PASS
 pr20527-1 PASS
-pr20601-1 REFUSED other
+pr20601-1 REFUSED const-qualifier
 pr20621-1 REFUSED struct-by-value
 pr21173 REFUSED other
 pr21331 PASS
@@ -1338,7 +1338,7 @@ pr59014 PASS
 pr59014-2 REFUSED long-long
 pr59101 REFUSED long-long
 pr59221 PASS
-pr59229 REFUSED other
+pr59229 REFUSED const-qualifier
 pr59358 PASS
 pr59387 PASS
 pr59388 PASS
@@ -1593,7 +1593,7 @@ printf-2 REFUSED other
 printf-chk-1 REFUSED varargs
 pta-field-1 PASS
 pta-field-2 PASS
-ptr-arith-1 REFUSED other
+ptr-arith-1 REFUSED const-qualifier
 pure-1 PASS
 pushpop_macro PASS
 regstack-1 REFUSED float
@@ -1701,3 +1701,4 @@ zero-struct-1 REFUSED other
 zero-struct-2 REFUSED other
 zerolen-1 PASS
 zerolen-2 PASS
+own/hex-escape-stops PASS

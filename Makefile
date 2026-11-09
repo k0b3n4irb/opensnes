@@ -316,6 +316,10 @@ tests: test-compiler
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
+	@# C conformance on the target, the frozen subset (about a minute; the whole suite is
+	@# `make test-torture`). It fetches the gcc tests the first time (network; skipped offline
+	@# outside CI). Shown to fail with fdcda7c8 and ee5b8636 undone (testing/torture/README.md).
+	@python3 testing/torture/run.py --quick
 	@# The three measured benches the CI runs after `make tests` (opensnes_build.yml):
 	@# they were not here, so a green `make tests` could be red there (2026-11-08: a new
 	@# label in WaitForVBlank read as 357 226 cycles of "idle" in libbench). About 20 s.

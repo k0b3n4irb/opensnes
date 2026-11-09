@@ -12,6 +12,7 @@ python3 testing/torture/run.py --fetch      # clone the tests at the pinned comm
 make test-torture                           # run all, compare with expected.txt (about 25 min)
 python3 testing/torture/run.py -v --only 20000113-1,pr58943
 python3 testing/torture/run.py --update     # re-capture expected.txt after an intended change
+python3 testing/torture/run.py --quick      # the frozen subset of quick.txt (about a minute); in `make tests`
 ```
 
 The tests are GPL-3.0 and are **never committed**: they are fetched into `build/torture/`
@@ -47,3 +48,19 @@ compiles to the wrong thing without a word; see `KNOWN_LIMITATIONS.md`.
 
 It runs on luna only, like everything else here; no console has run it. It covers the C that
 cproc accepts: more than half of the suite is refused up front, by design.
+
+## The frozen subset, and the proof that it sees what it should
+
+`make tests` runs `--quick`: the 26 tests of `quick.txt`, in about a minute. Here ANY difference from
+`expected.txt` fails, in both directions (a pass that fails, a refusal that starts to compile): they are
+the tests that pin behaviours we mean to keep. `own/` holds tests written for this SDK, in the same
+format, for what no gcc test exercises.
+
+Shown to fail with a fix undone, by building the cproc of the pin before it and running the subset on it
+(`TORTURE_BIN=<a bin/ with that cproc-qbe>`):
+
+- **`fdcda7c8`** (a string literal is `const char[]`; passed to a plain `char *` it was read from the wrong
+  bank in silence): the 10 refusals it causes change: 6 compile and pass, 2 do not build, and 2
+  (`20030920-1`, `961125-1`) fail at run time. Exit code 1.
+- **`ee5b8636`** (a hex escape stops at the first non-hex character): no test of the gcc suite has a `\x` followed
+  by a letter above `f`, so `own/hex-escape-stops.c` pins it: `FAIL abort` with the old cproc. Exit code 1.

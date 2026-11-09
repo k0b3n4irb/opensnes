@@ -72,6 +72,7 @@ REFUSAL_TAGS = [
     (r"variable-length", "vla"),
     (r"long double|_Complex|float", "float"),
     (r"no type in parameter|no type specifier|expected declaration", "k-and-r"),
+    (r"discards qualifiers", "const-qualifier"),
     (r"GNU attribute", "gnu-attribute"),
     (r"invalid UTF-8", "invalid-utf8"),
     (r"function definition not allowed", "nested-function"),
@@ -111,15 +112,20 @@ def refusal_tag(text):
     return "other"
 
 
+BIN = Path(os.environ["TORTURE_BIN"]) if os.environ.get("TORTURE_BIN") else None   # a compiler other than bin/ (to show the suite sees a reverted fix)
+
+
 def one(args):
     name, src, work, luna, sdk = args
-    d = work / name
+    bindir = BIN or (sdk / "bin")
+    d = work / name.replace("/", "_")
     d.mkdir(parents=True, exist_ok=True)
     # bytes, not text: some tests hold a raw 0xFF in a string literal, and a text round trip
     # with replacement turns it into three bytes (20000227-1)
-    (d / "t.c").write_bytes((HERE / "prelude.h").read_bytes() + (src / f"{name}.c").read_bytes())
+    srcfile = (HERE / "own" / (name[4:] + ".c")) if name.startswith("own/") else (src / f"{name}.c")
+    (d / "t.c").write_bytes((HERE / "prelude.h").read_bytes() + srcfile.read_bytes())
     # 1. does cc65816 take it? (fast; a refusal is a documented limit, not a defect)
-    r = subprocess.run([str(sdk / "bin" / "cc65816"), str(d / "t.c"), "-o", str(d / "t.asm"),
+    r = subprocess.run([str(bindir / "cc65816"), str(d / "t.c"), "-o", str(d / "t.asm"),
                         "-I", str(HERE / "shim"), "-I", str(sdk / "lib" / "include")],
                        capture_output=True, text=True)
     if r.returncode != 0:
@@ -130,7 +136,7 @@ def one(args):
     # 2. build the ROM
     shutil.copy(HERE / "rt.c", d / "rt.c")
     (d / "Makefile").write_text(MAKEFILE.format(sdk=sdk, shim=HERE / "shim"))
-    r = subprocess.run(["make", "-s", "-C", str(d), "SKIP_LINT=1"], capture_output=True, text=True)
+    r = subprocess.run(["make", "-s", "-C", str(d), "SKIP_LINT=1"] + ([f"CC={bindir / 'cc65816'}"] if BIN else []), capture_output=True, text=True)
     if r.returncode != 0 or not (d / "t.sfc").is_file():
         shutil.rmtree(d, ignore_errors=True)
         return name, "NOBUILD", ""
@@ -188,6 +194,7 @@ def main():
     ap.add_argument("--fetch", action="store_true", help="clone the tests at the pinned commit and stop")
     ap.add_argument("--dir", default=os.environ.get("TORTURE_DIR", str(DEFAULT_DIR)))
     ap.add_argument("--only", help="comma-separated test names")
+    ap.add_argument("--quick", action="store_true", help="the frozen subset of quick.txt (about a minute): any difference from expected.txt fails")
     ap.add_argument("--jobs", type=int, default=3)
     ap.add_argument("-v", "--verbose", action="store_true", help="one line per test")
     ap.add_argument("--update", action="store_true", help="rewrite expected.txt from this run")
@@ -197,6 +204,16 @@ def main():
         fetch(dest)
         return 0
     src = dest / "gcc" / SUBDIR
+    if not src.is_dir() and args.quick:
+        try:
+            fetch(dest)
+        except SystemExit as e:
+            # no network: skipped on a developer's machine, a failure in CI (the gate must run there)
+            print(f"torture --quick: {e}", file=sys.stderr)
+            if os.environ.get("CI"):
+                return 2
+            print("torture --quick: SKIPPED (tests not fetched; python3 testing/torture/run.py --fetch)")
+            return 0
     if not src.is_dir():
         print(f"torture: no tests in {src}; run with --fetch first", file=sys.stderr)
         return 2
@@ -204,7 +221,9 @@ def main():
     if not luna:
         print("torture: luna not found (scripts/install-luna.sh)", file=sys.stderr)
         return 2
-    names = sorted(p.stem for p in src.glob("*.c"))
+    names = sorted(p.stem for p in src.glob("*.c")) + sorted("own/" + p.stem for p in (HERE / "own").glob("*.c"))
+    if args.quick:
+        names = [l.strip() for l in (HERE / "quick.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
     if args.only:
         want = set(args.only.split(","))
         names = [n for n in names if n in want]
@@ -241,6 +260,13 @@ def main():
     if not exp:
         print("torture: no expected.txt: run with --update first", file=sys.stderr)
         return 2
+    if args.quick:
+        changed = [n for n in results if exp.get(n, ("?", ""))[0] != results[n][0]]
+        for n in sorted(changed):
+            print(f"  CHANGED {n}: expected {exp.get(n, ('?', ''))[0]}, now {results[n][0]} {results[n][1]}")
+        print("torture --quick: " + (f"{len(changed)} CHANGED (a behaviour we pin moved; if intended: --update)" if changed
+                                        else f"all {len(results)} as expected ({c['PASS']} pass, {c['REFUSED']} refused, {c['FAIL']} documented failures)"))
+        return 1 if changed else 0
     regress = [n for n, (s, _) in results.items() if exp.get(n, ("", ""))[0] == "PASS" and s != "PASS"]
     better = [n for n, (s, _) in results.items() if s == "PASS" and exp.get(n, ("", ""))[0] not in ("PASS", "")]
     new = [n for n in results if n not in exp]

@@ -1,0 +1,36 @@
+# The frozen subset run by `make tests` (python3 testing/torture/run.py --quick): about 30 tests, about a
+# minute. Here ANY difference from expected.txt is a failure, in both directions (a pass that fails, and a
+# refusal that starts to compile): these are the tests that pin behaviours we mean to keep.
+# 1. refused because a string literal is const char[] (fdcda7c8): reverting it makes them compile
+20000722-1
+20000910-2
+20010123-1
+20010915-1
+20011109-2
+20021204-1
+20030920-1
+930429-1
+961125-1
+pr59229
+# 2. strings, escapes, constant pointers that pass
+20070724-1
+960311-1
+960311-2
+960311-3
+pr110914
+20000113-1
+# 3. documented limits: the plain pointer to a literal (921019-1), the GNU attributes mode and vector_size
+#    accepted and ignored (20020108-1, scal-to-vec2: they change when the compiler refuses them), the
+#    evaluation order of gcc (pr58943)
+921019-1
+20020108-1
+scal-to-vec2
+pr58943
+# 4. general, sampled
+20011115-1
+20030928-1
+930621-1
+pr103052
+pr47155
+# 5. ours (testing/torture/own): what no gcc test exercises
+own/hex-escape-stops
