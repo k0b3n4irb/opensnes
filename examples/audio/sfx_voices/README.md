@@ -18,7 +18,7 @@ green waveform sweep, yellow restarts, red seven voices, grey done).
 
 The oracles (`load_lines_max`, `restart_lines_max`, `seven_lines_max`, …) are
 globals; `testing/manifests/audio_sfx_voices.toml` reads them. Measured: a
-192-byte step 115 scanlines at most, a stop+play pair 18, a pitch update 3,
+192-byte step 115 scanlines at most, a stop+play pair 12, a pitch update 3,
 seven voices 29 (1 scanline = 1 364 master cycles).
 
 ## SNES Concepts
