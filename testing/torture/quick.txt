@@ -20,8 +20,8 @@ pr59229
 pr110914
 20000113-1
 # 3. documented limits: the plain pointer to a literal (921019-1), the GNU attributes mode and vector_size
-#    accepted and ignored (20020108-1, scal-to-vec2: they change when the compiler refuses them), the
-#    evaluation order of gcc (pr58943)
+#    refused (20020108-1, scal-to-vec2: accepted and ignored before cproc 82e1c1d, they failed at run
+#    time; skipping the attribute again makes them FAIL), the evaluation order of gcc (pr58943)
 921019-1
 20020108-1
 scal-to-vec2

@@ -138,7 +138,7 @@
 20011223-1 PASS
 20020103-1 PASS
 20020107-1 REFUSED asm
-20020108-1 FAIL abort | GNU attribute mode(QI/HI) accepted and ignored (KNOWN_LIMITATIONS.md): u8 is 16 bits
+20020108-1 REFUSED gnu-attribute | mode(QI/HI): accepted and ignored before cproc 82e1c1d, u8 was 16 bits and the test failed
 20020118-1 PASS
 20020127-1 PASS
 20020129-1 PASS
@@ -315,10 +315,10 @@
 20041218-2 REFUSED vla
 20050104-1 REFUSED gnu-builtin
 20050106-1 REFUSED syntax
-20050107-1 PASS
+20050107-1 REFUSED gnu-attribute | mode(byte) on an enum: passed with the attribute ignored before cproc 82e1c1d, the enum 2 bytes instead of 1
 20050111-1 REFUSED long-long
-20050119-1 PASS
-20050119-2 PASS
+20050119-1 REFUSED gnu-attribute | mode(byte) on an enum: passed with the attribute ignored before cproc 82e1c1d, the enum 2 bytes instead of 1
+20050119-2 REFUSED gnu-attribute | mode(byte) on an enum: passed with the attribute ignored before cproc 82e1c1d, the enum 2 bytes instead of 1
 20050121-1 REFUSED float
 20050124-1 PASS
 20050125-1 REFUSED other
@@ -327,14 +327,14 @@
 20050215-1 REFUSED k-and-r
 20050218-1 REFUSED k-and-r
 20050224-1 PASS
-20050316-1 REFUSED long-long
-20050316-2 REFUSED long-long
-20050316-3 REFUSED long-long
+20050316-1 REFUSED gnu-attribute
+20050316-2 REFUSED gnu-attribute
+20050316-3 REFUSED gnu-attribute
 20050410-1 PASS
 20050502-1 PASS
 20050502-2 REFUSED k-and-r
-20050604-1 REFUSED float
-20050607-1 PASS
+20050604-1 REFUSED gnu-attribute
+20050607-1 REFUSED gnu-attribute | vector_size: passed with the attribute ignored before cproc 82e1c1d, the vector computed as one scalar
 20050613-1 PASS
 20050713-1 REFUSED struct-by-value
 20050826-1 REFUSED k-and-r
@@ -352,7 +352,7 @@
 20060110-2 REFUSED long-long
 20060127-1 REFUSED long-long
 20060412-1 PASS
-20060420-1 REFUSED float
+20060420-1 REFUSED gnu-attribute
 20060905-1 PASS
 20060910-1 PASS
 20060929-1 PASS
@@ -470,7 +470,7 @@
 20230509-1 PASS
 20230510-1 PASS
 20230630-1 PASS
-20230630-2 REFUSED syntax
+20230630-2 REFUSED gnu-attribute
 20230630-3 REFUSED k-and-r
 20230630-4 REFUSED k-and-r
 20230802-1 REFUSED long-long
@@ -762,9 +762,9 @@
 991227-1 REFUSED const-qualifier
 991228-1 REFUSED k-and-r
 alias-1 REFUSED float
-alias-2 NOBUILD
-alias-3 NOBUILD
-alias-4 NOBUILD
+alias-2 REFUSED gnu-attribute | alias: did not link before cproc 82e1c1d
+alias-3 REFUSED gnu-attribute | alias: did not link before cproc 82e1c1d
+alias-4 REFUSED gnu-attribute | alias: did not link before cproc 82e1c1d
 alias-access-path-1 PASS
 alias-access-path-2 PASS
 align-1 REFUSED gnu-attribute
@@ -810,7 +810,7 @@ builtin-prefetch-5 REFUSED gnu-builtin
 builtin-prefetch-6 REFUSED gnu-builtin
 builtin-types-compatible-p PASS
 call-trap-1 PASS
-cbrt REFUSED float
+cbrt REFUSED gnu-attribute
 ccmp-tree-1 REFUSED front-end-gap
 cmpdi-1 REFUSED k-and-r
 cmpsf-1 REFUSED k-and-r
@@ -901,7 +901,7 @@ mayalias-2 PASS
 mayalias-3 PASS
 medce-1 PASS
 memchr-1 REFUSED k-and-r
-memclr REFUSED syntax
+memclr REFUSED gnu-attribute
 memcpy-1 REFUSED compiler-internal
 memcpy-2 PASS
 memcpy-a1 REFUSED missing-header
@@ -914,7 +914,7 @@ memset-2 PASS
 memset-3 PASS
 memset-4 PASS
 minmaxcmp-1 PASS
-misalign REFUSED syntax
+misalign REFUSED gnu-attribute
 mod-1 REFUSED k-and-r
 mode-dependent-address REFUSED missing-header
 mul-sext REFUSED k-and-r
@@ -950,7 +950,7 @@ pr104196 PASS
 pr104604 REFUSED float
 pr104814 PASS
 pr104839 PASS
-pr105613 REFUSED syntax
+pr105613 REFUSED gnu-attribute
 pr105777 REFUSED missing-header
 pr105984 REFUSED gnu-builtin
 pr106032 PASS
@@ -959,11 +959,11 @@ pr107131 REFUSED long-long
 pr107879 REFUSED float
 pr107881-1 PASS
 pr108064 REFUSED gnu-attribute
-pr108292 REFUSED gnu-builtin
+pr108292 REFUSED gnu-attribute
 pr108498-1 REFUSED struct-by-value
 pr108498-2 REFUSED bit-field
 pr108789 REFUSED gnu-builtin
-pr109040 REFUSED index-swap
+pr109040 REFUSED gnu-attribute
 pr109778 PASS
 pr109925 PASS
 pr109938 REFUSED missing-header
@@ -976,9 +976,9 @@ pr110252-2 REFUSED asm
 pr110252-3 PASS
 pr110252-4 PASS
 pr110666-1 PASS
-pr110817-1 REFUSED index-swap
-pr110817-2 REFUSED index-swap
-pr110817-3 REFUSED index-swap
+pr110817-1 REFUSED gnu-attribute
+pr110817-2 REFUSED gnu-attribute
+pr110817-3 REFUSED gnu-attribute
 pr110914 PASS
 pr110954-1 PASS
 pr111151 PASS
@@ -1014,20 +1014,20 @@ pr119291 PASS
 pr119428 PASS
 pr120630 PASS
 pr120677 PASS
-pr121957 REFUSED asm
+pr121957 REFUSED gnu-attribute
 pr122000 REFUSED gnu-attribute
 pr122943 REFUSED long-long
 pr123625 REFUSED missing-header
-pr123625-2 REFUSED index-swap
-pr123625-3 REFUSED asm
-pr123753 REFUSED index-swap
+pr123625-2 REFUSED gnu-attribute
+pr123625-3 REFUSED gnu-attribute
+pr123753 REFUSED gnu-attribute
 pr123864 REFUSED long-long
 pr123978 REFUSED long-long
 pr124358 PASS
 pr125291 REFUSED gnu-builtin
-pr126405 REFUSED index-swap
-pr126405-2 REFUSED index-swap
-pr126405-3 REFUSED index-swap
+pr126405 REFUSED gnu-attribute
+pr126405-2 REFUSED gnu-attribute
+pr126405-3 REFUSED gnu-attribute
 pr126501 PASS
 pr126747 PASS
 pr126994 PASS
@@ -1069,7 +1069,7 @@ pr22429 PASS
 pr22493-1 PASS
 pr22630 PASS
 pr23047 PASS
-pr23135 REFUSED compiler-internal
+pr23135 REFUSED gnu-attribute
 pr23324 REFUSED k-and-r
 pr23467 REFUSED gnu-attribute
 pr23604 PASS
@@ -1280,8 +1280,8 @@ pr52979-2 REFUSED bit-field
 pr53084 PASS
 pr53160 PASS
 pr53465 PASS
-pr53645 REFUSED compiler-internal
-pr53645-2 REFUSED compiler-internal
+pr53645 REFUSED gnu-attribute
+pr53645-2 REFUSED gnu-attribute
 pr53688 PASS
 pr54471 REFUSED long-long
 pr54937 PASS
@@ -1351,7 +1351,7 @@ pr60062 PASS
 pr60072 PASS
 pr60454 PASS
 pr60822 REFUSED long-long
-pr60960 PASS
+pr60960 REFUSED gnu-attribute | vector_size: passed with the attribute ignored before cproc 82e1c1d, the vector computed as one scalar
 pr61306-1 PASS
 pr61306-2 PASS
 pr61306-3 PASS
@@ -1388,7 +1388,7 @@ pr65369 REFUSED missing-header
 pr65401 PASS
 pr65418-1 PASS
 pr65418-2 PASS
-pr65427 PASS
+pr65427 REFUSED gnu-attribute | vector_size: passed with the attribute ignored before cproc 82e1c1d, the vector computed as one scalar
 pr65648 REFUSED long-long
 pr65956 REFUSED asm
 pr66187 PASS
@@ -1435,7 +1435,7 @@ pr70460 REFUSED front-end-gap
 pr70566 PASS
 pr70586 PASS
 pr70602 REFUSED bit-field
-pr70903 REFUSED long-long
+pr70903 REFUSED gnu-attribute
 pr71083 REFUSED k-and-r
 pr71335 PASS
 pr71494 REFUSED front-end-gap
@@ -1502,8 +1502,8 @@ pr84524 REFUSED asm
 pr84748 REFUSED syntax
 pr85095 REFUSED gnu-builtin
 pr85156 REFUSED asm
-pr85169 REFUSED index-swap
-pr85331 REFUSED long-long
+pr85169 REFUSED gnu-attribute
+pr85331 REFUSED gnu-attribute
 pr85529-1 PASS
 pr85529-2 PASS
 pr85582-1 REFUSED long-long
@@ -1519,7 +1519,7 @@ pr86714 PASS
 pr86844 PASS
 pr87053 PASS
 pr87290 PASS
-pr87623 PASS
+pr87623 REFUSED gnu-attribute | scalar_storage_order: passed with the attribute ignored before cproc 82e1c1d, the members it reads are bytes
 pr88693 PASS
 pr88714 PASS
 pr88739 PASS
@@ -1540,7 +1540,7 @@ pr91597 REFUSED gnu-attribute
 pr91632 PASS
 pr91635 PASS
 pr92140 PASS
-pr92618 REFUSED long-long
+pr92618 REFUSED gnu-attribute
 pr92904 REFUSED gnu-attribute
 pr93213 REFUSED syntax
 pr93249 REFUSED gnu-builtin
@@ -1555,11 +1555,11 @@ pr93908 PASS
 pr93945 REFUSED asm
 pr94130 REFUSED asm
 pr94134 PASS
-pr94412 REFUSED index-swap
-pr94524-1 REFUSED index-swap
-pr94524-2 REFUSED index-swap
+pr94412 REFUSED gnu-attribute
+pr94524-1 REFUSED gnu-attribute
+pr94524-2 REFUSED gnu-attribute
 pr94567 PASS
-pr94591 REFUSED gnu-builtin
+pr94591 REFUSED gnu-attribute
 pr94724 PASS
 pr94734 PASS
 pr94809 REFUSED long-long
@@ -1599,18 +1599,18 @@ pushpop_macro PASS
 regstack-1 REFUSED float
 restrict-1 REFUSED struct-by-value
 return-addr REFUSED k-and-r
-scal-to-vec1 REFUSED float
-scal-to-vec2 FAIL abort | GNU attribute vector_size accepted and ignored (KNOWN_LIMITATIONS.md)
-scal-to-vec3 REFUSED float
+scal-to-vec1 REFUSED gnu-attribute
+scal-to-vec2 REFUSED gnu-attribute | vector_size: accepted and ignored before cproc 82e1c1d, the test failed
+scal-to-vec3 REFUSED gnu-attribute
 scope-1 REFUSED compiler-internal
 shiftdi REFUSED long-long
 shiftdi-2 REFUSED long-long
 shiftopt-1 PASS
 signed1bitfield-1 PASS
-simd-1 REFUSED compiler-internal
-simd-2 REFUSED compiler-internal
+simd-1 REFUSED gnu-attribute
+simd-2 REFUSED gnu-attribute
 simd-4 REFUSED missing-header
-simd-5 REFUSED compiler-internal
+simd-5 REFUSED gnu-attribute
 simd-6 REFUSED k-and-r
 split-path-1 REFUSED missing-header
 ssad-run NOBUILD
@@ -1680,7 +1680,7 @@ va-arg-8 PASS
 va-arg-9 REFUSED k-and-r
 va-arg-pack-1 REFUSED float
 va-arg-trap-1 REFUSED varargs
-vector-div-neg-pow2 REFUSED gnu-builtin
+vector-div-neg-pow2 REFUSED gnu-attribute
 vfprintf-1 REFUSED varargs
 vfprintf-chk-1 REFUSED k-and-r
 vla-dealloc-1 REFUSED vla
@@ -1700,5 +1700,5 @@ widechar-3 PASS
 zero-struct-1 REFUSED k-and-r
 zero-struct-2 REFUSED k-and-r
 zerolen-1 PASS
-zerolen-2 PASS
+zerolen-2 REFUSED gnu-attribute | mode(word): passed with the attribute ignored before cproc 82e1c1d (word is the width of int here, by chance)
 own/hex-escape-stops PASS
