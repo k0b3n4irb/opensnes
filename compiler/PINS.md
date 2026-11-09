@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | d337fd5767abf4f15e8bd0274eec25469755860b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 79ee5d9022fdb4c6a35f548e940f685e8032569a | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 49 patches since upstream merge-base 7051114
+### compiler/cproc — 50 patches since upstream merge-base 7051114
 
 ```
+82e1c1d attr: GNU attributes whose omission changes the program are refused — `mode`, `vector_size`, `ext_vector_type`, `alias`, `cleanup`, `section`, `noinit`, `persistent`, `ms_struct`, `scalar_storage_order` were skipped like any unknown attribute: `sizeof` of a `mode(QI)` type was 2, of a `vector_size(8)` type 2; the message names the attribute and why, in every spelling (`__mode__`, `[[gnu::mode]]`); weak, ifunc, may_alias, noreturn, naked, transparent_union stay skipped (harmless or a loud link error) (gcc.c-torture 20020108-1, scal-to-vec2, 2026-11-09)
 d337fd5 expr: an address above `$FFFF` cast to a plain pointer is refused — `(u8 *)0x708040` kept its bank only at a constant index, `p[i]` went to bank $00; a `__far` or `const` pointee, a function pointer and a negative sentinel pass; the value of `(u8 *)(BASE + 0x40 * n)` is computed without folding the tree (STRUCTURAL_DEFECTS A10, 2026-10-25)
 075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
 b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
