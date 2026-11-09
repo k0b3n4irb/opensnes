@@ -514,18 +514,23 @@ cproc has no `asm` statement: `__asm__("nop")` stops the build with
 ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
 pattern. Pinned by `cases/negative/inline_asm.c`.
 
-### 🟠 The GNU attributes `mode` and `vector_size` are accepted and ignored
-cproc skips every attribute it does not know, which is right for `noinline` or
-`unused` and wrong for the two that change a type. Measured on the target:
-`typedef unsigned int u8 __attribute__((mode(QI)))` has `sizeof` 2 (GNU C: 1),
-and `typedef short v4 __attribute__((vector_size(8)))` has `sizeof` 2 (GNU C: 8),
-with no message. `aligned` is refused (`GNU attribute 'aligned' is not supported
-here`) and `packed` is honoured. Found by `testing/torture`
-(`20020108-1`, `scal-to-vec2`).
+### 🟡 GNU attributes that change the program are refused
+cproc skips the GNU attributes that are hints (`noinline`, `unused`, `format`,
+`noreturn`, `may_alias`, `deprecated`...), honours `packed` on a structure, and
+refuses, with a message naming the attribute, those it does not implement and
+whose omission would compile a different program: `mode` and `vector_size` /
+`ext_vector_type` (they change a type's width), `alias`, `cleanup`, `section`,
+`noinit`, `persistent` (where and how an object lives), `ms_struct` and
+`scalar_storage_order` (a structure's layout and byte order), and `aligned`.
+For example `typedef unsigned int u8 __attribute__((mode(QI)));` stops with
+`GNU attribute 'mode' is not supported: it sets the width of the type`, in any
+spelling (`__mode__`, `[[gnu::mode(QI)]]`). `weak` and `ifunc` are skipped: the
+link then fails on the missing or duplicate symbol.
 
-**Mitigation:** write the type you mean (`unsigned char`, an array or a struct).
-Code ported from a GNU C source that uses `mode` or vector types needs the type
-spelled out; grep for `__attribute__` first.
+**Mitigation:** write the type you mean (`unsigned char`, an array or a struct),
+and the placement the SDK offers (`FAR`, `RAM_CODE`). Code ported from a GNU C
+source needs those spelled out; grep for `__attribute__` first. Pinned by the
+`cases/negative/gnu_attr_*.c` fixtures.
 
 ## Where to add new entries
 
