@@ -11,7 +11,7 @@ program built by both SDKs and counts the master cycles the machine
 really spent.
 
 On these 34 functions OpenSNES is **about 38 %** faster; measured on 23
-whole workloads, 62 % (below). What made the difference on code that
+whole workloads, 63 % (below). What made the difference on code that
 indexes an array or follows a pointer was not the pointer width: it was the
 stack frame and stack slots for values PVSnesLib keeps in the direct page,
 and code the optimiser left dead. Both are gone (see "Reading it" at the

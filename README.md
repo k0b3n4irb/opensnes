@@ -105,7 +105,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **65 examples** | From "Hello World" to a falling-blocks puzzle with music — each with a README, and a screenshot unless it is an audio one |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
 | **Debug emulator** | [luna](https://github.com/k0b3n4irb/luna) (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
-| **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
+| **Cross-platform** | Linux (x86_64, arm64), macOS, Windows. CI builds and boots every example on all of them; the full test suite (visual and functional comparisons) runs on Linux |
 
 ## Design Philosophy
 

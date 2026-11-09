@@ -1458,6 +1458,54 @@ def check_benchmark_table() -> list[str]:
                               json.loads(base.read_text(encoding="utf-8")))
 
 
+# --- anchor 22: the measured-workloads headline matches its table -----------
+# docs/BENCHMARK.md prints a generated table of the luna workloads whose Total
+# row gives the master-cycle saving (-63.4 %); the page's opening and the
+# ROADMAP repeat it in prose ("62 % (below)"). Anchor 13 reads the static
+# table and the summary line, not this headline: the prose said 62 % for the
+# day after the table said -63.4 % (an independent review, 2026-11-09).
+SDKBENCH_TOTAL_RE = re.compile(r"^\|\s*\*\*Total\*\*[^\n]*?\*\*[−-](\d+(?:\.\d)?)\s*%\*\*", re.M)
+SDKBENCH_CLAIMS = (
+    re.compile(r"measured on (\d+) whole workloads, (\d+) %"),            # BENCHMARK.md opening
+    re.compile(r"(\d+) % faster measured on luna on (\d+) workloads"),     # ROADMAP.md status
+)
+
+
+def sdkbench_headline_drifts(page: str, prose: dict[str, str]) -> list[str]:
+    """Headline claims of `prose` (path -> text) against the table's Total row of `page`."""
+    m = SDKBENCH_TOTAL_RE.search(page)
+    if not m:
+        return [f"{BENCH_PAGE}: the measured-workloads table has no Total row (the format changed?)"]
+    want = round(float(m.group(1)))
+    out: list[str] = []
+    found = 0
+    for path, text in prose.items():
+        flat = " ".join(text.split())
+        for rx in SDKBENCH_CLAIMS:
+            for hit in rx.finditer(flat):
+                found += 1
+                # the two spellings put the percentage first or second
+                pct = int(hit.group(2)) if "whole workloads" in hit.group(0) else int(hit.group(1))
+                if pct != want:
+                    out.append(f"{path}: says {pct} % for the measured workloads, "
+                               f"the Total row of {BENCH_PAGE} gives {m.group(1)} % (= {want})")
+    if not found:
+        out.append("no headline of the measured workloads found in the docs (the wording changed?)")
+    return out
+
+
+def check_sdkbench_headline() -> list[str]:
+    page = repo_path(BENCH_PAGE)
+    if not page.is_file():
+        return [f"{BENCH_PAGE} is missing"]
+    text = page.read_text(encoding="utf-8")
+    prose = {BENCH_PAGE: text}
+    road = repo_path("ROADMAP.md")
+    if road.is_file():
+        prose["ROADMAP.md"] = road.read_text(encoding="utf-8")
+    return sdkbench_headline_drifts(text, prose)
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -1486,6 +1534,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_example_modules())
     all_drifts.extend(check_build_knobs())
     all_drifts.extend(check_benchmark_table())
+    all_drifts.extend(check_sdkbench_headline())
     all_drifts.extend(check_header_map())
     all_drifts.extend(check_removed_api_names())
     all_drifts.extend(check_user_build_has_no_interpreter())

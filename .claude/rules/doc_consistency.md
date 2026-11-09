@@ -167,6 +167,13 @@ opt-in list.
     (`$01-$80` no repeat, 1-128 lines; `$81-$FF` repeat, 1-127). Caught by
     rag-partner when it built an evaluation set from our hardware docs.
 
+22. **The measured-workloads headline matches its table** (since 2026-11-09):
+    "N % (below)" in the opening of `docs/BENCHMARK.md` and "N % faster measured
+    on luna on 23 workloads" in `ROADMAP.md` must equal the rounded master-cycle
+    saving of the generated table's Total row. Caught as the prose saying 62 % over
+    a table that said -63.4 % (an independent review of 2026-11-09); anchor 13 only reads the
+    static table and its summary line.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the
