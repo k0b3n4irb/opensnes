@@ -65,17 +65,27 @@ include $(OPENSNES)/make/common.mk
 """
 
 REFUSAL_TAGS = [
+    # the compiler failed on its own, on C it should take: a defect, loud but a defect
+    (r"Assertion|crashed|SIGSEGV|never stored|used undefined|too large for the", "compiler-internal"),
+    (r"floating-point|long double|_Complex|float", "float"),
     (r"long long|64-bit", "long-long"),
     (r"va_start|va_arg|variadic", "varargs"),
-    (r"undeclared identifier: asm|asm", "asm"),
+    (r"undeclared identifier: asm|inline assembly|asm", "asm"),
     (r"struct (returns|parameters|pa)|parc|argv|by value", "struct-by-value"),
     (r"variable-length", "vla"),
-    (r"long double|_Complex|float", "float"),
-    (r"no type in parameter|no type specifier|expected declaration", "k-and-r"),
     (r"discards qualifiers", "const-qualifier"),
     (r"GNU attribute", "gnu-attribute"),
     (r"invalid UTF-8", "invalid-utf8"),
     (r"function definition not allowed", "nested-function"),
+    (r"__builtin_|__label__|undeclared identifier: __", "gnu-builtin"),
+    (r"bit-field", "bit-field"),
+    (r"either array or index", "index-swap"),
+    (r"No such file", "missing-header"),
+    (r"no type in parameter|no type specifier|no type in struct|expected declaration", "k-and-r"),
+    (r"too many arguments for function call|incomplete type|expected primary expression", "front-end-gap"),
+    (r"expected '|saw identifier|unexpected '|top-level", "syntax"),
+    (r"#error", "test-assumption"),
+    (r"base types of pointer assignment", "type-strictness"),
 ]
 
 
@@ -130,7 +140,8 @@ def one(args):
                        capture_output=True, text=True)
     if r.returncode != 0:
         msg = (r.stdout + r.stderr)
-        first = next((l for l in msg.splitlines() if re.search(r"error|unhandled|not (yet )?supported|Assertion", l)), "?")
+        lines = [l for l in msg.splitlines() if l.strip()]
+        first = next((l for l in lines if re.search(r"error|unhandled|not (yet )?supported|Assertion|crashed|floating-point|used undefined|never stored|too large", l)), lines[0] if lines else "?")
         shutil.rmtree(d, ignore_errors=True)
         return name, "REFUSED", refusal_tag(first)
     # 2. build the ROM

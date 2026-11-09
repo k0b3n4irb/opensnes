@@ -64,3 +64,29 @@ Shown to fail with a fix undone, by building the cproc of the pin before it and 
   (`20030920-1`, `961125-1`) fail at run time. Exit code 1.
 - **`ee5b8636`** (a hex escape stops at the first non-hex character): no test of the gcc suite has a `\x` followed
   by a letter above `f`, so `own/hex-escape-stops.c` pins it: `FAIL abort` with the old cproc. Exit code 1.
+
+## The refusals, triaged (2026-11-09)
+
+The 952 tests `cc65816` refuses are tagged in `expected.txt` (third column). By tag, and what each means:
+
+| Tag | Tests | What it is |
+|---|---|---|
+| `k-and-r` | 220 | Pre-C99 C: old-style function definitions, implicit `int`. cproc is a C11 front end and does not read it. By design. |
+| `long-long` | 164 | `long long`: the widest integer of this target is `long`. Documented. |
+| `float` | 76 | No FPU and no soft-float: refused, use the fixed-point types. Documented. |
+| `struct-by-value` | 69 | Struct parameters and returns: refused. Documented. |
+| `gnu-builtin` | 66 | `__builtin_*` functions and `__label__` the SDK does not have. |
+| `varargs`, `asm`, `vla`, `nested-function` | 51, 44, 19, 13 | Refused, each with an entry in `KNOWN_LIMITATIONS.md`. |
+| `syntax`, `front-end-gap` | 37, 20 | A construct the front end does not parse: GNU `typeof`, statement expressions, a call of an unprototyped function with arguments. Some are valid C11 (a gap to read one by one). |
+| `gnu-attribute` | 32 | Refused attributes (`aligned`, and, once the lot of 2026-11-09 lands, `mode`, `vector_size`...). |
+| `missing-header` | 29 | `<stdint.h>` and others the SDK does not provide, plus headers local to a gcc test. |
+| `const-qualifier` | 24 | A string literal is `const char[]` (`fdcda7c8`): passed to a plain `char *`, it is refused. |
+| `bit-field` | 24 | A field wider than the 16-bit `int`, or in a packed struct. |
+| `index-swap` | 13 | `i[a]` for `a[i]`: valid C, the front end wants the pointer first. A gap. |
+| `compiler-internal` | 14 | **The compiler failed on its own, on C it should take**: 8 assertions in `emitdata`, one `SIGSEGV` (`scope-1`), 3 "slot is read but never stored", one "ssa temporary used undefined", one function too large for the backend. Loud, but defects. |
+| `type-strictness`, `test-assumption`, `other` | 3, 3, 30 | Not read one by one yet. |
+
+The 14 `compiler-internal` tests: `20011126-2 20030404-1 memcpy-1 pr23135 pr28982b pr34099 pr34099-2 pr53645
+pr53645-2 scope-1 simd-1 simd-2 simd-5 va-arg-22`. Most of the assertions come from `vector_size` and `mode` being
+ignored (`vecint i = { 150, 100 }` is then a scalar with a two-element initialiser): refusing those attributes turns them into
+clean refusals. What stays is the work: reduce each to a minimal case and fix or refuse it.

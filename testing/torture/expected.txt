@@ -5,7 +5,7 @@
 20000121-1 REFUSED long-long
 20000205-1 PASS
 20000217-1 PASS
-20000223-1 REFUSED other
+20000223-1 REFUSED front-end-gap
 20000224-1 PASS
 20000225-1 PASS
 20000227-1 REFUSED invalid-utf8
@@ -29,12 +29,12 @@
 20000519-2 PASS
 20000523-1 REFUSED long-long
 20000528-1 PASS
-20000603-1 REFUSED other
-20000605-1 REFUSED other
+20000603-1 REFUSED float
+20000605-1 REFUSED float
 20000605-2 PASS
 20000605-3 PASS
 20000622-1 PASS
-20000703-1 REFUSED other
+20000703-1 REFUSED front-end-gap
 20000706-1 REFUSED struct-by-value
 20000706-2 REFUSED struct-by-value
 20000706-3 PASS
@@ -50,11 +50,11 @@
 20000717-5 REFUSED struct-by-value
 20000722-1 REFUSED const-qualifier
 20000726-1 REFUSED k-and-r
-20000731-1 REFUSED other
+20000731-1 REFUSED float
 20000731-2 PASS
 20000801-1 PASS
 20000801-2 PASS
-20000801-3 REFUSED other
+20000801-3 REFUSED k-and-r
 20000801-4 PASS
 20000808-1 REFUSED k-and-r
 20000815-1 REFUSED k-and-r
@@ -67,11 +67,11 @@
 20000917-1 REFUSED struct-by-value
 20001009-1 PASS
 20001009-2 REFUSED asm
-20001011-1 REFUSED other
+20001011-1 REFUSED gnu-builtin
 20001013-1 PASS
-20001017-1 REFUSED other
-20001017-2 REFUSED other
-20001024-1 REFUSED other
+20001017-1 REFUSED float
+20001017-2 REFUSED type-strictness
+20001024-1 REFUSED syntax
 20001026-1 REFUSED struct-by-value
 20001027-1 PASS
 20001031-1 REFUSED long-long
@@ -91,7 +91,7 @@
 20010106-1 PASS
 20010114-1 PASS
 20010116-1 PASS
-20010118-1 REFUSED other
+20010118-1 REFUSED float
 20010119-1 PASS
 20010122-1 REFUSED k-and-r
 20010123-1 REFUSED const-qualifier
@@ -109,7 +109,7 @@
 20010518-1 PASS
 20010518-2 REFUSED gnu-attribute
 20010520-1 PASS
-20010604-1 REFUSED other
+20010604-1 REFUSED missing-header
 20010605-1 REFUSED nested-function
 20010605-2 REFUSED float
 20010711-1 PASS
@@ -131,7 +131,7 @@
 20011115-1 PASS
 20011121-1 PASS
 20011126-1 REFUSED long-long
-20011126-2 REFUSED other
+20011126-2 REFUSED compiler-internal
 20011128-1 PASS
 20011217-1 PASS
 20011219-1 PASS
@@ -145,7 +145,7 @@
 20020201-1 REFUSED long-long
 20020206-1 REFUSED struct-by-value
 20020206-2 PASS
-20020213-1 REFUSED other
+20020213-1 REFUSED float
 20020215-1 REFUSED struct-by-value
 20020216-1 PASS
 20020219-1 REFUSED long-long
@@ -155,18 +155,18 @@
 20020227-1 REFUSED k-and-r
 20020307-1 PASS
 20020314-1 REFUSED other
-20020320-1 REFUSED other
-20020321-1 REFUSED other
+20020320-1 REFUSED front-end-gap
+20020321-1 REFUSED float
 20020328-1 PASS
 20020402-1 PASS
 20020402-2 PASS
 20020402-3 REFUSED long-long
-20020404-1 REFUSED other
+20020404-1 REFUSED syntax
 20020406-1 REFUSED k-and-r
 20020411-1 REFUSED k-and-r
 20020412-1 REFUSED vla
 20020413-1 REFUSED float
-20020418-1 REFUSED other
+20020418-1 REFUSED gnu-builtin
 20020423-1 PASS
 20020503-1 PASS
 20020506-1 REFUSED long-long
@@ -180,7 +180,7 @@
 20020615-1 PASS
 20020619-1 PASS
 20020716-1 PASS
-20020720-1 REFUSED other
+20020720-1 REFUSED float
 20020805-1 PASS
 20020810-1 REFUSED struct-by-value
 20020819-1 REFUSED k-and-r
@@ -196,24 +196,24 @@
 20021111-1 PASS
 20021113-1 PASS
 20021118-1 REFUSED struct-by-value
-20021118-2 REFUSED other
+20021118-2 REFUSED float
 20021118-3 PASS
 20021119-1 PASS
-20021120-1 REFUSED other
+20021120-1 REFUSED float
 20021120-2 PASS
-20021120-3 REFUSED other
+20021120-3 REFUSED gnu-builtin
 20021127-1 REFUSED long-long
 20021204-1 REFUSED const-qualifier
 20021219-1 PASS
 20030105-1 PASS
-20030109-1 REFUSED other
+20030109-1 REFUSED front-end-gap
 20030117-1 PASS
 20030120-1 PASS
 20030120-2 PASS
-20030125-1 REFUSED other
+20030125-1 REFUSED float
 20030128-1 PASS
 20030203-1 PASS
-20030209-1 REFUSED other
+20030209-1 REFUSED float
 20030216-1 PASS
 20030218-1 PASS
 20030221-1 PASS
@@ -222,11 +222,11 @@
 20030307-1 REFUSED long-long
 20030313-1 PASS
 20030316-1 PASS
-20030323-1 REFUSED other
+20030323-1 REFUSED gnu-builtin
 20030330-1 PASS
 20030401-1 PASS
 20030403-1 PASS
-20030404-1 REFUSED other
+20030404-1 REFUSED compiler-internal
 20030408-1 REFUSED other
 20030501-1 REFUSED nested-function
 20030606-1 PASS
@@ -237,7 +237,7 @@
 20030715-1 REFUSED const-qualifier
 20030717-1 PASS
 20030718-1 PASS
-20030811-1 REFUSED other
+20030811-1 REFUSED gnu-builtin
 20030821-1 PASS
 20030828-1 PASS
 20030828-2 PASS
@@ -265,7 +265,7 @@
 20040208-1 REFUSED float
 20040218-1 PASS
 20040223-1 REFUSED other
-20040302-1 REFUSED other
+20040302-1 REFUSED front-end-gap
 20040307-1 PASS
 20040308-1 REFUSED vla
 20040309-1 PASS
@@ -282,17 +282,17 @@
 20040411-1 REFUSED vla
 20040423-1 REFUSED vla
 20040520-1 REFUSED nested-function
-20040625-1 REFUSED other
-20040629-1 REFUSED other
+20040625-1 REFUSED syntax
+20040629-1 REFUSED bit-field
 20040703-1 REFUSED struct-by-value
 20040704-1 PASS
-20040705-1 REFUSED other
-20040705-2 REFUSED other
+20040705-1 REFUSED bit-field
+20040705-2 REFUSED bit-field
 20040706-1 PASS
 20040707-1 REFUSED struct-by-value
 20040709-1 REFUSED struct-by-value
-20040709-2 REFUSED other
-20040709-3 REFUSED other
+20040709-2 REFUSED bit-field
+20040709-3 REFUSED bit-field
 20040805-1 PASS
 20040811-1 REFUSED vla
 20040820-1 PASS
@@ -313,8 +313,8 @@
 20041214-1 REFUSED other
 20041218-1 REFUSED const-qualifier
 20041218-2 REFUSED vla
-20050104-1 REFUSED other
-20050106-1 REFUSED other
+20050104-1 REFUSED gnu-builtin
+20050106-1 REFUSED syntax
 20050107-1 PASS
 20050111-1 REFUSED long-long
 20050119-1 PASS
@@ -333,14 +333,14 @@
 20050410-1 PASS
 20050502-1 PASS
 20050502-2 REFUSED k-and-r
-20050604-1 REFUSED other
+20050604-1 REFUSED float
 20050607-1 PASS
 20050613-1 PASS
 20050713-1 REFUSED struct-by-value
 20050826-1 REFUSED k-and-r
 20050826-2 PASS
 20050929-1 PASS
-20051012-1 REFUSED other
+20051012-1 REFUSED front-end-gap
 20051021-1 PASS
 20051104-1 REFUSED const-qualifier
 20051110-1 PASS
@@ -352,12 +352,12 @@
 20060110-2 REFUSED long-long
 20060127-1 REFUSED long-long
 20060412-1 PASS
-20060420-1 REFUSED other
+20060420-1 REFUSED float
 20060905-1 PASS
 20060910-1 PASS
 20060929-1 PASS
 20060930-1 PASS
-20060930-2 REFUSED other
+20060930-2 REFUSED syntax
 20061031-1 REFUSED asm
 20061101-1 FAIL abort | int32plus: the test needs a 32-bit int (this target: 16)
 20061101-2 PASS
@@ -374,20 +374,20 @@
 20070824-1 PASS
 20070919-1 REFUSED k-and-r
 20071011-1 PASS
-20071018-1 REFUSED other
+20071018-1 REFUSED gnu-builtin
 20071029-1 PASS
 20071030-1 REFUSED k-and-r
 20071108-1 PASS
-20071120-1 REFUSED other
+20071120-1 REFUSED k-and-r
 20071202-1 PASS
 20071205-1 PASS
 20071210-1 REFUSED struct-by-value
-20071211-1 REFUSED other
+20071211-1 REFUSED asm
 20071213-1 REFUSED varargs
 20071216-1 PASS
 20071219-1 REFUSED k-and-r
-20071220-1 REFUSED other
-20071220-2 REFUSED other
+20071220-1 REFUSED syntax
+20071220-2 REFUSED syntax
 20080117-1 PASS
 20080122-1 REFUSED asm
 20080222-1 PASS
@@ -395,7 +395,7 @@
 20080424-1 PASS
 20080502-1 REFUSED float
 20080506-1 PASS
-20080506-2 REFUSED other
+20080506-2 REFUSED syntax
 20080519-1 PASS
 20080522-1 PASS
 20080529-1 REFUSED long-long
@@ -407,12 +407,12 @@
 20081117-1 REFUSED long-long
 20081218-1 PASS
 20090113-1 PASS
-20090113-2 REFUSED other
-20090113-3 REFUSED other
+20090113-2 REFUSED k-and-r
+20090113-3 REFUSED k-and-r
 20090207-1 PASS
 20090219-1 REFUSED nested-function
 20090527-1 PASS
-20090623-1 REFUSED other
+20090623-1 REFUSED syntax
 20090711-1 REFUSED long-long
 20090814-1 PASS
 20091229-1 REFUSED long-long
@@ -423,22 +423,22 @@
 20100708-1 PASS
 20100805-1 PASS
 20100827-1 REFUSED const-qualifier
-20101011-1 REFUSED other
-20101013-1 REFUSED other
+20101011-1 REFUSED missing-header
+20101013-1 REFUSED syntax
 20101025-1 PASS
 20110418-1 REFUSED long-long
 20111208-1 REFUSED k-and-r
 20111212-1 REFUSED gnu-attribute
 20111227-1 PASS
 20120105-1 PASS
-20120111-1 REFUSED other
+20120111-1 REFUSED missing-header
 20120207-1 PASS
 20120427-1 REFUSED k-and-r
 20120427-2 REFUSED k-and-r
 20120615-1 PASS
 20120808-1 PASS
 20120817-1 REFUSED long-long
-20120919-1 REFUSED other
+20120919-1 REFUSED float
 20121108-1 REFUSED const-qualifier
 20131127-1 REFUSED struct-by-value
 20140212-1 REFUSED long-long
@@ -465,16 +465,16 @@
 20190820-1 REFUSED other
 20190901-1 REFUSED k-and-r
 20191023-1 PASS
-20210505-1 REFUSED other
+20210505-1 REFUSED missing-header
 20221006-1 REFUSED other
 20230509-1 PASS
 20230510-1 PASS
 20230630-1 PASS
-20230630-2 REFUSED other
-20230630-3 REFUSED other
-20230630-4 REFUSED other
+20230630-2 REFUSED syntax
+20230630-3 REFUSED k-and-r
+20230630-4 REFUSED k-and-r
 20230802-1 REFUSED long-long
-20241029-1 REFUSED other
+20241029-1 REFUSED gnu-builtin
 900409-1 PASS
 920202-1 PASS
 920302-1 REFUSED k-and-r
@@ -488,8 +488,8 @@
 920501-1 REFUSED k-and-r
 920501-2 REFUSED long-long
 920501-3 REFUSED k-and-r
-920501-4 REFUSED other
-920501-5 REFUSED other
+920501-4 REFUSED front-end-gap
+920501-5 REFUSED front-end-gap
 920501-6 REFUSED k-and-r
 920501-7 REFUSED k-and-r
 920501-8 REFUSED varargs
@@ -507,7 +507,7 @@
 920721-1 PASS
 920721-2 REFUSED k-and-r
 920721-3 REFUSED k-and-r
-920721-4 REFUSED other
+920721-4 REFUSED gnu-builtin
 920726-1 REFUSED varargs
 920728-1 REFUSED k-and-r
 920730-1 REFUSED k-and-r
@@ -540,7 +540,7 @@
 921202-2 REFUSED long-long
 921204-1 PASS
 921207-1 REFUSED k-and-r
-921208-1 REFUSED other
+921208-1 REFUSED float
 921208-2 REFUSED k-and-r
 921215-1 REFUSED k-and-r
 921218-1 REFUSED k-and-r
@@ -550,7 +550,7 @@
 930123-1 PASS
 930126-1 REFUSED long-long
 930208-1 REFUSED k-and-r
-930406-1 REFUSED other
+930406-1 REFUSED front-end-gap
 930408-1 PASS
 930429-1 REFUSED const-qualifier
 930429-2 REFUSED k-and-r
@@ -563,13 +563,13 @@
 930603-1 REFUSED k-and-r
 930603-2 PASS
 930603-3 REFUSED k-and-r
-930608-1 REFUSED other
-930614-1 REFUSED other
-930614-2 REFUSED other
+930608-1 REFUSED type-strictness
+930614-1 REFUSED float
+930614-2 REFUSED float
 930621-1 PASS
 930622-1 REFUSED k-and-r
 930622-2 REFUSED long-long
-930628-1 REFUSED other
+930628-1 REFUSED float
 930630-1 PASS
 930702-1 REFUSED k-and-r
 930713-1 REFUSED k-and-r
@@ -581,7 +581,7 @@
 930921-1 REFUSED k-and-r
 930929-1 REFUSED k-and-r
 930930-1 REFUSED k-and-r
-930930-2 REFUSED other
+930930-2 REFUSED float
 931002-1 REFUSED nested-function
 931004-1 REFUSED struct-by-value
 931004-10 REFUSED varargs
@@ -638,7 +638,7 @@
 950710-1 REFUSED struct-by-value
 950714-1 PASS
 950809-1 PASS
-950906-1 REFUSED other
+950906-1 REFUSED front-end-gap
 950915-1 REFUSED long-long
 950929-1 PASS
 951003-1 PASS
@@ -691,25 +691,25 @@
 980205 REFUSED varargs
 980223 REFUSED struct-by-value
 980424-1 PASS
-980505-1 REFUSED other
+980505-1 REFUSED syntax
 980505-2 PASS
 980506-1 REFUSED k-and-r
 980506-2 PASS
 980506-3 REFUSED k-and-r
-980526-1 REFUSED other
+980526-1 REFUSED gnu-builtin
 980526-2 PASS
 980526-3 REFUSED k-and-r
 980602-1 PASS
 980602-2 PASS
-980604-1 REFUSED other
+980604-1 REFUSED float
 980605-1 REFUSED other
 980608-1 REFUSED varargs
 980612-1 PASS
-980617-1 REFUSED other
+980617-1 REFUSED type-strictness
 980618-1 PASS
 980701-1 PASS
 980707-1 PASS
-980709-1 REFUSED other
+980709-1 REFUSED missing-header
 980716-1 REFUSED varargs
 980929-1 PASS
 981001-1 PASS
@@ -718,12 +718,12 @@
 981206-1 PASS
 990106-1 REFUSED k-and-r
 990106-2 PASS
-990117-1 REFUSED other
+990117-1 REFUSED float
 990127-1 PASS
 990127-2 REFUSED other
 990128-1 PASS
 990130-1 REFUSED asm
-990208-1 REFUSED other
+990208-1 REFUSED front-end-gap
 990211-1 PASS
 990222-1 PASS
 990324-1 PASS
@@ -740,15 +740,15 @@
 990628-1 NOBUILD
 990804-1 PASS
 990811-1 PASS
-990826-0 REFUSED other
+990826-0 REFUSED missing-header
 990827-1 PASS
-990829-1 REFUSED other
+990829-1 REFUSED float
 990923-1 PASS
 991014-1 REFUSED k-and-r
 991016-1 REFUSED long-long
 991019-1 REFUSED struct-by-value
 991023-1 PASS
-991030-1 REFUSED other
+991030-1 REFUSED float
 991112-1 NOBUILD
 991118-1 REFUSED long-long
 991201-1 PASS
@@ -761,7 +761,7 @@
 991221-1 PASS
 991227-1 REFUSED const-qualifier
 991228-1 REFUSED k-and-r
-alias-1 REFUSED other
+alias-1 REFUSED float
 alias-2 NOBUILD
 alias-3 NOBUILD
 alias-4 NOBUILD
@@ -776,11 +776,11 @@ anon-1 PASS
 arith-1 PASS
 arith-rand PASS
 arith-rand-ll REFUSED long-long
-ashldi-1 REFUSED other
-ashrdi-1 REFUSED other
+ashldi-1 REFUSED test-assumption
+ashrdi-1 REFUSED test-assumption
 bcp-1 FAIL abort | __builtin_constant_p is a gcc builtin the SDK does not implement
 bf-layout-1 PASS
-bf-pack-1 REFUSED other
+bf-pack-1 REFUSED syntax
 bf-sign-1 PASS
 bf-sign-2 REFUSED long-long
 bf64-1 REFUSED long-long
@@ -788,30 +788,30 @@ bitfld-1 PASS
 bitfld-10 PASS
 bitfld-2 PASS
 bitfld-3 REFUSED long-long
-bitfld-4 REFUSED other
+bitfld-4 REFUSED bit-field
 bitfld-5 REFUSED long-long
-bitfld-6 REFUSED other
-bitfld-7 REFUSED other
+bitfld-6 REFUSED bit-field
+bitfld-7 REFUSED bit-field
 bitfld-8 REFUSED struct-by-value
 bitfld-9 REFUSED struct-by-value
 bitfld-signed1-1 PASS
 bitops-1 PASS
 bswap-1 REFUSED long-long
 bswap-2 REFUSED k-and-r
-bswap-3 REFUSED other
-built-in-setjmp REFUSED other
-builtin-bitops-1 REFUSED other
+bswap-3 REFUSED gnu-builtin
+built-in-setjmp REFUSED gnu-builtin
+builtin-bitops-1 REFUSED syntax
 builtin-constant REFUSED const-qualifier
-builtin-prefetch-1 REFUSED other
-builtin-prefetch-2 REFUSED other
-builtin-prefetch-3 REFUSED other
-builtin-prefetch-4 REFUSED other
-builtin-prefetch-5 REFUSED other
-builtin-prefetch-6 REFUSED other
+builtin-prefetch-1 REFUSED gnu-builtin
+builtin-prefetch-2 REFUSED gnu-builtin
+builtin-prefetch-3 REFUSED gnu-builtin
+builtin-prefetch-4 REFUSED gnu-builtin
+builtin-prefetch-5 REFUSED gnu-builtin
+builtin-prefetch-6 REFUSED gnu-builtin
 builtin-types-compatible-p PASS
 call-trap-1 PASS
-cbrt REFUSED other
-ccmp-tree-1 REFUSED other
+cbrt REFUSED float
+ccmp-tree-1 REFUSED front-end-gap
 cmpdi-1 REFUSED k-and-r
 cmpsf-1 REFUSED k-and-r
 cmpsi-1 REFUSED k-and-r
@@ -825,7 +825,7 @@ complex-1 REFUSED k-and-r
 complex-2 REFUSED k-and-r
 complex-3 REFUSED struct-by-value
 complex-4 REFUSED float
-complex-5 REFUSED other
+complex-5 REFUSED syntax
 complex-6 REFUSED k-and-r
 complex-7 REFUSED float
 compndlit-1 PASS
@@ -851,21 +851,21 @@ enum-2 PASS
 enum-3 PASS
 extzvsi PASS
 ffs-1 REFUSED k-and-r
-ffs-2 REFUSED other
-float-floor REFUSED other
-floatunsisf-1 REFUSED other
+ffs-2 REFUSED gnu-builtin
+float-floor REFUSED float
+floatunsisf-1 REFUSED float
 fprintf-1 REFUSED other
-fprintf-2 REFUSED other
+fprintf-2 REFUSED missing-header
 fprintf-chk-1 REFUSED k-and-r
-frame-address REFUSED other
-func-ptr-1 REFUSED other
+frame-address REFUSED gnu-builtin
+func-ptr-1 REFUSED float
 gofast REFUSED other
 ifcvt-diamond-1 PASS
 ifcvt-onecmpl-abs-1 PASS
 index-1 PASS
 inst-check REFUSED k-and-r
 int-compare REFUSED k-and-r
-ipa-sra-1 REFUSED other
+ipa-sra-1 REFUSED float
 ipa-sra-2 REFUSED k-and-r
 longlong REFUSED long-long
 loop-1 PASS
@@ -879,9 +879,9 @@ loop-2 REFUSED k-and-r
 loop-2b PASS
 loop-2c PASS
 loop-2d REFUSED k-and-r
-loop-2e REFUSED other
-loop-2f REFUSED other
-loop-2g REFUSED other
+loop-2e REFUSED gnu-builtin
+loop-2f REFUSED missing-header
+loop-2g REFUSED missing-header
 loop-3 REFUSED k-and-r
 loop-3b REFUSED k-and-r
 loop-3c REFUSED k-and-r
@@ -890,33 +890,33 @@ loop-4b PASS
 loop-5 PASS
 loop-6 PASS
 loop-7 PASS
-loop-8 REFUSED other
-loop-9 REFUSED other
-loop-ivopts-1 REFUSED other
+loop-8 REFUSED float
+loop-9 REFUSED syntax
+loop-ivopts-1 REFUSED float
 loop-ivopts-2 PASS
-lshrdi-1 REFUSED other
+lshrdi-1 REFUSED test-assumption
 lto-tbaa-1 PASS
 mayalias-1 PASS
 mayalias-2 PASS
 mayalias-3 PASS
 medce-1 PASS
 memchr-1 REFUSED k-and-r
-memclr REFUSED other
-memcpy-1 REFUSED other
+memclr REFUSED syntax
+memcpy-1 REFUSED compiler-internal
 memcpy-2 PASS
-memcpy-a1 REFUSED other
-memcpy-a2 REFUSED other
-memcpy-a4 REFUSED other
-memcpy-a8 REFUSED other
+memcpy-a1 REFUSED missing-header
+memcpy-a2 REFUSED missing-header
+memcpy-a4 REFUSED missing-header
+memcpy-a8 REFUSED missing-header
 memcpy-bi REFUSED gnu-attribute
 memset-1 PASS
 memset-2 PASS
 memset-3 PASS
 memset-4 PASS
 minmaxcmp-1 PASS
-misalign REFUSED other
+misalign REFUSED syntax
 mod-1 REFUSED k-and-r
-mode-dependent-address REFUSED other
+mode-dependent-address REFUSED missing-header
 mul-sext REFUSED k-and-r
 multdi-1 REFUSED long-long
 multi-ix REFUSED varargs
@@ -926,48 +926,48 @@ nestfunc-1 REFUSED nested-function
 nestfunc-2 REFUSED nested-function
 nestfunc-3 REFUSED nested-function
 nestfunc-4 FAIL exit0080 | a 500-deep call chain: the stack of the machine does not hold it
-nestfunc-5 REFUSED other
+nestfunc-5 REFUSED gnu-builtin
 nestfunc-6 REFUSED k-and-r
 nestfunc-7 REFUSED nested-function
-p18298 REFUSED other
+p18298 REFUSED missing-header
 packed-1 REFUSED gnu-attribute
 packed-2 REFUSED gnu-attribute
 packed-aligned REFUSED k-and-r
 pending-4 REFUSED k-and-r
-postmod-1 REFUSED other
+postmod-1 REFUSED float
 pr100453 REFUSED struct-by-value
 pr101188 REFUSED k-and-r
 pr101335 PASS
 pr102134 REFUSED long-long
 pr103052 PASS
-pr103209 REFUSED other
-pr103255 REFUSED other
+pr103209 REFUSED missing-header
+pr103255 REFUSED gnu-builtin
 pr103376 REFUSED long-long
 pr103405 REFUSED k-and-r
-pr103417 REFUSED other
+pr103417 REFUSED bit-field
 pr10352-1 PASS
 pr104196 PASS
 pr104604 REFUSED float
 pr104814 PASS
 pr104839 PASS
-pr105613 REFUSED other
-pr105777 REFUSED other
-pr105984 REFUSED other
+pr105613 REFUSED syntax
+pr105777 REFUSED missing-header
+pr105984 REFUSED gnu-builtin
 pr106032 PASS
 pr106523 PASS
 pr107131 REFUSED long-long
-pr107879 REFUSED other
+pr107879 REFUSED float
 pr107881-1 PASS
 pr108064 REFUSED gnu-attribute
-pr108292 REFUSED other
+pr108292 REFUSED gnu-builtin
 pr108498-1 REFUSED struct-by-value
-pr108498-2 REFUSED other
-pr108789 REFUSED other
-pr109040 REFUSED other
+pr108498-2 REFUSED bit-field
+pr108789 REFUSED gnu-builtin
+pr109040 REFUSED index-swap
 pr109778 PASS
 pr109925 PASS
-pr109938 REFUSED other
-pr109986 REFUSED other
+pr109938 REFUSED missing-header
+pr109986 REFUSED missing-header
 pr110115 PASS
 pr110165-1 REFUSED struct-by-value
 pr110166-1 REFUSED struct-by-value
@@ -976,9 +976,9 @@ pr110252-2 REFUSED asm
 pr110252-3 PASS
 pr110252-4 PASS
 pr110666-1 PASS
-pr110817-1 REFUSED other
-pr110817-2 REFUSED other
-pr110817-3 REFUSED other
+pr110817-1 REFUSED index-swap
+pr110817-2 REFUSED index-swap
+pr110817-3 REFUSED index-swap
 pr110914 PASS
 pr110954-1 PASS
 pr111151 PASS
@@ -990,12 +990,12 @@ pr111422 REFUSED long-long
 pr111431-1 PASS
 pr111469-1 PASS
 pr111613 NOBUILD
-pr111863-1 REFUSED other
+pr111863-1 REFUSED gnu-builtin
 pr112581-1 REFUSED long-long
 pr112758 REFUSED long-long
 pr113010 REFUSED long-long
 pr113787 PASS
-pr114207 REFUSED other
+pr114207 REFUSED missing-header
 pr114396 PASS
 pr114552 REFUSED asm
 pr114965 PASS
@@ -1017,35 +1017,35 @@ pr120677 PASS
 pr121957 REFUSED asm
 pr122000 REFUSED gnu-attribute
 pr122943 REFUSED long-long
-pr123625 REFUSED other
-pr123625-2 REFUSED other
+pr123625 REFUSED missing-header
+pr123625-2 REFUSED index-swap
 pr123625-3 REFUSED asm
-pr123753 REFUSED other
+pr123753 REFUSED index-swap
 pr123864 REFUSED long-long
 pr123978 REFUSED long-long
 pr124358 PASS
-pr125291 REFUSED other
-pr126405 REFUSED other
-pr126405-2 REFUSED other
-pr126405-3 REFUSED other
+pr125291 REFUSED gnu-builtin
+pr126405 REFUSED index-swap
+pr126405-2 REFUSED index-swap
+pr126405-3 REFUSED index-swap
 pr126501 PASS
 pr126747 PASS
 pr126994 PASS
-pr15262 REFUSED other
-pr15262-1 REFUSED other
-pr15262-2 REFUSED other
+pr15262 REFUSED float
+pr15262-1 REFUSED gnu-builtin
+pr15262-2 REFUSED float
 pr15296 REFUSED k-and-r
 pr16790-1 PASS
 pr17078-1 PASS
 pr17133 REFUSED other
 pr17252 PASS
-pr17377 REFUSED other
+pr17377 REFUSED gnu-builtin
 pr19005 PASS
-pr19449 REFUSED other
+pr19449 REFUSED gnu-builtin
 pr19515 PASS
 pr19606 REFUSED long-long
 pr19687 PASS
-pr19689 REFUSED other
+pr19689 REFUSED bit-field
 pr20100-1 PASS
 pr20187-1 REFUSED long-long
 pr20466-1 PASS
@@ -1069,12 +1069,12 @@ pr22429 PASS
 pr22493-1 PASS
 pr22630 PASS
 pr23047 PASS
-pr23135 REFUSED other
-pr23324 REFUSED other
+pr23135 REFUSED compiler-internal
+pr23324 REFUSED k-and-r
 pr23467 REFUSED gnu-attribute
 pr23604 PASS
-pr23941 REFUSED other
-pr24135 REFUSED other
+pr23941 REFUSED gnu-builtin
+pr24135 REFUSED gnu-builtin
 pr24141 PASS
 pr24142 PASS
 pr24716 PASS
@@ -1090,68 +1090,68 @@ pr28289 REFUSED other
 pr28403 REFUSED long-long
 pr28651 PASS
 pr28778 PASS
-pr28865 REFUSED other
-pr28982a REFUSED other
-pr28982b REFUSED other
+pr28865 REFUSED front-end-gap
+pr28982a REFUSED float
+pr28982b REFUSED compiler-internal
 pr29006 REFUSED long-long
 pr29156 PASS
 pr29695-1 REFUSED long-long
 pr29695-2 REFUSED long-long
 pr29797-1 FAIL abort | int32plus: the test needs a 32-bit int
 pr29797-2 PASS
-pr29798 REFUSED other
+pr29798 REFUSED float
 pr30185 REFUSED long-long
-pr30314 REFUSED other
+pr30314 REFUSED missing-header
 pr30778 REFUSED k-and-r
 pr31072 PASS
 pr31136 PASS
 pr31169 PASS
-pr31448 REFUSED other
+pr31448 REFUSED bit-field
 pr31448-2 PASS
 pr31605 PASS
 pr32244-1 REFUSED long-long
 pr32500 PASS
 pr33142 NOBUILD
-pr33382 REFUSED other
+pr33382 REFUSED front-end-gap
 pr33631 PASS
 pr33669 REFUSED long-long
 pr33779-1 PASS
 pr33779-2 PASS
-pr33870 REFUSED other
-pr33870-1 REFUSED other
+pr33870 REFUSED syntax
+pr33870-1 REFUSED syntax
 pr33992 REFUSED long-long
 pr34070-1 PASS
 pr34070-2 PASS
-pr34099 REFUSED other
-pr34099-2 REFUSED other
-pr34130 REFUSED other
+pr34099 REFUSED compiler-internal
+pr34099-2 REFUSED compiler-internal
+pr34130 REFUSED gnu-builtin
 pr34154 REFUSED long-long
 pr34176 REFUSED k-and-r
-pr34415 REFUSED other
+pr34415 REFUSED syntax
 pr34456 REFUSED other
-pr34768-1 REFUSED other
-pr34768-2 REFUSED other
+pr34768-1 REFUSED syntax
+pr34768-2 REFUSED syntax
 pr34971 REFUSED long-long
-pr34982 REFUSED other
+pr34982 REFUSED front-end-gap
 pr35163 PASS
 pr35231 PASS
 pr35390 PASS
-pr35456 REFUSED other
+pr35456 REFUSED gnu-builtin
 pr35472 REFUSED k-and-r
 pr35800 PASS
-pr36034-1 REFUSED other
-pr36034-2 REFUSED other
+pr36034-1 REFUSED float
+pr36034-2 REFUSED float
 pr36038 REFUSED long-long
 pr36077 PASS
 pr36321 REFUSED k-and-r
 pr36339 PASS
-pr36343 REFUSED other
+pr36343 REFUSED float
 pr36691 PASS
-pr36765 REFUSED other
+pr36765 REFUSED gnu-builtin
 pr37102 PASS
 pr37125 PASS
-pr37573 REFUSED other
-pr37780 REFUSED other
+pr37573 REFUSED syntax
+pr37780 REFUSED gnu-builtin
 pr37882 PASS
 pr37924 PASS
 pr37931 PASS
@@ -1159,7 +1159,7 @@ pr38048-1 PASS
 pr38048-2 PASS
 pr38051 REFUSED k-and-r
 pr38151 REFUSED float
-pr38212 REFUSED other
+pr38212 REFUSED syntax
 pr38236 PASS
 pr38422 PASS
 pr38533 REFUSED asm
@@ -1167,17 +1167,17 @@ pr38819 PASS
 pr38969 REFUSED k-and-r
 pr39100 PASS
 pr39120 REFUSED struct-by-value
-pr39228 REFUSED other
+pr39228 REFUSED gnu-builtin
 pr39233 PASS
 pr39240 PASS
 pr39339 PASS
-pr39501 REFUSED other
+pr39501 REFUSED float
 pr40022 REFUSED asm
 pr40057 REFUSED long-long
 pr40386 REFUSED long-long
 pr40404 PASS
 pr40493 PASS
-pr40579 REFUSED other
+pr40579 REFUSED syntax
 pr40657 REFUSED long-long
 pr40668 PASS
 pr40747 PASS
@@ -1185,8 +1185,8 @@ pr41239 REFUSED asm
 pr41317 PASS
 pr41395-1 REFUSED k-and-r
 pr41395-2 REFUSED k-and-r
-pr41463 REFUSED other
-pr41750 REFUSED other
+pr41463 REFUSED syntax
+pr41750 REFUSED syntax
 pr41917 PASS
 pr41919 REFUSED struct-by-value
 pr41935 REFUSED vla
@@ -1200,10 +1200,10 @@ pr42512 PASS
 pr42544 REFUSED long-long
 pr42570 REFUSED vla
 pr42614 REFUSED k-and-r
-pr42691 REFUSED other
+pr42691 REFUSED float
 pr42721 REFUSED long-long
 pr42833 REFUSED k-and-r
-pr43008 REFUSED other
+pr43008 REFUSED syntax
 pr43220 REFUSED vla
 pr43236 REFUSED k-and-r
 pr43269 PASS
@@ -1219,7 +1219,7 @@ pr44202-1 PASS
 pr44468 PASS
 pr44555 PASS
 pr44575 REFUSED varargs
-pr44683 REFUSED other
+pr44683 REFUSED gnu-builtin
 pr44828 PASS
 pr44852 REFUSED asm
 pr44858 REFUSED long-long
@@ -1235,13 +1235,13 @@ pr46909-1 PASS
 pr46909-2 PASS
 pr47148 PASS
 pr47155 PASS
-pr47237 REFUSED other
+pr47237 REFUSED gnu-builtin
 pr47299 PASS
 pr47337 REFUSED long-long
-pr47538 REFUSED other
+pr47538 REFUSED float
 pr47925 REFUSED asm
 pr48197 REFUSED long-long
-pr48571-1 REFUSED other
+pr48571-1 REFUSED gnu-builtin
 pr48717 PASS
 pr48809 PASS
 pr48814-1 PASS
@@ -1254,18 +1254,18 @@ pr49123 PASS
 pr49161 PASS
 pr49186 REFUSED long-long
 pr49218 REFUSED long-long
-pr49279 REFUSED other
+pr49279 REFUSED syntax
 pr49281 PASS
 pr49390 REFUSED asm
 pr49419 PASS
 pr49644 REFUSED float
 pr49712 PASS
 pr49768 PASS
-pr49886 REFUSED other
+pr49886 REFUSED syntax
 pr50865 REFUSED long-long
 pr51023 PASS
 pr51323 REFUSED struct-by-value
-pr51447 REFUSED other
+pr51447 REFUSED gnu-builtin
 pr51466 PASS
 pr51581-1 REFUSED asm
 pr51581-2 REFUSED asm
@@ -1275,13 +1275,13 @@ pr52129 REFUSED struct-by-value
 pr52209 PASS
 pr52286 REFUSED asm
 pr52760 PASS
-pr52979-1 REFUSED other
-pr52979-2 REFUSED other
+pr52979-1 REFUSED bit-field
+pr52979-2 REFUSED bit-field
 pr53084 PASS
 pr53160 PASS
 pr53465 PASS
-pr53645 REFUSED other
-pr53645-2 REFUSED other
+pr53645 REFUSED compiler-internal
+pr53645-2 REFUSED compiler-internal
 pr53688 PASS
 pr54471 REFUSED long-long
 pr54937 PASS
@@ -1297,17 +1297,17 @@ pr56837 REFUSED float
 pr56866 PASS
 pr56899 PASS
 pr56962 REFUSED long-long
-pr56982 REFUSED other
+pr56982 REFUSED missing-header
 pr57124 FAIL abort | int32plus: the test needs a 32-bit int
 pr57130 REFUSED struct-by-value
 pr57131 REFUSED long-long
 pr57144 REFUSED long-long
 pr57281 REFUSED long-long
 pr57321 PASS
-pr57344-1 REFUSED other
-pr57344-2 REFUSED other
-pr57344-3 REFUSED other
-pr57344-4 REFUSED other
+pr57344-1 REFUSED bit-field
+pr57344-2 REFUSED bit-field
+pr57344-3 REFUSED bit-field
+pr57344-4 REFUSED bit-field
 pr57568 PASS
 pr57829 PASS
 pr57860 REFUSED long-long
@@ -1325,13 +1325,13 @@ pr58387 PASS
 pr58419 REFUSED asm
 pr58431 PASS
 pr58564 PASS
-pr58570 REFUSED other
-pr58574 REFUSED other
+pr58570 REFUSED bit-field
+pr58574 REFUSED float
 pr58640 PASS
 pr58640-2 PASS
 pr58662 PASS
 pr58726 PASS
-pr58831 REFUSED other
+pr58831 REFUSED syntax
 pr58943 FAIL abort | x |= f() where f modifies x: unspecified order, gcc reads x after the call, cc65816 before
 pr58984 REFUSED struct-by-value
 pr59014 PASS
@@ -1343,9 +1343,9 @@ pr59358 PASS
 pr59387 PASS
 pr59388 PASS
 pr59413 PASS
-pr59643 REFUSED other
+pr59643 REFUSED gnu-builtin
 pr59747 REFUSED long-long
-pr60003 REFUSED other
+pr60003 REFUSED gnu-builtin
 pr60017 REFUSED struct-by-value
 pr60062 PASS
 pr60072 PASS
@@ -1359,14 +1359,14 @@ pr61375 REFUSED long-long
 pr61517 PASS
 pr61673 PASS
 pr61682 PASS
-pr61725 REFUSED other
+pr61725 REFUSED gnu-builtin
 pr62151 PASS
 pr63209 PASS
 pr63302 PASS
 pr63641 REFUSED asm
 pr63659 PASS
 pr63843 PASS
-pr64006 REFUSED other
+pr64006 REFUSED gnu-builtin
 pr64242 REFUSED k-and-r
 pr64255 PASS
 pr64260 PASS
@@ -1384,7 +1384,7 @@ pr65215-3 REFUSED long-long
 pr65215-4 REFUSED long-long
 pr65215-5 PASS
 pr65216 PASS
-pr65369 REFUSED other
+pr65369 REFUSED missing-header
 pr65401 PASS
 pr65418-1 PASS
 pr65418-2 PASS
@@ -1392,25 +1392,25 @@ pr65427 PASS
 pr65648 REFUSED long-long
 pr65956 REFUSED asm
 pr66187 PASS
-pr66233 REFUSED other
+pr66233 REFUSED float
 pr66556 FAIL abort | int32plus: the test needs a 32-bit int
 pr66757 PASS
 pr66940 REFUSED long-long
-pr67037 REFUSED other
+pr67037 REFUSED front-end-gap
 pr67226 REFUSED struct-by-value
 pr67714 PASS
 pr67781 PASS
-pr67929_1 REFUSED other
+pr67929_1 REFUSED float
 pr68143_1 PASS
 pr68185 PASS
-pr68249 REFUSED other
+pr68249 REFUSED front-end-gap
 pr68250 PASS
 pr68321 PASS
 pr68328 REFUSED asm
 pr68376-1 PASS
 pr68376-2 PASS
-pr68381 REFUSED other
-pr68390 REFUSED other
+pr68381 REFUSED gnu-builtin
+pr68390 REFUSED float
 pr68506 PASS
 pr68532 PASS
 pr68624 PASS
@@ -1425,48 +1425,48 @@ pr69320-3 PASS
 pr69320-4 REFUSED long-long
 pr69403 PASS
 pr69447 REFUSED long-long
-pr69691 REFUSED other
+pr69691 REFUSED gnu-builtin
 pr70005 PASS
 pr70127 PASS
 pr70222-1 REFUSED long-long
 pr70222-2 PASS
 pr70429 REFUSED long-long
-pr70460 REFUSED other
+pr70460 REFUSED front-end-gap
 pr70566 PASS
 pr70586 PASS
-pr70602 REFUSED other
+pr70602 REFUSED bit-field
 pr70903 REFUSED long-long
 pr71083 REFUSED k-and-r
 pr71335 PASS
-pr71494 REFUSED other
-pr71550 REFUSED other
-pr71554 REFUSED other
+pr71494 REFUSED front-end-gap
+pr71550 REFUSED gnu-builtin
+pr71554 REFUSED gnu-builtin
 pr71626-1 REFUSED k-and-r
-pr71626-2 REFUSED other
+pr71626-2 REFUSED k-and-r
 pr71631 PASS
 pr71700 PASS
 pr7284-1 FAIL abort | int32plus: the test needs a 32-bit int
 pr77718 REFUSED gnu-attribute
 pr77766 PASS
 pr77767 REFUSED vla
-pr78170 REFUSED other
+pr78170 REFUSED bit-field
 pr78378 REFUSED long-long
 pr78436 PASS
 pr78438 REFUSED asm
 pr78477 PASS
 pr78559 PASS
-pr78586 REFUSED other
+pr78586 REFUSED gnu-builtin
 pr78617 PASS
-pr78622 REFUSED other
+pr78622 REFUSED gnu-builtin
 pr78675 PASS
 pr78720 PASS
 pr78726 REFUSED asm
 pr78791 REFUSED long-long
 pr78856 PASS
-pr79043 REFUSED other
+pr79043 REFUSED float
 pr79121 REFUSED k-and-r
 pr79286 REFUSED other
-pr79327 REFUSED other
+pr79327 REFUSED gnu-builtin
 pr79354 REFUSED asm
 pr79388 PASS
 pr79450 REFUSED long-long
@@ -1475,34 +1475,34 @@ pr79737-2 REFUSED k-and-r
 pr80153 NOBUILD
 pr80421 REFUSED asm
 pr80501 PASS
-pr80692 REFUSED other
+pr80692 REFUSED front-end-gap
 pr81281 PASS
 pr81423 REFUSED long-long
 pr81503 REFUSED k-and-r
 pr81555 PASS
 pr81556 REFUSED long-long
-pr81588 REFUSED other
+pr81588 REFUSED asm
 pr81913 REFUSED k-and-r
 pr82192 REFUSED long-long
 pr82210 REFUSED gnu-attribute
 pr82387 REFUSED struct-by-value
 pr82388 REFUSED struct-by-value
 pr82524 PASS
-pr82954 REFUSED other
+pr82954 REFUSED syntax
 pr83269 PASS
 pr83298 PASS
 pr83362 REFUSED k-and-r
 pr83383 REFUSED long-long
 pr83477 PASS
 pr84169 REFUSED long-long
-pr84339 REFUSED other
-pr84478 REFUSED other
-pr84521 REFUSED other
+pr84339 REFUSED gnu-builtin
+pr84478 REFUSED gnu-builtin
+pr84521 REFUSED gnu-builtin
 pr84524 REFUSED asm
-pr84748 REFUSED other
-pr85095 REFUSED other
+pr84748 REFUSED syntax
+pr85095 REFUSED gnu-builtin
 pr85156 REFUSED asm
-pr85169 REFUSED other
+pr85169 REFUSED index-swap
 pr85331 REFUSED long-long
 pr85529-1 PASS
 pr85529-2 PASS
@@ -1524,28 +1524,28 @@ pr88693 PASS
 pr88714 PASS
 pr88739 PASS
 pr88904 REFUSED asm
-pr89195 REFUSED other
+pr89195 REFUSED bit-field
 pr89369 PASS
 pr89434 PASS
 pr89634 PASS
 pr89826 REFUSED long-long
 pr90025 REFUSED k-and-r
-pr90311 REFUSED other
+pr90311 REFUSED gnu-builtin
 pr90348 PASS
-pr90949 REFUSED other
+pr90949 REFUSED syntax
 pr91137 REFUSED long-long
-pr91450-1 REFUSED other
-pr91450-2 REFUSED other
+pr91450-1 REFUSED gnu-builtin
+pr91450-2 REFUSED gnu-builtin
 pr91597 REFUSED gnu-attribute
 pr91632 PASS
 pr91635 PASS
 pr92140 PASS
 pr92618 REFUSED long-long
 pr92904 REFUSED gnu-attribute
-pr93213 REFUSED other
-pr93249 REFUSED other
+pr93213 REFUSED syntax
+pr93249 REFUSED gnu-builtin
 pr93402 REFUSED long-long
-pr93434 REFUSED other
+pr93434 REFUSED float
 pr93494 REFUSED long-long
 pr93582 PASS
 pr93744-1 PASS
@@ -1555,11 +1555,11 @@ pr93908 PASS
 pr93945 REFUSED asm
 pr94130 REFUSED asm
 pr94134 PASS
-pr94412 REFUSED other
-pr94524-1 REFUSED other
-pr94524-2 REFUSED other
+pr94412 REFUSED index-swap
+pr94524-1 REFUSED index-swap
+pr94524-2 REFUSED index-swap
 pr94567 PASS
-pr94591 REFUSED other
+pr94591 REFUSED gnu-builtin
 pr94724 PASS
 pr94734 PASS
 pr94809 REFUSED long-long
@@ -1567,20 +1567,20 @@ pr95731 REFUSED long-long
 pr96549 PASS
 pr97073 REFUSED long-long
 pr97325 REFUSED long-long
-pr97386-1 REFUSED other
+pr97386-1 REFUSED gnu-builtin
 pr97386-2 REFUSED long-long
 pr97404 PASS
 pr97421-1 PASS
 pr97421-2 PASS
 pr97421-3 PASS
 pr97695 PASS
-pr97764 REFUSED other
+pr97764 REFUSED bit-field
 pr97836 PASS
 pr97888-1 PASS
 pr97888-2 PASS
-pr98304-2 REFUSED other
-pr98366 REFUSED other
-pr98474 REFUSED other
+pr98304-2 REFUSED missing-header
+pr98366 REFUSED bit-field
+pr98474 REFUSED gnu-builtin
 pr98681 PASS
 pr98727 PASS
 pr98736 PASS
@@ -1589,7 +1589,7 @@ pr98853-2 PASS
 pr99079 REFUSED long-long
 pr99751 PASS
 printf-1 REFUSED struct-by-value
-printf-2 REFUSED other
+printf-2 REFUSED missing-header
 printf-chk-1 REFUSED varargs
 pta-field-1 PASS
 pta-field-2 PASS
@@ -1599,20 +1599,20 @@ pushpop_macro PASS
 regstack-1 REFUSED float
 restrict-1 REFUSED struct-by-value
 return-addr REFUSED k-and-r
-scal-to-vec1 REFUSED other
+scal-to-vec1 REFUSED float
 scal-to-vec2 FAIL abort | GNU attribute vector_size accepted and ignored (KNOWN_LIMITATIONS.md)
-scal-to-vec3 REFUSED other
-scope-1 REFUSED other
+scal-to-vec3 REFUSED float
+scope-1 REFUSED compiler-internal
 shiftdi REFUSED long-long
 shiftdi-2 REFUSED long-long
 shiftopt-1 PASS
 signed1bitfield-1 PASS
-simd-1 REFUSED other
-simd-2 REFUSED other
-simd-4 REFUSED other
-simd-5 REFUSED other
+simd-1 REFUSED compiler-internal
+simd-2 REFUSED compiler-internal
+simd-4 REFUSED missing-header
+simd-5 REFUSED compiler-internal
 simd-6 REFUSED k-and-r
-split-path-1 REFUSED other
+split-path-1 REFUSED missing-header
 ssad-run NOBUILD
 stdarg-1 REFUSED varargs
 stdarg-2 REFUSED varargs
@@ -1637,7 +1637,7 @@ strlen-3 REFUSED k-and-r
 strlen-4 REFUSED k-and-r
 strlen-5 REFUSED k-and-r
 strlen-6 REFUSED k-and-r
-strlen-7 REFUSED other
+strlen-7 REFUSED gnu-builtin
 strncmp-1 NOBUILD
 struct-aliasing-1 PASS
 struct-cpy-1 REFUSED gnu-attribute
@@ -1652,7 +1652,7 @@ switch-1 PASS
 tstdi-1 REFUSED k-and-r
 unroll-1 PASS
 usad-run NOBUILD
-user-printf REFUSED other
+user-printf REFUSED missing-header
 usmul FAIL abort | int32plus: the test needs a 32-bit int
 va-arg-1 REFUSED varargs
 va-arg-10 REFUSED k-and-r
@@ -1668,7 +1668,7 @@ va-arg-19 REFUSED varargs
 va-arg-2 REFUSED k-and-r
 va-arg-20 REFUSED varargs
 va-arg-21 REFUSED varargs
-va-arg-22 REFUSED other
+va-arg-22 REFUSED compiler-internal
 va-arg-23 REFUSED varargs
 va-arg-24 REFUSED varargs
 va-arg-26 REFUSED varargs
@@ -1680,11 +1680,11 @@ va-arg-8 PASS
 va-arg-9 REFUSED k-and-r
 va-arg-pack-1 REFUSED float
 va-arg-trap-1 REFUSED varargs
-vector-div-neg-pow2 REFUSED other
-vfprintf-1 REFUSED other
-vfprintf-chk-1 REFUSED other
+vector-div-neg-pow2 REFUSED gnu-builtin
+vfprintf-1 REFUSED varargs
+vfprintf-chk-1 REFUSED k-and-r
 vla-dealloc-1 REFUSED vla
-vprintf-1 REFUSED other
+vprintf-1 REFUSED varargs
 vprintf-chk-1 REFUSED other
 vrp-1 PASS
 vrp-2 PASS
@@ -1697,8 +1697,8 @@ wchar_t-1 REFUSED k-and-r
 widechar-1 PASS
 widechar-2 REFUSED k-and-r
 widechar-3 PASS
-zero-struct-1 REFUSED other
-zero-struct-2 REFUSED other
+zero-struct-1 REFUSED k-and-r
+zero-struct-2 REFUSED k-and-r
 zerolen-1 PASS
 zerolen-2 PASS
 own/hex-escape-stops PASS
