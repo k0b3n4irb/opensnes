@@ -217,3 +217,4 @@ rom = "testing/fixtures/stress/timing_probe/timing_probe.sfc"
 name = "fin"
 [entree.screen.rom]
 frame = 30
+frames = 2

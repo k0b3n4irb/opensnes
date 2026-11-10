@@ -34,7 +34,9 @@ DEVICE = {"input/mouse": "reads a mouse luna does not model: boot screen only",
 
 # Probes made for the comparison itself: a screen that shows a timing a stabilised game screen cannot (luna's proposal,
 # 2026-11-10: a one-line fault of the NMI is seen by none of the 25 ROMs below, and by a ROM whose colour is its NMI line).
-EXTRA = [("testing/fixtures/stress/timing_probe", 30)]
+# (key, first frame, frames in the film): on luna with the fault the line alternates 227/226 from one frame to the next, so one
+# frame can fall on the right side; two successive frames cannot (luna, 2026-11-10).
+EXTRA = [("testing/fixtures/stress/timing_probe", 30, 2)]
 
 
 def entry_name(key: str) -> str:
@@ -77,12 +79,12 @@ def render() -> str:
         out.append("[entree.screen.rom]")
         out.append(f"frame = {frame}")
         out.append("")
-    for key, frame in EXTRA:
+    for key, frame, film in EXTRA:
         sfcs = sorted((ROOT / key).glob("*.sfc"))
         if not sfcs:
             raise SystemExit(f"gen_mesen2_corpus: no ROM under {key}: build first (make fixtures)")
         out += ["[[entree]]", f'name = "{Path(key).name}"', f'rom = "{sfcs[0].relative_to(ROOT).as_posix()}"',
-                "[[entree.screen]]", 'name = "fin"', "[entree.screen.rom]", f"frame = {frame}", ""]
+                "[[entree.screen]]", 'name = "fin"', "[entree.screen.rom]", f"frame = {frame}", f"frames = {film}", ""]
     return "\n".join(out)
 
 
