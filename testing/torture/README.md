@@ -39,10 +39,13 @@ Every FAIL is read, not assumed. At the pinned commit none is an arithmetic or c
 miscompilation: ten tests declare themselves `int32plus` (they need a 32-bit `int`; this target's
 is 16), others ask for a gcc builtin the SDK does not have, a 500-deep call chain the stack of
 the machine cannot hold, an evaluation order gcc chose among the unspecified ones, or a plain
-pointer to a string literal (the documented bank limit). Two tests found real defects of
-another kind: the GNU attributes `mode` and `vector_size` change a type and are accepted **and
-ignored** (`sizeof` of a `mode(QI)` type is 2, of a `vector_size(8)` type 2), so such code
-compiles to the wrong thing without a word; see `KNOWN_LIMITATIONS.md`.
+pointer to a string literal (the documented bank limit). Two tests found a real defect of
+another kind: the GNU attributes `mode` and `vector_size` change a type and were accepted **and
+ignored** (`sizeof` of a `mode(QI)` type was 2, of a `vector_size(8)` type 2), so such code
+compiled to the wrong thing without a word. They are refused now (cproc `82e1c1d`, with
+`alias`, `cleanup`, `section`, `noinit`, `persistent`, `ms_struct`, `scalar_storage_order`):
+`20020108-1` and `scal-to-vec2` are `REFUSED gnu-attribute`, and so are the tests that passed
+with the attribute ignored, by luck (see `KNOWN_LIMITATIONS.md`).
 
 ## What this does not prove
 
@@ -67,7 +70,7 @@ Shown to fail with a fix undone, by building the cproc of the pin before it and 
 
 ## The refusals, triaged (2026-11-09)
 
-The 952 tests `cc65816` refuses are tagged in `expected.txt` (third column). By tag, and what each means:
+The 965 tests `cc65816` refuses are tagged in `expected.txt` (third column). By tag, and what each means:
 
 | Tag | Tests | What it is |
 |---|---|---|
@@ -78,7 +81,7 @@ The 952 tests `cc65816` refuses are tagged in `expected.txt` (third column). By 
 | `gnu-builtin` | 66 | `__builtin_*` functions and `__label__` the SDK does not have. |
 | `varargs`, `asm`, `vla`, `nested-function` | 51, 44, 19, 13 | Refused, each with an entry in `KNOWN_LIMITATIONS.md`. |
 | `syntax`, `front-end-gap` | 37, 20 | A construct the front end does not parse: GNU `typeof`, statement expressions, a call of an unprototyped function with arguments. Some are valid C11 (a gap to read one by one). |
-| `gnu-attribute` | 32 | Refused attributes (`aligned`, and, once the lot of 2026-11-09 lands, `mode`, `vector_size`...). |
+| `gnu-attribute` | 84 | Refused attributes: `aligned`, and since the lot of 2026-11-10 `mode`, `vector_size`, `alias`, `cleanup`, `section`... (omitting them changes the program). |
 | `missing-header` | 29 | `<stdint.h>` and others the SDK does not provide, plus headers local to a gcc test. |
 | `const-qualifier` | 24 | A string literal is `const char[]` (`fdcda7c8`): passed to a plain `char *`, it is refused. |
 | `bit-field` | 24 | A field wider than the 16-bit `int`, or in a packed struct. |
@@ -90,3 +93,6 @@ The 14 `compiler-internal` tests: `20011126-2 20030404-1 memcpy-1 pr23135 pr2898
 pr53645-2 scope-1 simd-1 simd-2 simd-5 va-arg-22`. Most of the assertions come from `vector_size` and `mode` being
 ignored (`vecint i = { 150, 100 }` is then a scalar with a two-element initialiser): refusing those attributes turns them into
 clean refusals. What stays is the work: reduce each to a minimal case and fix or refuse it.
+- **`7a343a98`** (cproc `82e1c1d`: the GNU attributes whose omission changes the program are refused): with the
+  cproc of the pin before, `20020108-1` (`mode`) and `scal-to-vec2` (`vector_size`) compile again and fail at run
+  time (`CHANGED ... expected REFUSED, now FAIL abort`). Exit code 1.
