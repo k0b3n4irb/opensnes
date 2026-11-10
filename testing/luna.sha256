@@ -5,7 +5,7 @@
 #   V=$(cat testing/luna.version)
 #   gh api repos/k0b3n4irb/luna/releases/tags/$V --jq '.assets[] | "\(.digest|sub("sha256:";""))  \(.name)"'
 # and check one archive you downloaded against its line (sha256sum).
-0ad7009b47f6e169c5b7d73617407b786697767def4d213ed8d55eea6de01495  luna_v1.40.0_darwin_arm64.zip
-043c81f5898a01123c68f9d8766dfb03a015d9626ad4701cee3c41588a285c4c  luna_v1.40.0_linux_arm64.zip
-3e0732a44d43e049cda091985165fe6163067331e2a622a1abbfa826900f7ef9  luna_v1.40.0_linux_x86_64.zip
-d790bba251ff718dbb4828a2898cab43eaa8edf424c153dd5ca1fc97d1fceb25  luna_v1.40.0_windows_x86_64.zip
+6edea5a34fa7ea180e1537a24a07af252cad4eb6d4d6000d11b4532ba056bc00  luna_v1.43.0_darwin_arm64.zip
+d3a3322ce196244b1497a5654c7de4dde2e4cb1239c5f566d6ef7f4dede32645  luna_v1.43.0_linux_arm64.zip
+bad4b8cac6fe3e2849d69d36016053b7f422440173e46f5bc48a1a4e99609073  luna_v1.43.0_linux_x86_64.zip
+12d4fc583c28ce8928f92dd711dc8b5404390e98cab6d9c5398314bd91f47d4f  luna_v1.43.0_windows_x86_64.zip
