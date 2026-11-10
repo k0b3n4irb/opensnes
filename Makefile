@@ -293,6 +293,8 @@ tests: test-compiler
 	@# (luna race-sweep; skipped, loudly, while the pinned luna lacks it). Seen failing 2026-11-10 on the tree before 76adcdb0:
 	@# 135 of 141 addresses of the multiply, 193 of 206 of the divide; 0 of 353 now.
 	@python3 testing/race_gate.py
+	@# The list the second-emulator comparison reads (luna's job, kit's mesen2_screens --corpus) is generated; a stale one fails here.
+	@python3 devtools/gen_mesen2_corpus.py --check
 	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
