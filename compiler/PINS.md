@@ -31,7 +31,7 @@ reformat without updating the script.
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 79ee5d9022fdb4c6a35f548e940f685e8032569a | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
+| compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -212,15 +212,22 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 5 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
+### compiler/wla-dx — 6 patches since the v10.7 release (stable section sort, 2026-11-10; chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
 
 ```
+96e7860 wlalink: sort_sections is a stable sort, so the ROM bytes do not depend on the system's qsort
 7382e4c wlalink: a section with no room names its first label, and says when it is larger than a bank
 8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+`96e7860` (2026-11-10): `_sections_sort` returned -1 for two sections of the same priority and size in both
+directions, which is not an order, and `qsort()` placed them as its implementation pleased (glibc keeps the original
+order; macOS and MinGW do not). The same sources linked to ROMs that differed by the addresses of RAM variables on each
+system (8 variables of the console module in `print_string`; 41 to 51 bytes of 262 144). Ties now keep the position
+the section had before the sort. On Linux, which already gave that order, the 65 example ROMs are byte-identical.
 
 `7382e4c` (2026-10-14) changes a message only: a section that finds no
 room in ROM is refused naming its first label (for a C const object, its C
