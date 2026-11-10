@@ -192,8 +192,10 @@ its own.
   `WRAM_JOURNAL.md`); the interrupt gate (`testing/race_gate.py`, fixture `race_sweep`), SKIPPED until the pin carries
   `race-sweep` (first tag after v1.43.0: then bump, run, and confirm 353 addresses clean); `testing/mesen2_corpus.toml`
   (25 ROMs) for luna's second-opinion job.
-- **To do next**: (1) read the CI ROM-hash lists of run for `5ab849a7` (artifacts `ROM hashes`, `OpenSNES Logs`);
-  (2) the character-ring scroll brick asked by a partner port (a map whose unique characters exceed the 1 024 tilemap
+- **Done 2026-11-10 evening**: the ROM-hash lists are read. The one ROM that differed between systems (`backgrounds/mode1`,
+  Windows then macOS) came from the LZ77 encoder's uninitialised pad bytes (`eedca343`); run `42897584853` green, 65/65 equal on
+  Linux, macOS and Windows; the temporary mode1 diagnostic is out (`de285b66`); lesson written in the porting kit.
+- **To do next**: (2) the character-ring scroll brick asked by a partner port (a map whose unique characters exceed the 1 024 tilemap
   numbers; confirm the need with a second port's map first); (3) report to luna the >99 LSB sample differences on sample_swap, sfx_voices, snesmod_music_large
   (v1.40.0 vs v1.43.0, RMS windows within 0.67 %); (4) the main tree's `compiler/` submodules are behind the pins: a
   `git submodule update` and a full rebuild are due, announced to the partners first.
