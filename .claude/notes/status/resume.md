@@ -156,7 +156,7 @@ and the CHANGELOG.
 - **luna v1.43.0 is published** (`--inject-nmi-at`/`--inject-irq-at`, `[checkpoint.dsp]`, S-DSP stepped per SPC cycle):
   next lot = bump the pin from v1.40.0 (audio hashes will move: prove with `luna diff --audio --align-onset`), then the
   interrupt gate (it must fail for certain on the defects of `7802f85b` and `76adcdb0`).
-- **Waiting for a go (the system stopped my checks for lack of memory)**: the cproc lot, committed in a worktree (`work-attr`, fork commit `82e1c1d`, OpenSNES `7a343a98..9c68f2d1`), nothing pushed; my own gates are green, the A/B proof and the 2000-seed hunts must be replayed before the fork and OpenSNES are pushed. It makes cproc REFUSE the GNU attributes `mode` and `vector_size`
+- **cproc attribute lot: DONE and pushed (2026-11-10)**, fork `82e1c1d`, develop `011d7645`, CI green; worktree removed. (Was: my own gates are green, the A/B proof and the 2000-seed hunts must be replayed before the fork and OpenSNES are pushed. It makes cproc REFUSE the GNU attributes `mode` and `vector_size`
   (and whichever others it can justify) — a Class A lot (fork commit, PINS.md, negative cases, torture
   `expected.txt`: 20020108-1 and scal-to-vec2 go from FAIL to REFUSED). I re-validate every gate before merging.
 - **Finding to fix (Class A, cproc fork + PINS.md)**: the GNU attributes `mode` and `vector_size` are accepted and
@@ -185,3 +185,15 @@ and the CHANGELOG.
 Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
 answers the games, luna and the porting tools, and starts no chantier of
 its own.
+- **Done and pushed 2026-11-10 (develop `5ab849a7`, then `213d50df`)**: cproc refusal of mode/vector_size and the
+  other attributes that change the program (fork `82e1c1d`; lesson written in the porting kit); stable section sort in the wla-dx
+  fork (`96e7860d`, 6 patches; Linux ROMs byte-identical, the CI hash lists must now be equal on macOS and Windows: READ
+  THEM, run `devtools/compare_rom_hashes.py`); luna pin v1.43.0 with `audio.json` and `wram.json` recaptured (reasons in
+  `WRAM_JOURNAL.md`); the interrupt gate (`testing/race_gate.py`, fixture `race_sweep`), SKIPPED until the pin carries
+  `race-sweep` (first tag after v1.43.0: then bump, run, and confirm 353 addresses clean); `testing/mesen2_corpus.toml`
+  (25 ROMs) for luna's second-opinion job.
+- **To do next**: (1) read the CI ROM-hash lists of run for `5ab849a7` (artifacts `ROM hashes`, `OpenSNES Logs`);
+  (2) the character-ring scroll brick asked by a partner port (a map whose unique characters exceed the 1 024 tilemap
+  numbers; confirm the need with a second port's map first); (3) report to luna the >99 LSB sample differences on sample_swap, sfx_voices, snesmod_music_large
+  (v1.40.0 vs v1.43.0, RMS windows within 0.67 %); (4) the main tree's `compiler/` submodules are behind the pins: a
+  `git submodule update` and a full rebuild are due, announced to the partners first.
