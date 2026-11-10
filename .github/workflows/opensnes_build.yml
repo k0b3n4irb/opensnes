@@ -263,6 +263,19 @@ jobs:
         shell: msys2 {0}
         run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
 
+      # TEMPORARY (2026-11-10): on the push 89301356 the macOS ROM of backgrounds/mode1 differed from the
+      # other three systems' while the 64 others agreed (and all 65 agreed the run before). The folder goes out
+      # whole so that the first differing byte and its cause can be found. Remove once known.
+      - name: Keep the mode1 folder to find why one ROM differs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mode1 diag (${{ matrix.name }})
+          path: |
+            examples/backgrounds/mode1/
+            !examples/backgrounds/mode1/*.png
+          if-no-files-found: warn
+
       # Validate the starter project builds via the OPENSNES= consumption path
       # a downstream user follows (proves the release-consumption contract).
       - name: Build starter project (Linux/macOS)
