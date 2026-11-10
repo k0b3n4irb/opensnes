@@ -464,7 +464,11 @@ int Convert2PicLZ77(unsigned char *bufin, int buflen, unsigned char *bufout,int 
 	}
 	
 	// remove trails bytes and encoding is done
-	OutSize=ALIGN4(OutSize);
+	// The pad bytes up to the 4-byte boundary are part of the output: zero them,
+	// the caller's buffer comes from malloc and holds whatever was there before
+	// (a Windows build put $04 in the last byte of an example's tile data).
+	while (OutSize & 3)
+		bufout[OutSize++] = 0;
     if (!quietmode) info("compression Lz77 from %d bytes to %d bytes (ratio %d%%)", textsize, OutSize, ((textsize*100)/ OutSize)-100 ); 
     
     return OutSize;
