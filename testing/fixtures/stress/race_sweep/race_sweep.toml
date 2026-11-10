@@ -1,0 +1,11 @@
+# The subject of the interrupt gate (testing/race_gate.py, `luna race-sweep`): probe() does the runtime's 32-bit
+# operations once and stores them; the NMI lag callback does others. This manifest only proves the ROM reaches the
+# end of probe(); the sweep that forces a NMI before every instruction of the helpers is race_gate.py's.
+rom = "race_sweep.sfc"
+frames = 20
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE

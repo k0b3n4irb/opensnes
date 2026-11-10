@@ -54,7 +54,7 @@ STRIP ?= strip
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels libtests_region libtests_region_pal libtests_bigrom
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals leaf_frame leaf_split static_dup
-FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race koff_hold
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race koff_hold race_sweep
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
 FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
@@ -289,6 +289,10 @@ tests: test-compiler
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 testing/audio_regress.py
+	@# The interrupt gate: a NMI forced before EVERY instruction of the 32-bit helpers must not change a result
+	@# (luna race-sweep; skipped, loudly, while the pinned luna lacks it). Seen failing 2026-11-10 on the tree before 76adcdb0:
+	@# 135 of 141 addresses of the multiply, 193 of 206 of the divide; 0 of 353 now.
+	@python3 testing/race_gate.py
 	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
