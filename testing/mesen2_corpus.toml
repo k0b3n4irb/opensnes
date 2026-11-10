@@ -209,3 +209,11 @@ rom = "testing/fixtures/retired_examples/superfx_save/superfx_save.sfc"
 name = "fin"
 [entree.screen.rom]
 frame = 200
+
+[[entree]]
+name = "timing_probe"
+rom = "testing/fixtures/stress/timing_probe/timing_probe.sfc"
+[[entree.screen]]
+name = "fin"
+[entree.screen.rom]
+frame = 30

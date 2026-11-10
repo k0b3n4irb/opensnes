@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Write testing/mesen2_corpus.toml: one screen per ROM of the console protocol, for a second-emulator comparison.
 
-The list is not chosen here, it is read: the ROMs are the rows of docs/HARDWARE_VERIFICATION.md (the 26 rows, 25 distinct
+The list is not chosen here, it is read (plus the probes of EXTRA, made for the comparison): the ROMs are the rows of docs/HARDWARE_VERIFICATION.md (the 26 rows, 25 distinct
 ROMs: `input/controller` has two), the frame of the screen is the latest capture point of the ROM's luna manifest
 (testing/manifest.toml), the same instant luna_runner.py compares against its visual baseline. The comparison itself
 (luna against Mesen2, pixel by pixel, 5 bits per component, `row0 = 7` for the 7-line offset of Mesen2's core) is the
@@ -30,6 +30,11 @@ OUT = ROOT / "testing" / "mesen2_corpus.toml"
 FIRMWARE_GATED = {"mode7/dsp1_ground": "needs dsp1b.rom, which luna loads from its firmware folder; Mesen2 needs it in its own"}
 DEVICE = {"input/mouse": "reads a mouse luna does not model: boot screen only",
           "input/superscope": "reads a Super Scope luna does not model: boot screen only"}
+
+
+# Probes made for the comparison itself: a screen that shows a timing a stabilised game screen cannot (luna's proposal,
+# 2026-11-10: a one-line fault of the NMI is seen by none of the 25 ROMs below, and by a ROM whose colour is its NMI line).
+EXTRA = [("testing/fixtures/stress/timing_probe", 30)]
 
 
 def entry_name(key: str) -> str:
@@ -72,6 +77,12 @@ def render() -> str:
         out.append("[entree.screen.rom]")
         out.append(f"frame = {frame}")
         out.append("")
+    for key, frame in EXTRA:
+        sfcs = sorted((ROOT / key).glob("*.sfc"))
+        if not sfcs:
+            raise SystemExit(f"gen_mesen2_corpus: no ROM under {key}: build first (make fixtures)")
+        out += ["[[entree]]", f'name = "{Path(key).name}"', f'rom = "{sfcs[0].relative_to(ROOT).as_posix()}"',
+                "[[entree.screen]]", 'name = "fin"', "[entree.screen.rom]", f"frame = {frame}", ""]
     return "\n".join(out)
 
 
