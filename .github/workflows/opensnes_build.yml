@@ -494,3 +494,38 @@ jobs:
             testing/baselines/
             /tmp/opensnes-tests/luna-test-actual/
             /tmp/opensnes-tests/luna-test-corpus/
+
+  # ====================================================================== #
+  # The same sources must give the same ROMs on every system               #
+  #                                                                        #
+  # Each build leg writes the sha256 of its 65 example ROMs                #
+  # (devtools/rom_hashes.py); this job compares the lists. Until 2026-11-10 #
+  # macOS and Windows differed from Linux on all 65 (wlalink sorted equal  #
+  # sections with an order that was not one, and qsort() placed them as    #
+  # the platform pleased); the section sort is stable now.                 #
+  # ====================================================================== #
+  rom-hashes:
+    name: Same ROMs on every system
+    needs: [build, functional-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+
+      - name: Download the hash lists
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: hashes
+          pattern: "{ROM hashes*,OpenSNES Logs*}"
+
+      - name: Compare
+        run: |
+          find hashes -name 'rom_hashes_*.log' | sort
+          python3 devtools/compare_rom_hashes.py \
+            "linux-x86_64=hashes/ROM hashes (x86_64)/rom_hashes_x86_64.log" \
+            "linux-arm64=hashes/ROM hashes (arm64)/rom_hashes_arm64.log" \
+            "macos=hashes/OpenSNES Logs (darwin)/rom_hashes_darwin.log" \
+            "windows=hashes/OpenSNES Logs (windows)/rom_hashes_windows.log"
