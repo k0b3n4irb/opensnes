@@ -7,5 +7,5 @@ in every_third: present cpx\.w #124
 in mixed: present asl a
 in mixed: present cmp\.w #64
 in ramp: present asl a
-in ramp: present cmp\.w #64
+in ramp: present c(?:mp|px|py)\.w #64
 in fill_some: present asl a

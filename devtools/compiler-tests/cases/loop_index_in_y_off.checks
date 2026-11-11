@@ -1,0 +1,4 @@
+env QBE_NO_PEEP_LOOPY=1
+in lookup: absent cpy
+in lookup: absent iny
+in lookup: present inc a\n\tsta\.b tcc__lf\+\d+\n\tcmp\.w #32

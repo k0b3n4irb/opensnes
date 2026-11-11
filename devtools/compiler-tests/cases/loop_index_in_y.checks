@@ -1,0 +1,18 @@
+# A6a R2: the counter of a rotated loop goes to Y when the body writes X
+# (peephole_loop_x, second pass). The twin loop_index_in_y_off pins the
+# slot form with the Y pass off.
+in lookup: present ldy\.b tcc__lf\+\d+\n\tcpy\.w #32\n\tbcs
+in lookup: present @for_body\.\d+:\n\ttyx\n\tlda\.w idx,x
+in lookup: present tya\n\tasl a\n\ttax
+in lookup: present iny\n\tcpy\.w #32\n\tbcc @for_body
+in lookup: absent inc a
+# the far pointer indexed by the counter: Y is the counter, no `tay`
+in walk: present @for_body\.\d+:\n\tlda \[tcc__r9\],y
+in walk: absent tay
+in walk: present iny\n\tcpy\.w #32
+# base + counter, commuted: the counter is never stored
+in based: present @for_body\.\d+:\n\ttya\n\tclc\n\tadc 4,s\n\ttax
+in based: present iny\n\tcpy\.w #32
+# a call in the body: the counter stays in memory
+in calls: absent cpy
+in calls: absent cpx
