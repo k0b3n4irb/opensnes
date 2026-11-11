@@ -66,3 +66,55 @@ pushes 44 to 51, stack put back 34 to 39, callee frame 40); the games make
 5. **Two gauges from now on**: the bench (tight loops, against assembly) and
    the games' busy master cycles a frame on their own scenario, rebuilt on
    each lot by their sessions.
+
+## The real "1 for 1": two hot routines rewritten by hand (2026-11-11)
+
+In a working copy of each game (outside its repository), one hot routine of
+the profile was rewritten in assembly by hand, same data layout, same
+algorithm, the SDK's ABI at its boundary, linked in place of the C, and
+measured on the game's loaded scene. Equivalence proven: the game's state
+read at every one of 700 and 341 game steps is identical byte for byte, the
+frame hashes at four steps too, and the first game's 30 tests pass on the
+modified ROM.
+
+| | A (game 2) | B (game 1) |
+|---|---|---|
+| The routine | a path follower: sub-steps on four 32-bit accumulators, a sine table in ROM; a leaf its author had already bent to the compiler | the move and publication of 18 actors in parallel word arrays, clamps, a ROM table; a leaf written naturally |
+| Share of the game's busy time | 5.4 % | most of 11.5 % |
+| Master cycles, C -> hand | 17 153 702 -> 12 707 120 | 10 704 344 -> 6 103 146 |
+| **Factor C / hand** | **1.35** (loop 1.24, prologue 1.87, epilogue 1.54) | **1.75** (moving actor 1.84, still actor 2.4) |
+| The game's busy time | -0.95 % | -2.5 % |
+
+Where the gain comes from (cycles on the common path, checked against the
+measured total), A per sub-step of 31 gained, B per moving actor of 156:
+
+| Cause | A | B | Can the compiler learn it? |
+|---|--:|--:|---|
+| values kept in a register instead of temporaries | 12 | 44 | yes: register allocation |
+| the index held in X instead of reloaded from its memory cell | | 32 | yes |
+| loop counter in a register, direct loop-end branch, no jump to a jump | 11 | 28 | yes |
+| general signed compares replaced by one unsigned range test (exact on the whole domain) | | 34 | yes: idiom |
+| ROM table read absolute: data bank set once, second index in Y | 4 | 9 | yes, with the link map |
+| a value off the stack | 2 | | yes |
+| `cond ? k : 0` materialised when `k` is the bit tested | | 9 | yes: algebraic identity |
+| a `clc` the value's range makes useless | 2 | | yes: range analysis |
+
+Outside its loop (47 % of A's gain): each 32-bit value built as
+`high << 16 | low` goes through extension temporaries (11 instructions for
+4), the index kept on the stack is re-read, the frame is made and undone.
+
+**What it says.**
+1. On real game code the factor is **1.35 to 1.75**, not the bench's 2.2 to
+   2.7: 1.35 when the programmer has already bent the C to the compiler,
+   1.75 when it is written naturally.
+2. **Nothing of the gain needed knowledge the C source does not carry**: the
+   "perfect compiler" version is the hand version within 2 %. The target is
+   reachable by a compiler in principle.
+3. Rewriting one routine by hand, even the first of the profile, gives the
+   game 1 to 2.5 %; the same factor obtained by the compiler applies to all
+   the compiled C, 81 and 93 % of the busy time. This is the measured
+   answer to "assembly massively, or a better compiler": the compiler,
+   with assembly for the library's hot generic jobs.
+4. The order of causes is register allocation first (values, index,
+   counter: three quarters of the gain), then signed compares, then the
+   data bank. Two leaves only: nothing here about functions that call.
