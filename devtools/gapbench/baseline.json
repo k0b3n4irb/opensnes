@@ -145,6 +145,78 @@
    "asm_sum": 9411,
    "asm_bytes": 163,
    "ratio": 1.57
+  },
+  "slots": {
+   "c": 35627,
+   "c_sum": 38310,
+   "c_bytes": 87,
+   "asm": 7486,
+   "asm_sum": 38310,
+   "asm_bytes": 85,
+   "ratio": 4.76
+  },
+  "state": {
+   "c": 30293,
+   "c_sum": 50579,
+   "c_bytes": 392,
+   "asm": 16161,
+   "asm_sum": 50579,
+   "asm_bytes": 209,
+   "ratio": 1.87
+  },
+  "fptr": {
+   "c": 54077,
+   "c_sum": 48156,
+   "c_bytes": 98,
+   "asm": 16628,
+   "asm_sum": 48156,
+   "asm_bytes": 26,
+   "ratio": 3.25
+  },
+  "blocks": {
+   "c": 29072,
+   "c_sum": 54064,
+   "c_bytes": 223,
+   "asm": 10673,
+   "asm_sum": 54064,
+   "asm_bytes": 829,
+   "ratio": 2.72
+  },
+  "probe": {
+   "c": 33588,
+   "c_sum": 24510,
+   "c_bytes": 145,
+   "asm": 21351,
+   "asm_sum": 24510,
+   "asm_bytes": 96,
+   "ratio": 1.57
+  },
+  "chain": {
+   "c": 86079,
+   "c_sum": 28225,
+   "c_bytes": 71,
+   "asm": 37106,
+   "asm_sum": 28225,
+   "asm_bytes": 18,
+   "ratio": 2.32
+  },
+  "sprites": {
+   "c": 108212,
+   "c_sum": 64960,
+   "c_bytes": 643,
+   "asm": 51216,
+   "asm_sum": 64960,
+   "asm_bytes": 323,
+   "ratio": 2.11
+  },
+  "unpack": {
+   "c": 657068,
+   "c_sum": 23268,
+   "c_bytes": 381,
+   "asm": 51736,
+   "asm_sum": 23268,
+   "asm_bytes": 67,
+   "ratio": 12.7
   }
  },
  "fast": {
@@ -293,6 +365,78 @@
    "asm_sum": 9411,
    "asm_bytes": 163,
    "ratio": 1.6
+  },
+  "slots": {
+   "c": 29758,
+   "c_sum": 38310,
+   "c_bytes": 87,
+   "asm": 6196,
+   "asm_sum": 38310,
+   "asm_bytes": 85,
+   "ratio": 4.8
+  },
+  "state": {
+   "c": 24829,
+   "c_sum": 50579,
+   "c_bytes": 392,
+   "asm": 13187,
+   "asm_sum": 50579,
+   "asm_bytes": 209,
+   "ratio": 1.88
+  },
+  "fptr": {
+   "c": 46457,
+   "c_sum": 48156,
+   "c_bytes": 98,
+   "asm": 14132,
+   "asm_sum": 48156,
+   "asm_bytes": 26,
+   "ratio": 3.29
+  },
+  "blocks": {
+   "c": 24850,
+   "c_sum": 54064,
+   "c_bytes": 223,
+   "asm": 8964,
+   "asm_sum": 54064,
+   "asm_bytes": 829,
+   "ratio": 2.77
+  },
+  "probe": {
+   "c": 28549,
+   "c_sum": 24510,
+   "c_bytes": 145,
+   "asm": 17930,
+   "asm_sum": 24510,
+   "asm_bytes": 96,
+   "ratio": 1.59
+  },
+  "chain": {
+   "c": 74337,
+   "c_sum": 28225,
+   "c_bytes": 71,
+   "asm": 31857,
+   "asm_sum": 28225,
+   "asm_bytes": 18,
+   "ratio": 2.33
+  },
+  "sprites": {
+   "c": 90571,
+   "c_sum": 64960,
+   "c_bytes": 643,
+   "asm": 42647,
+   "asm_sum": 64960,
+   "asm_bytes": 323,
+   "ratio": 2.12
+  },
+  "unpack": {
+   "c": 564302,
+   "c_sum": 23268,
+   "c_bytes": 381,
+   "asm": 44475,
+   "asm_sum": 23268,
+   "asm_bytes": 67,
+   "ratio": 12.69
   }
  }
 }

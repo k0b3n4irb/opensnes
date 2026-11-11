@@ -35,6 +35,23 @@ SPEEDS = {"slow": 0, "fast": 1}
 # A routine moved in the ROM meets the memory refresh at other instructions:
 # a few master cycles in tens of thousands. Anything beyond is a real change.
 TOLERANCE = 0.002
+# The twelve rows the bench started with (2026-11-11): their plain mean is
+# kept beside the weighted one so that the first figure quoted stays readable.
+FIRST_ROWS = ("copy", "fill", "oam", "col", "row", "box", "fixed", "mul", "ents", "call", "soa", "glide")
+# What a row weighs in the weighted mean: the share of two real games' busy
+# time that the kind of work takes in their luna profiles (object logic 40 to
+# 50 %, sprites 16 to 22 %, boxes and probes 6 to 10 %, tilemaps a few %,
+# multiply under 1 %, block copies 0.2 %; calls spread over all of it, 6.6 %
+# whole). README.md says how they were read. A row not listed weighs 1.
+WEIGHTS = {
+    "soa": 8, "ents": 6, "state": 8, "fptr": 4, "slots": 4, "chain": 10,   # object logic
+    "oam": 6, "glide": 6, "sprites": 8,                                      # sprites
+    "box": 6, "probe": 4,                                                    # collisions
+    "col": 2, "row": 2, "blocks": 2,                                         # tilemaps
+    "call": 6,                                                               # calls
+    "mul": 1, "fixed": 1,                                                    # arithmetic
+    "copy": 1, "fill": 1, "unpack": 1,                                       # memory
+}
 
 
 def table():
@@ -132,8 +149,13 @@ def other_source(kernel, res):
 
 
 def summary(res):
-    ratios = [r["ratio"] for k, r in res.items() if not other_source(k, res)]
-    return {"geomean": geomean(ratios), "min": min(ratios), "max": max(ratios)}
+    rows = {k: r["ratio"] for k, r in res.items() if not other_source(k, res)}
+    ratios = list(rows.values())
+    total = sum(WEIGHTS.get(k, 1) for k in rows)
+    weighted = math.exp(sum(WEIGHTS.get(k, 1) * math.log(v) for k, v in rows.items()) / total)
+    first = [rows[k] for k in FIRST_ROWS if k in rows]
+    return {"geomean": geomean(ratios), "weighted": round(weighted, 2), "first": geomean(first),
+            "min": min(ratios), "max": max(ratios)}
 
 
 def print_table(results, markdown):
@@ -145,16 +167,18 @@ def print_table(results, markdown):
         lines.append((k + (" *" if other_source(k, slow) else ""), s["c"], s["asm"], f"{s['ratio']:.2f}", f["c"], f["asm"], f"{f['ratio']:.2f}",
                       s["c_bytes"], s["asm_bytes"]))
     ss, sf = summary(slow), summary(fast)
-    lines.append(("geometric mean", "", "", f"{ss['geomean']:.2f}", "", "", f"{sf['geomean']:.2f}", "", ""))
+    lines.append(("mean, weighted by real games' profiles", "", "", f"{ss['weighted']:.2f}", "", "", f"{sf['weighted']:.2f}", "", ""))
+    lines.append(("geometric mean, every row equal", "", "", f"{ss['geomean']:.2f}", "", "", f"{sf['geomean']:.2f}", "", ""))
+    lines.append(("geometric mean of the first twelve rows", "", "", f"{ss['first']:.2f}", "", "", f"{sf['first']:.2f}", "", ""))
     if markdown:
         print("| " + " | ".join(head) + " |")
         print("|---|" + "--:|" * (len(head) - 1))
         for row in lines:
             print("| " + " | ".join(str(c) for c in row) + " |")
     else:
-        print(*(h.rjust(14) if i else h.ljust(15) for i, h in enumerate(head)))
+        print(*(h.rjust(11) if i else h.ljust(40) for i, h in enumerate(head)))
         for row in lines:
-            print(*(str(c).rjust(14) if i else str(c).ljust(15) for i, c in enumerate(row)))
+            print(*(str(c).rjust(11) if i else str(c).ljust(40) for i, c in enumerate(row)))
     for k in slow:
         if "lib" in slow[k]:
             print(f"\n{k}: the library's routine, {slow[k]['lib']} master cycles a call SlowROM, "
