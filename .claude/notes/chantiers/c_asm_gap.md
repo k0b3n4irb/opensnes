@@ -230,3 +230,18 @@ Target since 2026-11-11 (conductor): the assembly column stays the target
 where the work is comparable, so the table says, row by row, when the C
 passes under the level of a commercial game. The bench gets the rows it owes
 to the games' patterns and a realistic weight of calls.
+
+## Our output on two real games (2026-11-11): the order changes
+
+`tech/our_asm_on_real_games.md`. Counted on executed instructions: every
+pattern of the list fixed gives a real game at most 20 % (the bench's 2.55
+is about tight loops on our data); 27 to 37 % of a game's busy time is the
+traffic of the compiler's temporaries, a third to a half of it on the stack
+in functions that call; calls cost 6.6 % whole, 4.1 % avoidable; bytes 0.7 %
+(the bench: 4.2); runtime multiply 0.1 to 1.1 % (the bench: 11.6).
+So, after the two lots that run: **the next compiler lot is values that
+cross a call off the stack and the call itself (A5 with B7's static
+frames), then the machine-level optimiser (B1)**; A7's multiply entries and
+A6c's unrolling stay, as bench work with a small effect on the games. The
+gauge of every lot is double: the bench, and the two games' busy master
+cycles a frame on their scenario.
