@@ -70,6 +70,14 @@ not be slower than the loop.
 loop. The factor is the same SlowROM and FastROM: the gap is in the
 instructions executed, not in where they are fetched from.
 
+## A second emulator
+
+The ROMs were replayed on Mesen2 (2026-11-11, both speeds, interrupts off as
+the ROM sets them): the 34 checksums are the same and the master cycles
+between the two marks differ by 0 on every row, the hardware multiplier read
+10 and 13 CPU cycles after its write included. Two emulators agreeing is
+protection against a drift of one of them, not a console.
+
 ## Reading a row
 
 - A factor is one routine on one data set; the geometric mean is over twelve
