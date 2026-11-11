@@ -1348,6 +1348,16 @@ static FAR u8 hr_save[544];
  * oam_max_id after a write to sprite 77 from 0 -> 77 */
 u16 r_setattr[8];
 static FAR u8 hr_want[544];
+/* The patterned shadow of the two vectors above: byte j = (start + j * step) | orv,
+ * by addition (a multiply per byte made these loops cost 8 frames each). */
+static void hr_fill(u8 start, u8 step, u8 orv) {
+    u16 j;
+    u8 v = start;
+    for (j = 0; j < 544; j++) {
+        oamMemory[j] = v | orv;
+        v += step;
+    }
+}
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
@@ -1776,7 +1786,7 @@ int main(void) {
             u16 j, k, last;
             for (j = 0; j < 544; j++) hr_save[j] = oamMemory[j];
             for (c = 0; c < 11; c++) {
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                hr_fill((u8)(c * 11), 37, 0x02);
                 last = hr_first[c] + hr_count[c];
                 if (last > 128) last = 128;
                 for (k = hr_first[c]; k < last; k++) {      /* the definition, written out */
@@ -1785,12 +1795,12 @@ int main(void) {
                     oamMemory[512 + (k >> 2)] |= (u8)(1 << ((k & 3) << 1));
                 }
                 for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                hr_fill((u8)(c * 11), 37, 0x02);
                 for (k = hr_first[c]; k < last; k++) oamHide(k);   /* and oamHide() itself */
                 k = 0;
                 for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
                 r_hrange[c] = k;
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                hr_fill((u8)(c * 11), 37, 0x02);
                 oamHideRange(hr_first[c], hr_count[c]);
                 k = 0;
                 for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
@@ -1808,10 +1818,10 @@ int main(void) {
                 static const u16 sa_pri[6]  = {0, 3, 1, 2, 3, 0};
                 static const u16 sa_fl[6]   = {0, 0xC0, 0x40, 0x80, 0xC0, 0x00};
                 for (c = 0; c < 6; c++) {
-                    for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 29 + c * 7) | 0x01);
+                    hr_fill((u8)(c * 7), 29, 0x01);
                     oamSet(sa_id[c], sa_x[c], sa_y[c], sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]);
                     for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
-                    for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 29 + c * 7) | 0x01);
+                    hr_fill((u8)(c * 7), 29, 0x01);
                     oamSetAttr(sa_id[c], sa_x[c], sa_y[c], sa_tile[c],
                                OAM_ATTR(sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]));
                     k = 0;
