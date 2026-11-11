@@ -245,3 +245,50 @@ frames), then the machine-level optimiser (B1)**; A7's multiply entries and
 A6c's unrolling stay, as bench work with a small effect on the games. The
 gauge of every lot is double: the bench, and the two games' busy master
 cycles a frame on their scenario.
+
+## Design notes for the next compiler lot: values that cross a call, off the stack (draft, 2026-11-11)
+
+Granted by the conductor as the next lot, with the second gauge as a
+criterion (the two games' busy master cycles a frame: 195 933 and 214 089
+at the start, measured by us on each lot from their sources built on this
+tree outside their repositories, confirmed by their sessions).
+
+What the counts allow (estimate, to be replaced by a measurement): the
+`n,s` traffic is 9 and 18 % of the games' busy time; a direct-page slot
+saves one cycle in five on each access (2 to 4 %), ends "index fetched from
+the stack" (1.2 to 2.1 %), the frame set-up (about 40 master cycles of the
+226 a call costs: 1 %) and the counters kept on the stack (0.9 % in one
+game): 4 to 7 % of busy time. Arguments in registers and near calls: up to
+4 %. Not more: the lot is worth doing, and it is not the whole gap.
+
+Two ways, and why the first alone is not enough:
+- **Callee-saved direct-page slots** (as one 65816 compiler does): safe
+  with recursion and interrupts, no whole-program knowledge; but saving and
+  restoring a slot costs about 15 CPU cycles a call, and at 54 to 68
+  non-leaf calls a frame with two or three slots each that is what the lot
+  would gain. Only as the fallback.
+- **Static frames along the call graph** (as the 6502 compilers do): a
+  function that is not recursive keeps its cross-call values at fixed
+  direct-page addresses, laid out by depth so that a caller's and a
+  callee's never overlap, nothing saved. In the direct page, because the
+  NMI handler runs on its own direct page: a function called from the main
+  loop and from an interrupt callback is then safe by construction, which
+  absolute addresses would not give. Room: `$A0-$FF` of the page, 48 words
+  for the deepest chain, costliest values first (the existing cost: use
+  count weighted by loop depth), the overflow on the stack as today; the
+  NMI's mirror page grows from 160 to 256 bytes.
+  What must be proven, and by whom: inside a module the call graph of the
+  `static` functions is known (the inliner already walks it); for exported
+  functions and calls through pointers it is not. So the compiler writes,
+  per function, its callees and the slots it holds across each call, and
+  the link check (`opensnes-rom check`, which already refuses a link) builds
+  the whole graph and FAILS the link on a cycle through a function with a
+  static frame or on two live frames that overlap; a function may be marked
+  reentrant in the source and keeps the stack. Refused, never miscompiled.
+- The measurement that decides the ambition: the hand rewrite of a hot
+  routine of each game (running). If a hand gets 1.3 on a real routine, this
+  lot and the machine-level optimiser are the plan; if it gets 2, the
+  question of a new code generator (B6) is open.
+
+The bench is to be re-weighted on the games' profiles (calls, stack, bytes)
+before its mean is quoted again; the old mean stays beside it.
