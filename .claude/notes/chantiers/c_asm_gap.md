@@ -1,0 +1,117 @@
+# C against hand-written assembly: the plan of approaches (2026-11-11)
+
+Goal (owner): bring the cost of C compiled by cc65816 as close as possible to
+1 for 1 with 65816 assembly written by hand. This page compares the
+approaches, gives the starting factor per routine and the factor each
+approach aims at. Nothing is fixed before it is reviewed; then one cause,
+one fix, one measurement, and this page gets the measured column.
+
+## Where we start (A1, done: `devtools/gapbench`, `make bench-gap`)
+
+Master cycles a call on luna, SlowROM (FastROM gives the same factors).
+
+| routine | C | asm | C/asm | where the extra cycles go (read in the compiler's output) |
+|---|--:|--:|--:|---|
+| copy | 22 276 | 13 842 | 1.61 | the loop is already the hand loop; assembly has `mvn` |
+| fill | 40 928 | 16 177 | 2.53 | the value reloaded every turn (4 of 20 cycles), no unrolling |
+| oam | 47 734 | 22 893 | 2.09 | structure through a 32-bit pointer, bytes one `sep`/`rep` each, signed compares |
+| col | 28 912 | 6 452 | 4.48 | a far pointer walked in memory (32-bit add a turn, re-staged a turn), counter in memory, no unrolling |
+| row | 19 152 | 6 452 | 2.97 | counter in memory (X is taken), value through a temporary, `sep`/`rep` + two masks a byte, no unrolling |
+| box | 20 712 | 12 408 | 1.67 | signed compare as `sbc / bvc / eor`, the `&&` chain made a 0/1 value, counter in memory |
+| fixed | 94 370 | 10 474 | 9.01 | `(s32)a * b` calls the general 32x32 multiply (four pushes, sixteen partial products' worth of work for a 16x8 need); `>> 8` is eight one-bit shifts through memory |
+| mul | 27 126 | 7 772 | 3.49 | `u8 * u8` calls the general 16x16 routine (it does use the hardware multiplier, three products and the interrupt-context test) with its arguments on the stack |
+| ents | 34 021 | 14 738 | 2.31 | `Ent *e` is a 32-bit pointer stepped in memory, fields read `lda.l $0000NN,x`, bytes one `sep`/`rep` each |
+| call | 69 380 | 32 642 | 2.13 | three pushes, `jsl`, the stack put back by `tsa/adc/tas`, the caller's own values on the stack across the call |
+| soa | 40 262 | 24 865 | 1.62 | one index register for word and byte arrays, signed compares, temporaries |
+| glide | 106 399 | 67 680 | 1.57 | one index register, the sign extension of a table byte, temporaries |
+| **geometric mean** | | | **2.55** | from 1.57 to 9.01 |
+
+The assembly column is ours: it is a floor we wrote, not the state of the
+art. A9 replaces it by what shipped games do.
+
+The 1.7 to 1.9 quoted before this bench was one routine (the copy). On
+twelve, three families stand out: what the 65816 or the console has and C
+has no word for (block move, hardware multiplier: copy, fixed, mul), what a
+register allocator would do (counter and second index in registers, no
+temporaries: every row), and what the ABI costs (call, pointers of 32 bits).
+
+## The approaches
+
+Gain: the factor aimed at on the rows named, an estimate from counting the
+cycles of the instructions the approach removes; the measured column is
+filled lot by lot. Cost and risk: S / M / L.
+
+| | Approach | Aims at | Estimated | Cost | Risk | Measured |
+|---|---|---|---|---|---|---|
+| A9 | **The yardstick of commercial games**: four to six successful games of the console, chosen so that their routines cover our use cases (scrolling, sprite list and OAM, DMA and HDMA, main loop and dispatch, sound, decompression). Each is disassembled on the machine, outside this repository; a routine of theirs is set beside what the SDK produces for the same use case in our examples (library assembly and compiled C both); the output is the table of what the SDK lacks or does worse. Here: only the patterns in our own words, a stand-alone example or bench row per pattern, and our measurements; no code, address or title | every row, the library, and what no row covers yet (data layout, dispatch, VBlank scheduling) | unknown until the first routine is read; it sets the ceiling the other approaches aim at, in place of our own hand assembly | M per game (reading), S per pattern | S for this repository (nothing of a game enters it); the titles and ROMs are the owner's decision | |
+| A1 | **The bench against hand assembly**, kept as a gate (`--check` in `make tests`): no routine may get slower | all | the instrument | done | none | 2.55 |
+| A6a | **Backend peephole and register use**: Y as a second index (catalogue A11), the loop counter in X or Y whatever else the body does, a value kept in A across an index load, a byte read as a word read + mask where the address is plain RAM or ROM, one mask not two, invariant reload out of the loop | row, col, fill, box, soa, glide, oam, ents | each of them down by 20 to 35 %: 1.6 -> 1.2-1.3, 3.0 -> 2.0 | M, a series of small rules | M: a peephole mistake is silent; each rule gets its difftest hunt (20 000 seeds) | |
+| A6b | **Bounded search for shorter sequences**: every straight-line window of 2 to 4 instructions the corpus emits, replaced by the shortest sequence with the same effect on A, X, Y, flags read later and memory, found by exhaustive search on a 65816 model and checked on luna | all, a few % each | 3 to 8 % overall (hypothesis until the first run) | M | M: the model of "flags read later" must be exact; rules land through the same hunt | |
+| A5 | **Calling convention**: first arguments in A / X / Y or direct-page slots for functions not reachable from assembly (the test already exists: `addrtaken`, not exported), `jsr`/`rts` inside a module, no frame rebuild after a call, 16-bit pointers for plain RAM objects where the type says so | call, ents, oam, mul | call 2.13 -> 1.3; ents and oam down by 15 % | L: ABI, library assembly keeps the stack ABI at its boundary | L: every asm/C boundary; Class A with the A/B corpus proof | |
+| A7 | **The library and the runtime in assembly where it is hot**: multiply entries sized to the operands the compiler can prove (8x8 inline on the hardware multiplier, 16x8, 16x16 -> 32 widening; today every product takes the general 16x16 or 32x32 routine), `>> 8` / `>> 16` as byte moves, `memcpy` / `memset` on `mvn` and unrolled stores, sprite list and row / column builders as library routines | fixed, mul, copy, fill | fixed 9.0 -> 1.5-2; mul 3.5 -> 1.5; `memcpy` under the C loop instead of above it | M | M: the hardware multiplier is shared with interrupt callbacks (the runtime tests `in_nmi_ctx` and takes a software path there; an inline sequence must keep that test); Class A/B | |
+| A6c | **Idioms the compiler can recognise**: a copy loop becomes `mvn`, a fill loop unrolled stores, a counted loop with a small body and a constant bound is unrolled (by 2, 4, 8 or whole), widening multiply recognised from `(s32)a * b` | copy, fill, col, row, fixed | copy 1.61 -> 1.0-1.1; fill 2.5 -> 1.2; col / row to under 2 | M-L | M: code size (a budget per function, measured on the 65 ROMs) | |
+| A8 | **What the programmer can say**: a documented set, each measured on the bench: `static` (already inlined at one site), locals for globals a store may alias, `FAR` only where needed, near pointers, an attribute to put a global in the direct page, an `inline` asm-free intrinsic header for the multiplier and block move (`mul8x8()`, `memcpy`), tables over shifts | all, at the source | 5 to 20 % on a routine rewritten with the guide; the intrinsics give A7's gain where the compiler cannot see the idiom | S-M | S | measured today, source changed only: an index instead of a walked pointer, ents 2.31 -> 1.62, col 4.48 -> 3.54; the 16x8 product split by hand, fixed 9.01 -> 4.03; a fill unrolled by hand in C gets SLOWER (2.53 -> 3.03) and so does row with an index (2.97 -> 3.11): two findings for A6a |
+| A3 | **State of the art**: what llvm-mos, cc65, KickC, Oscar64, vbcc and the 65816 compilers (Calypsi, WDC, ORCA/C) do that we do not, from their documentation; feeds A5, A6, A8 with techniques already proven elsewhere | ordering of the others | no gain of its own | S (documentary) | none | done, see below |
+| A2 | **Idioms of a professional assembly game**: a partner port sets the routines of a commercial game beside our compiler's output for the same job and sends generic patterns in words; each pattern is reproduced in a stand-alone example here and measured on the bench | new rows, new rules for A6a / A8 | unknown until the patterns arrive | S on our side per pattern | S (nothing of that game enters this repository) | |
+| A4 | **Profiles of real games**: `luna profile` on the games built on the SDK, their ten heaviest routines, each given a stand-alone twin in the bench when its shape is not there yet (two are: soa, glide); the gain of every lot is also read on those games, by their sessions | keeps the bench honest | no gain of its own | S per routine | none | 2 of 12 rows |
+
+## What the others do that we do not (A3, read 2026-11-11)
+
+Read in the sources and manuals named; no project publishes a gain per
+technique, and none publishes C against hand assembly. The one public
+comparison (c-bench-64, 6502, seconds) puts the compilers that allocate the
+zero page and pass arguments in registers 2 to 10 times ahead of cc65.
+llvm-mos has no 16-bit 65816 code generation (its issues 320 and 321 are
+open); the 65816 references are Calypsi, WDC and ORCA/C.
+
+| Technique | Who | Goes into |
+|---|---|---|
+| A pointer walked by a loop stays put in the direct page and Y steps (`lda [dp],y`); pointers live where the indirect modes reach them without a copy | llvm-mos (`MOSIndexIV`, `MOSCallingConv.td`) | A6a |
+| 8-bit accesses grouped so the width switches once a region; a byte read as a word read | Calypsi 65816 guide, 20.3.3; Oscar64 narrows 16 to 8 bits by value ranges and takes `__assume()` | A6a, A8 |
+| First argument in A (opt-in: `simple_call`, fastcall), then arguments in direct-page pseudo-registers, some kept across calls | Calypsi (`_Dp[0-7]`, `_Dp[8-15]`), llvm-mos (`RC`/`RS`), vbcc (`r0..r7`), cc65 | A5, in that order: the opt-in form does not touch the library's assembly |
+| Static frames from a whole-program proof of non-reentrance, overlapped along the call graph | llvm-mos (`MOSNonReentrant`, `MOSZeroPageAlloc`), Oscar64, cc65 `--static-locals`, KickC | A5 (first step: the `static` functions of a module) |
+| Load/store runs and repeated stores turned into `memcpy` / `memset`; block move for structure copies | llvm-mos (`MOSCombiner`) | A6c |
+| Unrolling asked by pragma (`unroll(full)`), forced inlining, constant parameters propagated into the callee | Oscar64, Calypsi | A6c, A8 |
+| Peephole rules found by exhaustive search and proven (solver or shared emulator) | DeiMOS, 6502-enumerator, Massalin 1987 | A6b |
+| Register choice by search on the cycle cost; optimal allocation by tree decomposition | KickC (`uplift`), SDCC (Krause 2013) | not planned: the heaviest step, after everything else |
+
+Not found anywhere: a compiler that inlines the console's multiplier. The
+PPU one (`$211B` -> `$2134`) is signed 16x8 with no wait, but unusable while
+Mode 7 is displayed.
+
+Sources: llvm-mos `llvm/lib/Target/MOS/*` (github.com/llvm-mos/llvm-mos),
+Calypsi 65816 guide 5.18 (github.com/hth313/Calypsi-tool-chains), Oscar64
+manual (github.com/drmortalwombat/oscar64), cc65 documentation
+(cc65.github.io), vbcc 6502 documentation, KickC manual
+(gitlab.com/camelot/kickc), ORCA/C `Gen.pas` (github.com/byteworksinc/ORCA-C),
+c-bench-64 (github.com/thred/c-bench-64), snes.nesdev.org wiki
+(Multiplication, MVN and MVP block copy). Not readable that day: the
+llvm-mos wiki, Krause's figures, the rules of PVSnesLib's 816-opt.
+
+## Order
+
+0. **A9 as soon as the ROMs are there**, one use case at a time, in parallel
+   with everything below: it corrects the targets and adds rows.
+1. **A3 and A4 first, they cost little and steer the rest** (A3 done, above;
+   A4: ask each game for its current top ten).
+2. **A7 runtime multiply and shifts**: the largest factor (9.0, 3.5), a
+   closed piece of assembly, no change to code generation.
+3. **A6a**, rule by rule, most frequent pattern first (counter and second
+   index in registers, byte reads, temporaries): it moves every row and
+   every game.
+4. **A6c** block move and unrolling, then **A8** written from what 2-4
+   taught (the guide says what the compiler now does alone).
+5. **A5** last among the code-generation lots: the widest change, and its
+   gain is measured better once the loops are tight.
+6. **A6b** when the hand-written rules stop paying; **A2** whenever patterns
+   arrive.
+
+Target, to be confirmed after lots 2 and 3: geometric mean under 1.5, no
+row above 2.0, with unchanged or smaller code on the 65 examples. 1.0 on
+every row is not promised: `col` and `row` at 1.0 mean full unrolling
+(505 bytes against 122).
+
+Every fix: gain on the bench, `make tests`, both differential tests, the 65
+ROMs rebuilt (identical or differences explained and checked on luna), no
+size or speed regression elsewhere (`sdkbench`, `libbench`, `cyclecount`),
+and a lesson per cause in the porting kit.

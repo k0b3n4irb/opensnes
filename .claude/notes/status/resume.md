@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-11-08, evening)
+# Where the work stands (resume note, 2026-11-11, evening)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -182,9 +182,24 @@ and the CHANGELOG.
 
 ## In progress
 
-Nothing between turns. OpenSNES works reactive (owner, 2026-10-29): it
-answers the games, luna and the porting tools, and starts no chantier of
-its own.
+**Priority lot since 2026-11-11 (owner): bring C closer to hand-written assembly, then an 8-direction scrolling brick.**
+The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to A9, starting factor per routine, order).
+- Done: `devtools/gapbench` (`make bench-gap`, `--check` in `make tests`): twelve routines, C against assembly by hand,
+  geometric mean 2.55, from 1.57 to 9.01. The plan is written and sent to the conductor for review.
+- **No compiler or library fix before the conductor has reviewed the plan.** Then, in the plan's order: runtime multiply and
+  shifts (A7), backend peephole and registers (A6a), idioms (A6c), the guide (A8), the calling convention (A5).
+- Waiting: the conductor's review; the commercial ROMs of A9 (the owner provides them; disassembly happens outside this
+  repository, only patterns in our words come back); the patterns of A2 from a partner port; the games' top-ten profiles (A4).
+- After the gap: the 8-direction scrolling brick (tile ring, new row and column in grouped DMA, VBlank budget measured), from
+  a partner port's real case, with an example, a luna test and its figure; that port tries it.
+- **Weekly duty (owner, 2026-11-11)**: a thread to the conductor with three new approaches or outside yardsticks not tried
+  yet, each with its expected gain, cost and what kept us from it. First one 2026-11-12, then every week.
+- **Why the yardstick of commercial games did not come from us**: our yardsticks were PVSnesLib (`sdkbench`, `libbench`,
+  `twinbench`) and ourselves (`cyclecount`); being 63 % ahead of PVSnesLib stood in for a measurement against hand assembly
+  or a shipped game, and since 2026-10-29 the project worked reactive only. An outside yardstick is now part of every plan.
+
+Reactive work goes on beside it (the games, luna, the porting tools):
+
 - **Done and pushed 2026-11-10 (develop `5ab849a7`, then `213d50df`)**: cproc refusal of mode/vector_size and the
   other attributes that change the program (fork `82e1c1d`; lesson written in the porting kit); stable section sort in the wla-dx
   fork (`96e7860d`, 6 patches; Linux ROMs byte-identical, the CI hash lists must now be equal on macOS and Windows: READ
