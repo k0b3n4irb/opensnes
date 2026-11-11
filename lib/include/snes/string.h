@@ -29,11 +29,11 @@
  * From 12 bytes up, memcpy copies with the CPU's block move (`mvn`): 7 CPU
  * cycles a byte, about 54 master cycles a byte between two RAM buffers on
  * luna. memmove does the same in either direction (`mvp` backward, from 14
- * bytes). memset stores a word at a time through the pointer, 8 CPU cycles
- * a byte. Shorter copies go a word at a time through the pointers (about
- * 12 CPU cycles a byte), which is faster than setting up the block move. A
- * call costs about 1 200 master cycles before its first byte, the C call
- * itself included.
+ * bytes). memset fills with unrolled word stores from 20 bytes up: about
+ * 3.6 CPU cycles a byte, 28 master cycles. Shorter counts go a word at a
+ * time through the pointers (about 12 and 8 CPU cycles a byte), which is
+ * faster than setting up the block move. A call costs about 1 200 master
+ * cycles before its first byte, the C call itself included.
  *
  * All three may be called from an NMI callback, also while the main thread
  * is inside one: the block move's instruction is written on the stack for
