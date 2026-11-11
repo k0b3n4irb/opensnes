@@ -66,6 +66,23 @@ void k_fill_c(void) {
     fl_val = v + 0x0101;
 }
 
+/* The same fill, unrolled by hand in the source: what a programmer tries
+ * first. It must not be slower than the plain loop (it was, 2026-11-11). */
+void k_fillu_c(void) {
+    u16 i, v = fl_val;
+    for (i = 0; i < 256; i += 8) {
+        fl_buf[i] = v;
+        fl_buf[i + 1] = v;
+        fl_buf[i + 2] = v;
+        fl_buf[i + 3] = v;
+        fl_buf[i + 4] = v;
+        fl_buf[i + 5] = v;
+        fl_buf[i + 6] = v;
+        fl_buf[i + 7] = v;
+    }
+    fl_val = v + 0x0101;
+}
+
 u16 c_fill(void) { return sum((const u8 *)fl_buf, 512) + fl_val; }
 
 /* ---- oam: a sprite list built from 32 objects, culled, the rest hidden -- */
@@ -159,6 +176,24 @@ void k_row_c(void) {
     u8 FAR *p = &map[map_y * 64 + map_x];
     for (c = 0; c < 32; c++)
         rowbuf[c] = tile_tab[p[c]];
+    map_y = (map_y + 1) & 31;
+}
+
+/* The same row and column with an index into the map instead of a walked
+ * pointer: the other way to write them. */
+void k_coli_c(void) {
+    u16 r, o = map_y * 64 + map_x;
+    for (r = 0; r < 32; r++) {
+        colbuf[r] = tile_tab[map[o]];
+        o += 64;
+    }
+    map_x = (map_x + 1) & 31;
+}
+
+void k_rowi_c(void) {
+    u16 c, o = map_y * 64 + map_x;
+    for (c = 0; c < 32; c++)
+        rowbuf[c] = tile_tab[map[o + c]];
     map_y = (map_y + 1) & 31;
 }
 
@@ -304,6 +339,25 @@ void k_ents_c(void) {
                 e->hp--;
             else
                 e->state = 0;
+        }
+    }
+}
+
+/* The same structures by index, ents[i].field, instead of a walked pointer. */
+void k_entsi_c(void) {
+    u16 i;
+    for (i = 0; i < 32; i++) {
+        if (!ents[i].state)
+            continue;
+        ents[i].x += ents[i].vx;
+        ents[i].y += ents[i].vy;
+        if (--ents[i].timer == 0) {
+            ents[i].timer = 6;
+            ents[i].vx = -ents[i].vx;
+            if (ents[i].hp)
+                ents[i].hp--;
+            else
+                ents[i].state = 0;
         }
     }
 }

@@ -20,6 +20,15 @@
    "asm_bytes": 56,
    "ratio": 2.53
   },
+  "fillu": {
+   "c": 49038,
+   "c_sum": 14232,
+   "c_bytes": 142,
+   "asm": 16177,
+   "asm_sum": 14232,
+   "asm_bytes": 56,
+   "ratio": 3.03
+  },
   "oam": {
    "c": 47734,
    "c_sum": 40489,
@@ -38,6 +47,15 @@
    "asm_bytes": 505,
    "ratio": 4.48
   },
+  "coli": {
+   "c": 22814,
+   "c_sum": 5253,
+   "c_bytes": 95,
+   "asm": 6452,
+   "asm_sum": 5253,
+   "asm_bytes": 505,
+   "ratio": 3.54
+  },
   "row": {
    "c": 19152,
    "c_sum": 43582,
@@ -47,8 +65,17 @@
    "asm_bytes": 505,
    "ratio": 2.97
   },
+  "rowi": {
+   "c": 20046,
+   "c_sum": 43582,
+   "c_bytes": 87,
+   "asm": 6452,
+   "asm_sum": 43582,
+   "asm_bytes": 505,
+   "ratio": 3.11
+  },
   "box": {
-   "c": 20712,
+   "c": 20710,
    "c_sum": 57396,
    "c_bytes": 210,
    "asm": 12408,
@@ -66,7 +93,7 @@
    "ratio": 9.01
   },
   "mul": {
-   "c": 27126,
+   "c": 27123,
    "c_sum": 48533,
    "c_bytes": 85,
    "asm": 7772,
@@ -83,6 +110,15 @@
    "asm_bytes": 85,
    "ratio": 2.31
   },
+  "entsi": {
+   "c": 23919,
+   "c_sum": 38482,
+   "c_bytes": 147,
+   "asm": 14738,
+   "asm_sum": 38482,
+   "asm_bytes": 85,
+   "ratio": 1.62
+  },
   "call": {
    "c": 69380,
    "c_sum": 13401,
@@ -93,7 +129,7 @@
    "ratio": 2.13
   },
   "soa": {
-   "c": 40262,
+   "c": 40259,
    "c_sum": 18949,
    "c_bytes": 312,
    "asm": 24865,
@@ -102,10 +138,10 @@
    "ratio": 1.62
   },
   "glide": {
-   "c": 106399,
+   "c": 106396,
    "c_sum": 9411,
    "c_bytes": 259,
-   "asm": 67680,
+   "asm": 67682,
    "asm_sum": 9411,
    "asm_bytes": 163,
    "ratio": 1.57
@@ -132,6 +168,15 @@
    "asm_bytes": 56,
    "ratio": 2.53
   },
+  "fillu": {
+   "c": 41334,
+   "c_sum": 14232,
+   "c_bytes": 142,
+   "asm": 13442,
+   "asm_sum": 14232,
+   "asm_bytes": 56,
+   "ratio": 3.07
+  },
   "oam": {
    "c": 39608,
    "c_sum": 40489,
@@ -142,7 +187,7 @@
    "ratio": 2.09
   },
   "col": {
-   "c": 24572,
+   "c": 24574,
    "c_sum": 5253,
    "c_bytes": 122,
    "asm": 5414,
@@ -150,35 +195,53 @@
    "asm_bytes": 505,
    "ratio": 4.54
   },
+  "coli": {
+   "c": 19170,
+   "c_sum": 5253,
+   "c_bytes": 95,
+   "asm": 5412,
+   "asm_sum": 5253,
+   "asm_bytes": 505,
+   "ratio": 3.54
+  },
   "row": {
-   "c": 16316,
+   "c": 16314,
    "c_sum": 43582,
    "c_bytes": 107,
-   "asm": 5414,
+   "asm": 5412,
    "asm_sum": 43582,
    "asm_bytes": 505,
    "ratio": 3.01
   },
+  "rowi": {
+   "c": 16927,
+   "c_sum": 43582,
+   "c_bytes": 87,
+   "asm": 5414,
+   "asm_sum": 43582,
+   "asm_bytes": 505,
+   "ratio": 3.13
+  },
   "box": {
-   "c": 17540,
+   "c": 17538,
    "c_sum": 57396,
    "c_bytes": 210,
-   "asm": 10296,
+   "asm": 10298,
    "asm_sum": 57396,
    "asm_bytes": 127,
    "ratio": 1.7
   },
   "fixed": {
-   "c": 79945,
+   "c": 79942,
    "c_sum": 30783,
    "c_bytes": 231,
-   "asm": 8772,
+   "asm": 8769,
    "asm_sum": 30783,
    "asm_bytes": 83,
-   "ratio": 9.11
+   "ratio": 9.12
   },
   "mul": {
-   "c": 24695,
+   "c": 24692,
    "c_sum": 48533,
    "c_bytes": 85,
    "asm": 6398,
@@ -187,13 +250,22 @@
    "ratio": 3.86
   },
   "ents": {
-   "c": 28410,
+   "c": 28413,
    "c_sum": 38482,
    "c_bytes": 195,
-   "asm": 12342,
+   "asm": 12344,
    "asm_sum": 38482,
    "asm_bytes": 85,
    "ratio": 2.3
+  },
+  "entsi": {
+   "c": 19893,
+   "c_sum": 38482,
+   "c_bytes": 147,
+   "asm": 12342,
+   "asm_sum": 38482,
+   "asm_bytes": 85,
+   "ratio": 1.61
   },
   "call": {
    "c": 60474,

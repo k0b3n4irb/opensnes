@@ -1,6 +1,6 @@
 # gapbench — what C costs against assembly written by hand
 
-Twelve routines of the kind a game runs every frame, each written twice on the
+Twelve routines (and four of them written a second way in C) of the kind a game runs every frame, each written twice on the
 same data: in C (`kernels.c`, compiled by cc65816) and in 65816 assembly by
 hand (`kernels.asm`). `run.py` builds one ROM, SlowROM and FastROM, and reads
 from luna the master cycles of 16 calls of each, interrupts off, minus the same
@@ -44,17 +44,27 @@ Master cycles a call. `C/asm` is the factor to bring down.
 |---|--:|--:|--:|--:|--:|--:|--:|--:|
 | copy | 22276 | 13842 | 1.61 | 18563 | 12236 | 1.52 | 26 | 15 |
 | fill | 40928 | 16177 | 2.53 | 34018 | 13442 | 2.53 | 39 | 56 |
+| fillu * | 49038 | 16177 | 3.03 | 41334 | 13442 | 3.07 | 142 | 56 |
 | oam | 47734 | 22893 | 2.09 | 39608 | 18937 | 2.09 | 368 | 169 |
-| col | 28912 | 6452 | 4.48 | 24572 | 5414 | 4.54 | 122 | 505 |
-| row | 19152 | 6452 | 2.97 | 16316 | 5414 | 3.01 | 107 | 505 |
-| box | 20712 | 12408 | 1.67 | 17540 | 10296 | 1.70 | 210 | 127 |
-| fixed | 94370 | 10474 | 9.01 | 79945 | 8772 | 9.11 | 231 | 83 |
-| mul | 27126 | 7772 | 3.49 | 24695 | 6398 | 3.86 | 85 | 52 |
-| ents | 34021 | 14738 | 2.31 | 28410 | 12342 | 2.30 | 195 | 85 |
+| col | 28912 | 6452 | 4.48 | 24574 | 5414 | 4.54 | 122 | 505 |
+| coli * | 22814 | 6452 | 3.54 | 19170 | 5412 | 3.54 | 95 | 505 |
+| row | 19152 | 6452 | 2.97 | 16314 | 5412 | 3.01 | 107 | 505 |
+| rowi * | 20046 | 6452 | 3.11 | 16927 | 5414 | 3.13 | 87 | 505 |
+| box | 20710 | 12408 | 1.67 | 17538 | 10298 | 1.70 | 210 | 127 |
+| fixed | 94370 | 10474 | 9.01 | 79942 | 8769 | 9.12 | 231 | 83 |
+| mul | 27123 | 7772 | 3.49 | 24692 | 6398 | 3.86 | 85 | 52 |
+| ents | 34021 | 14738 | 2.31 | 28413 | 12344 | 2.30 | 195 | 85 |
+| entsi * | 23919 | 14738 | 1.62 | 19893 | 12342 | 1.61 | 147 | 85 |
 | call | 69380 | 32642 | 2.13 | 60474 | 27880 | 2.17 | 76 | 30 |
-| soa | 40262 | 24865 | 1.62 | 33916 | 20809 | 1.63 | 312 | 171 |
-| glide | 106399 | 67680 | 1.57 | 89510 | 56049 | 1.60 | 259 | 163 |
+| soa | 40259 | 24865 | 1.62 | 33916 | 20809 | 1.63 | 312 | 171 |
+| glide | 106396 | 67682 | 1.57 | 89510 | 56049 | 1.60 | 259 | 163 |
 | geometric mean |  |  | 2.55 |  |  | 2.58 |  |  |
+
+A row marked `*` is the same routine written another way in C (`fillu` unrolled by
+hand, `coli` / `rowi` / `entsi` with an index instead of a walked pointer), against
+the same assembly. They are not in the mean: they are there because the way
+the C is written must not matter this much, and because an unrolled fill must
+not be slower than the loop.
 
 `copy` through the library's `memcpy`: 24 276 (SlowROM), slower than the C
 loop. The factor is the same SlowROM and FastROM: the gap is in the

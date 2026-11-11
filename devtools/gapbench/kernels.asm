@@ -31,12 +31,18 @@ bench_table:
     .dl s_copy,  k_copy_lib,  c_copy
     .dl s_fill,  k_fill_c,    c_fill
     .dl s_fill,  k_fill_asm,  c_fill
+    .dl s_fill,  k_fillu_c,   c_fill
+    .dl s_fill,  k_fillu_asm, c_fill
     .dl s_oam,   k_oam_c,     c_oam
     .dl s_oam,   k_oam_asm,   c_oam
     .dl s_map,   k_col_c,     c_col
     .dl s_map,   k_col_asm,   c_col
+    .dl s_map,   k_coli_c,    c_col
+    .dl s_map,   k_coli_asm,  c_col
     .dl s_map,   k_row_c,     c_row
     .dl s_map,   k_row_asm,   c_row
+    .dl s_map,   k_rowi_c,    c_row
+    .dl s_map,   k_rowi_asm,  c_row
     .dl s_box,   k_box_c,     c_box
     .dl s_box,   k_box_asm,   c_box
     .dl s_fixed, k_fixed_c,   c_fixed
@@ -45,6 +51,8 @@ bench_table:
     .dl s_mul,   k_mul_asm,   c_mul
     .dl s_ents,  k_ents_c,    c_ents
     .dl s_ents,  k_ents_asm,  c_ents
+    .dl s_ents,  k_entsi_c,   c_ents
+    .dl s_ents,  k_entsi_asm, c_ents
     .dl s_call,  k_call_c,    c_call
     .dl s_call,  k_call_asm,  c_call
     .dl s_soa,   k_soa_c,     c_soa
@@ -139,6 +147,7 @@ k_copy_asm:
 .SECTION ".gap_fill" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_fillu_asm:                    ; the same twin: only the C differs
 k_fill_asm:
     lda.w fl_val
     tay
@@ -274,6 +283,7 @@ k_oam_asm:
 .SECTION ".gap_col" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_coli_asm:                    ; the same twin: only the C differs
 k_col_asm:
     lda.w map_y
     asl a
@@ -303,6 +313,7 @@ k_col_asm:
 .SECTION ".gap_row" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_rowi_asm:                    ; the same twin: only the C differs
 k_row_asm:
     lda.w map_y
     asl a
@@ -501,6 +512,7 @@ k_mul_asm:
 .SECTION ".gap_ents" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_entsi_asm:                    ; the same twin: only the C differs
 k_ents_asm:
     ldx.w #0
 @loop:

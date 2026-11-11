@@ -32,6 +32,9 @@ WORK = REPO / "build" / "gapbench"
 BASELINE = HERE / "baseline.json"
 SOURCES = ("Makefile", "kernels.c", "kernels.asm")
 SPEEDS = {"slow": 0, "fast": 1}
+# A routine moved in the ROM meets the memory refresh at other instructions:
+# a few master cycles in tens of thousands. Anything beyond is a real change.
+TOLERANCE = 0.002
 
 
 def table():
@@ -106,7 +109,7 @@ def measure(luna, speed):
         r[variant] = round((s - seg[0]) / calls)
         r[variant + "_sum"] = c
         if variant != "lib":
-            r[variant + "_bytes"] = size.get(sym)
+            r[variant + "_bytes"] = size.get(sym) or size.get(re.sub(r"[ui]_asm$", "_asm", sym))
     for kernel, r in res.items():
         bad = [v for v in ("asm", "lib") if v in r and r[v + "_sum"] != r["c_sum"]]
         if bad or r["c_sum"] == 0:
@@ -121,10 +124,15 @@ def geomean(xs):
     return round(math.exp(sum(map(math.log, xs)) / len(xs)), 2)
 
 
+def other_source(kernel, res):
+    """fillu, coli, rowi, entsi: the same routine written another way in C,
+    against the same assembly. Shown, not counted in the mean."""
+    return kernel[-1] in "ui" and kernel[:-1] in res
+
+
 def summary(res):
-    return {"geomean": geomean([r["ratio"] for r in res.values()]),
-            "min": min(r["ratio"] for r in res.values()),
-            "max": max(r["ratio"] for r in res.values())}
+    ratios = [r["ratio"] for k, r in res.items() if not other_source(k, res)]
+    return {"geomean": geomean(ratios), "min": min(ratios), "max": max(ratios)}
 
 
 def print_table(results, markdown):
@@ -133,7 +141,7 @@ def print_table(results, markdown):
     lines = []
     for k in slow:
         s, f = slow[k], fast[k]
-        lines.append((k, s["c"], s["asm"], f"{s['ratio']:.2f}", f["c"], f["asm"], f"{f['ratio']:.2f}",
+        lines.append((k + (" *" if other_source(k, slow) else ""), s["c"], s["asm"], f"{s['ratio']:.2f}", f["c"], f["asm"], f"{f['ratio']:.2f}",
                       s["c_bytes"], s["asm_bytes"]))
     ss, sf = summary(slow), summary(fast)
     lines.append(("geometric mean", "", "", f"{ss['geomean']:.2f}", "", "", f"{sf['geomean']:.2f}", "", ""))
@@ -150,7 +158,8 @@ def print_table(results, markdown):
         if "lib" in slow[k]:
             print(f"\n{k}: the library's routine, {slow[k]['lib']} master cycles a call SlowROM, "
                   f"{fast[k]['lib']} FastROM")
-    print(f"\nmaster cycles a call; C/asm from {ss['min']:.2f} to {ss['max']:.2f} SlowROM, "
+    print("\n* the same routine written another way in C, against the same assembly; not in the mean")
+    print(f"master cycles a call; C/asm from {ss['min']:.2f} to {ss['max']:.2f} SlowROM, "
           f"{sf['min']:.2f} to {sf['max']:.2f} FastROM")
 
 
@@ -164,9 +173,9 @@ def check(results):
                 bad.append(f"{speed}/{k}: not in baseline.json (--update)")
                 continue
             for v in ("c", "asm"):
-                if r[v] > b[v]:
+                if r[v] > b[v] * (1 + TOLERANCE):
                     bad.append(f"{speed}/{k}: {v} {r[v]} master cycles, baseline {b[v]}")
-                elif r[v] < b[v]:
+                elif r[v] < b[v] * (1 - TOLERANCE):
                     print(f"note: {speed}/{k}: {v} {r[v]} is under the baseline {b[v]} (--update to keep the gain)")
     if bad:
         sys.exit("gapbench: slower than baseline.json\n  " + "\n  ".join(bad))
