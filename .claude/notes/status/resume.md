@@ -190,6 +190,15 @@ The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to
   written by an Opus agent in its own worktree (`a6a-lot1`: five backend rules; `a7-string`: `memcpy` / `memset`). Nothing of
   theirs is on `develop` until this session has re-run every gate (Class A: A/B corpus proof, both differential hunts,
   `make tests`). The live state is the last section of the plan.
+- **The project is no longer reactive (owner, 2026-11-11)**: it proposes its own chantiers. Due at the end of the A9
+  analysis: a plan of approaches FOUND BY US, beyond A1 to A9 (each with its aim, expected gain, first measurement, and what
+  kept us from thinking of it), handed to the conductor for the owner. At every lot the question is asked: what would the best
+  compiler team do in our place, and which yardstick are we not looking at.
+- **A9 is unlocked and running**: the commercial ROMs are on the machine (the emulator's local corpus, outside git); they are
+  read in place, disassembled by execution trace (`luna state --trace-log`) into a folder outside every repository. A first
+  game is being read (sprite list, object loop, main loop, NMI and transfers, scrolling, collisions, arithmetic,
+  decompression); only patterns in our words and our own measurements come back here. Next: a game with 8-direction scrolling,
+  before the scrolling brick is written.
 - **After each measured advance: one thread to luna and the two games** for their factual return on their real case (owner,
   2026-11-11: every other project is on hold and wakes only for that).
 - Waiting: the conductor's review; the commercial ROMs of A9 (the owner provides them; disassembly happens outside this
