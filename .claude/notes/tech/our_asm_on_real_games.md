@@ -115,6 +115,9 @@ Outside its loop (47 % of A's gain): each 32-bit value built as
    the compiled C, 81 and 93 % of the busy time. This is the measured
    answer to "assembly massively, or a better compiler": the compiler,
    with assembly for the library's hot generic jobs.
+   (In B the hand version is called where the C was inlined into its caller,
+   and the caller, recompiled without the loop, changed cost too, by -7 %:
+   caller and routine together give 1.47.)
 4. The order of causes is register allocation first (values, index,
    counter: three quarters of the gain), then signed compares, then the
    data bank. Two leaves only: nothing here about functions that call.
