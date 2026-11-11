@@ -212,3 +212,21 @@ returns of the emulator and the two games). Candidates, none measured yet:
 - **B7. Whole-program knowledge**: static frames from the call graph,
   arguments in direct-page slots, 16-bit pointers where the program never
   leaves bank `$7E` low RAM (A5 taken to its end at link time).
+- **B8. An SDK that makes "less work a frame" the easy path.** What the
+  shipped games win by is not their instructions, it is what they do not do:
+  empty slots skipped in fifteen instructions, an active list instead of a
+  pass over every slot, work spread over frames by parity, a new tilemap
+  line only when the camera leaves a loaded window, nothing resent that did
+  not change, everything presented in one VBlank when the step is done. To
+  propose, each measured on an example against its naive form: an object
+  pool with an active list and a per-object code pointer; a "dirty" mark on
+  what the library sends (OAM ranges, tilemap lines, palettes) so an
+  unchanged frame costs nothing; a stagger helper (every Nth frame by
+  index); fixed OAM slots a pool; one present call. And the examples
+  themselves rewritten where they redo per frame what did not change.
+
+Target since 2026-11-11 (conductor): the assembly column stays the target
+(mean under 1.5, no row above 2.0), and a column "shipped games" is added
+where the work is comparable, so the table says, row by row, when the C
+passes under the level of a commercial game. The bench gets the rows it owes
+to the games' patterns and a realistic weight of calls.
