@@ -149,6 +149,20 @@ and a lesson per cause in the porting kit.
 - Disassembly for A9 lives outside every repository, in a folder the
   conductor named; nothing leaves it but patterns in our words.
 
+## A9, first results (2026-11-11)
+
+Three commercial games read; the note is `tech/commercial_yardsticks.md`.
+Shipped assembly is not faster than our hand assembly, often slower; it wins
+by doing less a frame. So the assembly column of the bench is a harder
+target than the games, and what the games add is (1) a figure for width
+discipline (22 `rep`/`sep` per 1000 instructions in two games, 52 in the
+third, 75 in our C), (2) the weight of the calling convention (they call 10
+to 35 times per 1000 instructions with arguments in registers and the direct
+page; the bench 4 times), (3) thirteen things the SDK lacks or does worse,
+four of them in the library (the map engine at 3 times their cost per
+tilemap entry, hiding sprites at 3 to 9 times, `oamSet`, the NMI handler's
+width switches), and (4) the rows the bench owes to their patterns.
+
 ## Our own approaches, beyond A1 to A9 (draft, to be completed and costed when the A9 analysis is in)
 
 The owner opened every door on 2026-11-11: a redesign, assembly used
