@@ -11,6 +11,10 @@ env QBE_NO_PEEP_FLOW=1
 # can (see phi_share): the copies this case pins are the ones made when
 # they cannot, so it is compiled with the sharing off.
 env QBE_NO_PHI_SHARE=1
+# Since a byte read is a word read and a mask (no `sep`/`rep` around it), the
+# pointer st stays in tcc__r9 for the whole loop (see peep_r9loop): the case
+# pins the moves to and from its slots.
+env QBE_NO_PEEP_R9LOOP=1
 # Several phi moves in a row each load their own source: the A-cache must
 # not believe A still holds a value a previous move replaced (the
 # writestring() regression). Ported from opensnes-emu test_phi_acache
@@ -23,4 +27,4 @@ in writestring: present adc\.w #32\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: |
 # ...the other branch writes them with a load each, not A reused.
 in writestring: present \tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tjmp @if_join
 # st is a 4-byte far pointer: *st reads through [tcc__r9] with its bank.
-in writestring: present sta\.b tcc__r9\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.b tcc__r9\+2\n\tsep #\$20\n\tlda \[tcc__r9\]
+in writestring: present sta\.b tcc__r9\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.b tcc__r9\+2\n\tlda \[tcc__r9\]\n\tand\.w #\$00FF

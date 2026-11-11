@@ -12,7 +12,7 @@ in long_wr: present sta\.l flong\+2
 
 # sym[idx]: absolute long INDEXED — one instruction, no [tcc__r9] setup,
 # the add($sym, idx) is folded into the access (index only, no high half)
-in idx_rd:   present tax\n\tsep #\$20\n\tlda\.l fbuf,x
+in idx_rd:   present tax\n\tlda\.l fbuf,x\n\tand\.w #\$00FF
 in idx_rd:   absent tcc__r9
 in idx_wr:   present sta\.l fbuf,x
 in idx_wr:   absent tcc__r9

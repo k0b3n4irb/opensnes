@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 79ee5d9022fdb4c6a35f548e940f685e8032569a | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | b6e307191e47e75226247f4cb16c19d7fbcf4d5f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 141 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 142 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+b6e3071 perf(w65816): a byte read is a word read and a mask — `lda / and.w #$00FF` with a 16-bit accumulator in place of `sep #$20 / lda / rep #$20 / and`; never for a volatile access nor an address whose constant part is outside low RAM and banks $7E-$7F (a register may have a read side effect); gapbench geometric mean 2.55 -> 2.44; `QBE_NO_BYTE_WORD=1` (A6a R1, 2026-11-11)
 79ee5d9 gvn: a divide or remainder of two constants is folded — an integer div / rem is pinned (it may trap) and dedupins skipped every pinned instruction before foldref, so `19391 / 3584` called __sdiv16; it now goes through foldref, which refuses a zero divisor and INT_MIN / -1 at the class width; shard_dash and world_sprites lose 1 and 6 helper calls, the library byte-identical (2026-11-07)
 1dee06b perf(w65816): a leaf above 16 words keeps its costliest temps in tcc__lf — one word too many sent every temp of a leaf to the stack; it is coloured again as a function that calls with no temp crossing a call (costliest first in tcc__lf, the overflow on the stack); a 16.16 path walk 53 -> 42 instructions a turn, frame 40 -> 10 bytes, the corpus byte-identical; `QBE_NO_LEAF_SPLIT=1` (2026-11-04)
 42abcce perf(w65816): the per-object loop, 64 to 55 instructions: one-word copies share their source's slot, sinkload, peephole_slotdead

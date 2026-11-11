@@ -321,6 +321,13 @@ Constraints to respect:
   Plain globals remain the SDK convention for NMI flag handshakes
   (`vblank_flag`, `oam_update_flag`) only for cycle-cost equivalence —
   not because `volatile` is broken.
+- **A hardware register must be read through a volatile lvalue**: a
+  non-volatile byte is read as a word (`lda` with a 16-bit accumulator,
+  then `and.w #$00FF`), so the byte above it is read as well. Only a
+  `volatile` access, or an address whose compile-time constant part lies
+  outside `$0000-$1FFF` and banks `$7E-$7F`, keeps the 8-bit read
+  (`byte_load_as_word` in `w65816/emit.c`; `QBE_NO_BYTE_WORD=1` turns the
+  word read off). Hand-written assembly that C calls is not concerned.
 
 ---
 

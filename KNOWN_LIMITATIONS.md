@@ -304,6 +304,22 @@ changes. The runtime itself uses plain globals for its NMI handshakes
 compiler suite's `test_volatiles.c` (three reads of `hw_status` give three
 loads).
 
+### 🟡 A hardware register must be read through a `volatile` lvalue
+A byte that is not `volatile` is read as a 16-bit word whose low byte is
+kept: the byte above it is read too. On RAM and ROM that costs nothing and
+saves the switch to an 8-bit accumulator; on a register whose read has an
+effect it is a second, unwanted read (reading `$2137` latches the H/V
+counters, reading `$2139` or `$213A` steps the VRAM address). The compiler
+keeps the 8-bit read for every `volatile` access and for an address whose
+constant part is not in low RAM (`$0000-$1FFF`) or banks `$7E-$7F`, so
+`*(u8 *)0x2138` and `((u8 *)0x4210)[i]` are read one byte. What it cannot
+see is a register address reaching a plain pointer at run time.
+
+**Mitigation:** read registers through `REG_*` (`snes/registers.h`, all
+`vu8` / `vu16`) or any `volatile` pointer. **Test:** the compiler check
+`byte_word` (the plain, indexed, `FAR`, `const`, pointer and field reads as
+words; the volatile and constant-address reads as bytes).
+
 ### 🟢 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges (lint-enforced)
 WLA-DX tracks the current accumulator/index register width across `rep`/`sep`
 instructions, but merging branches resets that tracking. The next instruction

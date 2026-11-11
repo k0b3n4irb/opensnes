@@ -15,4 +15,4 @@ in test_bit_set_clear: present lda #8\n\tsta\.w byte_val\n\tlda #136\n\tsta\.w b
 # (0xAB & 0x0F) << 4 | (0xAB >> 4) & 0x0F = 0xBA.
 in test_mask_extract: present lda #186\n\tsta\.w byte_val\n
 # The one test that survives to run time: bit 3 of byte_val.
-in test_bit_test: present lda\.w byte_val\n\trep #\$20\n\tand\.w #\$00FF\n\tand\.w #8\n
+in test_bit_test: present lda\.w byte_val\n\tand\.w #\$00FF\n\tand\.w #8\n

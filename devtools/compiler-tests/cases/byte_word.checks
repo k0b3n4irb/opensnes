@@ -1,0 +1,25 @@
+# A6a R1: a byte read is a word read and one mask, without the
+# `sep #$20` / `rep #$20` around it: two bytes read, the low one kept
+# (`byte_load_as_word` in emit.c). The twin byte_word_off pins the old shape.
+in plain:         present lda\.w g\n\tand\.w #\$00FF
+in indexed:       present lda\.w arr,x\n\tand\.w #\$00FF
+in far_indexed:   present lda\.l farr,x\n\tand\.w #\$00FF
+in const_indexed: present lda\.l tab,x\n\tand\.w #\$00FF
+in through_ptr:   present lda\.l \$000000,x\n\tand\.w #\$00FF
+in field:         present lda\.l \$000003,x\n\tand\.w #\$00FF
+in far_ptr:       present lda \[tcc__r9\],y\n\tand\.w #\$00FF
+in plain:         absent sep
+in indexed:       absent sep
+in far_indexed:   absent sep
+in const_indexed: absent sep
+in through_ptr:   absent sep
+in field:         absent sep
+in far_ptr:       absent sep
+# The byte above may be a register with a read side effect: a volatile
+# access keeps the 8-bit read, and so does an address whose constant part
+# is not in low RAM, volatile or not.
+in vol_global:   present sep #\$20\n\tlda\.w vflag\n\trep #\$20
+in vol_ptr:      present sep #\$20\n\tlda\.l \$000000,x\n\trep #\$20
+in reg_volatile: present sep #\$20\n\tlda\.l \$0000,x\n\trep #\$20
+in reg_plain:    present sep #\$20\n\tlda\.l \$0000,x\n\trep #\$20
+in reg_indexed:  present sep #\$20\n\tlda\.l \$004210,x\n\trep #\$20

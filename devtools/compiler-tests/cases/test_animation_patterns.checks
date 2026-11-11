@@ -5,9 +5,9 @@
 absent ; unhandled op
 # Const tables live in the asset banks: C reads them with the indexed
 # long form, whose bank comes from the symbol (#121, #127.3).
-in load_tiles: present tax\n\tsep #\$20\n\tlda\.l tile_data,x\n
+in load_tiles: present (?:tax|ldx\.b tcc__lf\+\d+)\n\tlda\.l tile_data,x\n\tand\.w #\$00FF\n
 in load_palette: present tax\n\tlda\.l palette,x\n
-in get_tile_for_state: present tax\n\tsep #\$20\n\tlda\.l frame_tiles,x\n
+in get_tile_for_state: present (?:tax|ldx\.b tcc__lf\+\d+)\n\tlda\.l frame_tiles,x\n\tand\.w #\$00FF\n
 # Each branch writes its port through the pointer: 8-bit store via X,
 # within the branch (the match may not cross a jmp or a label).
 # Re-pinned 2026-10-08: a store through a pointer loads X first, then the

@@ -6,4 +6,4 @@ present wide:\n\tdsb 64\n
 in test_2d_access: present lda #2\n\tsta\.w grid\+7\n\tlda #3\n\tsta\.w grid\+8\n\tlda #42\n\tsta\.w grid\+21\n\tlda #99\n\tsta\.w grid\+31\n
 # u16 wide[2][16]: [1][15] = (16 + 15) * 2 = 62, a 16-bit store.
 in test_2d_wide: present lda\.w #43981\n\tsta\.w wide\+62\n
-in main: present sep #\$20\n\tlda\.w grid\+21\n
+in main: present lda\.w grid\+21\n\tand\.w #\$00FF\n
