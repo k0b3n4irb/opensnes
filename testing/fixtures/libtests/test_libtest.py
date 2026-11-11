@@ -226,7 +226,7 @@ CASES = [
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
     # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 240), an invalid id (0, 0)
     # oamHideRange: the same bytes as a loop of oamHide in nine cases, then oam_max_id 127
-    ("r_hrange", 20, 127 << 144),
+    ("r_hrange", 24, 127 << 176),
     ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 240, 0, 0x0A00]))),
     # the setters in assembly since 2026-10-09: x and size bits of four
     # neighbours, ids that are not sprites, the dirty flag, scroll of a layer

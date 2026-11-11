@@ -1341,7 +1341,7 @@ static u8 s_near[16];
 u16 r_str[24];
 /* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
 u16 r_oamget[8];
-u16 r_hrange[10];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 9, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
+u16 r_hrange[12];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 11, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
 static FAR u8 hr_save[544];
 static FAR u8 hr_want[544];
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
@@ -1763,14 +1763,15 @@ int main(void) {
          * with a pattern in every byte (sizes and ninth bits included): the
          * same bytes everywhere, edges inside a byte of the high table
          * (3+9, 5+3), whole bytes (4+8), the clamp at 128, one sprite, an id
-         * past the end, a count of 0. */
+         * past the end, a count of 0, all 128, and 91 from 30 (past 64: the
+         * two passes of the low table). */
         {
-            static const u8 hr_first[9] = {0, 3, 4, 5, 125, 127, 128, 10, 40};
-            static const u8 hr_count[9] = {1, 9, 8, 3, 10, 1, 5, 0, 32};
+            static const u8 hr_first[11] = {0, 3, 4, 5, 125, 127, 128, 10, 40, 0, 30};
+            static const u8 hr_count[11] = {1, 9, 8, 3, 10, 1, 5, 0, 32, 128, 91};
             u8 c;
             u16 j, k, last;
             for (j = 0; j < 544; j++) hr_save[j] = oamMemory[j];
-            for (c = 0; c < 9; c++) {
+            for (c = 0; c < 11; c++) {
                 for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
                 last = hr_first[c] + hr_count[c];
                 if (last > 128) last = 128;
@@ -1793,7 +1794,7 @@ int main(void) {
             }
             oam_max_id = 0;
             oamHideRange(120, 20);
-            r_hrange[9] = oam_max_id;
+            r_hrange[11] = oam_max_id;
             for (j = 0; j < 544; j++) oamMemory[j] = hr_save[j];
         }
         /* the ninth x bit and the size bit of neighbours in one byte of the

@@ -119,9 +119,11 @@ compilers.
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,545 | -39.4 % |
 | `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,309 | -73.4 % |
 | `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,588 | -44.6 % |
-| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,820 | -82.2 % |
+| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 4,614 | -91.6 % |
 | `mapcol` | the map engine streaming one new column (29 entries), one `mapUpdate` | — | 13,158 | |
 | `maprow` | the map engine streaming one new row (33 entries), one `mapUpdate` | — | 14,981 | |
+| `hide1` | one sprite parked off screen: `oamHideRange` here, `oamClear` there | — | 1,710 | |
+| `hide128` | all 128 sprites parked off screen in one call: `oamHideRange` here, `oamClear` there | — | 10,158 | |
 
 OpenSNES costs no more than PVSnesLib on **14 of the 16 rows** both were measured on. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->

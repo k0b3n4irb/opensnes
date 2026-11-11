@@ -131,12 +131,12 @@
       }
     },
     "hiderange": {
-      "cycles": 9820,
+      "cycles": 4614,
       "detail": {
-        "oamHideRange@low": 102760,
-        "oamHideRange@mid": 67600,
-        "oamHideRange": 9240,
-        "oamHideRange@done": 5200
+        "_ohr_run": 25920,
+        "_ohr_lo2": 24880,
+        "opensnes_font_2bpp_end": 8138,
+        "_ohr_lo1": 6880
       }
     },
     "mapcol": {
@@ -155,6 +155,24 @@
         "_mapupd8": 20400,
         "_ProcessHorizontalBuffer": 17120,
         "_mapupd3": 7280
+      }
+    },
+    "hide1": {
+      "cycles": 1710,
+      "detail": {
+        "_ohr_one": 10200,
+        "opensnes_font_2bpp_end": 9058,
+        "_ohr_done": 5240,
+        "NmiHandler@oam_done": 4496
+      }
+    },
+    "hide128": {
+      "cycles": 10158,
+      "detail": {
+        "_ohr_run": 101920,
+        "_ohr_mid": 34120,
+        "_ohr_lo2": 24880,
+        "_ohr_big": 9320
       }
     }
   }

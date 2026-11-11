@@ -506,8 +506,11 @@ void oamHide(u16 id);
  * Does to sprites @p first to @p first + @p count - 1 what oamHide() does
  * to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A
  * scene that clears or parks many sprites a frame (a pool of effects, the
- * sprites a screen no longer shows) pays about a quarter of what the same
- * loop of oamHide() calls costs.
+ * sprites a screen no longer shows) pays, the call included: 1,710 master
+ * cycles for one sprite, 2,750 for 4, 4,610 for 32, 10,160 for all 128,
+ * about 58 a sprite past the first few; a loop of oamHide() costs about 800
+ * a sprite (SlowROM, devtools/libbench, rows hide1, hiderange, hide128,
+ * hideeach).
  *
  * @param first First sprite ID (0-127); at 128 or more nothing is done
  * @param count How many; the run is cut at sprite 127, 0 does nothing

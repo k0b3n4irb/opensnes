@@ -295,28 +295,21 @@ oamHide:
 ;   6,s first   4,s count
 ;
 ; oamHide() for count sprites from first: x low 1, y 240, bit 8 of x set,
-; tile, attributes and size bit untouched. The low table takes one word a
-; sprite (y 240 over x 1); the high table is filled a byte (four sprites) at
-; a time with $55 in the middle, and sprite by sprite at the two edges.
-; Clamped at 128. Highest id written -> oam_max_id, oam_update_flag set.
-; tcc__r9: end (exclusive), tcc__r9+2: end * 4, tcc__r10: byte index.
+; tile, attributes and size bit untouched. Clamped at 128. Highest id written
+; -> oam_max_id, oam_update_flag set.
+;
+; Both tables are written by straight runs of stores entered part way, so
+; that a sprite costs its stores and nothing else: the low table one word a
+; sprite (y 240 over x 1, `sta abs,x`, 40 mclk), the high table one word for
+; eight sprites (`ora #$5555`), with a mask at the two edge words. Until
+; 2026-11-11 a loop with a compare a sprite and a byte of the high table at a
+; time: 307 mclk a sprite for 32, 274 for 128 (devtools/libbench, rows
+; hiderange, hide128).
+; tcc__r9: end (exclusive), tcc__r9+2: the end word, tcc__r10 (4 bytes): the
+; two edge masks, tcc__r0: scratch.
 ;------------------------------------------------------------------------------
-.MACRO HIDE_ONE_XHI            ; Y = id; leaves A 16-bit
-    tya
-    asl a
-    asl a
-    tax                         ; X = id * 4: its row of oam_ext_tab
-    lda.l oam_ext_tab+2,x       ; the index of its byte in the high table
-    sta.b tcc__r10
-    lda.l oam_ext_tab,x         ; low byte: the mask that sets bit 8
-    sep #$20
-    .ACCU 8
-    ldx.b tcc__r10
-    ora.w oamMemory+512,x
-    sta.w oamMemory+512,x
-    rep #$20
-    .ACCU 16
-.ENDM
+
+.DEFINE OHR_SMALL 3               ; under this many sprites, the loop of oamHide()'s stores
 
 .SECTION ".text.oamHideRange" SUPERFREE
 
@@ -328,8 +321,7 @@ oamHideRange:
     cmp.w #128
     bcc +
     rtl                 ; not a sprite
-+   tay                 ; Y = first
-    lda 4,s             ; count
++   lda 4,s             ; count
     bne +
     rtl                 ; nothing to hide
 +   clc
@@ -338,61 +330,146 @@ oamHideRange:
     bcc +
     lda.w #128
 +   sta.b tcc__r9       ; end
-    asl a
-    asl a
-    sta.b tcc__r9+2     ; end * 4
+    sec
+    sbc 6,s             ; first: n = end - first
+    cmp.w #OHR_SMALL
+    bcs _ohr_big
+    lda 6,s             ; first
+    tay                 ; Y = id: a short run, sprite by sprite
+_ohr_one:
     tya
     asl a
     asl a
-    tax                 ; X = first * 4
+    tax                 ; X = id * 4: the sprite's entry, and its row of oam_ext_tab
     lda.w #$F001        ; y 240 over x 1
-@low:
     sta.w oamMemory,x
-    inx
-    inx
-    inx
-    inx
-    cpx.b tcc__r9+2
-    bne @low
-@head:                  ; sprite by sprite up to a multiple of 4
-    tya
-    and.w #3
-    beq @mid
-    cpy.b tcc__r9
-    bcs @done
-    HIDE_ONE_XHI
-    iny
-    bra @head
-@mid:                   ; a whole byte: four sprites
-    tya
-    clc
-    adc.w #4
-    cmp.b tcc__r9
-    beq +
-    bcs @tail
-+   tya
-    lsr a
-    lsr a
-    tax
+    lda.l oam_ext_tab+2,x
+    sta.b tcc__r10      ; the index of its byte in the high table
+    lda.l oam_ext_tab,x ; low byte: the mask that sets bit 8
+    ldx.b tcc__r10
     sep #$20
     .ACCU 8
-    lda.w oamMemory+512,x
-    ora.b #$55
+    ora.w oamMemory+512,x
     sta.w oamMemory+512,x
     rep #$20
     .ACCU 16
-    tya
-    clc
-    adc.w #4
-    tay
-    bra @mid
-@tail:
-    cpy.b tcc__r9
-    bcs @done
-    HIDE_ONE_XHI
     iny
-    bra @tail
-@done:
+    cpy.b tcc__r9
+    bcc _ohr_one
+    brl _ohr_done
+
+_ohr_big:
+    ; the low table: a run of 64 `sta dp,x` (2 bytes, 38 mclk on SlowROM
+    ; against 46 for `sta abs,x`) with the direct page on the shadow, entered
+    ; part way so that only the stores wanted run. Sprites 64 and on of the
+    ; range go first, with the direct page 256 bytes further.
+    tay                 ; Y = n (3 to 128)
+    lda 6,s             ; first
+    asl a
+    asl a
+    tax                 ; X = first * 4
+    phd
+    cpy.w #65
+    bcc _ohr_lo1
+    lda.w #oamMemory + 256
+    tcd
+    pea _ohr_lo1 - 1    ; where the run returns
+    tya
+    eor.w #$FFFF
+    sec
+    adc.w #128          ; 64 - (n - 64)
+    asl a               ; 2 bytes a store (carry clear: under 128)
+    adc.w #_ohr_run - 1 ; rts adds 1
+    pha
+    lda.w #$F001        ; y 240 over x 1
+    rts                 ; into _ohr_run, same bank
+_ohr_lo1:
+    lda.w #oamMemory
+    tcd
+    pea _ohr_lo2 - 1
+    tya
+    cmp.w #65
+    bcc +
+    lda.w #64
++   eor.w #$FFFF
+    sec
+    adc.w #64           ; 64 - min(n, 64)
+    asl a
+    adc.w #_ohr_run - 1
+    pha
+    lda.w #$F001
+    rts
+_ohr_lo2:
+    pld
+
+    ; the high table, a word (eight sprites) at a time
+    lda 6,s             ; first
+    and.w #7
+    asl a
+    tax
+    lda.l oam_hide_head,x
+    sta.b tcc__r10      ; mask of the start word
+    lda.b tcc__r9
+    dec a
+    and.w #7
+    asl a
+    tax
+    lda.l oam_hide_tail,x
+    sta.b tcc__r10+2    ; mask of the end word
+    lda.b tcc__r9
+    dec a
+    lsr a
+    lsr a
+    and.w #$FFFE
+    sta.b tcc__r9+2     ; byte of the end word
+    lda 6,s             ; first
+    lsr a
+    lsr a
+    and.w #$FFFE
+    tax                 ; X = byte of the start word
+    cpx.b tcc__r9+2
+    bne +
+    lda.b tcc__r10      ; one word: both edges
+    and.b tcc__r10+2
+    ora.w oamMemory+512,x
+    sta.w oamMemory+512,x
+    brl _ohr_done
++   lda.b tcc__r10
+    ora.w oamMemory+512,x
+    sta.w oamMemory+512,x
+    inx
+    inx
+    ; the m whole words between (0 to 14): enter the 14 copies at 14 - m
+    txa
+    eor.w #$FFFF
+    sec
+    adc.b tcc__r9+2     ; 2 * m
+    bne +
+    brl _ohr_tail
++   lsr a
+    eor.w #$FFFF
+    sec
+    adc.w #14           ; 14 - m
+    sta.b tcc__r0
+    asl a
+    asl a
+    asl a
+    adc.b tcc__r0       ; (14 - m) * 9, a copy is 9 bytes (carry clear)
+    adc.w #_ohr_mid - 1
+    pha
+    rts                 ; into _ohr_mid, same bank
+_ohr_mid:
+    .REPEAT 14 INDEX OHM
+    lda.w oamMemory + 512 + (13 - OHM) * 2,x
+    ora.w #$5555
+    sta.w oamMemory + 512 + (13 - OHM) * 2,x
+    .ENDR
+    ldx.b tcc__r9+2     ; the end word
+_ohr_tail:
+    lda.b tcc__r10+2
+    ora.w oamMemory+512,x
+    sta.w oamMemory+512,x
+_ohr_done:
     sep #$20
     .ACCU 8
     lda.b tcc__r9
@@ -405,6 +482,21 @@ oamHideRange:
     rep #$20
     .ACCU 16
     rtl
+
+; The masks of the two edge words, in this section (read long): a table in a
+; section of its own (SEMISUPERFREE) is kept by `wlalink -d` in every ROM
+; that links this file, called or not.
+oam_hide_head:                  ; the x bits of sprites first & 7 to 7 of a word
+    .dw $5555, $5554, $5550, $5540, $5500, $5400, $5000, $4000
+oam_hide_tail:                  ; the x bits of sprites 0 to (end - 1) & 7
+    .dw $0001, $0005, $0015, $0055, $0155, $0555, $1555, $5555
+
+; 64 stores of A at sprites 63 down to 0 from D + X; entered part way
+_ohr_run:
+    .REPEAT 64 INDEX OHR
+    sta.b 252 - OHR * 4,x
+    .ENDR
+    rts
 
 .ENDS
 

@@ -49,7 +49,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402  (wla_sym, git_head)
 
 WORK = REPO / "build" / "libbench"
-ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange", "mapcol", "maprow"]
+ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange", "mapcol", "maprow", "hide1", "hide128"]
 # what one repetition asks for, and how many calls that is
 WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "scroll": ("`bgSetScroll` on three backgrounds, ten times", 30),
@@ -67,6 +67,8 @@ WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "hiderange": ("the same 32 sprites in one call: `oamHideRange` here, `oamClear` there", 1),
         "mapcol": ("the map engine streaming one new column (29 entries), one `mapUpdate`", 29),
         "maprow": ("the map engine streaming one new row (33 entries), one `mapUpdate`", 33),
+        "hide1": ("one sprite parked off screen: `oamHideRange` here, `oamClear` there", 1),
+        "hide128": ("all 128 sprites parked off screen in one call: `oamHideRange` here, `oamClear` there", 128),
         "worldo": ("the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there", 19)}
 REPS = 20
 FRAMES = 300

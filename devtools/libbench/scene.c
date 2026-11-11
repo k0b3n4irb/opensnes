@@ -429,6 +429,36 @@ void row_maprow(void) {
     }
 }
 
+/* oamHideRange at the two ends of its range: one sprite, all 128. PVSnesLib
+ * runs oamClear(first, count), as in hiderange. */
+void row_hide1(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(40, 1);
+#else
+        oamHideRange(10, 1);
+#endif
+#endif
+    }
+}
+
+void row_hide128(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(0, 128);
+#else
+        oamHideRange(0, 128);
+#endif
+#endif
+    }
+}
+
 /* All of it in one frame, REPS frames in a row: the pad, three scrolls, 32
  * sprites placed, 20 characters, then the frame boundary — where each SDK's
  * handler sends what the calls left for it (PVSnesLib uploads the sprite
@@ -510,6 +540,10 @@ int main(void) {
     row_mapcol();
 #elif ROW == 17
     row_maprow();
+#elif ROW == 18
+    row_hide1();
+#elif ROW == 19
+    row_hide128();
 #endif
     done = 0x600D;
     while (1) {
