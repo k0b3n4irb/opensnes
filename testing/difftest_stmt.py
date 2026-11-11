@@ -46,6 +46,7 @@ import os
 import random
 import shutil
 import subprocess
+import threading
 import sys
 from pathlib import Path
 
@@ -945,7 +946,7 @@ def c_block(block, ind):
             out.append(f"{pad}}}")
         elif k == "swalk":
             _, tab, acc, op1, op2, f2, arr, j1, j2 = st
-            t, stride, rows, _ = P_CUR.ctabs[tab]
+            t, stride, rows, _ = _CUR.p.ctabs[tab]
             mask = "(ARRLEN_" + arr + " - 1)"
             out.append(f"{pad}{{ const {t} *pq = {tab}; u8 rn;")
             out.append(f"{pad}    for (rn = {rows}; rn; rn--, pq += {stride}) {{")
@@ -997,7 +998,10 @@ def c_helper(h, k: int, n: int) -> str:
     return f"{rt} h{k}(struct S{n} *q) {{ return {rd(h.expr)}; }}"
 
 
-P_CUR = None   # the program whose block c_block is writing (its tables)
+# the program whose block c_block is writing (its tables): one per thread —
+# the seeds run on a thread pool, and a module global was overwritten by
+# another seed between c_prog and c_block (KeyError on a table name)
+_CUR = threading.local()
 
 
 def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
@@ -1061,8 +1065,7 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     out.append("    u32 h = 0x811C9DC5UL;")
     for name, (t, vals) in P.arrays.items():
         out.append(f"    {t} {'FAR ' if name in P.far else ''}*pw_{name};")
-    global P_CUR
-    P_CUR = P
+    _CUR.p = P
     text = "\n".join(c_block(P.body, 1))
     for name, (t, vals) in P.arrays.items():
         text = text.replace("ARRLEN_" + name, str(len(vals)))
