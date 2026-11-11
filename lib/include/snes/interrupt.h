@@ -157,6 +157,11 @@ void nmiSetLag(VBlankCallback callback);
  * @warning ASM handlers only. The handler contract:
  *   - Save and restore every register it touches (A/X/Y, DP, DBR — the
  *     interrupted code is arbitrary C). P is restored by RTI automatically.
+ *   - Set the data bank before any 16-bit-address read or write (`phb`,
+ *     then `pea $0000 / plb / plb`): on entry it is whatever the
+ *     interrupted code left, which is `$00` in compiled C but the
+ *     destination's bank inside `memcpy`, `memmove`, `memset` and the
+ *     decompressors, which move blocks with the data bank changed.
  *   - Read REG_TIMEUP ($4211) to acknowledge the IRQ, or it re-fires forever.
  *   - Return with `rti`.
  *   - After any `rep`/`sep`, add explicit `.ACCU`/`.INDEX` directives
