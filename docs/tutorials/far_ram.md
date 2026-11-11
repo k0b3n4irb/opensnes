@@ -159,8 +159,10 @@ memcpy(level, level1, sizeof(level));   /* ROM -> FAR */
 memset(level, 0, sizeof(level));        /* clear it */
 ```
 
-`memcpy` and `memset` move a word at a time: 23 CPU cycles a word in the
-copy loop, so about 12 a byte. For VRAM, CGRAM and OAM the data goes
+`memcpy` copies with the CPU's block move (`mvn`) from 12 bytes up, 7 CPU
+cycles a byte; `memset` stores a word at a time, 8 CPU cycles a byte
+(`<snes/string.h>` has the figures). For VRAM,
+CGRAM and OAM the data goes
 through PPU ports: that is DMA's job (`dmaCopyVram()` and friends), not
 `memcpy`'s.
 

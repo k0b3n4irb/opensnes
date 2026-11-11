@@ -1,0 +1,20 @@
+# memcpy, memmove and memset in an NMI callback while the main thread is
+# inside its own long ones (main.c): the block move's instruction is written
+# on the stack for each call, so the interrupt's call cannot rewrite the one
+# the main thread is executing. Bad counts 0; the iteration count and the
+# callbacks that landed inside a main thread's call prove the race was run.
+rom = "string_nmi.sfc"
+frames = 2600                    # the loop ends near frame 2200
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_iters" = 600
+"r_bad_cpy" = 0                  # main: memcpy $7E -> $7F
+"r_bad_mov" = 0                  # main: memmove backward in $7F (MVP)
+"r_bad_set" = 0                  # main: memset of $7F
+"r_cb_bad" = 0                   # the callback's memcpy, memmove, memset
+"r_cb_runs" = { ge = 2000, width = 2 }   # one a frame: the race ran for thousands of frames
+"r_cb_inside" = { ge = 300, width = 2 }  # ... and landed inside a main thread call hundreds of times (518 measured)
