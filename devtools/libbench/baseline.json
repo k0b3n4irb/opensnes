@@ -174,6 +174,33 @@
         "_ohr_lo2": 24880,
         "_ohr_big": 9320
       }
+    },
+    "oamfast": {
+      "cycles": 82825,
+      "detail": {
+        "row_oamfast@do_body": 988230,
+        "row_oamfast@if_false": 291800,
+        "row_oamfast@cond_join": 208184,
+        "row_oamfast@if_join": 60902
+      }
+    },
+    "oamattr": {
+      "cycles": 50629,
+      "detail": {
+        "oamSetAttr": 445964,
+        "row_oamattr@for_body": 436262,
+        "oamSetAttr@x_done": 96166,
+        "oamSetAttr@none": 28960
+      }
+    },
+    "oambatch": {
+      "cycles": 36686,
+      "detail": {
+        "oamSetBatch@gen_done": 407524,
+        "oamSetBatch@gen": 267640,
+        "opensnes_font_2bpp_end": 43000,
+        "oamSetBatch@done": 5760
+      }
     }
   }
 }

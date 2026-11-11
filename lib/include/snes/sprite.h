@@ -304,9 +304,14 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
- * @note **Performance**: `oamSet()` is written in assembly and is cheap; use it
- * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
- * (see "Fast Macro Sprite API" below) save the call itself.
+ * @note **Performance**: `oamSet()` is written in assembly; about 2,030 master
+ * cycles a sprite, the call and its seven arguments included (SlowROM,
+ * devtools/libbench, row `oamset`). A game that keeps the attribute byte
+ * composed pays about 1,580 with oamSetAttr(); one with arrays of x, y, tile
+ * and attribute about 1,150 a sprite with oamSetBatch(). The `oamSetFast()`
+ * macro costs more than the call (about 2,590: the compiled C writes each byte
+ * through a computed index), and so does `oamSetXYFast()` against oamSetXY()
+ * (about 1,920 against 1,330).
  *
  * @note Any integer type works for the coordinates you keep on your side
  * (`u16`, `s16`, struct members or plain variables). Until 2026-09-21 this
@@ -318,6 +323,30 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
+
+/**
+ * @brief Set a sprite whose attribute byte the game keeps composed
+ *
+ * oamSet() with the attribute byte given whole: @p attr is stored as the
+ * fourth OAM byte (vhoopppc, as OAM_ATTR() builds it; its bit 0 is bit 8
+ * of the tile), the low byte of @p tile as the third. Nothing is shifted
+ * or masked, so a game that keeps the byte in its data (one per object or
+ * per animation frame) pays neither the composition nor the two extra
+ * arguments of oamSet(). Same x, y, ninth x bit, size bit untouched, same
+ * invalid-id rule.
+ *
+ * @param id Sprite ID (0-127)
+ * @param x X position (0-511, negative wraps)
+ * @param y Y position (0-255), as oamSet() takes it
+ * @param tile Tile number: its low byte is stored, bit 8 comes from @p attr
+ * @param attr Attribute byte (vhoopppc)
+ *
+ * @code
+ * u8 attr = OAM_ATTR(tile, pal, prio, OBJ_FLIPX);   // once, when it changes
+ * oamSetAttr(id, x, y, tile, attr);                 // every frame
+ * @endcode
+ */
+void oamSetAttr(u16 id, u16 x, u16 y, u16 tile, u16 attr);
 
 /**
  * @brief Set sprite X position
@@ -825,30 +854,29 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 /*============================================================================
  * Fast Macro Sprite API
  *
- * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
- * These write directly to oamMemory[] without function call overhead.
+ * Inline alternatives to oamSet/oamSetXY: they write directly to oamMemory[]
+ * without a function call.
  *
- * oamSet() is a call with seven arguments pushed and a stack frame; for a
- * handful of sprites updated every frame the macros below write the four
- * OAM bytes in place. (A byte count of an earlier oamSet's frame and a
- * "visible jitter" claim stood here until 2026-10-04; the cost is in
- * docs/PERF.md, measured, not here.)
+ * The macros below write the OAM bytes in place, from C. They are NOT
+ * cheaper than the assembly setters: measured per sprite (devtools/libbench,
+ * SlowROM), oamSetFast() 2,590 master cycles against oamSet() 2,030 and
+ * oamSetAttr() 1,580, oamSetXYFast() 1,920 against oamSetXY() 1,330. They
+ * stay for code that wants the writes inline; for speed, call the setters.
  *
  * Note: cc65816 does not truly inline 'static inline' functions — they
  * become separate SUPERFREE sections with global labels that conflict
- * across translation units. Macros are the only zero-overhead option.
+ * across translation units; hence macros.
  *
  * oamMemory[] and oam_update_flag are declared in <snes/system.h>
  * (included automatically via <snes.h>).
  *
  * Usage:
- *   // Pre-compute attribute byte once at init
+ *   // Pre-compute attribute byte once at init, then per frame:
  *   u8 attr = OAM_ATTR(tile, palette, priority, flags);
+ *   oamSetAttr(id, x, y, tile, attr);      // the cheapest full update
  *
- *   // Per-frame: fast full update
+ *   // the inline forms
  *   oamSetFast(id, x, y, tile, palette, priority, flags);
- *
- *   // Per-frame: position-only update (most common)
  *   oamSetXYFast(id, x, y);
  *============================================================================*/
 
@@ -878,11 +906,10 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
           (_slot) == 2 ? 0x10 : 0x40))
 
 /**
- * @brief Set sprite properties with zero function-call overhead
+ * @brief Set sprite properties with inline writes
  *
- * Drop-in replacement for oamSet() that writes directly to oamMemory[].
- * Same parameters, same behavior, but compiles to direct memory writes
- * instead of a call to oamSet().
+ * Same parameters and behavior as oamSet(), written directly to
+ * oamMemory[] instead of a call. Measured slower than the call (see above).
  *
  * @param _id Sprite ID (0-127)
  * @param _x X position (0-511)
@@ -911,8 +938,8 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 /**
  * @brief Update sprite position only (most common per-frame operation)
  *
- * Fastest possible sprite update — only writes X, Y, and X high bit.
- * Use when tile/palette/priority/flags don't change between frames.
+ * Writes only X, Y and the X high bit, inline. Measured slower than
+ * oamSetXY() (see above).
  *
  * @param _id Sprite ID (0-127)
  * @param _x X position (0-511)

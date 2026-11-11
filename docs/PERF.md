@@ -61,9 +61,11 @@ above 300 mclk per frame.
   17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
   8,900 mclk per frame (2.5 %) for its five characters, each a 32x32
-  sprite placed or hidden every frame (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
-  `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
-  counts.
+  sprite placed or hidden every frame (the setters are assembly). For large
+  counts: `oamSetAttr` when the game keeps the attribute byte composed,
+  `oamSetBatch` over arrays, or writing `oamMemory[]` directly
+  (sprite_swarm). The `oamSetFast` / `oamSetXYFast` macros cost more than
+  the calls (rows `oamfast`, `oamset`, `oamattr` below).
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
   rooftop_run (both are compiled C).
 - **`bgSetScroll`**: about 570 mclk per frame in each of the three games.
@@ -124,6 +126,9 @@ compilers.
 | `maprow` | the map engine streaming one new row (33 entries), one `mapUpdate` | — | 14,981 | |
 | `hide1` | one sprite parked off screen: `oamHideRange` here, `oamClear` there | — | 1,710 | |
 | `hide128` | all 128 sprites parked off screen in one call: `oamHideRange` here, `oamClear` there | — | 10,158 | |
+| `oamfast` | the 32 sprites of oamset through the `oamSetFast` macro | — | 82,825 | |
+| `oamattr` | the 32 sprites, attribute byte composed by the game: `oamSetAttr` | — | 50,629 | |
+| `oambatch` | the 32 sprites from arrays of x, y, tile and attr: one `oamSetBatch` here | — | 36,686 | |
 
 OpenSNES costs no more than PVSnesLib on **14 of the 16 rows** both were measured on. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->

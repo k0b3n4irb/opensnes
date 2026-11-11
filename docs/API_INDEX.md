@@ -23,6 +23,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
+| draw a sprite whose attribute byte (flip, priority, palette) the game keeps composed | `oamSetAttr`, `OAM_ATTR` | `sprite` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | hide a sprite that left the screen, or a run of them | `oamHide`, `oamHideRange` | `sprite` | [demos/rpg](../examples/demos/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/aseprite_pipeline](../examples/sprites/aseprite_pipeline/) |

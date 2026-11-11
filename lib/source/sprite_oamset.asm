@@ -251,6 +251,64 @@ oamSet:
 .ENDS
 
 ;------------------------------------------------------------------------------
+; void oamSetAttr(u16 id, u16 x, u16 y, u16 tile, u16 attr)
+;   12,s id   10,s x   8,s y   6,s tile   4,s attr
+;
+; oamSet() for a game that keeps the attribute byte composed (vhoopppc, as
+; OAM_ATTR() builds it, bit 0 being bit 8 of the tile): the tile's low byte
+; and attr are stored as given, nothing is shifted or masked. Two arguments
+; fewer to push, and no composition.
+;------------------------------------------------------------------------------
+.SECTION ".text.oamSetAttr" SUPERFREE
+
+oamSetAttr:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 12,s            ; id
+    cmp.w #128
+    bcs @none           ; not a sprite: nothing is written
+    asl a
+    asl a
+    tax                 ; X = id * 4: the sprite's entry, and its row of oam_ext_tab
+    lda.l oam_ext_tab+2,x
+    tay                 ; Y = id >> 2: the sprite's byte of the high table
+    sep #$20
+    .ACCU 8
+    lda 10,s            ; x low byte
+    sta.l oamMemory,x
+    lda 8,s             ; y low byte
+    sta.l oamMemory+1,x
+    lda 6,s             ; tile low byte
+    sta.l oamMemory+2,x
+    lda 4,s             ; attr
+    sta.l oamMemory+3,x
+    lda 11,s            ; x high byte
+    lsr a               ; carry = bit 8 of x
+    bcs @x_high
+    lda.l oam_ext_tab+1,x
+    sta.w oam_update_flag ; any non-zero value: a mask is never 0
+    and.w oamMemory+512,y
+@x_done:
+    sta.w oamMemory+512,y
+    lda 12,s            ; id (low byte: it is under 128)
+    cmp.w oam_max_id
+    bcc +
+    sta.w oam_max_id     ; highest sprite written: the NMI sends up to it
++   rep #$20
+    .ACCU 16
+@none:
+    rtl
+@x_high:
+    .ACCU 8
+    lda.l oam_ext_tab,x
+    sta.w oam_update_flag
+    ora.w oamMemory+512,y
+    bra @x_done
+
+.ENDS
+
+;------------------------------------------------------------------------------
 ; void oamHide(u16 id)
 ;   4,s id
 ;

@@ -49,7 +49,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402  (wla_sym, git_head)
 
 WORK = REPO / "build" / "libbench"
-ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange", "mapcol", "maprow", "hide1", "hide128"]
+ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange", "mapcol", "maprow", "hide1", "hide128", "oamfast", "oamattr", "oambatch"]
 # what one repetition asks for, and how many calls that is
 WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "scroll": ("`bgSetScroll` on three backgrounds, ten times", 30),
@@ -69,6 +69,9 @@ WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "maprow": ("the map engine streaming one new row (33 entries), one `mapUpdate`", 33),
         "hide1": ("one sprite parked off screen: `oamHideRange` here, `oamClear` there", 1),
         "hide128": ("all 128 sprites parked off screen in one call: `oamHideRange` here, `oamClear` there", 128),
+        "oamfast": ("the 32 sprites of oamset through the `oamSetFast` macro", 32),
+        "oamattr": ("the 32 sprites, attribute byte composed by the game: `oamSetAttr`", 32),
+        "oambatch": ("the 32 sprites from arrays of x, y, tile and attr: one `oamSetBatch` here", 32),
         "worldo": ("the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there", 19)}
 REPS = 20
 FRAMES = 300
@@ -84,7 +87,7 @@ OPENSNES_MAKEFILE = """OPENSNES := {repo}
 TARGET   := bench.sfc
 ROM_NAME := LIBBENCH
 USE_LIB  := 1
-LIB_MODULES := console sprite dma background text input vramqueue map
+LIB_MODULES := console sprite dma background text input vramqueue map sprite_batch
 SKIP_LINT := 1
 CSRC := scene.c
 include $(OPENSNES)/make/common.mk

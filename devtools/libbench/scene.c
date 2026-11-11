@@ -103,6 +103,74 @@ void row_oamxy(void) {
     }
 }
 
+/* The same 32 sprites through the three other ways to write a whole entry:
+ *   oamfast:  the oamSetFast() macro, the arguments of oamset;
+ *   oamattr:  oamSetAttr(), the attribute byte composed once by the game;
+ *   oambatch: one oamSetBatch() call over arrays of x, y, tile and attr.
+ * PVSnesLib has none of them and runs its oamSet(), as in oamset. */
+static s16 bat_x[32];
+static s16 bat_y[32];
+static u8 bat_tile[32];
+static u8 bat_attr[32];
+
+void row_oamfast(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);
+#else
+            oamSetFast(i, i << 3, r + i, i, 0, 3, 0);
+#endif
+#endif
+        }
+    }
+}
+
+void row_oamattr(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);
+#else
+            oamSetAttr(i, i << 3, r + i, i, 0x30);
+#endif
+#endif
+        }
+    }
+}
+
+void row_oambatch(void) {
+    u16 r, i;
+#if !PVS
+    static OamBatch bat;
+    bat.x = bat_x; bat.y = bat_y; bat.tile = bat_tile; bat.attr = bat_attr;
+    bat.first_id = 0; bat.count = 32;
+#endif
+    for (i = 0; i < 32; i++) {
+        bat_x[i] = i << 3; bat_tile[i] = i; bat_attr[i] = 0x30;
+    }
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the game moves its sprites, in both ROMs */
+        for (i = 0; i < 32; i++) bat_y[i] = r + i;
+#if CALLS
+#if PVS
+        for (i = 0; i < 32; i++) oamSet(i << 2, bat_x[i], bat_y[i], 3, 0, 0, bat_tile[i], 0);
+#else
+        oamSetBatch(&bat);
+#endif
+#endif
+    }
+}
+
 /* Sprites parked off screen: one call each, then the range in one call.
  * PVSnesLib has no per-sprite park that is not a visibility flag and no
  * range call but oamClear(first, count), which does the same job. */
@@ -544,6 +612,12 @@ int main(void) {
     row_hide1();
 #elif ROW == 19
     row_hide128();
+#elif ROW == 20
+    row_oamfast();
+#elif ROW == 21
+    row_oamattr();
+#elif ROW == 22
+    row_oambatch();
 #endif
     done = 0x600D;
     while (1) {

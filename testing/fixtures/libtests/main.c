@@ -1343,6 +1343,10 @@ u16 r_str[24];
 u16 r_oamget[8];
 u16 r_hrange[12];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 11, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
 static FAR u8 hr_save[544];
+/* oamSetAttr against oamSet with the same sprite, on a patterned shadow: bytes
+ * that differ per case -> 0 x 6, then an id of 128 changes nothing -> 0, then
+ * oam_max_id after a write to sprite 77 from 0 -> 77 */
+u16 r_setattr[8];
 static FAR u8 hr_want[544];
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
@@ -1795,6 +1799,34 @@ int main(void) {
             oam_max_id = 0;
             oamHideRange(120, 20);
             r_hrange[11] = oam_max_id;
+            {
+                static const u16 sa_id[6]   = {0, 5, 63, 64, 126, 127};
+                static const u16 sa_x[6]    = {0, 255, 256, 300, 511, 17};
+                static const u16 sa_y[6]    = {0, 240, 100, 7, 255, 223};
+                static const u16 sa_tile[6] = {0, 0x1FF, 0x100, 0x0AB, 0x0FF, 0x155};
+                static const u16 sa_pal[6]  = {0, 7, 3, 5, 1, 6};
+                static const u16 sa_pri[6]  = {0, 3, 1, 2, 3, 0};
+                static const u16 sa_fl[6]   = {0, 0xC0, 0x40, 0x80, 0xC0, 0x00};
+                for (c = 0; c < 6; c++) {
+                    for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 29 + c * 7) | 0x01);
+                    oamSet(sa_id[c], sa_x[c], sa_y[c], sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]);
+                    for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                    for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 29 + c * 7) | 0x01);
+                    oamSetAttr(sa_id[c], sa_x[c], sa_y[c], sa_tile[c],
+                               OAM_ATTR(sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]));
+                    k = 0;
+                    for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                    r_setattr[c] = k;
+                }
+                for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                oamSetAttr(128, 1, 2, 3, 4);
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_setattr[6] = k;
+                oam_max_id = 0;
+                oamSetAttr(77, 10, 10, 10, 0x30);
+                r_setattr[7] = oam_max_id;
+            }
             for (j = 0; j < 544; j++) oamMemory[j] = hr_save[j];
         }
         /* the ninth x bit and the size bit of neighbours in one byte of the

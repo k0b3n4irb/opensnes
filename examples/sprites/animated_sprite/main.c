@@ -10,7 +10,7 @@
  * bit (bit 6 of attribute byte).
  *
  * Animation is frame-paced with a configurable delay between tile changes.
- * The sprite's OAM tile number is updated each frame via oamSet() to point
+ * The sprite's OAM tile number is updated each frame via oamSetAttr() to point
  * at the correct frame in the pre-loaded sprite sheet. Movement is
  * controlled with the D-PAD and clamped to screen boundaries.
  *
@@ -224,8 +224,11 @@ int main(void) {
         /* Idle: no tick — a paused animation costs nothing and the last
          * frame simply stays in OAM (same behavior as before). */
 
-        u16 flags = kit.flipx ? OBJ_FLIPX : 0;
-        oamSet(0, kit.x, kit.y, kit.gfx_frame, 0, 3, flags);
+        /* The attribute byte (palette 0, priority 3, the flip) composed
+         * here and given whole: oamSetAttr() stores it as it is, where
+         * oamSet() builds it from three arguments at every call. */
+        oamSetAttr(0, kit.x, kit.y, kit.gfx_frame,
+                   OAM_ATTR(kit.gfx_frame, 0, 3, kit.flipx ? OBJ_FLIPX : 0));
     }
 
     return 0;
