@@ -199,6 +199,6 @@ its own.
   sheets 507-973, only one boss sheet at 1 165 solved by hand): below 1 024, so the need stays one port's; no module (two-games rule);
   the asker has the VRAM queue and an offered per-frame cost measurement on a stand-alone reproducer (waits for its N).
   Reopens with a second game above 1 024.
-- **To do next**: (3) report to luna the >99 LSB sample differences on sample_swap, sfx_voices, snesmod_music_large
-  (v1.40.0 vs v1.43.0, RMS windows within 0.67 %); (4) the main tree's `compiler/` submodules are behind the pins: a
+- **Done 2026-11-11**: (3) the >99 LSB sample differences reported to luna (note `partners/luna/2026-11-11_to_luna_v1.43.0-sample-diff-above-99-lsb.md`, `e87f18da`); waits for its answer.
+- **To do next**: (4) the main tree's `compiler/` submodules are behind the pins: a
   `git submodule update` and a full rebuild are due, announced to the partners first.
