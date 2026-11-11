@@ -148,3 +148,53 @@ and a lesson per cause in the porting kit.
   assembly column is with the owner (a public act).
 - Disassembly for A9 lives outside every repository, in a folder the
   conductor named; nothing leaves it but patterns in our words.
+
+## Our own approaches, beyond A1 to A9 (draft, to be completed and costed when the A9 analysis is in)
+
+The owner opened every door on 2026-11-11: a redesign, assembly used
+massively, another C compiler, if the measurement justifies it. What stays
+untouchable: the showcase, the rights (tool licences, no code of the
+commercial ROMs), the proofs (tests, the 65 ROMs rebuilt, the factual
+returns of the emulator and the two games). Candidates, none measured yet:
+
+- **B1. A machine-level optimiser instead of text rules.** The backend has
+  no register allocator; what stands in for one is a dozen peephole passes
+  over the emitted text, each with its own hand-made liveness. Parse the
+  emitted function once into a structured 65816 form (instruction, operands,
+  what it reads and writes of A / X / Y / flags / width / direct-page slots /
+  memory classes), run generic passes on it (liveness, copy propagation,
+  dead stores, promotion of a direct-page slot to X or Y over a region,
+  placement of `rep` / `sep` as a dataflow problem, branch shortening), emit.
+  Every existing rule becomes a case of a general pass; the same optimiser
+  could read the library's hand-written assembly. Aim: what a register
+  allocator gives, without rewriting instruction selection.
+- **B2. Width as a property of the code, not of each access.** The compiler
+  computes everything in 16 bits and narrows at each byte access. Commercial
+  games of the era live in 8 bits for whole routines (to be confirmed by the
+  A9 traces). A width analysis on the IR (value ranges, `u8` arithmetic that
+  cannot overflow visibly) and regions of 8-bit code chosen by cost.
+- **B3. Optimisation guided by the emulator's profile.** We own a
+  cycle-accurate profiler and deterministic replays: feed the profile of a
+  game's scenario back to the compiler (hot loops unrolled and inlined, cold
+  code kept small, switch cases ordered by frequency, the direct page given
+  to the hottest globals). No 65xx compiler we read does this.
+- **B4. Search for the best loop, the emulator as the judge.** For the few
+  loops a profile names, a bounded stochastic or exhaustive search over
+  instruction sequences, equivalence checked on a model and on luna with the
+  differential tests' inputs; the result is kept as a rule (general) or as a
+  per-function replacement (specific).
+- **B5. Assembly bricks with a register calling convention, for the hot
+  jobs every game has** (object loop iterator, sprite list from parallel
+  arrays, row and column builders, box batches, fixed-point batches): the
+  game stays in C, its hot paths are library calls measured against the
+  commercial routines. Precedent: `oamPlaceWorld` (1.68 against the C loop).
+- **B6. Another code generator.** No living 65816 C compiler has a licence
+  we can ship on (read 2026-11-11: one is hobby-only and closed, one is
+  Windows-only and restricted; llvm-mos has no 16-bit 65816). So "another
+  compiler" means writing ours: either a new back end behind the same IR
+  (instruction selection by patterns with a cycle cost model, registers
+  A / X / Y and direct-page pseudo-registers allocated), or B1 grown until
+  it is one. To be decided on the measured ceiling of B1 on the bench.
+- **B7. Whole-program knowledge**: static frames from the call graph,
+  arguments in direct-page slots, 16-bit pointers where the program never
+  leaves bank `$7E` low RAM (A5 taken to its end at link time).
