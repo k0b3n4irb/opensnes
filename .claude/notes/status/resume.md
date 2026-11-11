@@ -195,7 +195,10 @@ its own.
 - **Done 2026-11-10 evening**: the ROM-hash lists are read. The one ROM that differed between systems (`backgrounds/mode1`,
   Windows then macOS) came from the LZ77 encoder's uninitialised pad bytes (`eedca343`); run `42897584853` green, 65/65 equal on
   Linux, macOS and Windows; the temporary mode1 diagnostic is out (`de285b66`); lesson written in the porting kit.
-- **To do next**: (2) the character-ring scroll brick asked by a partner port (a map whose unique characters exceed the 1 024 tilemap
-  numbers; confirm the need with a second port's map first); (3) report to luna the >99 LSB sample differences on sample_swap, sfx_voices, snesmod_music_large
+- **Done 2026-11-11**: the character-ring brick: second port measured (753 unique characters at most, 303 in the worst window, per-level
+  sheets 507-973, only one boss sheet at 1 165 solved by hand): below 1 024, so the need stays one port's; no module (two-games rule);
+  the asker has the VRAM queue and an offered per-frame cost measurement on a stand-alone reproducer (waits for its N).
+  Reopens with a second game above 1 024.
+- **To do next**: (3) report to luna the >99 LSB sample differences on sample_swap, sfx_voices, snesmod_music_large
   (v1.40.0 vs v1.43.0, RMS windows within 0.67 %); (4) the main tree's `compiler/` submodules are behind the pins: a
   `git submodule update` and a full rebuild are due, announced to the partners first.
