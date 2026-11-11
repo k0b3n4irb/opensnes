@@ -136,6 +136,8 @@ gap_call:
     jml [bench_ptr]
 gap_ret:
     rep #$30
+    .ACCU 16
+    .INDEX 16
     rts
 .ENDS
 

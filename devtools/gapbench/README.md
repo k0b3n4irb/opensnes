@@ -106,9 +106,10 @@ the same assembly. They are not in the mean: they are there because the way
 the C is written must not matter this much, and because an unrolled fill must
 not be slower than the loop.
 
-`copy` through the library's `memcpy`: 24 276 (SlowROM), slower than the C
-loop. The factor is the same SlowROM and FastROM: the gap is in the
-instructions executed, not in where they are fetched from.
+`copy` through the library's `memcpy`: 15 266 (SlowROM) since it copies with
+the block move; it was 24 276, slower than the C loop, when the bench started.
+The factor is the same SlowROM and FastROM: the gap is in the instructions
+executed, not in where they are fetched from.
 
 ## Three means
 
