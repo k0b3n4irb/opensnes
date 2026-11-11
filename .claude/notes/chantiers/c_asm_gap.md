@@ -292,3 +292,24 @@ Two ways, and why the first alone is not enough:
 
 The bench is to be re-weighted on the games' profiles (calls, stack, bytes)
 before its mean is quoted again; the old mean stays beside it.
+
+## Measured on real game code by hand (2026-11-11): what the order should be
+
+`tech/our_asm_on_real_games.md`, last two sections. Four perimeters of the
+two games rewritten in assembly by hand, equivalence proven at every game
+step: leaves 1.35 and 1.75; functions that call 1.10 to 1.13 with the body
+alone and today's ABI, 1.23 and 1.66 with their callees and a convention of
+the programmer's. Nothing of it needed knowledge the C source lacks. Order
+by measured weight, to be confirmed in the complete plan:
+1. **a jump table for a dense `switch`** (function by function; 4.8 % of one
+   game's busy time by itself, 2.53 on the dispatch);
+2. **register allocation of values, indices and counters** (function by
+   function; half to three quarters of every hand gain): the machine-level
+   optimiser, with the two rewritten leaves as its test: done when the
+   compiler is within 1.1 of the hand on them;
+3. **values that cross a call off the stack, near calls, arguments in
+   registers** (the file, then the program): about a third of what the
+   convention-free versions gain;
+4. signed compares as range tests, the data bank set for a loop.
+Rewriting game routines by hand is not the way: one routine gives its game
+1 to 2.5 %; the same factor from the compiler applies to all the compiled C.

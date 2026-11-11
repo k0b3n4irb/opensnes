@@ -121,3 +121,57 @@ Outside its loop (47 % of A's gain): each 32-bit value built as
 4. The order of causes is register allocation first (values, index,
    counter: three quarters of the gain), then signed compares, then the
    data bank. Two leaves only: nothing here about functions that call.
+
+## Functions that call: what the body is worth, what the convention is worth (2026-11-11)
+
+Same method, same proof of equivalence (the game's state at every step,
+frame hashes), on one function that calls in each game, rewritten twice:
+**(a)** the body by hand, its callees left in C and called through today's
+ABI; **(b)** the function and its hot callees of the same file by hand, with
+the convention a programmer chooses between them (the current object held in
+a register across the calls, an argument in A, near calls), the SDK's ABI
+only towards the rest.
+
+| | game 2: walk of a linked list of objects and dispatch by type (a `switch` of about a hundred cases, one handler a case) | game 1: the move decision of an actor and its three small helpers |
+|---|--:|--:|
+| the function and what it calls in its file, C | 183.8 M | 9.23 M |
+| (a) body by hand, ABI everywhere | 162.1 M: **1.13**, the game's busy time -4.8 % | 8.41 M: **1.10**, -0.5 % |
+| (b) all by hand | 149.9 M: **1.23**, -7.0 % | 5.56 M: **1.66**, -1.9 % |
+| on the rewritten perimeter alone | 1.51 then 2.18 | |
+
+- **A jump table is the clearest and cheapest gain**: the dispatch goes from
+  1 567 to 620 master cycles an object (2.53); it is nearly all of (a) in
+  game 2, 4.8 % of that game's busy time by itself, and the compiler can do
+  it function by function. Today a dense `switch` is a binary search of
+  compares, and a table of function pointers written in C costs more than
+  the `switch` (measured by that game: +0.9 to +2.7 %), because a call
+  through a pointer is the heaviest call the compiler emits.
+- **The body alone, with today's ABI everywhere, is worth little (1.10 to
+  1.13)**: what a hand gains in the body the ABI takes back as soon as two
+  helpers the compiler was inlining become calls again.
+- **From (a) to (b): 1.5 and 1.8**, of which the calling convention in the
+  strict sense (far call, arguments, frame, re-reads from the stack) is
+  about 30 %; the rest is register allocation, which a function with nothing
+  on the stack makes possible.
+- **Causes of (b), in master cycles gained, and who can get them**
+  (F: the compiler function by function; M: only seeing the whole file;
+  P: only the whole program, or a change of ABI; H: only the programmer):
+
+| Cause | game 2, one handler (12.9 M gained) | game 1 (3.9 M) | Who |
+|---|--:|--:|---|
+| direct-page temporaries replaced by registers | 6.5 | 1.0 | F |
+| values re-read from the stack (locals that cross a call, arguments) | 3.4 | 0.4 | M when the callee is in the file; P or ABI otherwise |
+| indices rebuilt, `clc`, masks | 1.6 | 0.6 | F |
+| near call and return, a small callee merged | 1.1 | 0.4 | M, with the linker (same bank) |
+| a field recomputed on each side of a call | | 0.7 | M |
+| general signed compares, jumps to jumps | 0.7 | 0.5 | F for the jumps; H for the sign read on a difference |
+| the caller's stack frame | 0.3 | 0.2 | M |
+| passing the arguments | -0.6 | 0.2 | M for `static` functions; P or ABI otherwise |
+
+**All four hand rewrites together**: on real game code the factor is 1.35
+and 1.75 on leaves, 1.23 and 1.66 on functions that call; register
+allocation is half to three quarters of every gain and needs only the
+function; a jump table is the largest single item where a game dispatches;
+values on the stack and the convention come third and need the file.
+Limits: four perimeters, one handler of 98 in game 2, two value-range
+assumptions in (b) checked on the scene only.
