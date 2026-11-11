@@ -81,3 +81,27 @@ irqTestHandlerFar:
     rti
 
 .ends
+
+; The map engine's streaming (2026-11-11): a map of 80 x 40 entries and its
+; metatile table, made by formula so that test_libtest.py can compute every
+; tilemap word the engine must leave in VRAM. Entries carry both flip bits
+; and junk in bits 10-13 (which the engine masks off); metatile words carry
+; flip bits too (OR-ed with the entry's). The formulas are mapgen_entry()
+; and mapgen_tile() of test_libtest.py.
+.section ".rodata_mapgen" semisuperfree banks 7-1
+
+mapgen:
+.dw 80 * 8, 40 * 8, 80 * 40 * 2
+.REPEAT 80 * 40 INDEX MG
+.dw (((MG * 37) & $3FF) | (((MG * 5) & 15) << 10) | (((MG >> 3) & 3) << 14))
+.ENDR
+
+mapgen_tiles:
+.REPEAT 2048 INDEX MT
+.dw (((MT * 11) & $3FF) | ((MT & 7) << 10) | (((MT >> 3) & 3) << 14))
+.ENDR
+
+mapgen_props:
+.dsw 1024, 0
+
+.ends

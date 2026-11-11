@@ -148,6 +148,10 @@ maprowmetatileofs       DW                  ; VRAM offset for horizontal update
 
 mapendloop              DW                  ; Ending position of draw loop
 
+mapvtop                 DW                  ; VRAM offset of the column's top row (c0 * 32)
+mapvlen1                DW                  ; bytes of the column sent from row c0 down
+mapvlen2                DW                  ; bytes sent from row 0 after the wrap (0: none)
+
 mapupdbuf               DB                  ; State of buffer update
 mapdirty                DB                  ; 1 if map needs full redraw
 
@@ -630,133 +634,159 @@ _mapDAS2:
     rtl
 
 ;------------------------------------------------------------------------------
-; _ProcessHorizontalBuffer (internal)
-; A = tile index of the leftmost displayed tile
+; _ProcessHorizontalBuffer (internal): the new row, 33 entries
+; A = tile index (bytes) of the leftmost displayed tile; DB = $7E
+;
+; Entry m (0-32) is the map word at maptile_L1d + A + 2m, expanded through
+; metatiles and written to byte (maprowidx + 2m) & $7F of the 64-entry ring at
+; bg_L1. The ring's wrap is resolved here, not per entry: the row is one or two
+; runs of consecutive bytes, each walked by _hrun with Y counting down to 0 on
+; long pointers biased to the run's start (source and destination advance by
+; the same 2 bytes, so one index serves both). 302 mclk an entry against 911
+; for the loop of 2026-11-10, which switched the data bank and recomputed the
+; source address per entry (devtools/libbench, row maprow).
+; Scratch: tcc__r0 the entry, tcc__r1 (3 bytes) the source, tcc__r2 (3 bytes)
+; the destination, tcc__r3 the first run's length in bytes.
 ;------------------------------------------------------------------------------
 _ProcessHorizontalBuffer:
-    sta.l mapendloop
     clc
-    adc.w #(MAP_DISPW + 1) * 2
-    tax
-
-    lda.l maprowidx
-    clc
-    adc.w #(32 + 1) * 2 - 2
-    and.w #$7F
-    tay
-
-_phb1:
-    dex
-    dex
-    phx
-
-    lda maptile_L1d
-    clc
-    adc 1,s
-    tax
-    phb
+    adc maptile_L1d
+    sta.b tcc__r1                           ; source of the first run
+    lda.w #bg_L1
+    sta.b tcc__r2                           ; destination, before the offset
     sep #$20
     .ACCU 8
-    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
-    pha                                     ; hardcoded bank $00; now honours the
-    plb                                     ; pointer's bank so the map can live
-    rep #$20                                ; outside bank $00)
+    lda maptile_L1b
+    sta.b tcc__r1+2
+    lda #:bg_L1
+    sta.b tcc__r2+2
+    rep #$20
     .ACCU 16
-    lda 0,x
-    plb
+    lda maprowidx
+    and.w #$007E                            ; the ring byte of entry 0
+    tax
+    clc
+    adc.b tcc__r2
+    sta.b tcc__r2
+    txa
+    eor.w #$FFFF
+    sec
+    adc.w #128                              ; bytes from entry 0 to the wrap
+    cmp.w #(MAP_DISPW + 1) * 2 + 1
+    bcc +
+    lda.w #(MAP_DISPW + 1) * 2              ; no wrap: one run of 33
++   sta.b tcc__r3
+    tay
+    dey
+    dey
+    jsr _hrun
+    lda.w #(MAP_DISPW + 1) * 2
+    sec
+    sbc.b tcc__r3                           ; bytes left after the wrap
+    beq +
+    tay
+    dey
+    dey
+    lda.b tcc__r1
+    clc
+    adc.b tcc__r3
+    sta.b tcc__r1                           ; the source continues
+    lda.w #bg_L1
+    sta.b tcc__r2                           ; the ring starts again at 0
+    jsr _hrun
++   rts
 
-    pha
-    and #$03FF
+; Y = offset of the run's last entry (bytes); A 16-bit, X 16-bit
+_hrun:
+    lda [tcc__r1],y
+    sta.b tcc__r0
+    and.w #$03FF
     asl a
     tax
-    lda.l metatiles.topleft,x
-    sta.w maptmpvalue
-    pla
-    and #$C000
-    ora maptmpvalue
-
-    sta bg_L1, y
-
-    plx
-
+    lda.b tcc__r0
+    and.w #$C000
+    ora.w metatiles.topleft,x
+    sta [tcc__r2],y
     dey
     dey
-    bpl _phb2
-    ldy #64 * 2 - 2
-
-_phb2:
-    cpx.w mapendloop
-    bpl _phb1
-
+    bpl _hrun
     rts
 
 ;------------------------------------------------------------------------------
-; _ProcessVerticalBuffer (internal)
-; A = tile index of the topmost displayed tile
+; _ProcessVerticalBuffer (internal): the new column, 29 entries
+; A = tile index (bytes) of the topmost displayed tile, + 2; DB = $7E
+;
+; Entry j (0-28) is the map word at maptile_L1d + A - 2 + j * maprowsize,
+; expanded through metatiles and written to bgvertleftbuf_L1[j]: the buffer
+; holds the column top to bottom, in order, and mapVblank resolves the ring
+; (the top entry belongs to tilemap row (mapcolidx / 2) & 31) by sending it in
+; one or two transfers. The loop is unrolled: the destination is a constant of
+; each copy, Y walks the source (data bank set once to the map's), X indexes
+; metatiles, A stays 16-bit throughout. 288 mclk an entry against 940 for the
+; loop of 2026-11-10 (examples/maps/map_scroll; devtools/libbench, row mapcol).
+; Scratch: tcc__r0 the entry, tcc__r1 maprowsize.
 ;------------------------------------------------------------------------------
-_ProcessVerticalBuffer:
-    tay
-    sec
-    sbc.l maprowsize
-    sta.l mapendloop
+.MACRO VCOL_ENTRY ARGS SLOT                 ; Y = the entry's address in the map bank
+    lda.w $0000,y
+    sta.b tcc__r0
+    and.w #$03FF
+    asl a                                   ; carry clear: the index is under $800
+    tax
+    .IF SLOT < MAP_DISPH
     tya
-
-    clc
-    adc.w mapadrrowlut+MAP_DISPH * 2
-    dec a
-    dec a
-    tax
-
-    lda.l mapcolidx
-    clc
-    adc.w #29*2 - 2
-    and.w #$3F
+    adc.b tcc__r1                           ; the next row (carry clear above)
     tay
+    .ENDIF
+    lda.b tcc__r0
+    and.w #$C000
+    ora.l metatiles.topleft,x
+    sta.l bgvertleftbuf_L1 + SLOT * 2
+.ENDM
 
-_pvb1:
-    phx
-
-    lda maptile_L1d
+_ProcessVerticalBuffer:
     clc
-    adc 1,s
+    adc maptile_L1d
+    dec a
+    dec a
+    tay                                     ; Y = the top entry's address
+    lda maprowsize
+    sta.b tcc__r1
+
+    ; the two transfers mapVblank makes: rows c0-31 from the buffer's start,
+    ; then rows 0 on with the rest (none when c0 + 28 <= 31)
+    lda mapcolidx
+    and.w #$003E                            ; 2 * c0
     tax
+    asl a
+    asl a
+    asl a
+    asl a
+    sta mapvtop                             ; c0 * 32: VRAM offset of the top row
+    txa
+    eor.w #$FFFF
+    sec
+    adc.w #64                               ; bytes from row c0 to row 31
+    cmp.w #(MAP_DISPH + 1) * 2 + 1
+    bcc +
+    lda.w #(MAP_DISPH + 1) * 2
++   sta mapvlen1
+    eor.w #$FFFF
+    sec
+    adc.w #(MAP_DISPH + 1) * 2
+    sta mapvlen2
+
     phb
     sep #$20
     .ACCU 8
-    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
-    pha                                     ; hardcoded bank $00; now honours the
-    plb                                     ; pointer's bank so the map can live
-    rep #$20                                ; outside bank $00)
-    .ACCU 16
-    lda 0,x
-    plb
-
+    lda maptile_L1b                         ; DB = the map's bank, once
     pha
-    and #$03FF
-    asl a
-    tax
-    lda.l metatiles.topleft,x
-    sta.w maptmpvalue
-    pla
-    and #$C000
-    ora maptmpvalue
-
-    sta bgvertleftbuf_L1, Y
-
-    pla
-    sec
-    sbc.l maprowsize
-    tax
-
-    dey
-    dey
-    bpl _pvb2
-    ldy #32 * 2 - 2
-
-_pvb2:
-    cpx.w mapendloop
-    bpl _pvb1
-
+    plb
+    rep #$20
+    .ACCU 16
+    .REPEAT MAP_DISPH + 1 INDEX VSLOT
+    VCOL_ENTRY VSLOT
+    .ENDR
+    plb
     rts
 
 ;------------------------------------------------------------------------------
@@ -793,14 +823,41 @@ _mapvb1:
     lda #:bgvertleftbuf_L1
     sta.l $4304
 
-    ldx bgvvramloc_L1
-    ldy #32*2
+    ; the buffer holds the column top to bottom: rows c0 to 31 first,
+    ; then, past the ring's wrap, rows 0 on (_ProcessVerticalBuffer)
+    rep #$20
+    .ACCU 16
+    lda.l mapvtop
+    clc
+    adc bgvvramloc_L1
+    sta $2116
+    lda.l mapvlen1
+    sta $4305
+    sep #$20
+    .ACCU 8
     lda #$1
-
-    stx $2116
-    sty $4305
     sta.l $420B
 
+    rep #$20
+    .ACCU 16
+    lda.l mapvlen2
+    beq _mapvb1b
+    tay
+    lda.l mapvlen1
+    clc
+    adc.w #bgvertleftbuf_L1
+    sta $4302
+    ldx bgvvramloc_L1
+    stx $2116
+    sty $4305
+    sep #$20
+    .ACCU 8
+    lda #$1
+    sta.l $420B
+
+_mapvb1b:
+    sep #$20
+    .ACCU 8
     lda.l mapupdbuf
 
 _mapvb2:

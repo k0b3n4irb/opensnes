@@ -16,6 +16,7 @@
 #include "which.h"
 #if !PVS
 #include <snes/vramqueue.h>
+#include <snes/map.h>
 #endif
 
 u16 res;
@@ -374,6 +375,60 @@ void row_vramq(void) {
     }
 }
 
+/* The map engine streaming a new column, then a new row (the row builder had
+ * never been timed). A map of 128 x 64 entries; the camera moves one tile (8
+ * pixels) a repetition, right for mapcol, down for maprow, so that every
+ * mapUpdate() builds exactly one column of 29 entries or one row of 33.
+ * mapUpdateCamera() runs in both ROMs and cancels; mapUpdate() is the row. The
+ * entries are varied (tile ids, both flip bits) though no SDK's cost depends
+ * on them. Both SDKs have the four calls under these names. */
+#define BMW 128
+#define BMH 64
+static const u16 bench_map[3 + BMW * BMH] = {
+    BMW * 8, BMH * 8, BMW * BMH * 2,
+    0x0001, 0x4002, 0x8003, 0xC004, 0x0105, 0x0206, 0x03FF, 0x0000
+};
+static const u16 bench_tiles[2048] = { 0x0000, 0x0001, 0x2002, 0x0403, 0x0004, 0x1C05 };
+static const u16 bench_props[1024] = { 0x0000, 0xFF00 };
+
+static void map_setup(void) {
+    setScreenOff();
+#if PVS
+    mapLoad((u8 *)bench_map, (u8 *)bench_tiles, (u8 *)bench_props);
+#else
+    mapLoad((const u8 *)bench_map, (const u8 *)bench_tiles, (const u8 *)bench_props);
+#endif
+    mapUpdateCamera(0, 0);
+    mapUpdate();
+    setScreenOn();
+}
+
+void row_mapcol(void) {
+    u16 r;
+    map_setup();
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the camera follows x - 128 once x is 128 ahead of it: 8 (r + 1) */
+        mapUpdateCamera(128 + ((r + 1) << 3), 0);
+#if CALLS
+        mapUpdate();
+#endif
+    }
+}
+
+void row_maprow(void) {
+    u16 r;
+    map_setup();
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the camera follows y - 144 once y is 144 below it: 8 (r + 1) */
+        mapUpdateCamera(0, 144 + ((r + 1) << 3));
+#if CALLS
+        mapUpdate();
+#endif
+    }
+}
+
 /* All of it in one frame, REPS frames in a row: the pad, three scrolls, 32
  * sprites placed, 20 characters, then the frame boundary — where each SDK's
  * handler sends what the calls left for it (PVSnesLib uploads the sprite
@@ -451,6 +506,10 @@ int main(void) {
     row_hideeach();
 #elif ROW == 15
     row_hiderange();
+#elif ROW == 16
+    row_mapcol();
+#elif ROW == 17
+    row_maprow();
 #endif
     done = 0x600D;
     while (1) {

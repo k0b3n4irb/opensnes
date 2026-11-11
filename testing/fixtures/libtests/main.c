@@ -463,6 +463,20 @@ u8 r_tile8[64];
 u8 r_tile4_dot[32];
 u16 r_glyph_ok;            /* tileBlitGlyph2bpp: cases equal to the C reference */
 u8 r_glyph_pin[32];        /* one case's tile and right tile, pinned outside the ROM */
+/* The map engine's column and row streaming (2026-11-11): a camera walk over
+ * the formula map of data.asm, each step at most one tile on each axis, with
+ * mapUpdate() and mapVblank() in force blank. test_libtest.py checks every
+ * tilemap word of the final visible window (33 x 29) in VRAM against the
+ * formula; the walk crosses both rings' wraps. r_mapwalk: steps run. */
+extern u8 mapgen[];
+extern u8 mapgen_tiles[];
+extern u8 mapgen_props[];
+extern u16 map_cam_x;
+extern u16 map_cam_y;
+u16 r_mapwalk;
+static const s8 mw_dx[] = { 1, 0, 1, -1, 0, 1 };
+static const s8 mw_dy[] = { 0, 1, 0, 0, -1, 1 };
+static const u8 mw_n[]  = { 34, 6, 2, 3, 2, 2 };
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -2062,6 +2076,22 @@ int main(void) {
     r_fast[10] = padHeld(0) | padPressed(1) | padReleased(0);          /* 0 */
     r_fast[11] = (padHeld)(1) | (padPressed)(0) | (padHeld)(9) | (padPressed)(200) | padReleased(5);  /* 0 */
     r_fast[12] = 0xFA57;
+
+    {
+        u16 leg, k;
+        setScreenOff();
+        mapLoad(mapgen, mapgen_tiles, mapgen_props);
+        r_mapwalk = 0;
+        for (leg = 0; leg < 6; leg++) {
+            for (k = 0; k < mw_n[leg]; k++) {
+                map_cam_x += (s16)mw_dx[leg] * 8;
+                map_cam_y += (s16)mw_dy[leg] * 8;
+                mapUpdate();
+                mapVblank();
+                r_mapwalk++;
+            }
+        }
+    }
 
     r_done      = 0xBEEF;
 

@@ -35,6 +35,7 @@ import argparse
 import concurrent.futures
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -48,7 +49,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402  (wla_sym, git_head)
 
 WORK = REPO / "build" / "libbench"
-ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange"]
+ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo", "hideeach", "hiderange", "mapcol", "maprow"]
 # what one repetition asks for, and how many calls that is
 WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "scroll": ("`bgSetScroll` on three backgrounds, ten times", 30),
@@ -64,6 +65,8 @@ WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "vramq": ("the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there", 6),
         "hideeach": ("32 sprites parked off screen, one call each", 32),
         "hiderange": ("the same 32 sprites in one call: `oamHideRange` here, `oamClear` there", 1),
+        "mapcol": ("the map engine streaming one new column (29 entries), one `mapUpdate`", 29),
+        "maprow": ("the map engine streaming one new row (33 entries), one `mapUpdate`", 33),
         "worldo": ("the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there", 19)}
 REPS = 20
 FRAMES = 300
@@ -79,7 +82,7 @@ OPENSNES_MAKEFILE = """OPENSNES := {repo}
 TARGET   := bench.sfc
 ROM_NAME := LIBBENCH
 USE_LIB  := 1
-LIB_MODULES := console sprite dma background text input vramqueue
+LIB_MODULES := console sprite dma background text input vramqueue map
 SKIP_LINT := 1
 CSRC := scene.c
 include $(OPENSNES)/make/common.mk
@@ -124,7 +127,13 @@ def profile(rom: Path, luna: str, frames: int) -> dict:
                    capture_output=True, text=True)
     cycles: dict = {}
     for e in json.loads(out.read_text())["entries"]:
-        cycles[e["symbol"]] = cycles.get(e["symbol"], 0) + e["mclk"]
+        # The compiler numbers its block labels across the file, so the same
+        # block of a function after the row (main's last loop) is
+        # `main@while_body.235` in one ROM and `.250` in the other: without
+        # the number they cancel instead of counting as a gain (2026-11-11,
+        # 1 280 mclk a repetition read as the cost of a call).
+        name = re.sub(r"(@[A-Za-z_]+)\.\d+$", r"\1", e["symbol"])
+        cycles[name] = cycles.get(name, 0) + e["mclk"]
     return cycles
 
 
@@ -168,12 +177,17 @@ def write_doc() -> None:
     t = ref["rows"]
     out = ["| Row | What it asks for | PVSnesLib | OpenSNES | |", "|---|---|---:|---:|---:|"]
     for n in ROWS:
-        o, p = b[n]["cycles"], t[n]["cycles"]
+        o = b[n]["cycles"]
         what = LABEL.get(n) or WHAT[n][0]
+        if n not in t:     # a row added after the reference was measured
+            out.append(f"| `{n}` | {what} | — | {o:,} | |")
+            continue
+        p = t[n]["cycles"]
         out.append(f"| `{n}` | {what} | {p:,} | {o:,} | {100 * (o - p) / p:+.1f} % |")
     out.append("")
-    out.append(f"OpenSNES costs no more than PVSnesLib on **{sum(b[n]['cycles'] <= t[n]['cycles'] for n in ROWS)} "
-               f"of the {len(ROWS)} rows**. PVSnesLib at `{ref['pvsneslib']}`.")
+    both = [n for n in ROWS if n in t]
+    out.append(f"OpenSNES costs no more than PVSnesLib on **{sum(b[n]['cycles'] <= t[n]['cycles'] for n in both)} "
+               f"of the {len(both)} rows** both were measured on. PVSnesLib at `{ref['pvsneslib']}`.")
     text = DOC.read_text()
     a, z = "<!-- libbench:begin -->", "<!-- libbench:end -->"
     i, j = text.index(a) + len(a), text.index(z)
@@ -219,8 +233,12 @@ def main() -> int:
     print(f"{'row':8} {'PVSnesLib':>10} {'OpenSNES':>10} {'':>9}   per call PVS / OSN")
     behind = []
     for n in wanted:
-        o, p = ours[n]["cycles"], theirs[n]["cycles"]
         calls = WHAT[n][1] if n in WHAT else 1
+        o = ours[n]["cycles"]
+        if n not in theirs:
+            print(f"{n:8} {'—':>10} {o:>10,} {'':>9}   {'—':>8} / {o / calls:,.0f}")
+            continue
+        p = theirs[n]["cycles"]
         print(f"{n:8} {p:>10,} {o:>10,} {100 * (o - p) / p:>+8.1f} %   {p / calls:>8,.0f} / {o / calls:,.0f}")
         if args.detail:
             for who, d in (("PVS", theirs[n]["detail"]), ("OSN", ours[n]["detail"])):

@@ -138,6 +138,24 @@
         "oamHideRange": 9240,
         "oamHideRange@done": 5200
       }
+    },
+    "mapcol": {
+      "cycles": 13158,
+      "detail": {
+        "_ProcessVerticalBuffer": 220400,
+        "_maupd4": 14160,
+        "_mapupd9": 7080,
+        "_mapupd3": 6480
+      }
+    },
+    "maprow": {
+      "cycles": 14981,
+      "detail": {
+        "_hrun": 237320,
+        "_mapupd8": 20400,
+        "_ProcessHorizontalBuffer": 17120,
+        "_mapupd3": 7280
+      }
     }
   }
 }

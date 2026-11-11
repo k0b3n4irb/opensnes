@@ -282,6 +282,7 @@ CASES = [
     # vramQueueFlushUntil: none before line 0, then the first of three, the
     # two left moved to the head in order with their costs, then both
     ("r_vqu", 16, sum(w << (16 * i) for i, w in enumerate([3, 2, 0x6610, 0x6600, 0x8000, 0x8058, 0, 0]))),
+    ("r_mapwalk",  2, 49),       # the map walk ran its 49 steps (VRAM checked by map_window_fails)
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -387,6 +388,42 @@ VRAM_CASES = [
 ]
 
 
+# The map walk of main.c (2026-11-11): the formulas of data.asm's mapgen and
+# mapgen_tiles, and the camera where the walk ends (in tiles).
+MAPGEN_W, MAPGEN_H = 80, 40
+MAPWALK_END = (35, 6)
+
+
+def mapgen_entry(i: int) -> int:
+    return ((i * 37) & 0x3FF) | (((i * 5) & 15) << 10) | (((i >> 3) & 3) << 14)
+
+
+def mapgen_tile(k: int) -> int:
+    return ((k * 11) & 0x3FF) | ((k & 7) << 10) | (((k >> 3) & 3) << 14)
+
+
+def map_window_fails(vram: bytes) -> int:
+    """Every tilemap word of the visible window (33 columns x 29 rows) the map
+    engine must have streamed: entry e of map cell (r, c) gives
+    metatile[e & 0x3FF] | (e & 0xC000), at word $6800 + page * $400 +
+    (r % 32) * 32 + c % 32 of the 64 x 32 tilemap, page = (c % 64) // 32."""
+    c0, r0 = MAPWALK_END
+    bad = []
+    for r in range(r0, r0 + 29):
+        for c in range(c0, c0 + 33):
+            e = mapgen_entry(r * MAPGEN_W + c)
+            want = mapgen_tile(e & 0x3FF) | (e & 0xC000)
+            word = 0x6800 + ((c % 64) // 32) * 0x400 + (r % 32) * 32 + c % 32
+            got = vram[2 * word] | (vram[2 * word + 1] << 8)
+            if got != want:
+                bad.append(f"({c},{r}) {got:04x}!={want:04x}")
+    if bad:
+        print(f"  FAIL  map window: {len(bad)} of {33 * 29} words wrong, first {bad[:4]}")
+    else:
+        print(f"  PASS  map window: the {33 * 29} tilemap words streamed by the walk")
+    return 1 if bad else 0
+
+
 # Expected-fail vectors: real, minimally-pinned compiler bugs. A FAIL here is
 # the known baseline; an unexpected PASS (XPASS) means the compiler got fixed —
 # promote the vector out. Pattern copied from test_a6_farptr.py.
@@ -460,8 +497,9 @@ def run(region: str = "ntsc") -> int:
         else:
             print(f"  FAIL  vram[{addr:#06x}..+{len(want)}] == pattern  [got {got.hex()}]")
             fails += 1
+    fails += map_window_fails(vram)
     total = (len(CASES) + len(REGION_CASES[region])
-             + len(PPU_CASES) + len(VRAM_CASES))
+             + len(PPU_CASES) + len(VRAM_CASES) + 1)
     print(f"\nLib runtime assertions ({region}): {total - fails}/{total} ok")
     return 1 if fails else 0
 

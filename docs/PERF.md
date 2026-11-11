@@ -72,7 +72,7 @@ above 300 mclk per frame.
 
 The per-function figures are what luna counts at the function's own
 labels. Asm routines a function calls under their own names (the map
-engine's `map_prepare_column`, SNESMOD's SPC transfer routines) are not
+engine's `_ProcessVerticalBuffer`, SNESMOD's SPC transfer routines) are not
 added to it, and code the compiler inlined into the caller is counted in
 the caller.
 
@@ -120,8 +120,10 @@ compilers.
 | `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,309 | -73.4 % |
 | `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,588 | -44.6 % |
 | `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,820 | -82.2 % |
+| `mapcol` | the map engine streaming one new column (29 entries), one `mapUpdate` | — | 13,158 | |
+| `maprow` | the map engine streaming one new row (33 entries), one `mapUpdate` | — | 14,981 | |
 
-OpenSNES costs no more than PVSnesLib on **14 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
+OpenSNES costs no more than PVSnesLib on **14 of the 16 rows** both were measured on. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library
