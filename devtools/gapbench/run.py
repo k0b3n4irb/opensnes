@@ -96,6 +96,7 @@ def sizes(rom):
 def measure(luna, speed):
     calls, rows = table()
     rom = build(speed)
+    assert len(rows) <= 64, "bench_sum in kernels.c holds 64 rows"
     jobs = [(mark, k + 1) for k in range(len(rows)) for mark in ("bench_mark_a", "bench_mark_b")]
     with concurrent.futures.ThreadPoolExecutor(int(os.environ.get("LUNA_JOBS", os.cpu_count() or 2))) as ex:
         totals = dict(zip(jobs, ex.map(lambda j: mclk_at(luna, rom, *j), jobs)))

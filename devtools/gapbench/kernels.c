@@ -528,7 +528,7 @@ u16 c_glide(void) { return sum(gl_oam, ND * 4) + sum((const u8 *)gl_x9, sizeof(g
 
 u16 bench_i, bench_k, bench_n;
 u16 bench_ptr[2];
-u16 bench_sum[32];
+u16 bench_sum[64];          /* one a row of bench_table (kernels.asm), room to grow */
 
 extern void bench_run(void);
 
