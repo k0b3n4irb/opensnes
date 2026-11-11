@@ -115,3 +115,36 @@ Every fix: gain on the bench, `make tests`, both differential tests, the 65
 ROMs rebuilt (identical or differences explained and checked on luna), no
 size or speed regression elsewhere (`sdkbench`, `libbench`, `cyclecount`),
 and a lesson per cause in the porting kit.
+
+## State (kept current)
+
+- 2026-11-11: plan reviewed by the conductor. Target granted: geometric mean
+  under 1.5, no row above 2.0, the 65 examples no bigger; reviewed again
+  after the first two lots. Order until the ROMs of A9 arrive: A6a, then A7,
+  then A5 (first argument in A).
+- Running, each in its own worktree: **A6a lot 1** (a byte read as a word
+  read, the loop counter in Y when X is taken, a load of what A already
+  holds dropped across blocks, a constant added to an index folded into the
+  operand, one mask not two); **A7 lot 1** (`memcpy` / `memmove` on the block
+  move through a thunk built on the stack, `memset` on unrolled
+  absolute-indexed stores).
+- After each measured advance: one thread to luna and to the two games that
+  build on this tree, asking for their factual return on their real case
+  (ROM rebuilt on `develop`: size, cycles of their hot routines, hashes,
+  their tests). Everybody else is on hold (owner, 2026-11-11).
+- Rows to add to the bench once lot 1 has landed (A4, shapes sent by the
+  games; stand-alone equivalents, nothing of theirs): a walk of a linked
+  list by index with a chain of tests then a dense `switch`; a loop of
+  sub-steps on three 32-bit accumulators with a table read through a pointer
+  derived from an angle; up to 50 objects whose fields are 16-bit arrays
+  indexed by a byte, box and visibility tests, sprite emission inlined; a
+  byte table indexed by a word feeding four byte arrays (measured by a
+  partner port at 2.7 to 2.9 against a commercial routine on that pattern).
+- Agreed outside yardsticks beyond A9: the twelve routines through the other
+  living 65816 C compilers (after reading their licences; figures stay
+  private if a licence forbids publishing them); whole-frame profiles of the
+  commercial games without disassembly; the bench replayed on a second
+  emulator with luna. Inviting outside assembly programmers to beat our
+  assembly column is with the owner (a public act).
+- Disassembly for A9 lives outside every repository, in a folder the
+  conductor named; nothing leaves it but patterns in our words.

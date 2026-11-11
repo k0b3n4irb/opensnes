@@ -186,8 +186,12 @@ and the CHANGELOG.
 The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to A9, starting factor per routine, order).
 - Done: `devtools/gapbench` (`make bench-gap`, `--check` in `make tests`): twelve routines, C against assembly by hand,
   geometric mean 2.55, from 1.57 to 9.01. The plan is written and sent to the conductor for review.
-- **No compiler or library fix before the conductor has reviewed the plan.** Then, in the plan's order: runtime multiply and
-  shifts (A7), backend peephole and registers (A6a), idioms (A6c), the guide (A8), the calling convention (A5).
+- The plan is reviewed and granted (2026-11-11): target a geometric mean under 1.5, no row above 2.0. Two lots run, each
+  written by an Opus agent in its own worktree (`a6a-lot1`: five backend rules; `a7-string`: `memcpy` / `memset`). Nothing of
+  theirs is on `develop` until this session has re-run every gate (Class A: A/B corpus proof, both differential hunts,
+  `make tests`). The live state is the last section of the plan.
+- **After each measured advance: one thread to luna and the two games** for their factual return on their real case (owner,
+  2026-11-11: every other project is on hold and wakes only for that).
 - Waiting: the conductor's review; the commercial ROMs of A9 (the owner provides them; disassembly happens outside this
   repository, only patterns in our words come back); the patterns of A2 from a partner port; the games' top-ten profiles (A4).
 - After the gap: the 8-direction scrolling brick (tile ring, new row and column in grouped DMA, VBlank budget measured), from
