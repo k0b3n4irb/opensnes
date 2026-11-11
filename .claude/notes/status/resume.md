@@ -199,6 +199,15 @@ The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to
   game is being read (sprite list, object loop, main loop, NMI and transfers, scrolling, collisions, arithmetic,
   decompression); only patterns in our words and our own measurements come back here. Next: a game with 8-direction scrolling,
   before the scrolling brick is written.
+- **Owed when the running lots are finished (owner, 2026-11-11): the complete plan**, in this repository, generic: (1) the
+  inventory of what is missing (tools, sources, documentation) and who is asked; (2) every cost item from the largest to the
+  smallest, MEASURED on both gauges (the re-weighted bench; the two games' busy master cycles a frame), with its share, its
+  established cause, the axis that attacks it, the expected then measured gain, and its owner (compiler, library, runtime,
+  examples, documentation, the game); nothing without a cause, what is not measured is measured first; (3) the small items
+  too, each with its lesson; (4) the path step by step: one lot = one axis, measured before and after on both gauges,
+  contested by the thinker before starting and after measuring, with its lesson; no lot starts before the previous one is
+  measured; (5) no concession: an axis is dropped only on written proof. The conductor reviews it before the owner.
+  Inputs already there: `chantiers/c_asm_gap.md`, `tech/commercial_yardsticks.md`, `tech/our_asm_on_real_games.md`.
 - **After each measured advance: one thread to luna and the two games** for their factual return on their real case (owner,
   2026-11-11: every other project is on hold and wakes only for that).
 - Waiting: the conductor's review; the commercial ROMs of A9 (the owner provides them; disassembly happens outside this
