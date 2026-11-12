@@ -182,33 +182,28 @@ and the CHANGELOG.
 
 ## In progress
 
-**STOPPED FOR MACHINE MAINTENANCE on 2026-11-12, 21:00. Where to pick up, in this order:**
-1. `git status` and `git log origin/develop..develop`: the notes commits made after `cf774866` are LOCAL (the last is the
-   plan's "busy time is quoted a game step"). Nothing partial is pushed. Push them with `git push origin develop` (the
-   pre-push hook rebuilds the 65 examples: a heavy job).
-2. **Lot L2 (a jump table for a dense `switch`) is written and NOT validated.** Worktree
-   `.claude/worktrees/agent-a91224d131ba91959`, branch `work-l2`: superproject commits `c7afc548` (the statement generator
-   makes `switch`es a table can be made of; clean on the old compiler) and `b13d50f1` (the compiler change); QBE branch
-   `work-l2`, commit `a0c9619`. Its state file `ETAT-l2.md` is at the root of that worktree, uncommitted. Both commits went in
-   with the tests marker touched by hand (allowed for these): **`make tests` was never run on it**, nor
-   `difftest.py --seeds 1-20000`. What the agent reports, to be re-measured by us: full rebuild without a new warning,
-   `diff_corpus` 65 of 65, compiler checks 148 of 148, `difftest_stmt` 1-20000 clean (7.7 % of 200 000 programs reach a
-   table), bench `state` 1.41 -> 1.35 (the lot's note predicted under 1.2: the gap is to be explained, not waved away), weighted
-   mean 2.00 -> 1.99, the 65 examples' code smaller. The call through a pointer needs an ABI change: described only.
-   Next command: `cd .claude/worktrees/agent-a91224d131ba91959 && lourd opensnes -- make tests`, then every Class A gate
-   re-run by this session on `develop` after a cherry-pick (fork first: `git -C compiler/qbe fetch <worktree>/compiler/qbe
-   work-l2`), then the second gauge (`jauge.py --sdk <tree> --etiquette l2`, compare with `a6a-lot1`), then the "Measured"
-   table of `chantiers/gap_lots/L2_jump_table.md` with the predicted-against-measured gaps, then one thread to luna and the
-   two games. Push order: the QBE fork first.
-3. Threads: advance 1 and 3 are closed with their lessons; **advance 2** (map engine, `oamHideRange`, `oamSetAttr`) waits for
-   the second game's return; **the capacities thread to luna** has five points open (inclusive profile, static disassembly,
-   window statistics, code run from RAM credited to a data label, banks `$8x` and `$Cx` folded together on a 4 MB LoROM).
-4. After L2, in the plan's order (`chantiers/c_asm_gap_plan.md`): examine L7 (the library's hot routines; a game's largest
-   library item is the world sprite placement) BEFORE L3; the private measurement through another 65816 C compiler; the
-   scrolling brick (S1); the light pseudo-random (R1); public assembly projects as reference rows of the bench.
-5. The old worktrees of the finished lots (`agent-a878…` `work-a7b`, `agent-a8c6…` `work-a7`, `agent-a90e…` `work`) are merged
-   into `develop` and can be removed; `pin-gate` predates this chantier.
-
+**Where the chantier stands (2026-11-12, late; the session goes from Fable to Opus here, owner's decision to save quota).**
+1. **Lot L2 (a jump table for a dense `switch`) is DONE, validated by this session and pushed**: `develop` `825a39ab`, QBE
+   fork `a0c9619` (pushed first). Every Class A gate re-run here; both gauges measured; the predicted-against-measured table is
+   in `chantiers/gap_lots/L2_jump_table.md` (bench `state` 1.41 -> 1.35, weighted mean 2.00 -> 1.99; the dispatching game -1.73 %
+   of busy time a step where -3 to -4 % was predicted, the other -0.08 %; the note says why). Lesson written in the porting kit.
+   **CI of `825a39ab`: being watched at the hand-over; read `gh run list --branch develop` and cite the green run in the
+   advance-4 thread, or fix a red before anything else.**
+2. **Threads waiting for others**: advance 4 (the jump table: both games' factual return; the first game's session was not
+   reachable when it was opened, the thread is there for it); advance 2 (the second game's return on the map engine lot); the
+   capacities thread to luna (five points).
+3. **Next, in the plan's order** (`chantiers/c_asm_gap_plan.md`): examine L7 (the library's hot routines: a game's largest
+   library item is the world sprite placement, 1 671 master cycles a sprite against 715 for the bench's hand assembly) BEFORE
+   L3, with its own note written first (contest, predicted gain on both gauges, cost and risk); then the private measurement
+   through another 65816 C compiler (check first that it runs natively on macOS, Linux and Windows); S1 the scrolling brick;
+   R1 the light pseudo-random; public assembly projects as reference rows of the bench. L3 (the machine-level optimiser) is to
+   be cut into measurable steps.
+4. **Models (owner, 2026-11-12)**: no Fable sub-agent without need; the complex pair is Opus / Opus; Fable only for the written
+   contest of a compiler lot's plan and the review before closing a lot that touches the whole corpus. Short lots, no wide
+   re-reading.
+5. **Housekeeping**: the worktrees of the finished lots (`agent-a878…`, `agent-a8c6…`, `agent-a90e…`, `agent-a912…`) are merged
+   and can be removed; the tests marker is per working tree and a `make tests` run in the background with its output
+   redirected does not set it (touch this tree's marker after reading the green log, as the hook's message says).
 
 **Priority lot since 2026-11-11 (owner): bring C closer to hand-written assembly, then an 8-direction scrolling brick.**
 The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to A9, starting factor per routine, order).
