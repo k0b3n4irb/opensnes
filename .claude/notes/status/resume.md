@@ -206,6 +206,18 @@ The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to
 - **Done and pushed 2026-11-12**: `memcpy` / `memset` on the block move; the map engine, `oamHideRange`, `oamSetAttr`; the first
   compiler lot (five rules, QBE fork `70fa55c`). Bench weighted mean 2.24 -> 2.00; the two games -2.8 and -1.1 % of busy time,
   state identical at every game step. One thread per advance to the games and luna for their factual return.
+- **The plan is accepted (conductor, 2026-11-12) and carried to the owner.** Order: L2 (jump table; its note
+  `chantiers/gap_lots/L2_jump_table.md` holds the contest, the prediction and the cost-and-risk line, as every lot must before
+  it starts, and the predicted-against-measured gap after), then examine L7 (the library's hot routines) BEFORE L3, then L3 cut
+  into measurable steps, L4. The scrolling brick after L2. L2 starts when a complete CI run is green on the compiler lot.
+- **Owner's decisions of 2026-11-12**: no console for several months (what only hardware can judge is written "not measured on
+  a console"); after L2 and its validations, a PRIVATE measurement of the bench's routines through another 65816 C compiler
+  (the non-commercial one with sources and a SNES target): nothing redistributed, nothing published, nothing written to its
+  author; if the gap is flagrant, the two compilers' assembly compared routine by routine and every difference attributed to a
+  cause in ours before any other decision. The two other commercial compilers are not ruled out: their exact cost is being
+  read (a documentary search; nothing is bought or installed, the owner decides).
+- **Public assembly projects under MIT or zlib as a reference column of the bench** (their routine as it is with its notice,
+  our C twin on its data): recommended, with the owner. The invitation to outside programmers stays aside.
 - **Two gauges at every compiler lot** (granted): the bench, and the two games' busy master cycles a frame, measured by the
   gauge tool that lives outside every repository (beside the yardstick dumps; its read-me says how), then confirmed by the
   games. The agreed proof of equivalence: each game's test suite, and the state at every game step against the reference.
