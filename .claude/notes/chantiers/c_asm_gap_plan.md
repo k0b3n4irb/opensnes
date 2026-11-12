@@ -25,6 +25,13 @@ proven identical at every game step. **Estimate** is written as such.
 | Game 2, busy mclk a frame on its scenario | 214 012 | **211 672** (-1.1 %) | falls at every compiler lot |
 | The 65 examples, bytes of code | 2 393 055 | 2 385 016 | never larger |
 
+Known bias of the games' figure (measured by the porting kit against a test
+ROM, 2026-11-12): the emulator's idle count leaves out the memory refresh
+that falls while the CPU sleeps, so "busy" is over-stated by about 2.5
+points of a frame; the differences in master cycles between two builds are
+right, the percentages of gain slightly under-stated. To be corrected when
+the emulator gives the exact value.
+
 What "1 for 1" is on a real game, by hand: **1.35 and 1.75** on two leaves,
 **1.23 and 1.66** on two functions that call. Nothing of it needed knowledge
 the C source does not carry. So the honest end of this plan is the games'
