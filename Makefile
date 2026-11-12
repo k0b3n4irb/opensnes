@@ -341,13 +341,14 @@ tests: test-compiler
 
 # What the tests leave in the temporary directory: $(OPENSNES_TMP), the files
 # of QBE's suite that it never removes, and the pass markers of earlier days
-# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh; today's
-# stays, the pre-commit hook reads it).
+# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh, one per
+# working tree; today's stay, the pre-commit hook reads this tree's).
 clean-tmp:
 	@rm -rf $(OPENSNES_TMP)
 	@rm -f /tmp/qbe.zzzz.*
 	@for f in /tmp/opensnes_tests_passed_*; do \
-		[ -e "$$f" ] && [ "$$f" != /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d) ] && rm -f "$$f"; done; true
+		case "$$f" in /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d)_*) continue;; esac; \
+		[ -e "$$f" ] && rm -f "$$f"; done; true
 
 # The VBlank time budget on its own (gaps review R4): the same gate `make
 # tests` runs, handy while tuning the NMI handler. `--report` prints the
