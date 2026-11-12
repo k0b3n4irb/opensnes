@@ -214,8 +214,8 @@ The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to
   a console"); after L2 and its validations, a PRIVATE measurement of the bench's routines through another 65816 C compiler
   (the non-commercial one with sources and a SNES target): nothing redistributed, nothing published, nothing written to its
   author; if the gap is flagrant, the two compilers' assembly compared routine by routine and every difference attributed to a
-  cause in ours before any other decision. The two other commercial compilers are not ruled out: their exact cost is being
-  read (a documentary search; nothing is bought or installed, the owner decides).
+  cause in ours before any other decision. The two other commercial compilers are ruled out by the owner (2026-11-12, after their cost was read:
+  one's price is not published and it is Windows-only, the other targets another machine): the non-commercial one stays, alone.
 - **Public assembly projects under MIT or zlib as a reference column of the bench** (their routine as it is with its notice,
   our C twin on its data): recommended, with the owner. The invitation to outside programmers stays aside.
 - **Two gauges at every compiler lot** (granted): the bench, and the two games' busy master cycles a frame, measured by the
