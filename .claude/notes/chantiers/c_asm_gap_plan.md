@@ -19,10 +19,10 @@ proven identical at every game step. **Estimate** is written as such.
 
 | | Before the first compiler lot | After it (2026-11-12) | Target |
 |---|--:|--:|---|
-| Bench, mean weighted by the games' profiles (`devtools/gapbench`); it started at 2.24 on 2026-11-11 | 2.24 | **2.00** | under 1.5, no row above 2.0 |
+| Bench, mean weighted by the games' profiles (`devtools/gapbench`); it started at 2.24 on 2026-11-11 | 2.24 | **2.00**; after L2 1.99 | under 1.5, no row above 2.0 |
 | the same, every row equal / the first twelve rows | 2.74 / 2.55 | 2.41 / 2.20 | (for the record) |
-| Game 1, busy mclk a frame on its scenario | 195 812 | **190 264** (-2.8 %) | falls at every compiler lot |
-| Game 2, busy mclk a frame on its scenario | 214 012 | **211 672** (-1.1 %) | falls at every compiler lot |
+| Game 1, busy mclk a frame on its scenario | 195 812 | **190 264** (-2.8 %); after L2 190 121 | falls at every compiler lot |
+| Game 2, busy mclk a frame on its scenario | 214 012 | **211 672** (-1.1 %); after L2 208 020 (-1.7 % more) | falls at every compiler lot |
 | The 65 examples, bytes of code | 2 393 055 | 2 385 016 | never larger |
 
 The figure to quote is the busy time **a game step**, not a frame: when the

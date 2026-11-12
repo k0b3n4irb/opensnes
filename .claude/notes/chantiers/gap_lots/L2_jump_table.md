@@ -67,8 +67,8 @@ function pointers (bench `fptr`, 3.16).
 |---|--:|--:|---|
 | bench `state` | under 1.2 | **1.35** (22 753 -> 21 826 mclk; FastROM 1.40 -> 1.35) | the dispatch was not most of the row: the table took 927 mclk of the 6 592 the C costs above the hand (14 %). What is left is in the handlers: a value stored to a slot and loaded back, `sep / rep` around each byte store, and the loop counter, which the dispatch's X pushes into Y, given back to X by a `tyx` in every case. The hand keeps the object in Y for the whole update. Items 1 and 3 of the plan (L3), not L2 |
 | bench, weighted mean | 1.96 to 1.98 | **1.99** (2.00 -> 1.99; FastROM 2.02 -> 2.01) | follows from the row: 8 / 87 of 0.06 |
-| game 2, busy master cycles a frame | -3 to -4 % | (the thinker measures) | |
-| game 1, busy master cycles a frame | 0 to -0.3 % | (the thinker measures) | |
+| game 2, busy master cycles a game step | -3 to -4 % | **-1.73 %** (635 015 -> 624 059; its dispatcher function -11.9 %, 31 399 -> 27 647 a frame; frames late 433 -> 431; code -1.1 %; state identical at the 700 steps read) | half of what was predicted. The prediction took the 117 CPU cycles the hand saved on "the binary search and the three tests written before it, turned into one bound and a table" as the table's own; the compiler's table replaces the search only: the tests written before the `switch` are still compares, and the values re-read from the stack around the dispatch are untouched (L4). A hand's gain on a perimeter is not the gain of the one transformation named after it: the share of each must be counted before it is predicted |
+| game 1, busy master cycles a game step | 0 to -0.3 % | **-0.08 %** (380 528 -> 380 242; code -0.7 %; state identical at the 341 steps read) | as predicted: its hot code has no dense dispatch |
 | the 65 examples, bytes of code | not larger | **205 443 against 207 937** (-1.2 %; 53 smaller, 12 equal, none larger) | measured as the sum of the `.text.*` sections of the 65 `.sym` (the plan's 2 385 016 used another method, not written down; this one is in the commit). Most of the gain is not from `switch`es (8 in the examples, 3 taken) but from chains of `if (v == k)` on one value, which are the same region to the back end |
 | `sdkbench` `switch` (not predicted) | | 880 728 -> 664 268 (-24.6 %) | an interpreter's dispatch: the workload a table is for |
 
@@ -78,3 +78,13 @@ the default, not its compares, and turned 27 range tests of the corpus
 one target. The decision is now on the tree's size (its compares) against
 the table's (its slots), and a range test is refused (check
 `jump_table_tree`). The corpus trace of each `switch` is in the commit.
+
+Re-validated by the session on `develop` after the cherry-pick (2026-11-12):
+full rebuild; the 65 ROMs against those built before the lot, 65 of 65 MATCH
+at tolerance 0; compiler checks 148 of 148; `difftest` and `difftest_stmt`
+5 000 seeds clean each (the first had not been run on this lot); `make
+tests` green. WRAM: 19 of 65 streams move, journalled. Audio: one hash of
+nine moves (the Super FX skeleton): `luna diff --audio --align-onset` over
+900 frames gives the same sound 1 to 8 samples early, 28 windows of 29 within
+1.24 %, one at 2.19 % (tolerance 2 %); re-captured as a phase shift of faster
+code, the cause of that one window not established further.
