@@ -21,8 +21,8 @@ promise 1.0 will make.
 
 A modern, well-tested SNES SDK ready for serious hobby development, game
 jams, and educational use, building toward commercial-grade maturity. The
-compiler produces code about 38 % faster than PVSnesLib + 816-opt estimated
-on 34 functions, and 63 % faster measured on luna on 23 workloads, each of
+compiler produces code about 39 % faster than PVSnesLib + 816-opt estimated
+on 34 functions, and 65 % faster measured on luna on 23 workloads, each of
 them faster, none larger, and level or shallower in stack on 22
 (`docs/BENCHMARK.md`). 65 working examples cover every major subsystem,
 with CI on Linux (x86_64 and arm64), macOS and Windows. Linux runs the full

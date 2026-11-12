@@ -127,15 +127,15 @@
   },
   "chips_sa1_starfield": {
     "fbhash": [
-      "ccb88b06616531c6",
-      "5a11f524ffa6f895"
+      "db6d7b2bd0b7b37f",
+      "0a9abef9580138f2"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.40.0",
-    "rom_sha256": "797a091d76448142e41b48afa65f2cb2f9f903467d4bd79e679ef6c0048f9081"
+    "luna_version": "v1.43.0",
+    "rom_sha256": "613acc7b8824c0a6f3bb19ef1c03267cbbfb26ca07eefa4a305205783f22ac07"
   },
   "chips_superfx_3d": {
     "fbhash": [
