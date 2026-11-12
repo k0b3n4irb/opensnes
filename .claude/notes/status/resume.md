@@ -1,4 +1,4 @@
-# Where the work stands (resume note, 2026-11-11, evening)
+# Where the work stands (resume note, 2026-11-12, night)
 
 The note a new conversation starts from. Keep it short and current: what is
 in progress, the next step, what waits for whom. History is in the git log
@@ -182,27 +182,26 @@ and the CHANGELOG.
 
 ## In progress
 
-**Where the chantier stands (2026-11-12, late; the session goes from Fable to Opus here, owner's decision to save quota).**
-1. **Lot L2 (a jump table for a dense `switch`) is DONE, validated by this session and pushed**: `develop` `825a39ab`, QBE
-   fork `a0c9619` (pushed first). Every Class A gate re-run here; both gauges measured; the predicted-against-measured table is
-   in `chantiers/gap_lots/L2_jump_table.md` (bench `state` 1.41 -> 1.35, weighted mean 2.00 -> 1.99; the dispatching game -1.73 %
-   of busy time a step where -3 to -4 % was predicted, the other -0.08 %; the note says why). Lesson written in the porting kit.
-   **CI of `825a39ab`: being watched at the hand-over; read `gh run list --branch develop` and cite the green run in the
-   advance-4 thread, or fix a red before anything else.**
-2. **Threads waiting for others**: advance 4 (the jump table: both games' factual return; the first game's session was not
-   reachable when it was opened, the thread is there for it); advance 2 (the second game's return on the map engine lot); the
-   capacities thread to luna (five points).
-3. **Next, in the plan's order** (`chantiers/c_asm_gap_plan.md`): examine L7 (the library's hot routines: a game's largest
-   library item is the world sprite placement, 1 671 master cycles a sprite against 715 for the bench's hand assembly) BEFORE
-   L3, with its own note written first (contest, predicted gain on both gauges, cost and risk); then the private measurement
-   through another 65816 C compiler (check first that it runs natively on macOS, Linux and Windows); S1 the scrolling brick;
-   R1 the light pseudo-random; public assembly projects as reference rows of the bench. L3 (the machine-level optimiser) is to
-   be cut into measurable steps.
-4. **Models (owner, 2026-11-12)**: no Fable sub-agent without need; the complex pair is Opus / Opus; Fable only for the written
+**Where the chantier stands (2026-11-12, night; this session runs on Opus since this evening, owner's decision to save
+quota; a Fable sub-agent may be called by this session alone when needed, and the journal says when and why).**
+1. **Lot L2 (jump table) is DONE and pushed** (`develop` `825a39ab`, QBE fork `a0c9619`). Both games returned their figures
+   on the advance-4 thread: game 1 -0.072 % a step (30/30 tests), game 2 -1.86 % (713 steps, 16 tables of 147 sites). The
+   thread closes with the CI run and the lesson.
+2. **L7 examined, not opened** (`chantiers/gap_lots/L7_library_hot_routines.md`): about -1.5 % of game 1's busy time and
+   -0.4 % of game 2's at best; ~4 of the plan's 18.7 points are DMA bytes, not code; `(dp),y` costs the same as `[dp],y`
+   with 16-bit index registers. Kept from it: the fixture `testing/fixtures/stress/world_place` (in `make tests`). The
+   `oamPlaceWorld` unrolling waits as a short lot for a quiet day.
+3. **Next, in the plan's order** (`chantiers/c_asm_gap_plan.md`): the private measurement through another 65816 C compiler
+   (check first that it runs natively on macOS, Linux and Windows; nothing of it enters the repository but neutral figures),
+   then L3 (the machine-level optimiser) cut into measurable steps, its plan contested in writing by a Fable sub-agent
+   before it starts; R1 the light pseudo-random stays in the plan.
+4. **Threads waiting for others**: advance 2 (the second game's return on the map engine lot); the capacities thread to
+   luna (its point 10, the mirror fold per mapper, also explains the false slowdowns game 2 saw in its own profile list).
+5. **Models (owner, 2026-11-12)**: no Fable sub-agent without need; the complex pair is Opus / Opus; Fable only for the written
    contest of a compiler lot's plan and the review before closing a lot that touches the whole corpus. Short lots, no wide
    re-reading.
-5. **Housekeeping**: the worktrees of the finished lots (`agent-a878…`, `agent-a8c6…`, `agent-a90e…`, `agent-a912…`) are merged
-   and can be removed; the tests marker is per working tree and a `make tests` run in the background with its output
+6. **Housekeeping**: the worktrees of the finished lots (`agent-a878…`, `agent-a8c6…`, `agent-a90e…`, `agent-a912…`) are merged
+   and can be removed (their branches are not ancestors of `develop`, checked 2026-11-12: compare by content first); the tests marker is per working tree and a `make tests` run in the background with its output
    redirected does not set it (touch this tree's marker after reading the green log, as the hook's message says).
 
 **Priority lot since 2026-11-11 (owner): bring C closer to hand-written assembly, then an 8-direction scrolling brick.**
