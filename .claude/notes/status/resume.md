@@ -182,6 +182,28 @@ and the CHANGELOG.
 
 ## In progress
 
+**STOPPED FOR MACHINE MAINTENANCE on 2026-11-12, 21:00. Where to pick up, in this order:**
+1. `git status` and `git log origin/develop..develop`: the notes commits made after `cf774866` are LOCAL (the last is the
+   plan's "busy time is quoted a game step"). Nothing partial is pushed. Push them with `git push origin develop` (the
+   pre-push hook rebuilds the 65 examples: a heavy job).
+2. **Lot L2 (a jump table for a dense `switch`) was being written by an agent** in the worktree
+   `.claude/worktrees/agent-a91224d131ba91959`, branch `work-l2`, QBE branch `work-l2` (commit `a0c9619` "a dense switch is a
+   jump table" existed at the stop, with uncommitted superproject files: checks, baselines, the lot's note). Read its
+   `ETAT-l2.md` at the root of that worktree (asked at the stop; if it is absent, read `git -C <worktree> status` and
+   `git -C <worktree>/compiler/qbe log`). A `difftest_stmt.py --seeds 1-20000` hunt was running and was not finished: it
+   has to be run again. NOTHING of L2 is validated: re-run every gate (Class A) before any merge, then the second gauge
+   (`python3 jauge.py --sdk <tree> --etiquette l2` in the gauge's folder, compare with `a6a-lot1`), then fill the "Measured"
+   table of `chantiers/gap_lots/L2_jump_table.md`, then one thread to luna and the two games.
+3. Threads: advance 1 and 3 are closed with their lessons; **advance 2** (map engine, `oamHideRange`, `oamSetAttr`) waits for
+   the second game's return; **the capacities thread to luna** has five points open (inclusive profile, static disassembly,
+   window statistics, code run from RAM credited to a data label, banks `$8x` and `$Cx` folded together on a 4 MB LoROM).
+4. After L2, in the plan's order (`chantiers/c_asm_gap_plan.md`): examine L7 (the library's hot routines; a game's largest
+   library item is the world sprite placement) BEFORE L3; the private measurement through another 65816 C compiler; the
+   scrolling brick (S1); the light pseudo-random (R1); public assembly projects as reference rows of the bench.
+5. The old worktrees of the finished lots (`agent-a878…` `work-a7b`, `agent-a8c6…` `work-a7`, `agent-a90e…` `work`) are merged
+   into `develop` and can be removed; `pin-gate` predates this chantier.
+
+
 **Priority lot since 2026-11-11 (owner): bring C closer to hand-written assembly, then an 8-direction scrolling brick.**
 The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to A9, starting factor per routine, order).
 - Done: `devtools/gapbench` (`make bench-gap`, `--check` in `make tests`): twelve routines, C against assembly by hand,
