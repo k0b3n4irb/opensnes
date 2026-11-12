@@ -14,5 +14,6 @@ in test_shift_right: present lda #8\n\tsta\.w byte_val\n[\s\S]*lda\.w #128\n\tst
 in test_bit_set_clear: present lda #8\n\tsta\.w byte_val\n\tlda #136\n\tsta\.w byte_val\n\tlda #128\n\tsta\.w byte_val\n\tstz\.w byte_val\n
 # (0xAB & 0x0F) << 4 | (0xAB >> 4) & 0x0F = 0xBA.
 in test_mask_extract: present lda #186\n\tsta\.w byte_val\n
-# The one test that survives to run time: bit 3 of byte_val.
-in test_bit_test: present lda\.w byte_val\n\tand\.w #\$00FF\n\tand\.w #8\n
+# The one test that survives to run time: bit 3 of byte_val (one mask since
+# A6a R5: the zero extension's $00FF and the test's 8 are one `and`).
+in test_bit_test: present lda\.w byte_val\n\tand\.w #8\n

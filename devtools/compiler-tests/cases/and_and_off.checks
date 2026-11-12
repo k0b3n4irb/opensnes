@@ -1,0 +1,2 @@
+env QBE_NO_PEEP_AND2=1
+in bit3: present lda\.w flags\n\tand\.w #\$00FF\n\tand\.w #8\n
