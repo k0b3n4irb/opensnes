@@ -628,13 +628,52 @@ def gen_stmt(rng, P, depth):
         return ("gskip", gen_expr(rng, P, 2), body, P.nlabel)
     if depth > 0 and pick < 0.39:
         labels = rng.sample(range(8), rng.randint(2, 4))
+        sel = masked(gen_expr(rng, P, 2), 8)
+        if rng.random() < 0.6:
+            # L2 (2026-11-12): switches the back end may turn into a jump
+            # table — 4 to 12 cases, dense or with holes or sparse, from 0, a
+            # positive or a negative first case, on a value of 16 or 32 bits,
+            # signed or unsigned, or on a byte — and some it must not
+            n = rng.randint(2, 12)
+            shape = rng.random()
+            if shape < 0.15:
+                # a byte variable as it is: unsigned char promoted to int
+                cands = [v for v, t in P.vars.items() if t in ("u8", "s8")]
+                if cands:
+                    var = rng.choice(cands)
+                    lo = 0 if P.vars[var] == "u8" else -6
+                    labels = rng.sample(range(lo, lo + n + 4), n)
+                    sel = ("v", var)
+                else:
+                    labels = rng.sample(range(n + 2), n)
+                    sel = masked(gen_expr(rng, P, 2), 16)
+            else:
+                first = rng.choice([0, 0, rng.randint(1, 40), -rng.randint(1, 12), 1000])
+                stride = rng.choice([1, 1, 1, 2, 3]) if shape < 0.85 else 0
+                if stride:
+                    span = stride * (n + 2)
+                    pool = list(range(first - stride, first + span, stride))
+                else:
+                    span = 300                          # sparse: the tree stays
+                    pool = list(range(first, first + span))
+                labels = rng.sample(pool, min(n, len(pool)))
+                width = 16 if span <= 16 else 64 if span <= 64 else 512
+                # (e & (width - 1)) + base reaches the labels and around them
+                base = first - rng.randint(0, 2) * max(stride, 1)
+                sel = ("b", "+", masked(gen_expr(rng, P, 2), width), konst("s16", base))
+                if base >= 0 and rng.random() < 0.5:
+                    sel = masked(gen_expr(rng, P, 2), width)
+                    labels = [lab - base for lab in labels]
         P.ctx.append("switch")
-        arms = [[lab, gen_block(rng, P, depth - 1, rng.randint(1, 2)), rng.random() < 0.3]
+        # an arm of a large switch is one statement: ten programs inlined
+        # into main must stay under the backend's 2048 temporaries
+        arms = [[lab, gen_block(rng, P, depth - 1 if len(labels) <= 4 else 0,
+                                rng.randint(1, 2 if len(labels) <= 4 else 1)), rng.random() < 0.3]
                 for lab in labels]
         if rng.random() < 0.7:               # a default arm, anywhere
             arms.insert(rng.randint(0, len(arms)), [None, gen_block(rng, P, depth - 1, 1), rng.random() < 0.3])
         P.ctx.pop()
-        return ("sw", masked(gen_expr(rng, P, 2), 8), arms)
+        return ("sw", sel, arms)
     if pick < 0.42 and P.ctx and P.ctx[-1] == "loop":
         return (rng.choice(["brk", "cont"]), gen_expr(rng, P, 2))
     if pick < 0.46:
@@ -797,7 +836,11 @@ def run_block(block, P, env):
         elif k == "sw":
             sel = ev(st[1], P, env).value
             arms = st[2]
-            at = next((n for n, a in enumerate(arms) if a[0] == sel), None)
+            # a case label is converted to the promoted type of the value
+            # (C11 6.8.4.2): `case -1` matches 65535 on an unsigned int
+            pt = D.promote(ty(st[1], P))
+            at = next((n for n, a in enumerate(arms)
+                       if a[0] is not None and D.wrap(a[0], pt) == sel), None)
             if at is None:
                 at = next((n for n, a in enumerate(arms) if a[0] is None), None)
             while at is not None and at < len(arms):
