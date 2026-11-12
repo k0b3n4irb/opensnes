@@ -25,6 +25,19 @@ proven identical at every game step. **Estimate** is written as such.
 | Game 2, busy mclk a frame on its scenario | 214 012 | **211 672** (-1.1 %) | falls at every compiler lot |
 | The 65 examples, bytes of code | 2 393 055 | 2 385 016 | never larger |
 
+The figure to quote is the busy time **a game step**, not a frame: when the
+code gets faster fewer frames run late, so more frames do their full work
+(the NMI handler stops skipping its transfers, the display pass runs once
+more), and "busy a frame" mixes the cost of the code with the number of
+frames treated. Measured on the first compiler lot: the handler's cost per
+pass did not move (900 master cycles when the frame is late, 7 859 for a
+full pass); only the number of full passes rose (463 -> 491 and 758 -> 768),
+which predicts the handler's extra time within 3.2 and 0.5 %. A step: -2.98 %
+and -1.09 %; frames late 219 -> 190 and 443 -> 433. And a profile by symbol is
+not quoted before its instruction counts are compared: on a 4 MB LoROM the
+emulator's profile credited code of one bank to data tables of another (asked
+of the emulator's team).
+
 Known bias of the games' figure (measured by the porting kit against a test
 ROM, 2026-11-12): the emulator's idle count leaves out the memory refresh
 that falls while the CPU sleeps, so "busy" is over-stated by about 2.5
