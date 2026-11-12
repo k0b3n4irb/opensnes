@@ -199,15 +199,17 @@ The plan and its state: `.claude/notes/chantiers/c_asm_gap.md` (approaches A1 to
   game is being read (sprite list, object loop, main loop, NMI and transfers, scrolling, collisions, arithmetic,
   decompression); only patterns in our words and our own measurements come back here. Next: a game with 8-direction scrolling,
   before the scrolling brick is written.
-- **Owed when the running lots are finished (owner, 2026-11-11): the complete plan**, in this repository, generic: (1) the
-  inventory of what is missing (tools, sources, documentation) and who is asked; (2) every cost item from the largest to the
-  smallest, MEASURED on both gauges (the re-weighted bench; the two games' busy master cycles a frame), with its share, its
-  established cause, the axis that attacks it, the expected then measured gain, and its owner (compiler, library, runtime,
-  examples, documentation, the game); nothing without a cause, what is not measured is measured first; (3) the small items
-  too, each with its lesson; (4) the path step by step: one lot = one axis, measured before and after on both gauges,
-  contested by the thinker before starting and after measuring, with its lesson; no lot starts before the previous one is
-  measured; (5) no concession: an axis is dropped only on written proof. The conductor reviews it before the owner.
-  Inputs already there: `chantiers/c_asm_gap.md`, `tech/commercial_yardsticks.md`, `tech/our_asm_on_real_games.md`.
+- **The complete plan is `chantiers/c_asm_gap_plan.md`** (2026-11-12): every cost item with its share, cause, what shipped
+  games do, axis, expected gain and owner; the small items with their lessons; what is missing and who is asked; the path lot
+  by lot (L2 jump tables, L3 the machine-level optimiser, L4 values off the stack and the call, then L5 to L9, S1 the scrolling
+  brick, S2). It is with the conductor for review: **no new lot before its answer.**
+- **Done and pushed 2026-11-12**: `memcpy` / `memset` on the block move; the map engine, `oamHideRange`, `oamSetAttr`; the first
+  compiler lot (five rules, QBE fork `70fa55c`). Bench weighted mean 2.24 -> 2.00; the two games -2.8 and -1.1 % of busy time,
+  state identical at every game step. One thread per advance to the games and luna for their factual return.
+- **Two gauges at every compiler lot** (granted): the bench, and the two games' busy master cycles a frame, measured by the
+  gauge tool that lives outside every repository (beside the yardstick dumps; its read-me says how), then confirmed by the
+  games. The agreed proof of equivalence: each game's test suite, and the state at every game step against the reference.
+- **Push order**: a fork first, then the commit that pins it (the pre-push hook now refuses the other order).
 - **After each measured advance: one thread to luna and the two games** for their factual return on their real case (owner,
   2026-11-11: every other project is on hold and wakes only for that).
 - Waiting: the conductor's review; the commercial ROMs of A9 (the owner provides them; disassembly happens outside this
