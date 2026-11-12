@@ -186,14 +186,20 @@ and the CHANGELOG.
 1. `git status` and `git log origin/develop..develop`: the notes commits made after `cf774866` are LOCAL (the last is the
    plan's "busy time is quoted a game step"). Nothing partial is pushed. Push them with `git push origin develop` (the
    pre-push hook rebuilds the 65 examples: a heavy job).
-2. **Lot L2 (a jump table for a dense `switch`) was being written by an agent** in the worktree
-   `.claude/worktrees/agent-a91224d131ba91959`, branch `work-l2`, QBE branch `work-l2` (commit `a0c9619` "a dense switch is a
-   jump table" existed at the stop, with uncommitted superproject files: checks, baselines, the lot's note). Read its
-   `ETAT-l2.md` at the root of that worktree (asked at the stop; if it is absent, read `git -C <worktree> status` and
-   `git -C <worktree>/compiler/qbe log`). A `difftest_stmt.py --seeds 1-20000` hunt was running and was not finished: it
-   has to be run again. NOTHING of L2 is validated: re-run every gate (Class A) before any merge, then the second gauge
-   (`python3 jauge.py --sdk <tree> --etiquette l2` in the gauge's folder, compare with `a6a-lot1`), then fill the "Measured"
-   table of `chantiers/gap_lots/L2_jump_table.md`, then one thread to luna and the two games.
+2. **Lot L2 (a jump table for a dense `switch`) is written and NOT validated.** Worktree
+   `.claude/worktrees/agent-a91224d131ba91959`, branch `work-l2`: superproject commits `c7afc548` (the statement generator
+   makes `switch`es a table can be made of; clean on the old compiler) and `b13d50f1` (the compiler change); QBE branch
+   `work-l2`, commit `a0c9619`. Its state file `ETAT-l2.md` is at the root of that worktree, uncommitted. Both commits went in
+   with the tests marker touched by hand (allowed for these): **`make tests` was never run on it**, nor
+   `difftest.py --seeds 1-20000`. What the agent reports, to be re-measured by us: full rebuild without a new warning,
+   `diff_corpus` 65 of 65, compiler checks 148 of 148, `difftest_stmt` 1-20000 clean (7.7 % of 200 000 programs reach a
+   table), bench `state` 1.41 -> 1.35 (the lot's note predicted under 1.2: the gap is to be explained, not waved away), weighted
+   mean 2.00 -> 1.99, the 65 examples' code smaller. The call through a pointer needs an ABI change: described only.
+   Next command: `cd .claude/worktrees/agent-a91224d131ba91959 && lourd opensnes -- make tests`, then every Class A gate
+   re-run by this session on `develop` after a cherry-pick (fork first: `git -C compiler/qbe fetch <worktree>/compiler/qbe
+   work-l2`), then the second gauge (`jauge.py --sdk <tree> --etiquette l2`, compare with `a6a-lot1`), then the "Measured"
+   table of `chantiers/gap_lots/L2_jump_table.md` with the predicted-against-measured gaps, then one thread to luna and the
+   two games. Push order: the QBE fork first.
 3. Threads: advance 1 and 3 are closed with their lessons; **advance 2** (map engine, `oamHideRange`, `oamSetAttr`) waits for
    the second game's return; **the capacities thread to luna** has five points open (inclusive profile, static disassembly,
    window statistics, code run from RAM credited to a data label, banks `$8x` and `$Cx` folded together on a 4 MB LoROM).
