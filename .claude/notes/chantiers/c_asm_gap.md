@@ -75,7 +75,7 @@ open); the 65816 references are Calypsi, WDC and ORCA/C.
 | Peephole rules found by exhaustive search and proven (solver or shared emulator) | DeiMOS, 6502-enumerator, Massalin 1987 | A6b |
 | Register choice by search on the cycle cost; optimal allocation by tree decomposition | KickC (`uplift`), SDCC (Krause 2013) | not planned: the heaviest step, after everything else |
 
-Not found anywhere: a compiler that inlines the console's multiplier. The
+Corrected 2026-11-12: two 65816 compilers do use the console's multipliers (one through library routines behind an option, one with a SNES target whose manual does not say whether inline or by routine); the first reading had missed a 65816 back end of vbcc with a SNES target. The
 PPU one (`$211B` -> `$2134`) is signed 16x8 with no wait, but unusable while
 Mode 7 is displayed.
 
