@@ -4,7 +4,8 @@
 # turn the push's Lint job red and could only be repaired by a force-push.
 # Then build every example from a clean export of the pushed commit
 # (devtools/check_clean_export.py): a file the commit leaves out turns
-# every build leg red.
+# every build leg red. And every submodule commit it names must already be
+# on that submodule's remote (devtools/check_submodule_pins.py).
 # Installed by `make hooks` (git config core.hooksPath scripts/githooks).
 #
 # stdin: one line per ref: <local ref> <local sha> <remote ref> <remote sha>
@@ -22,6 +23,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
         range="$remote_sha..$local_sha"
     fi
     python3 "$top/devtools/lint_commits.py" "$range" || status=1
+    # A submodule commit must be on its fork before the commit that names it.
+    python3 "$top/devtools/check_submodule_pins.py" "$local_sha" || status=1
     # Every example must build from the pushed commit alone, as CI builds it.
     python3 "$top/devtools/check_clean_export.py" "$local_sha" || status=1
 done
