@@ -7,216 +7,216 @@
    "asm": 13842,
    "asm_sum": 402,
    "asm_bytes": 15,
-   "lib": 15266,
+   "lib": 15268,
    "lib_sum": 402,
    "ratio": 1.61
   },
   "fill": {
-   "c": 40928,
+   "c": 32422,
    "c_sum": 14232,
-   "c_bytes": 39,
-   "asm": 16177,
+   "c_bytes": 33,
+   "asm": 16180,
    "asm_sum": 14232,
    "asm_bytes": 56,
-   "ratio": 2.53
+   "ratio": 2.0
   },
   "fillu": {
-   "c": 49038,
+   "c": 17718,
    "c_sum": 14232,
-   "c_bytes": 142,
+   "c_bytes": 71,
    "asm": 16177,
    "asm_sum": 14232,
    "asm_bytes": 56,
-   "ratio": 3.03
+   "ratio": 1.1
   },
   "oam": {
-   "c": 47734,
+   "c": 42886,
    "c_sum": 40489,
-   "c_bytes": 368,
+   "c_bytes": 340,
    "asm": 22893,
    "asm_sum": 40489,
    "asm_bytes": 169,
-   "ratio": 2.09
+   "ratio": 1.87
   },
   "col": {
-   "c": 28912,
+   "c": 16582,
    "c_sum": 5253,
-   "c_bytes": 122,
+   "c_bytes": 98,
    "asm": 6452,
    "asm_sum": 5253,
    "asm_bytes": 505,
-   "ratio": 4.48
+   "ratio": 2.57
   },
   "coli": {
-   "c": 22814,
+   "c": 14178,
    "c_sum": 5253,
-   "c_bytes": 95,
-   "asm": 6452,
+   "c_bytes": 74,
+   "asm": 6454,
    "asm_sum": 5253,
    "asm_bytes": 505,
-   "ratio": 3.54
+   "ratio": 2.2
   },
   "row": {
-   "c": 19152,
+   "c": 12890,
    "c_sum": 43582,
-   "c_bytes": 107,
+   "c_bytes": 88,
    "asm": 6452,
    "asm_sum": 43582,
    "asm_bytes": 505,
-   "ratio": 2.97
+   "ratio": 2.0
   },
   "rowi": {
-   "c": 20046,
+   "c": 14771,
    "c_sum": 43582,
-   "c_bytes": 87,
+   "c_bytes": 74,
    "asm": 6452,
    "asm_sum": 43582,
    "asm_bytes": 505,
-   "ratio": 3.11
+   "ratio": 2.29
   },
   "box": {
-   "c": 20712,
+   "c": 18469,
    "c_sum": 57396,
-   "c_bytes": 210,
+   "c_bytes": 206,
    "asm": 12408,
    "asm_sum": 57396,
    "asm_bytes": 127,
-   "ratio": 1.67
+   "ratio": 1.49
   },
   "fixed": {
-   "c": 94370,
+   "c": 93277,
    "c_sum": 30783,
-   "c_bytes": 231,
-   "asm": 10476,
+   "c_bytes": 223,
+   "asm": 10474,
    "asm_sum": 30783,
    "asm_bytes": 83,
-   "ratio": 9.01
+   "ratio": 8.91
   },
   "mul": {
-   "c": 27126,
+   "c": 26234,
    "c_sum": 48533,
-   "c_bytes": 85,
-   "asm": 7770,
+   "c_bytes": 78,
+   "asm": 7772,
    "asm_sum": 48533,
    "asm_bytes": 52,
-   "ratio": 3.49
+   "ratio": 3.38
   },
   "ents": {
-   "c": 34021,
+   "c": 30667,
    "c_sum": 38482,
-   "c_bytes": 195,
-   "asm": 14738,
+   "c_bytes": 182,
+   "asm": 14740,
    "asm_sum": 38482,
    "asm_bytes": 85,
-   "ratio": 2.31
+   "ratio": 2.08
   },
   "entsi": {
-   "c": 23919,
+   "c": 18735,
    "c_sum": 38482,
-   "c_bytes": 147,
+   "c_bytes": 127,
    "asm": 14738,
    "asm_sum": 38482,
    "asm_bytes": 85,
-   "ratio": 1.62
+   "ratio": 1.27
   },
   "call": {
-   "c": 69380,
+   "c": 66876,
    "c_sum": 13401,
-   "c_bytes": 76,
+   "c_bytes": 74,
    "asm": 32642,
    "asm_sum": 13401,
    "asm_bytes": 30,
-   "ratio": 2.13
+   "ratio": 2.05
   },
   "soa": {
-   "c": 40262,
+   "c": 37082,
    "c_sum": 18949,
-   "c_bytes": 312,
+   "c_bytes": 291,
    "asm": 24865,
    "asm_sum": 18949,
    "asm_bytes": 171,
-   "ratio": 1.62
+   "ratio": 1.49
   },
   "glide": {
-   "c": 106399,
+   "c": 98814,
    "c_sum": 9411,
-   "c_bytes": 259,
+   "c_bytes": 249,
    "asm": 67680,
    "asm_sum": 9411,
    "asm_bytes": 163,
-   "ratio": 1.57
+   "ratio": 1.46
   },
   "slots": {
-   "c": 35630,
+   "c": 32330,
    "c_sum": 38310,
-   "c_bytes": 87,
+   "c_bytes": 82,
    "asm": 7486,
    "asm_sum": 38310,
    "asm_bytes": 85,
-   "ratio": 4.76
+   "ratio": 4.32
   },
   "state": {
-   "c": 30295,
+   "c": 22753,
    "c_sum": 50579,
-   "c_bytes": 392,
+   "c_bytes": 346,
    "asm": 16161,
    "asm_sum": 50579,
    "asm_bytes": 209,
-   "ratio": 1.87
+   "ratio": 1.41
   },
   "fptr": {
-   "c": 54075,
+   "c": 52486,
    "c_sum": 48156,
    "c_bytes": 98,
    "asm": 16631,
    "asm_sum": 48156,
    "asm_bytes": 26,
-   "ratio": 3.25
+   "ratio": 3.16
   },
   "blocks": {
-   "c": 29072,
+   "c": 24452,
    "c_sum": 54064,
-   "c_bytes": 223,
+   "c_bytes": 201,
    "asm": 10673,
    "asm_sum": 54064,
    "asm_bytes": 829,
-   "ratio": 2.72
+   "ratio": 2.29
   },
   "probe": {
-   "c": 33591,
+   "c": 30319,
    "c_sum": 24510,
-   "c_bytes": 145,
-   "asm": 21348,
+   "c_bytes": 134,
+   "asm": 21351,
    "asm_sum": 24510,
    "asm_bytes": 96,
-   "ratio": 1.57
+   "ratio": 1.42
   },
   "chain": {
-   "c": 86079,
+   "c": 84381,
    "c_sum": 28225,
-   "c_bytes": 71,
-   "asm": 37103,
+   "c_bytes": 65,
+   "asm": 37106,
    "asm_sum": 28225,
    "asm_bytes": 18,
-   "ratio": 2.32
+   "ratio": 2.27
   },
   "sprites": {
-   "c": 108209,
+   "c": 97178,
    "c_sum": 64960,
-   "c_bytes": 643,
+   "c_bytes": 568,
    "asm": 51216,
    "asm_sum": 64960,
    "asm_bytes": 323,
-   "ratio": 2.11
+   "ratio": 1.9
   },
   "unpack": {
-   "c": 657068,
+   "c": 633456,
    "c_sum": 23268,
-   "c_bytes": 381,
+   "c_bytes": 362,
    "asm": 51736,
    "asm_sum": 23268,
    "asm_bytes": 67,
-   "ratio": 12.7
+   "ratio": 12.24
   }
  },
  "fast": {
@@ -232,211 +232,211 @@
    "ratio": 1.52
   },
   "fill": {
-   "c": 34018,
+   "c": 26574,
    "c_sum": 14232,
-   "c_bytes": 39,
-   "asm": 13445,
+   "c_bytes": 33,
+   "asm": 13442,
    "asm_sum": 14232,
    "asm_bytes": 56,
-   "ratio": 2.53
+   "ratio": 1.98
   },
   "fillu": {
-   "c": 41336,
+   "c": 14698,
    "c_sum": 14232,
-   "c_bytes": 142,
+   "c_bytes": 71,
    "asm": 13445,
    "asm_sum": 14232,
    "asm_bytes": 56,
-   "ratio": 3.07
+   "ratio": 1.09
   },
   "oam": {
-   "c": 39610,
+   "c": 35544,
    "c_sum": 40489,
-   "c_bytes": 368,
+   "c_bytes": 340,
    "asm": 18937,
    "asm_sum": 40489,
    "asm_bytes": 169,
-   "ratio": 2.09
+   "ratio": 1.88
   },
   "col": {
-   "c": 24572,
+   "c": 14080,
    "c_sum": 5253,
-   "c_bytes": 122,
+   "c_bytes": 98,
    "asm": 5412,
    "asm_sum": 5253,
    "asm_bytes": 505,
-   "ratio": 4.54
+   "ratio": 2.6
   },
   "coli": {
-   "c": 19170,
+   "c": 11918,
    "c_sum": 5253,
-   "c_bytes": 95,
+   "c_bytes": 74,
    "asm": 5414,
    "asm_sum": 5253,
    "asm_bytes": 505,
-   "ratio": 3.54
+   "ratio": 2.2
   },
   "row": {
-   "c": 16316,
+   "c": 11046,
    "c_sum": 43582,
-   "c_bytes": 107,
-   "asm": 5414,
-   "asm_sum": 43582,
-   "asm_bytes": 505,
-   "ratio": 3.01
-  },
-  "rowi": {
-   "c": 16930,
-   "c_sum": 43582,
-   "c_bytes": 87,
+   "c_bytes": 88,
    "asm": 5412,
    "asm_sum": 43582,
    "asm_bytes": 505,
-   "ratio": 3.13
+   "ratio": 2.04
+  },
+  "rowi": {
+   "c": 12512,
+   "c_sum": 43582,
+   "c_bytes": 74,
+   "asm": 5414,
+   "asm_sum": 43582,
+   "asm_bytes": 505,
+   "ratio": 2.31
   },
   "box": {
-   "c": 17540,
+   "c": 15560,
    "c_sum": 57396,
-   "c_bytes": 210,
-   "asm": 10296,
+   "c_bytes": 206,
+   "asm": 10298,
    "asm_sum": 57396,
    "asm_bytes": 127,
-   "ratio": 1.7
+   "ratio": 1.51
   },
   "fixed": {
-   "c": 79945,
+   "c": 78991,
    "c_sum": 30783,
-   "c_bytes": 231,
+   "c_bytes": 223,
    "asm": 8772,
    "asm_sum": 30783,
    "asm_bytes": 83,
-   "ratio": 9.11
+   "ratio": 9.0
   },
   "mul": {
-   "c": 24695,
+   "c": 24035,
    "c_sum": 48533,
-   "c_bytes": 85,
+   "c_bytes": 78,
    "asm": 6398,
    "asm_sum": 48533,
    "asm_bytes": 52,
-   "ratio": 3.86
+   "ratio": 3.76
   },
   "ents": {
-   "c": 28410,
+   "c": 25657,
    "c_sum": 38482,
-   "c_bytes": 195,
+   "c_bytes": 182,
    "asm": 12342,
    "asm_sum": 38482,
    "asm_bytes": 85,
-   "ratio": 2.3
+   "ratio": 2.08
   },
   "entsi": {
-   "c": 19893,
+   "c": 15644,
    "c_sum": 38482,
-   "c_bytes": 147,
-   "asm": 12344,
+   "c_bytes": 127,
+   "asm": 12342,
    "asm_sum": 38482,
    "asm_bytes": 85,
-   "ratio": 1.61
+   "ratio": 1.27
   },
   "call": {
-   "c": 60474,
+   "c": 58233,
    "c_sum": 13401,
-   "c_bytes": 76,
+   "c_bytes": 74,
    "asm": 27880,
    "asm_sum": 13401,
    "asm_bytes": 30,
-   "ratio": 2.17
+   "ratio": 2.09
   },
   "soa": {
-   "c": 33914,
+   "c": 31233,
    "c_sum": 18949,
-   "c_bytes": 312,
+   "c_bytes": 291,
    "asm": 20809,
    "asm_sum": 18949,
    "asm_bytes": 171,
-   "ratio": 1.63
+   "ratio": 1.5
   },
   "glide": {
-   "c": 89510,
+   "c": 83062,
    "c_sum": 9411,
-   "c_bytes": 259,
-   "asm": 56052,
+   "c_bytes": 249,
+   "asm": 56049,
    "asm_sum": 9411,
    "asm_bytes": 163,
-   "ratio": 1.6
+   "ratio": 1.48
   },
   "slots": {
-   "c": 29758,
+   "c": 27121,
    "c_sum": 38310,
-   "c_bytes": 87,
+   "c_bytes": 82,
    "asm": 6194,
    "asm_sum": 38310,
    "asm_bytes": 85,
-   "ratio": 4.8
+   "ratio": 4.38
   },
   "state": {
-   "c": 24827,
+   "c": 18394,
    "c_sum": 50579,
-   "c_bytes": 392,
+   "c_bytes": 346,
    "asm": 13185,
    "asm_sum": 50579,
    "asm_bytes": 209,
-   "ratio": 1.88
+   "ratio": 1.4
   },
   "fptr": {
-   "c": 46457,
+   "c": 45111,
    "c_sum": 48156,
    "c_bytes": 98,
    "asm": 14130,
    "asm_sum": 48156,
    "asm_bytes": 26,
-   "ratio": 3.29
+   "ratio": 3.19
   },
   "blocks": {
-   "c": 24850,
+   "c": 20854,
    "c_sum": 54064,
-   "c_bytes": 223,
+   "c_bytes": 201,
    "asm": 8964,
    "asm_sum": 54064,
    "asm_bytes": 829,
-   "ratio": 2.77
+   "ratio": 2.33
   },
   "probe": {
-   "c": 28546,
+   "c": 25676,
    "c_sum": 24510,
-   "c_bytes": 145,
+   "c_bytes": 134,
    "asm": 17930,
    "asm_sum": 24510,
    "asm_bytes": 96,
-   "ratio": 1.59
+   "ratio": 1.43
   },
   "chain": {
-   "c": 74337,
+   "c": 72835,
    "c_sum": 28225,
-   "c_bytes": 71,
+   "c_bytes": 65,
    "asm": 31860,
    "asm_sum": 28225,
    "asm_bytes": 18,
-   "ratio": 2.33
+   "ratio": 2.29
   },
   "sprites": {
-   "c": 90571,
+   "c": 81387,
    "c_sum": 64960,
-   "c_bytes": 643,
+   "c_bytes": 568,
    "asm": 42647,
    "asm_sum": 64960,
    "asm_bytes": 323,
-   "ratio": 2.12
+   "ratio": 1.91
   },
   "unpack": {
-   "c": 564302,
+   "c": 545960,
    "c_sum": 23268,
-   "c_bytes": 381,
-   "asm": 44475,
+   "c_bytes": 362,
+   "asm": 44472,
    "asm_sum": 23268,
    "asm_bytes": 67,
-   "ratio": 12.69
+   "ratio": 12.28
   }
  }
 }
