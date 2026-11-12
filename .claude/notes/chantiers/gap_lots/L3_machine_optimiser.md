@@ -98,6 +98,85 @@ never executed by any test, read before S3 is written.
 sub-agent contests the plan, 2026-11-12, the one use of Fable the owner allows: the written contest of a
 compiler lot's plan.)
 
+**Verdict: go with changes.** The axis is right; the plan over-states S3's ceiling by about a factor of two, its proof is blind to
+the errors S3 is most exposed to, and it spends two steps before any figure says whether the lot pays. (Static counts on the 75
+`*.c.asm` of the examples as built 2026-11-12; cycle figures from the timing rules, not measured; other compilers from memory.)
+
+**(a) What would make it not pay.**
+- The 11.6 / 10.8 bound is the sum of six rows of `our_asm_on_real_games.md`; only three are X/Y promotion: temporaries and reloads
+  across a branch 3.4 / 3.9 (S4, A-cache); index fetched from the stack 1.2 / 2.1 (L4: the value crosses a call, X and Y are
+  caller-saved, `compiler/ABI.md`); operand passed through a temporary 1.6 / 0.8 (operand fusion); loop counter, doubled index, X
+  shuttling 5.4 / 4.0 (**S3**). S3's bound is 5.4 / 4.0, overlaps included, counted before lot 1 put the counter in Y.
+- A promoted access is cheaper, not free: `lda.b T` (16 bits) 32 mclk, `txa` 14: 18 of 32 saved; only `ldx T` -> nothing saves all.
+  The direct-page share of item 1 is 18.0 / 19.0 % (27.2 - 9.2, 37.1 - 18.1).
+- Of 610 (function, slot) pairs with 4 449 accesses, 411 (1 915 accesses, 43 %) have only `lda/sta/stz/ldx/ldy/inc/dec`; the rest
+  have an ALU operand (`adc` 101 slots, `sbc` 82, `cmp` 39). The two heaviest candidates per function: 1 526 accesses (34 %).
+  **Hypothesis: 18 % x 0.34 x 0.56, about 3.5 % of busy time for S3, not 11.**
+- S3's list is poorer than the rule it would retire: `pp_alu_of_slot` already turns `lda P / clc / adc T` into
+  `txa / clc / adc P`. Missing: `lda T / cmp #k` -> `cpx #k`, `lda T / sta G` -> `stx G`, `lda T / pha` -> `phx`,
+  `lda G / sta T` -> `ldx G`, `stz T` -> `ldx #0`, `dec T` -> `dex`, `txy` / `tyx`. Width: `tax` with an 8-bit A copies the
+  hidden byte, so a `sta.b T` in a `sep #$20` region is not a `tax`.
+- The hand's 32 cycles of "index held in X" need X held for the whole object while A computes, the second index in Y: only if the
+  emitter's own scratch use of X (the `tax` of every indexed access) leaves the region, which is instruction selection.
+
+**(b) What it could break.**
+1. Poisoning proves backward facts only: a missing WRITE in the model (`inx` absent) makes liveness conservative and passes, yet
+   falsifies "X still holds T", which S3 and S4 consume (the `pp_writes_x` lesson). S3 needs a second executable contract: an
+   assertion build that keeps the shadow store and emits `cpx T / beq + / brk` wherever the analysis claims X == T.
+2. `sep #$C3` / `rep #$C3` only where N, V, Z and C are all dead: a mask per flag. `lda #$5A5A` and `ldx #$DEAD` set N and Z
+   themselves: `php / plp` around them when N/Z are live.
+3. The high half of A is untested unless an 8-bit region gets `xba / lda #$5A / xba`.
+4. Stack slots move: `N,s` names another slot after each `pha` / `pea`; the stack depth at every line and every merge is needed.
+5. The text does not carry the return type: `rtl` reads A and `tcc__retval_hi`; a `jsl` writes A, X, Y, P, every `tcc__r*` and
+   `tcc__lf`, and reads the `tcc__r*` inputs of the runtime helpers.
+6. The shared direct page is sound (caller-saved `tcc__lf`, the NMI's mirror); hand assembly breaking the ABI would surface.
+7. Poison goes in last: a line inside the `asl a / tax / bvs` group makes `jt_rewrite` stop (refused, not silent); insert after
+   it, the model knowing `jmp (@jtt.N,x)`; it also changes what `peephole_entry` and `peephole_r9_loop` match.
+8. S0's byte-identical round trip proves nothing about the model (printing the stored string satisfies it); strict mode proves
+   coverage, not truth; the hand-checked table is the weak link. Use luna as the oracle: on a trace, a register or flag that
+   changes across an instruction and is not in its write set is a model error.
+9. One negative control is too few: one per resource (A low, A high, X, Y, each flag, a direct-page byte, a stack byte).
+
+**(c) Ordering and cut.** Count before S0 (a script over the `.c.asm` weighted by the games' traces is enough to decide). Placement
+after the old rules is doubtful: `peephole_loop_x` has taken the hot loops, so S3 would measure leftovers; count with the loop rules
+off and on, and treat S3 as replacing `loop_x` in the same commit. Move S2's check mode (old predicates against new over the corpus)
+into S1: a free second proof (`pp_nz_dead_after` looks at 8 lines only).
+
+**(d) State of the art.** llvm-mos allocates before emission (imaginary zero-page registers as a register class, A/X/Y constrained
+classes, a real allocator); vbcc and Calypsi use zero-page pseudo-registers; cc65 has `register` variables in zero page. None
+recovers allocation from text. Here `color_slots` already has liveness, interference, `cross[]` and a loop-weighted cost, and
+`SOFF()` / `emit_stack_load/store/op` are the single choke point: a third colour, "lives in X / Y", for a temp whose every use is
+index, copy, step or compare with a constant, inherits types, widths and aliasing from the IR, where S0 must re-derive them from
+text in about 1 100 lines. Its difficulty is knowing where the emitter clobbers X (a dry-run emission can record it). S0 + S1 then
+remain as the verifier, which is their real value.
+
+**(e) Changes, ranked.** 1. Take the count first; restate S3's bound as 5.4 / 4.0 at most. 2. A one-day spike of the IR-side X/Y
+colour on gapbench `col` / `row` and leaf B before committing to S3 in text. 3. Fix the poisoning specification (b2-b5, b7, b9) and
+add the forward assertion build. 4. Validate the model against luna traces, not the data sheet by hand. 5. Extend S3's forms
+(commutative ALU, `cpx` / `stx` / `phx` first). 6. Decide L3 against L4 on the count: the stack is 9.2 / 18.1 % and S3 cannot
+touch it. **The one measurement before S0**: on today's compiler and both games' traces, the master cycles of the accesses to
+direct-page slots whose every access in their live range is rewritable while X or Y is free, split by form, with
+`peephole_loop_x` on and off. **Under about 3 % of busy time on both games, S3 does not open as written and L4 goes first.**
+
+
+### The plan after the contest (accepted, 2026-11-12)
+
+All six changes are taken. The lot now starts with a measurement, not with S0:
+
+1. **M0, the count** (before any compiler code): on today's compiler, weighted by both games' traces, the master cycles of
+   accesses to direct-page slots whose every access in their live range is rewritable while X or Y is free (the extended list
+   of forms of change 5), split by form, with the loop rules (`peephole_loop_x`, `QBE_NO_PEEP_LOOPY`) on and off; and the same
+   count for stack slots, which only L4 reaches. A script over the `.c.asm` and the traces, outside the compiler.
+   **Decision rule: under about 3 % of busy time on both games, S3 does not open as written and L4 goes first.**
+2. If M0 passes: a one-day spike of an X/Y colour in `color_slots` (the IR side) on gapbench `col` / `row` and leaf B, measured
+   against the counted gain; the text-side S3 only if the spike shows the IR side cannot see where the emitter takes X.
+3. S0 and S1 become the verifier of whichever side is chosen: the model checked against luna traces (a register or flag that
+   changes across an instruction outside its write set is a model error), the old predicates compared with S1 in S1 itself,
+   poisoning per flag with `php / plp` where N/Z are live, the high half of A poisoned in 8-bit regions, the stack depth
+   tracked at every line and merge, `jsl` / `rtl` with their full read and write sets, poison inserted after `jt_rewrite`,
+   one negative control per resource, and a forward assertion build (`cpx T / beq + / brk` where X == T is claimed).
+4. S3's bound restated: **5.4 / 4.0 % at most, about 3.5 % as hypothesis**, not 11.6 / 10.8.
+
 ## Measured
 
 (filled step by step)
