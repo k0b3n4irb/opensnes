@@ -203,7 +203,7 @@ while it runs (bytes below the initial stack pointer).
 | `long` | 300 steps of a 32-bit generator and hash | 5,944,006 | 2,400,672 | -59.6 % | 594 | 285 | -52.0 % | 76 | 33 |
 | `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,558 | 2,686,076 | -65.8 % | 605 | 271 | -55.2 % | 41 | 23 |
 | `calls` | recursive `fib(17)` | 5,041,974 | 2,563,034 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,292 | 880,728 | -67.3 % | 523 | 271 | -48.2 % | 34 | 23 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,292 | 664,268 | -75.4 % | 523 | 236 | -54.9 % | 34 | 23 |
 | `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,124 | 1,338,098 | -51.4 % | 233 | 107 | -54.1 % | 34 | 23 |
 | `list` | a 64-node linked list walked 40 times | 2,858,638 | 1,296,642 | -54.6 % | 402 | 267 | -33.6 % | 37 | 23 |
 | `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,926 | 715,970 | -75.5 % | 397 | 170 | -57.2 % | 33 | 23 |
@@ -214,11 +214,11 @@ while it runs (bytes below the initial stack pointer).
 | `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,138 | 945,840 | -48.3 % | 392 | 270 | -31.1 % | 42 | 27 |
 | `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,371,286 | 4,518,340 | -68.6 % | 831 | 326 | -60.8 % | 52 | 28 |
 | `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,805,026 | 6,668,592 | -76.0 % | 1018 | 434 | -57.4 % | 61 | 23 |
-| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,799,876 | 11,764,356 | -68.9 % | 7722 | 3136 | -59.4 % | 93 | 59 |
+| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,799,876 | 11,755,294 | -68.9 % | 7722 | 3095 | -59.9 % | 93 | 56 |
 | `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,922 | 4,531,784 | -60.1 % | 888 | 397 | -55.3 % | 94 | 35 |
 | `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,396,874 | 51,077,432 | -62.0 % | 5132 | 2749 | -46.4 % | 84 | 63 |
-| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 56,783,146 | ours only | — | 3044 | | — | 62 |
-| **Total** | | **325,169,900** | **112,818,834** | **-65.3 %** | **25801** | **11881** | **-54.0 %** | | |
+| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 56,709,468 | ours only | — | 2975 | | — | 62 |
+| **Total** | | **325,169,900** | **112,593,312** | **-65.4 %** | **25801** | **11805** | **-54.2 %** | | |
 
 Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
 

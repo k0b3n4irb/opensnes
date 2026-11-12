@@ -1,0 +1,19 @@
+# L2: shapes that keep the compare tree with the jump table on
+# (QBE_JT_TRACE=1 names the reason of each).
+# three cases: too few
+in few: absent jtt
+in few: present cmp\.w #1\n
+# five cases over 401 values: too sparse
+in sparse: absent jtt
+in sparse: present cmp\.w #200\n
+# a 32-bit value: the compares are 32-bit, never a table
+in wide: absent jtt
+# a sparse switch with a dense cluster: the tree splits the cluster at its
+# root (0..2 on one side, 4..7, 1000 and 2000 on the other), so no subtree
+# holds it whole, and the two-compare subtrees are range tests, not tables
+in cluster: present cmp\.w #1000\n
+in cluster: present cmp\.w #2000\n
+absent jtt
+# a range test is not a dispatch: 96 slots of one target refused
+in inrange: absent jtt
+in inrange: present cmp\.w #(32|128)\n

@@ -156,19 +156,19 @@
    "ratio": 4.32
   },
   "state": {
-   "c": 22753,
+   "c": 21826,
    "c_sum": 50579,
-   "c_bytes": 346,
+   "c_bytes": 336,
    "asm": 16161,
    "asm_sum": 50579,
    "asm_bytes": 209,
-   "ratio": 1.41
+   "ratio": 1.35
   },
   "fptr": {
    "c": 52486,
    "c_sum": 48156,
    "c_bytes": 98,
-   "asm": 16631,
+   "asm": 16628,
    "asm_sum": 48156,
    "asm_bytes": 26,
    "ratio": 3.16
@@ -177,13 +177,13 @@
    "c": 24452,
    "c_sum": 54064,
    "c_bytes": 201,
-   "asm": 10673,
+   "asm": 10670,
    "asm_sum": 54064,
    "asm_bytes": 829,
    "ratio": 2.29
   },
   "probe": {
-   "c": 30319,
+   "c": 30322,
    "c_sum": 24510,
    "c_bytes": 134,
    "asm": 21351,
@@ -192,10 +192,10 @@
    "ratio": 1.42
   },
   "chain": {
-   "c": 84381,
+   "c": 84378,
    "c_sum": 28225,
    "c_bytes": 65,
-   "asm": 37106,
+   "asm": 37103,
    "asm_sum": 28225,
    "asm_bytes": 18,
    "ratio": 2.27
@@ -376,34 +376,34 @@
    "ratio": 4.38
   },
   "state": {
-   "c": 18394,
+   "c": 17854,
    "c_sum": 50579,
-   "c_bytes": 346,
-   "asm": 13185,
+   "c_bytes": 336,
+   "asm": 13187,
    "asm_sum": 50579,
    "asm_bytes": 209,
-   "ratio": 1.4
+   "ratio": 1.35
   },
   "fptr": {
    "c": 45111,
    "c_sum": 48156,
    "c_bytes": 98,
-   "asm": 14130,
+   "asm": 14132,
    "asm_sum": 48156,
    "asm_bytes": 26,
    "ratio": 3.19
   },
   "blocks": {
-   "c": 20854,
+   "c": 20856,
    "c_sum": 54064,
    "c_bytes": 201,
-   "asm": 8964,
+   "asm": 8967,
    "asm_sum": 54064,
    "asm_bytes": 829,
    "ratio": 2.33
   },
   "probe": {
-   "c": 25676,
+   "c": 25674,
    "c_sum": 24510,
    "c_bytes": 134,
    "asm": 17930,
@@ -421,7 +421,7 @@
    "ratio": 2.29
   },
   "sprites": {
-   "c": 81387,
+   "c": 81384,
    "c_sum": 64960,
    "c_bytes": 568,
    "asm": 42647,

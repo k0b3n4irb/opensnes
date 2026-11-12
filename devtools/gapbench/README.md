@@ -51,7 +51,7 @@ shape each, nothing of a game. What they are there for:
 - `slots`: what an empty slot costs. 465 master cycles a slot in C, 97 in
   assembly (FastROM): a game pays it for every slot of every pass.
 - `state` and `fptr`: the two ways a game dispatches an object. In C the
-  second costs 1.9 times the first (46 457 against 24 829, FastROM): each
+  second costs 2.5 times the first (45 111 against 17 854, FastROM, the `switch` a jump table since lot L2): each
   handler is a far call with its argument on the stack. In assembly they
   are within 8 % of each other.
 - `chain`: the weight of calls. The C version makes 28.9 calls for 1 000
@@ -66,7 +66,7 @@ shape each, nothing of a game. What they are there for:
 The byte count of an assembly twin is its entry routine only: the handlers
 of `fptr` and the callees of `chain` (and of `call`) are not in it.
 
-## The table (2026-11-12, after the first compiler lot)
+## The table (2026-11-12, after lot L2, the jump table)
 
 Master cycles a call. `C/asm` is the factor to bring down. At the start
 (2026-11-11) the weighted mean was 2.24, every row equal 2.74, the first
@@ -91,15 +91,15 @@ twelve rows 2.55; `baseline.json` in the history holds every figure of that day.
 | soa | 37082 | 24865 | 1.49 | 31233 | 20809 | 1.50 | 291 | 171 |
 | glide | 98814 | 67680 | 1.46 | 83062 | 56049 | 1.48 | 249 | 163 |
 | slots | 32330 | 7486 | 4.32 | 27121 | 6194 | 4.38 | 82 | 85 |
-| state | 22753 | 16161 | 1.41 | 18394 | 13185 | 1.40 | 346 | 209 |
-| fptr | 52486 | 16631 | 3.16 | 45111 | 14130 | 3.19 | 98 | 26 |
-| blocks | 24452 | 10673 | 2.29 | 20854 | 8964 | 2.33 | 201 | 829 |
-| probe | 30319 | 21351 | 1.42 | 25676 | 17930 | 1.43 | 134 | 96 |
-| chain | 84381 | 37106 | 2.27 | 72835 | 31860 | 2.29 | 65 | 18 |
-| sprites | 97178 | 51216 | 1.90 | 81387 | 42647 | 1.91 | 568 | 323 |
+| state | 21826 | 16161 | 1.35 | 17854 | 13187 | 1.35 | 336 | 209 |
+| fptr | 52486 | 16628 | 3.16 | 45111 | 14132 | 3.19 | 98 | 26 |
+| blocks | 24452 | 10670 | 2.29 | 20856 | 8967 | 2.33 | 201 | 829 |
+| probe | 30322 | 21351 | 1.42 | 25674 | 17930 | 1.43 | 134 | 96 |
+| chain | 84378 | 37103 | 2.27 | 72835 | 31860 | 2.29 | 65 | 18 |
+| sprites | 97178 | 51216 | 1.90 | 81384 | 42647 | 1.91 | 568 | 323 |
 | unpack | 633456 | 51736 | 12.24 | 545960 | 44472 | 12.28 | 362 | 67 |
-| mean, weighted by real games' profiles |  |  | 2.00 |  |  | 2.02 |  |  |
-| geometric mean, every row equal |  |  | 2.41 |  |  | 2.43 |  |  |
+| mean, weighted by real games' profiles |  |  | 1.99 |  |  | 2.01 |  |  |
+| geometric mean, every row equal |  |  | 2.40 |  |  | 2.43 |  |  |
 | geometric mean of the first twelve rows |  |  | 2.20 |  |  | 2.23 |  |  |
 
 A row marked `*` is the same routine written another way in C (`fillu` unrolled by

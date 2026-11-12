@@ -56,8 +56,8 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 880728,
-      "size": 271,
+      "cycles": 664268,
+      "size": 236,
       "stack": 23,
       "res": 9705
     },
@@ -122,9 +122,9 @@
       "res": 29147
     },
     "depot": {
-      "cycles": 11764356,
-      "size": 3136,
-      "stack": 59,
+      "cycles": 11755294,
+      "size": 3095,
+      "stack": 56,
       "res": 54047
     },
     "div32": {
@@ -140,8 +140,8 @@
       "res": 18907
     },
     "stepseq": {
-      "cycles": 56783146,
-      "size": 3044,
+      "cycles": 56709468,
+      "size": 2975,
       "stack": 62,
       "res": 30034
     }

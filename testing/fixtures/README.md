@@ -39,6 +39,7 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `const_div/` | a divide or remainder of two constants folded at compile time (signed and unsigned, 16 and 32 bits, negatives, limits, a numerator folded just before): no division helper called, every value against one written by hand; INT_MIN / -1, INT_MIN % -1 and a zero divisor kept as run-time calls |
 | `debug_channel/` | the debug channel to luna (nocash / WDM) |
 | `d_quals/` | `volatile`, `const` and the qualifiers' codegen |
+| `jump_table/` | a dense `switch` as a jump table: every shape the recogniser takes (from 0, from 10, negative and wrapping, a byte, no default with phi moves, shared labels, fallthrough, a default in the middle, the value read after, in a loop indexed by its counter, on a loop counter) or refuses (three cases, sparse, 32 bits, a dense cluster in a sparse switch), swept and checksummed against a host model; one sweep in the main loop and in the NMI callback |
 | `leaf_frame/` | a leaf's direct-page frame (`tcc__lf`): the same leaf in the main loop and in the NMI callback, no wrong result on either side |
 | `leaf_split/` | leaves above the 16 words of `tcc__lf`, split between it and a stack frame: results against a host model, and the main loop against the NMI callback |
 | `static_dup/` | two sources each defining `static u16 k` and `static u16 tag()`: the link succeeds and each reads its own (statics are emitted `name.<source>`) |

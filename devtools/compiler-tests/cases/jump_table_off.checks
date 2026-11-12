@@ -1,0 +1,6 @@
+# L2: the twin of jump_table, with the table off: the binary search of
+# compares cproc builds, a value compared twice at each node.
+env QBE_NO_JUMP_TABLE=1
+in dense: absent jtt
+in dense: absent jmp \(
+in dense: present cmp\.w #3\n\tbeq @switch_case\.\d+\n@switch_ne\.\d+:\n\tcmp\.w #3\n

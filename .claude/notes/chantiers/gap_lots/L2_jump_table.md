@@ -61,7 +61,20 @@ so no middle-end pass is touched. Second step, only if the first is
 measured: the same indexed indirect emission for a call through a table of
 function pointers (bench `fptr`, 3.16).
 
-## Measured (to fill)
+## Measured (2026-11-12, qbe `a0c9619`)
 
 | Gauge | Predicted | Measured | Gap between the two, and what it teaches |
 |---|--:|--:|---|
+| bench `state` | under 1.2 | **1.35** (22 753 -> 21 826 mclk; FastROM 1.40 -> 1.35) | the dispatch was not most of the row: the table took 927 mclk of the 6 592 the C costs above the hand (14 %). What is left is in the handlers: a value stored to a slot and loaded back, `sep / rep` around each byte store, and the loop counter, which the dispatch's X pushes into Y, given back to X by a `tyx` in every case. The hand keeps the object in Y for the whole update. Items 1 and 3 of the plan (L3), not L2 |
+| bench, weighted mean | 1.96 to 1.98 | **1.99** (2.00 -> 1.99; FastROM 2.02 -> 2.01) | follows from the row: 8 / 87 of 0.06 |
+| game 2, busy master cycles a frame | -3 to -4 % | (the thinker measures) | |
+| game 1, busy master cycles a frame | 0 to -0.3 % | (the thinker measures) | |
+| the 65 examples, bytes of code | not larger | **205 443 against 207 937** (-1.2 %; 53 smaller, 12 equal, none larger) | measured as the sum of the `.text.*` sections of the 65 `.sym` (the plan's 2 385 016 used another method, not written down; this one is in the commit). Most of the gain is not from `switch`es (8 in the examples, 3 taken) but from chains of `if (v == k)` on one value, which are the same region to the back end |
+| `sdkbench` `switch` (not predicted) | | 880 728 -> 664 268 (-24.6 %) | an interpreter's dispatch: the workload a table is for |
+
+What the first version taught: it counted the values a region sends off
+the default, not its compares, and turned 27 range tests of the corpus
+(`c >= 32 && c < 128`: two compares) into tables of up to 497 slots of
+one target. The decision is now on the tree's size (its compares) against
+the table's (its slots), and a range test is refused (check
+`jump_table_tree`). The corpus trace of each `switch` is in the commit.
