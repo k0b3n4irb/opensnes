@@ -1,3 +1,6 @@
+# A6a R3 (a load of what A holds goes, peephole_xflow) is a mechanism of its own:
+# off here, the shape pinned is the one before it.
+env QBE_NO_PEEP_AFLOW=1
 # Since 2026-10-10 a phi and the value that feeds it share a slot when they
 # can (see phi_share): the copies this case pins are the ones made when
 # they cannot, so it is compiled with the sharing off.

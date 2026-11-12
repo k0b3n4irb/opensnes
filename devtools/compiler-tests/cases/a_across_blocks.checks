@@ -1,0 +1,8 @@
+# A6a R3: `lda S` with A already S on every way in goes when its N and Z
+# are set again before anything reads them (peephole_xflow), and the
+# reload of `sta S / tyx / lda S` goes across the transfer and a block
+# label (peephole). The twin a_across_blocks_off pins the loads.
+in fill: present @for_body\.\d+:\n\tsta\.l fbuf,x\n
+in fill: present @for_join\.\d+:\n\tclc\n\tadc\.w #257
+in column: present lda\.w tab,x\n\ttyx\n\tsta\.w out,x
+in column: absent sta\.b tcc__lf\+\d+\n\ttyx

@@ -1,0 +1,3 @@
+env QBE_NO_PEEP_AFLOW=1
+in fill: present @for_body\.\d+:\n\tlda\.b tcc__lf\+\d+\n\tsta\.l fbuf,x
+in fill: present @for_join\.\d+:\n\tlda\.b tcc__lf\+\d+\n\tclc

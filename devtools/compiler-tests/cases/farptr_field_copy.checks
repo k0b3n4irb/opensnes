@@ -21,4 +21,6 @@
 # addressing (`lda.l mirror+N,x`, then `lda.w` on 2026-10-09: a plain
 # object, issue #166); the invariant is unchanged.
 in getinfo: absent lda\.w mirror[^\n]*,x\n\tlda
-count 2 lda\.w mirror[^\n]*,x\n\t(?:sta|pha)
+# Re-pinned 2026-11-11 (A6a R3): the value may also stay in A across the
+# `ldx` of the pointer, straight into the store, with no spill at all.
+count 2 lda\.w mirror[^\n]*,x\n\t(?:sta|pha|ldx[^\n]*\n\tsta)

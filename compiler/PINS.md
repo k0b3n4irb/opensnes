@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 780f5e913fe8574daf45ab9bdaeddd09fe642324 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | ab06b6b2b88556a066726cec501fdf27eed3c691 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 143 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 144 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+ab06b6b perf(w65816): a load of what A already holds goes, across blocks — peephole_xflow carried A's slot across blocks for the tax rule only; it now drops `lda S` when A equals S on every way in and N/Z are dead (pp_nz_dead_after), and the base pass's `sta S / ldx P / lda S` takes ldy / tyx / txy and a block label; the fill's loop body is one store; gapbench 2.31 -> 2.22; `QBE_NO_PEEP_AFLOW=1` (A6a R3, 2026-11-11)
 780f5e9 perf(w65816): the counter of a rotated loop in Y when X is taken — the loop rule refused a body that wrote X (a table lookup, a second index) and left the counter in memory; a second pass uses Y when nothing but the counter's own reads writes it, and both passes now read `lda S / tax|tay`, `ldx|ldy S` and `lda P / clc / adc S` (commuted); gapbench 2.44 -> 2.31; `QBE_NO_PEEP_LOOPY=1` (A6a R2, 2026-11-11)
 b6e3071 perf(w65816): a byte read is a word read and a mask — `lda / and.w #$00FF` with a 16-bit accumulator in place of `sep #$20 / lda / rep #$20 / and`; never for a volatile access nor an address whose constant part is outside low RAM and banks $7E-$7F (a register may have a read side effect); gapbench geometric mean 2.55 -> 2.44; `QBE_NO_BYTE_WORD=1` (A6a R1, 2026-11-11)
 79ee5d9 gvn: a divide or remainder of two constants is folded — an integer div / rem is pinned (it may trap) and dedupins skipped every pinned instruction before foldref, so `19391 / 3584` called __sdiv16; it now goes through foldref, which refuses a zero divisor and INT_MIN / -1 at the class width; shard_dash and world_sprites lose 1 and 6 helper calls, the library byte-identical (2026-11-07)
