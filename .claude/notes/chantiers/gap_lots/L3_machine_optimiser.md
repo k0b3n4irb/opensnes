@@ -257,3 +257,14 @@ absolute-indexed one; 96 187 executions x 6 mclk = **1.6 % of busy** in game 2 i
 | operand in place, adjacent (M5) | 0.58 / 0.21 | local rule, S | with X/Y values |
 Not additive; the conductor's estimate for the set is 5 to 8 % on game 2. The next count that serves the list is the
 long-indexed one (game 1 first: why it uses `abs,X`), then the union of the sites of the others, to give the overlap a number.
+
+### Long-indexed reads counted (2026-11-13, same traces)
+
+Targets of the executed `op $BBHHHH,X` by bank (trace operands). Game 2: 143 061 executions, of which 75 637 `lda` and 34 872 `sta`
+in bank **$7E** (FAR RAM: the object table), then `cmp`/`adc`/`sbc` $7E, and 7 092 `lda` in a ROM bank. Game 1: 12 714
+executions (`lda` from asset banks $9E, $87, $A5; 785 `sta` $7E). So the long form is not the const-read rule of bank $00: it
+is FAR RAM, which an absolute-indexed form cannot reach with DB = $00. Ceiling if every one cost a cycle less (6 mclk each):
+143 061 x 6 / 35 687 410 = **2.4 %** of game 2's busy time, ~0.2 % for game 1 (hypothesis of one cycle per long form is the
+65816 timing table, not re-measured by luna here). A DB switch to $7E per function would also break I/O ($21xx) and ROM reads
+in the same function: cost out of proportion to a gain under the 3 % rule. **The axis does not open.** The list above stands
+with this line: 1.6 -> at most 2.4 / 0.2, not additive with the others, no lot.
