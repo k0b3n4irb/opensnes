@@ -102,10 +102,18 @@ def main() -> int:
         if shipped:
             sys.exit(f"release-smoke: FAIL: retired converters in bin/: {', '.join(shipped)}")
 
-        # The library ships as objects: the build never reads its .asm.
-        lib_asm = sorted(p.name for p in (sdk / "lib" / "build").rglob("*.asm"))
+        # The library ships as objects and their texts (X.c.asm, X-asm.text.asm:
+        # opensnes-rom place / check read the call graph from them, L4); the
+        # wrappers the C build writes (X.asm) stay out, and every object has its text.
+        build = sdk / "lib" / "build"
+        lib_asm = sorted(p.name for p in build.rglob("*.asm")
+                         if not p.name.endswith((".c.asm", ".text.asm")))
         if lib_asm:
             sys.exit(f"release-smoke: FAIL: lib/build ships {len(lib_asm)} intermediate .asm files")
+        textless = sorted(str(o.relative_to(build)) for o in build.rglob("*.o")
+                          if not (o.with_suffix(".c.asm").exists() or o.with_suffix(".text.asm").exists()))
+        if textless:
+            sys.exit(f"release-smoke: FAIL: lib/build ships {len(textless)} objects without their text: {textless[:3]}")
 
         stale = sorted(p.name for p in starter.rglob("*") if p.suffix in BUILD_OUTPUTS)
         if stale:

@@ -12,6 +12,14 @@
  * read guard, the SA-1 boot check, the NMI / WRAM-port race lint, and the asset inventory.
  * Exit 1 when a check fails; warnings do not fail.
  *
+ * With --objects LINKFILE it also runs the static-frame checks (sframe.c) on
+ * the objects the link took.
+ *
+ *   opensnes-rom place [--out FILE] [--window-base ADDR] [--what-if] <linkfile>
+ *
+ * The window of the static frames (L4), placed over the program's call graph
+ * read from the linked objects' texts; nothing is written on a refusal.
+ *
  *   opensnes-rom inspect [--json] <game.sfc>...
  *
  * The cartridge header (title, mapping, chip, sizes, region, version), the
@@ -32,6 +40,7 @@
 #include "sym.h"
 #include "checks.h"
 #include "header.h"
+#include "sframe.h"
 
 static const cli_opt check_opts[] = {
     { "bank0-fail", 0, CLI_INT, "N", "fail when bank $00 ROM has fewer than N bytes free (0 = never)", "0" },
@@ -41,6 +50,7 @@ static const cli_opt check_opts[] = {
     { "no-bank-reads", 0, CLI_FLAG, NULL, "skip the bank-blind read guard", NULL },
     { "no-nmi-race", 0, CLI_FLAG, NULL, "skip the NMI / WRAM-port race lint", NULL },
     { "no-assets", 0, CLI_FLAG, NULL, "skip the asset inventory line", NULL },
+    { "objects", 0, CLI_STR, "LINKFILE", "also check the static frames against the linked objects' texts (the linkfile make writes)", NULL },
     { "keep-ram-markers", 0, CLI_FLAG, NULL, "leave wlalink's RAM_USAGE_SLOT_* rows in the .sym (a profiler folding PCs onto labels takes them for code)", NULL },
 };
 
@@ -69,6 +79,8 @@ static int run_check(cli_ctx *ctx)
     if (!cli_has(ctx, "no-bank-reads")) r.bankreads = check_bank_reads(ctx, &s, dir);
     if (!cli_has(ctx, "no-nmi-race")) r.nmirace = check_nmi_race(ctx, dir);
     if (!cli_has(ctx, "no-assets")) report_assets(ctx, dir, &r);
+    int sframe = -1;
+    if (cli_str(ctx, "objects", NULL)) sframe = check_sframe(ctx, &s, cli_str(ctx, "objects", NULL));
     sym_free(&s);
     /* wlalink's RAM-usage markers are of no use once the checks have read
      * the .sym (every current one has a [ramsections] block), and they
@@ -79,7 +91,7 @@ static int run_check(cli_ctx *ctx)
         cli_warn(ctx, sym_path, "could not remove the RAM_USAGE_SLOT_* rows: %s", why);
 
     int failed = r.bank0 == 1 || r.ram == 1 || r.datainit == 1 || r.bankreads == 1 || r.nmirace == 1
-              || r.sa1boot == 1;
+              || r.sa1boot == 1 || sframe == 1;
     if (ctx->json) {
         cli_json_begin(ctx);
         cli_json_str(ctx, "input", in);
@@ -92,6 +104,7 @@ static int run_check(cli_ctx *ctx)
         cli_json_int(ctx, "sa1_boot", r.sa1boot);
         cli_json_int(ctx, "bank_reads", r.bankreads);
         cli_json_int(ctx, "nmi_race", r.nmirace);
+        if (sframe >= 0) cli_json_int(ctx, "sframe", sframe);
         cli_json_object(ctx, "assets"); cli_json_int(ctx, "vram_bytes", r.asset_vram); cli_json_int(ctx, "colours", r.asset_colours);
         cli_json_int(ctx, "files", r.asset_files); cli_json_int(ctx, "scenes", r.asset_scenes);
         if (r.asset_scenes) {
@@ -348,9 +361,17 @@ static int run_budget(cli_ctx *ctx)
     return CLI_OK;
 }
 
+static const cli_opt place_opts[] = {
+    { "out", 'o', CLI_STR, "FILE", "the window to write", "sframe.asm beside the linkfile" },
+    { "window-base", 0, CLI_STR, "ADDR", "the first byte of the window in the direct page", "$A8" },
+    { "what-if", 0, CLI_FLAG, NULL, "count only: give every compiler candidate of the project a frame (stack temps + parameters) and report refusals and the deepest chain; writes nothing", NULL },
+};
+
 static const cli_cmd cmds[] = {
     { "check", "the post-link checks: bank $00 ROM, C RAM band, data-init sentinel, SA-1 boot, bank-blind reads, NMI / WRAM-port race, asset inventory",
       check_opts, CLI_N(check_opts), "check game.sfc --bank0-fail 1024 --ram-fail 512", 1, run_check },
+    { "place", "the static frames' window from the linked objects' call graph (sframe.asm); refused on a re-entry or a window too small",
+      place_opts, CLI_N(place_opts), "place linkfile", 1, run_place },
     { "inspect", "the cartridge header, the checksum against the image, CRC32 and SHA-1 (exit 1 on a wrong checksum)",
       NULL, 0, "inspect game.sfc", 1, run_inspect },
     { "budget", "what the game uses of the console: ROM bank by bank, RAM, and the VRAM and CGRAM of its assets",

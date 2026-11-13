@@ -254,4 +254,9 @@ def big_rom():
 g.check("budget --json on a 128-bank FastROM image (banks past 64)", "each section in its own bank", big_rom)
 
 
+# the static frames (L4 S1): place and check --objects
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sframe_golden import add_cases  # noqa: E402
+add_cases(g)
+
 sys.exit(g.report())

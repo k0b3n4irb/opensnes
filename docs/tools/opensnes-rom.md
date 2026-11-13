@@ -51,6 +51,50 @@ as a routine. The checks take the RAM figures from `[ramsections]`, so
 nothing reads the markers; `--keep-ram-markers` leaves the file as the
 linker wrote it.
 
+## Static frames: place, and check --objects
+
+```sh
+opensnes-rom place linkfile                       # writes sframe.asm beside the linkfile
+opensnes-rom check game.sfc --objects linkfile    # the seven checks, and the frames
+```
+
+A static frame keeps a C function's values at a fixed place of the direct
+page, `sf.<function>.f`, instead of on the stack. Two functions may share
+those bytes only if they can never be active together, and a function with
+a static frame must never be active twice; the compiler sees one file, so
+both are decided here, over the whole program, from the objects the link
+takes (the `linkfile` that `make` writes). The build does not run these
+yet, and the compiler gives no function a static frame: `place` writes a
+window with no section and no label.
+
+Every object has its text beside it: `X.c.wrap.asm` or `X.wrap.asm` in the
+project, `X.c.asm` and `X-asm.text.asm` in `lib/build/<flavour>/`,
+`crt0.text.asm`. The compiler writes a call table into every C text
+(comment lines `; sframe fn`, `; sframe call`, `; sframe addr`). A routine
+of assembly is closed when the routines it calls are closed and it does
+not jump through a pointer or return to an address it pushed; anything
+else, an object without a text, or a call to a symbol no text defines, may
+reach any exported or address-taken function.
+
+`place` reads the C tables and the assembly, refuses a function with a
+static frame that can call back into itself (it names the path) and a
+window too small, places each frame just past the deepest frame that can
+be active under it, and writes `sframe.asm`. On a refusal it writes
+nothing and removes an old `sframe.asm`, so the link stops on the missing
+labels whatever the Makefile does with the exit code. `--what-if` gives
+every function the compiler could frame its frame, reports the refusals
+and the deepest chain, and writes nothing.
+
+`check --objects` reads the same objects another way: the calls, the
+addresses taken and the bytes of each frame come from the instruction
+lines, not from the tables. It refuses a table that differs from its text,
+an `sf.*` label of the `.sym` no table claims (or the reverse), a frame
+used past its size or without `.b`, a function with a static frame that
+can be active twice, two frames that overlap while one can run under the
+other, a frame past `$FF`, outside its window or on another block of the
+direct page (`.registers`, `tcc__lf`, `.snesmod_zp`), and a frame an NMI
+callback can reach that ends past the NMI page.
+
 ## Inspect
 
 ```sh

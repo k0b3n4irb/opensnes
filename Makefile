@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -321,6 +321,9 @@ tests: test-compiler
 		$(MAKE) -s -C $$d clean && $(MAKE) -s -C $$d && python3 $$d/test_*.py || exit 1; done
 	@python3 devtools/link_modules.py
 	@python3 testing/bank_spill.py
+	@# L4 static frames (S1, dormant): opensnes-rom place and check --objects on every built example, the
+	@# compiler's provoked fault (QBE_SFRAME_FAULT=noedge refused), the tool against the S0 count (seconds).
+	@python3 devtools/sframe/test_sframe_link.py --oracle
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
@@ -737,6 +740,9 @@ count-sframe:
 	@python3 devtools/sframe/test_sframe_count.py
 	@python3 devtools/sframe/sframe_count.py --corpus examples --lib-casm lib/build/lorom
 
+test-sframe:
+	@python3 devtools/sframe/test_sframe_link.py --oracle
+
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: Doxygen resolves some directory links
 # differently on Windows, so a doc warning must not be able to block a build
@@ -793,10 +799,12 @@ release: all
 	@for f in $(RELEASE_DIR)/opensnes/bin/*; do \
 		[ -f "$$f" ] && { $(STRIP) -S "$$f" || exit 1; }; done; true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@# The objects and the label index only: the build links
-	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and never
-	@# reads the .asm the compiler wrote on the way (about 200 files).
-	@cd lib && find build \( -name '*.o' -o -name symbols.txt \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
+	@# The objects, the label index and the objects' texts: the build links
+	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and
+	@# opensnes-rom place / check read the call graph of the linked objects
+	@# from X.c.asm (C, with its side table) and X-asm.text.asm (assembly)
+	@# (L4 static frames, 2026-11-14). The wrappers X.asm stay out.
+	@cd lib && find build \( -name '*.o' -o -name symbols.txt -o -name '*.c.asm' -o -name '*.text.asm' \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
@@ -913,7 +921,8 @@ help:
 	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
 	@echo "  bench-slots - Sprites at fixed VRAM slots against the dynamic engine, on luna"
 	@echo "  bench-gap - What C costs against hand-written assembly, twelve routines, on luna"
-	@echo "  count-sframe - L4 S0: the static-frame count (build with QBE_SFRAME_DUMP=1 first)"
+	@echo "  count-sframe - L4 S0: the static-frame count (every .c.asm carries the side table since S1)"
+	@echo "  test-sframe - L4 S1: opensnes-rom place / check --objects on the corpus, the noedge fault, the S0 count as oracle"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"

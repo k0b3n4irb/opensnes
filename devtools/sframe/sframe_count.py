@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""L4 S0: count what static frames would take, from a build made with QBE_SFRAME_DUMP=1.
+"""L4 S0: count what static frames would take, from any build (the side table is in every .c.asm since S1).
 
 Maintainer tool (never in a user build). Reads the `; sframe` comment lines the backend writes after each function
 (`compiler/qbe/w65816/emit.c`, `sframe_dump`) and the instruction lines of the same `.c.asm`, the library's `.c.asm`
