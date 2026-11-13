@@ -98,6 +98,11 @@ before its code, its switch, and the faulted run that proves its check can turn 
 
 ### S0, the count before any code (spike, no codegen change)
 
+**Done 2026-11-13: `L4_s0_count.md`.** Rule figure (point 9, strict closure model, net of refusals) 1.71 % (game 1) and
+2.07 % (game 2): the lot continues to S1, by 0.07 point, inside the spread of the gauge's windows (1.02 to 2.61 on game 2);
+the stop after S3 (at least 1.07 / 1.31 %) decides. Deepest chain with parameters 90 / 80 B: S2b mandatory by point 8
+(game 1, by 2 bytes). No NMI-reachable candidate; neither game links SNESMOD.
+
 - **Object**: a count mode in the backend, `QBE_SFRAME_DUMP=1`, that writes the side table of point 2 as comments only (what
   each function would get: candidate or the reason it is not, frame words that would go static, parameter bytes, its calls);
   a host script (`devtools/sframe/sframe_count.py`, maintainer tool, never in a user build) that runs points 3 and 4 on a
