@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | a0c96192ee8e18d6f46390810323b33d7d6d6278 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 650a80efcd52e454f196288622976112b0355110 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
