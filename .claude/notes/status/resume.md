@@ -198,7 +198,7 @@ quota; a Fable sub-agent may be called by this session alone when needed, and th
    open as written. **L4 counted** (`gap_lots/L4_frames_and_calls.md`, M1 2026-11-13): 5.0 and 7.1 % of busy time at most, L4 opens
    (static frames 4.1 / 6.2, first argument in A 0.6; near calls out, 0.3). L4's design is written and contested (Fable, 2026-11-13: go with changes, all five taken: overlap criterion not cycles,
    placement at link time, arguments in the callee's static frame, window sized from the measurement, refusal's remedy).
-   **Next: M2**, a count (slot kinds, deepest static chain, share refused, change 3's saving) before any code. Tooling of the count:
+   **M2 done (2026-11-13)**: F1 alone 2.4 / 2.7 %, F1 + change 3 2.9 / 3.3 %, deepest chain 136 / 104 bytes (window above 96), refusals 1 of 143 / 233; by the rule L4 as written does not open. The largest class is temps crossing no call that sit on the stack (3.4 / 7.2 %): **next M3**, a count of what a larger or better-used `tcc__lf` takes, before any code (`gap_lots/L4_frames_and_calls.md`, section M2). Tooling of the count:
    `dumps/opensnes-etalons/l3m0/` (private; `trace.py TAG`, `m0.py TAG sb|x2`). R1 stays in the plan.
 4. **Threads waiting for others**: advance 2 (the second game's return on the map engine lot); the capacities thread to
    luna (its point 10, the mirror fold per mapper, also explains the false slowdowns game 2 saw in its own profile list).

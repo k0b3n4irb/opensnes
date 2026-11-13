@@ -185,3 +185,47 @@ What the count says about the design:
   whose slots all go static pays none.
 - The figure is an upper bound: every function is assumed to get a static frame. L4's design note says which do not
   (reached from assembly, address taken, recursion, the NMI) and recounts.
+
+### M2, the count by slot kind and the overlap refusals (2026-11-13)
+
+Same traces and builds as M1 (private tooling `m2.py`, which reads each function's slot map from the `.c.asm` header
+comments and follows the stack frames in the trace: an access `n,S` is a parameter when its absolute address is past the
+function's return address, a stack object when it lies in an `alloc` slot, else a temp; a temp read is **cross-call** if a
+call was executed since its last write, **no-call** if not (a value that crossed no call but got a stack slot: `tcc__lf`
+overflow). Whole cost of the executed `n,S` accesses: 9.62 % (game 1) and 16.55 % (game 2) of busy time, as M0's 9.8 / 19.2
+within the method's error.)
+
+| whole cost of `n,S` accesses, % of busy | game 1 | game 2 |
+|---|--:|--:|
+| parameter reads | 2.39 | 2.18 |
+| cross-call temp reads | 1.49 | 2.07 |
+| no-call temp reads (`tcc__lf` overflow) | 3.38 | 7.21 |
+| temp writes | 2.36 | 5.08 |
+| stack objects | 0 | 0 |
+
+What it says:
+- **The largest class is not what L4 was written for**: temps that cross no call and still sit on the stack (3.4 and 7.2 %
+  of busy time, reads only; their writes are in the last row) are a `tcc__lf` overflow, not a call-crossing value. A larger or
+  better-used `tcc__lf` (or a static frame for the same) would take them; this is a new axis, to count on its own (how much
+  of it a bigger `tcc__lf` takes, at what cost in direct page).
+- **Candidates** (`static`, address never taken, not a leaf, on no cycle, not reached from both the NMI and the main loop):
+  143 of 1 418 compiled functions (game 1), 233 of 1 884 (game 2). The overlap criterion as approximated here (a candidate
+  calls out of its file into something that reaches its file again) refuses **1 of 143 and 1 of 233**: refusals are not the
+  problem. (The approximation does not see an indirect call; the games' compiled code has none that this tool can name.)
+- **The deepest static chain is 136 bytes (game 1) and 104 bytes (game 2)** of temps, stack objects left out. **Both are above
+  the 96-byte window of the draft**; the window has to be sized at about 140 bytes, and the NMI page with it.
+
+By the rule, in accepted candidates (cycle of each access, `ldx d`, `inc d`, frame made and undone, as M1):
+
+| | game 1 | game 2 |
+|---|--:|--:|
+| part 1, all slots static, parameters too | 2.56 | 2.88 |
+| F1: temps static, parameters stay on the stack | **2.38** | **2.69** |
+| F1 + change 3 (every argument into the callee's frame, the caller's stack restore gone: 0.31 / 0.38) | **2.88** | **3.27** |
+
+**Decision, by the rule (under 3 % after parameters and refusals, the static frames alone do not open)**: F1 alone is
+2.4 and 2.7 %, below. With change 3 it is 2.9 and 3.3 %: game 2 crosses the 3 % line, game 1 stays just under, and the
+estimate rests on a 136-byte window the direct page does not have today. **L4 as written does not open; the lot to weigh is
+F1 + change 3 together, with the window and the NMI page as its first cost, against the `tcc__lf` axis above, which the
+same count shows to be as large and has no window problem (it is the same direct page, used better).** Next: count that axis
+(M3) before any code. Figures to re-take after any compiler change; nothing here is a measurement of a change made.
