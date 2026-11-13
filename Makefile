@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -730,6 +730,13 @@ bench-gap:
 	@scripts/install-luna.sh
 	@python3 devtools/gapbench/run.py
 
+# L4 S0, a count before any code: what static frames would take, under three edge
+# models (.claude/notes/chantiers/gap_lots/L4_s0_count.md). Reads the comments
+# QBE_SFRAME_DUMP=1 adds to the .c.asm (the ROMs do not change): build with it first.
+count-sframe:
+	@python3 devtools/sframe/test_sframe_count.py
+	@python3 devtools/sframe/sframe_count.py --corpus examples --lib-casm lib/build/lorom
+
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: Doxygen resolves some directory links
 # differently on Windows, so a doc warning must not be able to block a build
@@ -906,6 +913,7 @@ help:
 	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
 	@echo "  bench-slots - Sprites at fixed VRAM slots against the dynamic engine, on luna"
 	@echo "  bench-gap - What C costs against hand-written assembly, twelve routines, on luna"
+	@echo "  count-sframe - L4 S0: the static-frame count (build with QBE_SFRAME_DUMP=1 first)"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"

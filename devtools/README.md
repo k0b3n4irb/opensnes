@@ -70,6 +70,7 @@ compile-time pattern checks (`cases/`, `run.py`).
 | `gapbench/run.py`, `gapbench/kernels.c`, `gapbench/kernels.asm` | twelve routines a game runs every frame, each in C and in assembly written by hand on the same data, timed on luna (master cycles a call, SlowROM and FastROM); the two must leave the same checksum. `--check` fails on a routine slower than `baseline.json` | `make bench-gap`; `make tests` runs `--check` |
 | `twinbench/run.py` | the examples that exist in both SDKs, run side by side on luna with the same input script: master cycles of work per frame. The twins are ports, not the same source, so it reports and gates nothing; pairs found not to do the same work are listed in the script and left out | `make bench-twins` (needs `PVSNESLIB_HOME`) |
 | `asset_budget.py` | static VRAM / CGRAM weight of an example's converted assets | `asset-budget`, `common.mk` (one line per link) |
+| `sframe/sframe_count.py`, `sframe/test_sframe_count.py` | L4 S0: what static frames in the direct page would take, read from the comments `QBE_SFRAME_DUMP=1` adds to every `.c.asm` (candidates, refusals under three edge models, placement, deepest chain, NMI-reachable frames, window fits); the test counts seven generated programs whose answer is known, and a faulted run. A report for a lot's decision, no gate | `make count-sframe` |
 | `vram_layout/` | `vram.spec` → `vram_map.h` by CP-SAT (ortools, opt-in; six examples use it) | by hand, gated by `lint-vram` |
 
 ## Data files
