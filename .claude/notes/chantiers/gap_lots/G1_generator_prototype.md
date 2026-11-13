@@ -85,3 +85,32 @@ Verdict of the contest: do not start step 1 as written. Taken, in order:
 
 Recorded, not taken: the pair stays Opus / Opus by the owner's rule of 2026-11-12 (Fable only for contest and the review before
 close).
+
+## G1-M0 and the other compiler (2026-11-13), the two figures asked before step 2
+
+**G1-M0** (private traces of the gauge, reproduced by a script; game 1 / game 2, % of busy time): leaves (no call executed or
+emitted) 21.4 / 18.6; functions that call 58.9 / 74.4; not C (library assembly, NMI) 19.7 / 7.0. Half of the busy time is in 5
+functions (game 2) and 7 (game 1); 90 % in 27 and 23. Functions that call and hold a value across a call (a stack frame): 57.0 /
+67.7, of which the `n,S` accesses alone 8.7 / 17.5. Leaf B of the hand rewrite is no longer a leaf once the compiler inlines it
+(it sits in the hottest function of game 1); only leaf A remains one.
+Prediction of condition 2 on game 2, written before the prototype (gain = class share x (1 - 1 / factor)):
+leaves alone at 1.2 / 1.35: 3.1 / 4.8 % — **out of reach** (it would need 2.17 on every leaf); leaves plus functions that call at
+1.10: 9.9 / 11.6 %, at 1.13: 11.7 / 13.4 %. Correction (hypothesis, from the notes): the 1.13 was measured before the jump table,
+which was most of it, so the remaining body factor is about 1.086 and the range falls to **9.0 to 10.7 %**: the line is reached
+only if the prototype also wins about 1.09 to 1.10 on the functions that call, under today's ABI. With a free convention inside a
+file (1.23) the estimate is about 18.7 %: that is L4's territory, outside the narrow scope.
+
+**The other 65816 compiler** (vbcc65816 Release 2 under emulation, private; its own Dhrystone binary reproduced byte for byte):
+geometric mean over the twelve bench routines 2.56 times the hand against 2.20 for ours (20 routines: 2.60 against 2.40). It is
+not a target: the hand stays the yardstick. It is clearly better on six routines (`unpack` 0.34 of ours, `call` 0.41 or 0.71
+without inlining, `chain` 0.68, `slots` 0.66, `fixed` 0.80, `ents` 0.94); taking the better of both on each row would give 1.99
+instead of 2.20 (a calculation on the table). Ideas ours lacks, from reading both assemblies (hypotheses until coded): a far
+pointer kept in a direct-page slot and used as `[dp]` with a 16-bit increment (`unpack`), the first argument in A and the
+arguments popped once after several calls, small same-file functions inlined, a 32-bit `>> 8` as a byte move, constant-count
+loops unrolled. Not to copy: its unrolling without the index in X.
+
+**What this says about G1**: the narrow scope cannot reach the 10 % line by allocation inside leaves; it can only if the
+functions that call also gain, and most of what they lose is the stack traffic that L4 and the call convention address. So the
+cheap order is: L4's counting step (S0) and the IR-side probe first (about two days together), the vbcc ideas as short lots
+(they are our own backend's), and the prototype's remaining cost is 7 to 11 days of the pair after the probe (hypothesis; the
+figure was 8 to 12 before the probe and the contest's cuts), with its first stop at the hot loops of the leaves.
