@@ -133,6 +133,10 @@ the stop after S3 (at least 1.07 / 1.31 %) decides. Deepest chain with parameter
 
 ### S1, the placer and the overlap check (`opensnes-rom place` / `check`), dormant
 
+**Done 2026-11-14: `L4_s1_result.md`** (branch `l4s1`). ROMs identical (130/130), the checks pass on 65/65, the tool agrees
+with the S0 script on 65/65 under both closure models, every fault refused by a named check; the NMI / WRAM-port lint's
+blindness to static names found and fixed on the way. What S2 inherits: the result note's last section.
+
 - **Object**: points 3 and 4 in compiled C (the user build runs no interpreter): the `.c.asm` side-table reader (beside
   `check_nmi_race`'s function parser in `asm.c`), the graph, the placement, `sframe.asm`; the check reading the `.sym` back.
   Nothing calls it from `make/common.mk` yet.
