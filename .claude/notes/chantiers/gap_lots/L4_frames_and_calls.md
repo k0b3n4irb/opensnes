@@ -28,4 +28,41 @@ the call graph shows to be recursive or reached from the NMI handler, which a st
 
 ## Measured
 
-(filled by M1)
+### M1, the count (2026-11-13)
+
+Same traces and tooling as M0 (private, `dumps/opensnes-etalons/l3m0/m1.py`; the gauge's builds, today's compiler
+`develop` `0a9b9fa0`, 4 x 40 frames a game). Each saving is the executed instruction's measured cost minus its replacement's:
+an `n,S` access as a direct-page access is one internal cycle less (6 mclk: `lda sr,S` is opcode, operand, internal, data;
+`lda d` with D page-aligned is opcode, operand, data); `(n,S),y` -> `(d),y` two; `lda n,s / tax` -> `ldx d` the transfer;
+`lda / inc a / sta` on the same slot -> `inc d` (50 mclk); the frame made and undone, all of it; `jsl` -> `jsr` 14 mclk
+(the bank byte fetched and pushed); the first argument's push, all of it.
+
+| % of busy time | game 1 | game 2 |
+|---|--:|--:|
+| **1. static frames** | **4.12** | **6.19** |
+| - the cycle of each `n,S` access (needs the DIRECT PAGE) | 1.65 | 3.29 |
+| - `lda n,s / tax` -> `ldx d` | 0.64 | 1.13 |
+| - frame made (prologue) + undone (epilogue) | 0.64 + 0.79 | 0.75 + 0.90 |
+| - `lda / inc / sta` -> `inc d` | 0.40 | 0.13 |
+| 2. near calls (`jsl` -> `jsr`, callee in the same file) | 0.30 | 0.31 |
+| 3. first argument in A (its push) | 0.58 | 0.61 |
+| **sum** | **5.01** | **7.11** |
+| of which functions a static frame cannot take (recursive, or reached from the NMI and the main loop) | 0.00 | 0.00 |
+
+(1 recursive function and 1 called from both sides in game 1; 2 and 6 in game 2; none of them carries stack traffic in the
+windows.)
+
+**Decision, by the rule written before the count: L4 opens.** The sum is above 3 % on both games. Part 1 enters (4.1 and
+6.2), part 3 enters at the edge (0.58 and 0.61), **part 2, near calls, does not** (0.30 and 0.31, under 0.5 on both): left
+out of the lot.
+
+What the count says about the design:
+- A third to a half of part 1 (1.65 and 3.29) exists only if the static frames are in the **direct page**: a static frame
+  in plain RAM is addressed absolute, `lda abs` costs the same four cycles as `lda sr,S` (a ROM fetch instead of an internal
+  cycle). The rest (no frame to make, `ldx`, `inc`) holds anywhere. The direct page is shared (`.registers` `$00-$3F`,
+  SNESMOD `$40-$7F`, `tcc__lf` `$80-$9F`): how many bytes a static frame scheme gets there, or whether D moves per function
+  (`tcd`, its cost), is the first question of L4's design.
+- Part 1's frame make and undo (1.4 and 1.65 %) is what every function with a stack slot pays at every call; a function
+  whose slots all go static pays none.
+- The figure is an upper bound: every function is assumed to get a static frame. L4's design note says which do not
+  (reached from assembly, address taken, recursion, the NMI) and recounts.
