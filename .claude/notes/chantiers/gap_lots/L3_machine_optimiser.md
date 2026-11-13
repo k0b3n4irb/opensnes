@@ -220,3 +220,17 @@ L4. What the count also shows:
 
 S0 and S1 (the instruction model and the proven liveness) are kept in the plan as the verifier of any later rewriting, not
 started now.
+
+## Decision after M0, L4 M2 and M3 (2026-11-13), and the next lot
+
+By the 3 % rule written before the counts: **L4 does not open as written** (static frames F1 2.4 / 2.7 %; with change 3, 2.9 / 3.3 %,
+on a 136-byte window the direct page does not have). **The `tcc__lf` axis does not open** (ceiling 0.7 / 1.7 %; M2's 3.4 / 7.2 was
+whole cost, not saving). **S3 does not open** (1.1 / 2.2 %). L4's cheap part stays on the shelf: change 3 alone is not counted apart.
+**Next lot: S4 / L5, the operand kept in A and the compares**: the slots read by `cmp T` / `sbc T` weigh 7.5 / 7.0 and 3.9 / 5.7 %
+of busy time as whole cost, more than any rewritable class counted so far.
+
+Rule for this lot, written before its count (M5): its saving is counted as instructions removed or made cheaper, not as the
+whole cost of the slots. It opens if the executed saving on accepted sites is **3 % or more of busy time in one game** and
+the other is not worse. Count: in the traces, each `sta T` ... `cmp/sbc T` pair where A is dead after the compare or T can be
+replaced by the reversed operation; and each compare that is a signed range test with a provable range (L5). Report by shape.
+If it fails the rule, the conductor gets M4 (top-cost instruction shapes, whole program) instead of a lot.
