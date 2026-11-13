@@ -57,6 +57,25 @@ def nmirace_lag():
 
 
 g.check("check nmirace.sym with nmiSetLag", "refused like nmiSet", nmirace_lag)
+
+
+def nmirace_static():
+    """The write in a static C function (`fill.main`), placed in the file before any function the callback
+    reaches: until 2026-11-14 a name with a dot was not read as a function, its body went to the function above
+    it (here one nothing reaches) and the race passed."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        asm = ("other:\n\trts\nfill.main:\n\tsta.w $2180\n\trts\nmain:\n\tpea.w my_cb.main\n\tjsl nmiSet\n\trts\n"
+               "my_cb.main:\n\tjsr fill.main\n\trts\n")
+        proc = g.run(["check", "nmirace.sym"], work, ["nmirace.sym"], {"nmirace.c.asm": asm})
+        text = proc.stdout + proc.stderr
+        if proc.returncode == 0 or "fill.main" not in text or "NMI / WRAM port race" not in text:
+            return ["a WRAM-port write in a static function reached from a static callback was not refused"]
+        return []
+
+
+g.check("check: the race in a static function (fill.main)", "refused, the static function named", nmirace_static)
 g.expect_stdout("inspect good.sfc hirom.sfc oddsize.sfc (header, checksum, digests)", ["inspect", "good.sfc", "hirom.sfc", "oddsize.sfc"],
                 golden="inspect.txt", copy=["good.sfc", "hirom.sfc", "oddsize.sfc"])
 g.expect_stdout("inspect --json good.sfc hirom.sfc", ["inspect", "--json", "good.sfc", "hirom.sfc"],
