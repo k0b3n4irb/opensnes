@@ -268,3 +268,21 @@ is FAR RAM, which an absolute-indexed form cannot reach with DB = $00. Ceiling i
 65816 timing table, not re-measured by luna here). A DB switch to $7E per function would also break I/O ($21xx) and ROM reads
 in the same function: cost out of proportion to a gain under the 3 % rule. **The axis does not open.** The list above stands
 with this line: 1.6 -> at most 2.4 / 0.2, not additive with the others, no lot.
+
+## Lot LF+M5 (opened by the conductor, 2026-11-13): `tcc__lf` +4 words and the adjacent operand in place
+
+The conductor opens one short lot from the ranked list, two axes that do not overlap in code: (a) `tcc__lf` grows by four
+words (16 -> 20 words, 32 -> 40 bytes of direct page; the NMI mirror 160 -> 168 bytes); (b) M5's shape, `lda SRC / sta T /
+[ldx|ldy ...] / lda Y / [clc|sec] / op T` with T a `tcc__lf` slot dead after the operation and op one of cmp, adc, sbc, and,
+ora, eor: the `lda` and the `sta` go, the operation takes SRC (`peephole_fuse_indexed`, which already does it for SRC =
+`SYM,x`). Pair: Opus writes and validates (no sub-agent for this lot, the conductor's instruction).
+
+**Prediction, written before the code** (from M3 and M5, the same traces): (a) 0.64 / 1.14 % of busy time (game 1 / game 2),
+(b) 0.58 / 0.21 %. Overlap: (a) moves stack temps into `tcc__lf`, which can only add sites to (b) (a T that was `n,S` becomes a
+candidate) and never removes one; (b) removes accesses to `tcc__lf` slots that (a) did not count (M3 counted stack accesses
+only). So the two are additive or slightly better: **about 1.2 % (game 1) and 1.35 % (game 2) together**, at most the sum of
+the ceilings 0.66 + 0.58 = 1.24 and 1.66 + 0.21 = 1.87. M5 counted SRC as immediate, direct page or absolute; the rule also
+takes a stack slot `n,s` (same proof, nothing moves the stack between), so (b) may come out a little above 0.58 / 0.21.
+Limits stated before: M3 classified on the executed path of one run (the compiler decides statically, so the real (a) is at
+most its figure); M5's deadness was read on the executed path too (the rule asks `pp_slot_live_at` over all paths, so it
+accepts at most what M5 counted, plus the stack sources).
