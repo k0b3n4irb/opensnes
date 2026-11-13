@@ -86,6 +86,65 @@ per-file switch keeps a file on stack frames.
 Near calls are out (M1: 0.3 %). The `n,S` traffic of functions that are not `static` (1.4 and 2.9 % of part 1) stays for a
 later step that needs the program's call graph at link time.
 
+## Contested (Fable sub-agent, 2026-11-13: the written contest of a compiler lot's plan, the one use the owner allows)
+
+**Verdict: go with changes.** The NMI argument holds, but the overlay rule and the link check as written leave a
+miscompilation, and the 96-byte window cannot hold per-file sections. (From reading code and the note; nothing built.)
+
+**(a) Soundness.** The direct-page claim holds in every context the SDK allows: `nmiSet` and `nmiSetLag` callbacks run after
+`lda #tcc__nmi_registers / tcd` (`templates/crt0.asm` ~1130, 1184, 1441) and never in the same NMI; IRQ handlers are
+assembly only (`interrupt.h` ~157-171); code that moves D (`tile.asm`, `sprite_oamset.asm`) is assembly that calls no C;
+the Super FX owned-cart NMI keeps the interrupted D but calls only `gsu_present_step` (not traced to its end); SA-1 runs
+assembly with D = `$3000`; `tcc__fp` frames never move D; `splice_fn` makes the inlined body's slots the caller's; an NMI
+nested in an overrunning callback already breaks `tcc__r*` and `tcc__lf` (not new).
+**The hole is re-entry into the file, with no cycle.** File A, static `f` and `h`, each called from an exported function:
+neither has a static caller, so both are at offset 0. `f` calls `B.x`, which calls exported `A.e1`, which calls `h`: `h`
+overwrites `f`'s live frame. No function is on a cycle: the link check as written passes it. The same inside one file (`f`
+calls exported `e1`, which calls `h`), and through any indirect call (a dispatcher reaching address-taken handlers that call
+the file's static helpers). So: **the criterion is overlap, not cycles** (for each call made while a static frame is live, no
+function it can reach may own bytes overlapping the frames live at that point), and **F2 is a precondition of F1**, not a
+later safety step. A refusal would also fire on ordinary C (callbacks) with only a per-file switch as remedy: a hidden quirk
+to weigh against `PHILOSOPHY.md`.
+
+**(b) Would it pay?** Parameters stay on the stack (read at `framesize + PARAM_OFFSET + n`, caller-pushed): they are inside
+M1's 2.70 / 3.25 % and F1 does not remove them. Only cross-call temps, `tcc__lf` overflow and stack objects are left to win
+(temps that cross no call are already in `tcc__lf`); a function with an address-taken local keeps its prologue, and the
+local's address would have to be `tdc + off`. **The window does not fit**: 96 bytes over about 20 files is 4.8 bytes a file,
+under one median frame; game 2's dispatcher and emitter (18 + 30) take half of it; side-by-side sections mean link errors
+from the first real game. F0 costs 192 bytes of plain band in every ROM (window and NMI page), 16 % of the tight game's
+1 170 free. Uncounted upside: a far pointer in a direct-page slot is dereferenced in place (`lda [slot],y`).
+
+**(c) Alternatives.** Link-time placement: take it now (the compiler emits `lda.b sframe_f+N` as it does `tcc__lf+N`, plus
+its side table; the link tool assigns offsets from the program's call graph; the window holds the deepest chain of the
+program, not the sum of files; the same pass does the overlap check; exported functions can join later). Arguments stored
+into the callee's static frame: replaces F3 (`sta.b` costs what `pha` does; the callee's parameter reads become direct-page;
+the caller's stack restore after the call goes, 9 cycles; every argument, not the first). D moved per function: no
+(`phd/tcd/pld` 11 cycles a call, a non-aligned D costs a cycle per access, `tcc__r*` and `tcc__lf` out of reach). Plain-RAM
+frames for functions proven NMI-unreachable: the proof fails (the callback is a run-time pointer). More `tcc__lf`: nothing
+for temps that cross a call.
+
+**(d) Ordering.** F0 first is wrong (192 bytes and a WRAM re-capture for a predicted 0). Spike first, in count mode: the
+compiler dumps per static candidate its slot kinds and its calls, no codegen change; then the link-time placement and the
+overlap check together; then F1. The window's size comes from the measured deepest chain, not a fixed 96.
+
+**(e) Changes, ranked.** 1. Overlap criterion, its check shipped with or before F1. 2. Link-time placement over the whole
+program; no per-file sections. 3. Arguments in the callee's static frame (F3 folded in). 4. Window sized from the
+measurement; F0 after the spike. 5. Decide what a refusal offers beyond a per-file switch. **The measurement before F0**: the
+static candidates' executed `n,S` traffic by slot kind (parameter read, cross-call temp, `tcc__lf` overflow, stack object),
+the deepest static chain of each game in bytes, and the share in functions the overlap criterion refuses. **If what remains
+after parameters and refusals is under the rule's 3 %, L4 as written does not open and change 3 becomes the lot.**
+
+### Taken (2026-11-13)
+
+All five changes are taken. Already measured, the parameters (dynamic, M1's traces; a parameter is an `n,S` access beyond
+the frame and the return address): in `static` functions, whole cost of their own frame slots **4.53 % (game 1) and 7.38 %
+(game 2)**, of their parameter reads **1.88 and 1.87 %**; in the other functions 2.83 / 0.61 and 9.59 / 0.35. Next step,
+**M2** (a count, no code change): the rest of the split by slot kind (cross-call temp, `tcc__lf` overflow, stack object; the
+compiler's count mode or the `.c.asm`'s slot map), the deepest static chain in bytes, the share refused by the overlap
+criterion with indirect calls reaching every address-taken function, and the saving of change 3 (every argument stored in
+the callee's frame, the stack restore gone). Rule unchanged: under 3 % on both games after parameters and refusals, the
+static frames do not open and change 3 alone is weighed.
+
 ## Measured
 
 ### M1, the count (2026-11-13)
