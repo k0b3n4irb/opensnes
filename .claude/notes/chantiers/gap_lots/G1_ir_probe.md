@@ -57,6 +57,88 @@ and 33 % of leaf B's** (on the bench twins when the real leaves cannot be rebuil
 that, and if the refusals are mostly the emitter's X, the probe is the evidence that justifies G1's allocator (which says
 nothing yet of G1's 10 % line, G1-M0). Expected, from the table: **under the line on both; the reason the X of service**.
 
-## Measured
+## Measured (2026-11-13)
 
-(filled after the code)
+What was built, beyond the plan above (each found by reading the probe's own output on gapbench, before any game figure):
+the candidates are only webs with an index use or a phi (a value made and read once gains nothing in X and cost a `tax` /
+`cmp #0`); a counter in X / Y is compared with `cpx` / `cpy #k` and stepped with `inx` / `dex` (x2 at most); the base
+`fuse_indexed` text rule takes `lda.w sym,y` as a source like `sym,x`; a web whose index serves a long access (FAR or const
+object: no `long,y`) does not try Y, one that serves `[tcc__r9],y` does not try X (each would copy into the other register
+at every access); the registers are given again from scratch after each refusal, costliest web first. A function with a
+jump table is coloured too: the table's captured moves count as anyone's write (refuse more, never less).
+
+**Two defects of the first version, found by the gates, not by the measures** (the lesson in the porting kit):
+`difftest_stmt.py` failed 59 of 2 000 fresh seeds (910001-912000), reduced to `i = 2; while (i--) {}` leaving 0: the check
+"two members of a web interfere" skipped every pair whose union-find root had the higher number, so a counter and its next
+value (both live at the test) took X together; and the emission's proof trusted the colouring for the colour's own writes.
+Both fixed (every pair checked; an own write of X / Y while another value of that register lives is a refusal); the 2 000
+seeds then pass. That first version had passed the gauge of both games (state identical at every step) and the bench's
+checksums: they prove the games and the bench, not the compiler.
+
+Builds: `develop` 650a80e (the reference, `g1probe-avant`) against branch `probe-xy`; gauge on the frozen game sources,
+state IDENTICAL to the reference at the 341 and 700 steps; the two hand leaves measured on their study copies (C rebuilt
+by each SDK, the hand version linked by its switch), the game's state identical in the three builds.
+
+| | predicted | measured |
+|---|--:|--:|
+| leaf A (game 2), share of the C - hand gap | at most 5 % | **0.0 %** (16 366 830 -> 16 367 410 mclk; hand 12 707 660) |
+| leaf B (game 1), routine alone | at most 20 % | **20.3 %** (9 522 620 -> 8 828 590; hand 6 107 176; factor 1.56 -> 1.45) |
+| leaf B with its caller | | **20.1 %** (13 966 912 -> 13 214 632; hand 10 232 184; 1.37 -> 1.29) |
+| `glide` (twin of game 2's sprite loop) | 8 to 11 % | **16.4 %** (98 814 -> 93 702; 1.46 -> 1.38) |
+| `soa` (twin of leaf B) | 0 to 10 % | **10.4 %** (37 082 -> 35 813; 1.49 -> 1.44) |
+| gapbench weighted mean / first twelve rows | 1.95 to 1.99 | **1.91 / 2.15** (from 1.99 / 2.20; `state` 1.35 -> 1.21; `oam` +0.24 %, the one row slower) |
+| game 1, busy time saved | 0.2 (0 to 0.6) | **1.37 %** (lag frames 172 -> 159; code -1.21 %) |
+| game 2, busy time saved | 0.2 (0 to 0.6) | **1.78 %** (lag frames 430 -> 417; code -0.99 %) |
+
+The game figures are seven to nine times the prediction: the prediction leaned on the last count's failure and on the
+emitter's X, and underrated two things the colour does that M0 did not count: the `tyx` before each access of a counter
+the loop rule had put in Y (the colour indexes `sym,y` directly), and functions with a jump table (game 2's main loop -3.9 %,
+its object dispatcher -0.8 %: only once the tables were allowed; without them game 2 was -1.05 %). Functions slower: game 1's
+sprite update +2.7 %, a sprite routine of game 2 +1.1 % (not studied); and three of the measured workloads
+(`devtools/sdkbench`, limit +2 %): `collide` +4.1 %, `bytes` +5.1 %, `tilemap` +7.5 %. Read on `tilemap`: the inner
+counter (the hot one) is an operand of `eor` / `ora`, so the colour refuses it, while the text loop rule had kept it in Y
+(it rewrites a commutative operand, `pp_alu_of_slot`); the colour then gives Y to the outer counter, and the loop rule,
+which the colour switches off for the whole function on a register it uses, no longer keeps the inner one: the inner loop
+goes back to memory. The colour's cost model does not see what the text rules would have done with the register, and a
+register is held for a whole function, not a region.
+
+**How the probe meets the emitter's X, and what stops it.** Weighted by the colouring's cost (use count x loop depth), the
+candidates of both games' C end: coloured 60.3 % / 78.6 % (game 1 / 2); refused because the emitter writes the register
+while the value lives (the `tax` of an indexed access whose index is another value, a call, a table's dispatch) 30.7 / 14.1
+% alone and 7.2 / 5.1 % with a slot path too; refused only for a slot path (an ALU operand, a high half) 1.6 / 2.2 %. So among
+the values the colour can hold (indices, counters), the X of service is nearly the whole refusal, and most of them are taken.
+What the colour cannot hold is the larger part: **a value that is an operand of `adc`, `sbc`, `cmp`, `and` lives in A or in
+memory on the 65816, never in X or Y**, and those are not even candidates. That is the hand's "values kept in a register"
+(12 of leaf A's 31 cycles a sub-step, 44 of leaf B's 156), its signed-compare and data-bank idioms, and leaf A's 32-bit
+accumulators. Leaf A shows it whole: its only index already sat in X through the text rules, nothing else qualified.
+
+**Verdict, by the rule written before the code: the probe does not take the essential** (leaf A 0 % against 37 %, leaf B
+20 % against 33 %). It stops on two walls: the emitter's X of service, for the indices it does try (a third to a fifth of
+the candidates' weight); and, larger, the absence of any allocation of A, which no X / Y colour can supply because A is
+the emitter's scratch for every operation. Both are what an allocator that chooses A, X, Y and the direct page together
+with instruction selection would address: this is the evidence that justifies G1's prototype as an experiment. It says
+nothing new of G1's 10 % line (G1-M0: out of reach on the leaves alone), except that the colour's 1.4 / 1.8 % now belong
+to the baseline any prototype is measured against.
+
+**The probe as a lot** (decision for the conductor): it gains 1.37 / 1.78 % of busy time and 0.08 on the weighted bench,
+with the state identical, and its proof is executable (the emission refuses what its text does not prove; `QBE_XY_FAULT=1`
+injects a `tax` too many that the proof is made to trust: `difftest_stmt` fails 41 seeds of 100; `QBE_XY_FAULT=2`, the same
+`tax` undeclared: the proof refuses the value, 100 / 100 clean). Before `develop` it needs: the three slower workloads fixed (the loop
+rule switched off only where a coloured value lives, or the colour weighed against it), the 17 compiler checks that pin
+the old shapes moved or given `QBE_NO_XY_COLOUR=1`; the two example baselines that shift by one frame re-captured with
+their reason (`basics/collision_demo`, `sprites/sprite_swarm`: `diff_corpus` SAME-SEQUENCE at offset -1, the code is
+faster); a hunt of 20 000 seeds of each differential test (the rule for a new rule; 2 000 were run here); its paragraph in
+`compiler.md`; and a reading of the two slower functions. Cost: about 900 lines in `emit.c`, compile time about +5 % on the
+two largest files of game 2 (a function is emitted again after each refusal).
+
+Gates of the probe (branch `probe-xy`): `QBE_NO_XY_COLOUR=1` gives a byte-identical kernel file and 150 / 150 compiler checks;
+with the colour, 133 / 150 (the 17 shape pins above; no value check fails). Final run, branch head: `difftest.py` and
+`difftest_stmt.py` 2 000 fresh seeds each (950001-952000) clean; the 2 000 seeds that caught the defect (910001-912000)
+clean; `diff_corpus` 63 / 65 MATCH, the two DIFFs SAME-SEQUENCE at offset -1; `make tests` steps: liveness 65 / 65 (both
+power-ons), compare 63 / 65 (the same two), manifests 175 / 176 (`movement_collision_demo`: every value passes, its frame
+hash is the same one-frame shift), audio 4 / 9 hashes, of the five `luna diff --audio --align-onset` gives MATCH on four
+(max delta 0.27 %) and DIFF on `chips/superfx_game_skeleton` (2.46 % in its last window, shift 6 samples, first sound at
+the same sample: hypothesis, a game event a few cycles earlier; not listened to), WRAM oracle 15 / 65 (the streams move
+with the code, not re-captured on a measurement branch); fixtures, ROM coverage, race gate, NMI budget, VRAM DMA, link of
+the modules, bank spill, the user project, torture subset, `bench.py`, `libbench` all pass; `sdkbench` and `gapbench
+--check` fail on the slower rows above. Nothing re-baselined.
