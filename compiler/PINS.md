@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 42c86ad51695af2ed151dc22a075916b8456bce8 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 1aeda9947d57ee7a44a4d6b9ab181948f992f718 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 149 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 150 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1aeda99 feat(w65816): the static-frame side table is written for every function, frames on or off — the S0 comment lines always, `sf=` (0 until a frame is given) and `; sframe table 1`; read by opensnes-rom place / check --objects; `QBE_SFRAME_FAULT=noedge` drops a call from the table (the check must refuse); the ROMs do not change (L4 S1, 2026-11-14)
 42c86ad feat(w65816): QBE_SFRAME_DUMP writes what a static frame would take, as comments — after each function's `.ENDS` (no text pass sees them): candidate or why not, stack and parameter bytes, every IR call with its argument bytes, the unit's address-taken names; read by devtools/sframe/sframe_count.py; the ROMs do not change (L4 S0, 2026-11-13)
 650a80e perf(w65816): tcc__lf has 20 words, and a plain source is the operand in place — peephole_fuse_indexed folds `lda SRC / sta T / ldx|ldy / lda Y / op T` into `lda Y / op SRC` (switches QBE_LF_WORDS, QBE_NO_PEEP_FUSE_SRC)
 a0c9619 perf(w65816): a dense switch is a jump table — the compare tree stays in the IR; jt_find evaluates a region of compares on one 16-bit value on all 65536 values and emits `asl a / tax / jmp (@jtt.N,x)` and a `.dw` table before `.ENDS` from 4 cases and 4 compares, 3 slots a compare (a range test is not a dispatch); the text passes see a group of `bvs` to the targets in place of the jump, rewritten by jt_rewrite; gapbench state 1.41 -> 1.35; `QBE_NO_JUMP_TABLE=1`, `QBE_JT_TRACE=1` (L2, 2026-11-12)
