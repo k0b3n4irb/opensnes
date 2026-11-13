@@ -45,3 +45,43 @@ so (an early verdict costs 4 to 6 days, not 11).
 - Whether the allocator should work on the IR before or after the existing peephole rules (hypothesis: before; the rules become
   its cleanup).
 - How the prototype and L4's static frames share the direct page (to settle once L4's window is measured).
+
+## Contest (Fable, 2026-11-13, written) and what is taken
+
+Verdict of the contest: do not start step 1 as written. Taken, in order:
+1. **G1-M0 first (one day, before any code)**: the share of game 2's busy time by function after inlining, leaves against
+   functions that call, and the prediction of condition 2 written before the code. Reason (calculation on the notes' figures,
+   not a measurement): 10 % of busy time at a factor of 1.35 on the leaves needs about 41 % of the C's time covered; at 1.2 it
+   needs 64 %; the hot time of game 2 is in functions that call, where the ABI keeps values on the stack (`ABI.md`: A, X, Y,
+   `tcc__r*`, `tcc__lf` are all the callee's to clobber). If the reachable share stays under 10 %, G1 does not open as scoped.
+2. **The scope contradiction**: "designed for the 65816" includes the convention and static frames, and the scope leaves both out.
+   Either the scope takes the free convention between `static` functions of one file, or the question is rewritten as
+   "allocation and selection inside the function" and condition 2 is lowered, with the conductor's agreement. Asked of the
+   conductor.
+3. **The other 65816 compiler measured first** on the two leaves (compile to assembly, static cost weighted by the traces' block
+   counters; private; way 2 is under way): if it is at 1.4 on leaf B, the bar of 1.1 is past the state of the art.
+4. **An IR-side probe, one day, as the comparison arm**: a third colour "lives in X/Y" in `color_slots`, asked by L3's contest and
+   postponed. If it takes most of what the new generator would, the generator is not needed.
+5. **The rule, refined without replacing it** (the headline stays: within 1.1 of the hand on the two leaves AND 10 % of game 2's
+   busy time): targets in master cycles per perimeter with leaf B defined (routine alone 1.75 or with its caller 1.47); two
+   lines per leaf, "allocation and selection only" and "with idioms" (52 of B's 156 cycles are range test, data bank and
+   `cond ? k : 0`, which any generator can take); a held-out set (`gapbench` rows); a frozen reference commit; the comparison
+   also to the ceiling of the retouch axes; game 1 no worse and code size; the coverage and extrapolation rule written before;
+   what is kept of an intermediate result.
+6. **Stops moved**: after G1-M0; after the hot loops of the two leaves alone; after a sample of 6 to 8 functions of game 2 drawn
+   by profile weight, outside the four perimeters. The whole-program count is dropped.
+7. **Cost re-estimated**: 15 to 25 days as written, 8 to 12 with the cuts (no 8-bit width, no step 3 under the pure ABI, a sample
+   instead of the whole program); the starting debt measured by switching the existing analyses off (`QBE_NO_*`) on the leaves.
+8. **Proof as a condition of any figure**: a mutation score of the equivalence harness (50 to 100 one-instruction faults injected
+   in the output; under 90 % detected, the proof is not enough for a generator); a paranoid build (each definition also stored,
+   each use compared) with poisoning of registers declared dead; both differential tests through the prototype, 20 000 seeds
+   each, with the fallback rate; a width-flow check on the emitted text; the boundary contract checked on the luna trace at
+   every `jsl` / `rtl` (stack balanced, D and the data bank unchanged); the NMI handler's data-bank assumption read in
+   `crt0.asm` before the prototype sets the bank.
+9. **Open 1 settled**: allocate on the IR before the rules; the old text rules are cut except branch shortening, and the count
+   of lines they would change on the prototype's output is the control (expected zero).
+10. **Open 2 settled**: L4 ships now its link-time half (annex table, placement, overlap check, window); its emitter half waits
+    for G1's first stop; a static slot becomes a colour class of the allocator.
+
+Recorded, not taken: the pair stays Opus / Opus by the owner's rule of 2026-11-12 (Fable only for contest and the review before
+close).
