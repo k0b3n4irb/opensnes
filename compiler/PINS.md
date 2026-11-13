@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 147 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 148 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+650a80e perf(w65816): tcc__lf has 20 words, and a plain source is the operand in place — peephole_fuse_indexed folds `lda SRC / sta T / ldx|ldy / lda Y / op T` into `lda Y / op SRC` (switches QBE_LF_WORDS, QBE_NO_PEEP_FUSE_SRC)
 a0c9619 perf(w65816): a dense switch is a jump table — the compare tree stays in the IR; jt_find evaluates a region of compares on one 16-bit value on all 65536 values and emits `asl a / tax / jmp (@jtt.N,x)` and a `.dw` table before `.ENDS` from 4 cases and 4 compares, 3 slots a compare (a range test is not a dispatch); the text passes see a group of `bvs` to the targets in place of the jump, rewritten by jt_rewrite; gapbench state 1.41 -> 1.35; `QBE_NO_JUMP_TABLE=1`, `QBE_JT_TRACE=1` (L2, 2026-11-12)
 70fa55c perf(w65816): two masks in a row are one — `and.w #K1 / and.w #K2` is `and.w #(K1 & K2)`: a byte read and its zero extension each masked the value; gapbench 2.22 -> 2.20; `QBE_NO_PEEP_AND2=1` (A6a R5, 2026-11-11)
 a475b76 perf(reassoc): a constant added to a loop counter goes into the symbol — `sym[i + k]` folded into `sym+k*s` only when i's own definition bounded it; testbound now takes the bound from a dominating `cultw i, N` (a loop's counter in its body), and the old add goes when the extension was its only use (ivar then scales the counter); the fill unrolled by hand 44157 -> 17718 cycles; `QBE_NO_REASSOC_LOOP=1` (A6a R4, 2026-11-11)
