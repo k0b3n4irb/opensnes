@@ -179,4 +179,44 @@ All six changes are taken. The lot now starts with a measurement, not with S0:
 
 ## Measured
 
-(filled step by step)
+### M0, the count (2026-11-13)
+
+Method (private tooling outside the repository, the gauge's builds: frozen game sources, today's compiler `develop`
+`0a9b9fa0`): luna traces of 4 x 40 frames of each game's loaded scene (the windows of the 2026-11-11 count); every executed
+instruction of compiled C that reads or writes a direct-page temporary (`tcc__lf+N`) attributed to its (function, slot),
+with its measured cost. Statically, from the `.c.asm`, a slot is **rewritable** when all its accesses are in the contest's
+extended list (`lda` -> `txa`, `sta` -> `tax`, `stz` -> `ldx #0`, `ldx` -> nothing, `ldy` -> `tyx`/`txy`, `inc`/`dec` ->
+`inx`/`dex`, `lda T / cmp #k` -> `cpx #k`, `adc`/`and`/`ora`/`eor` when the operation commutes after `lda P`), and excluded
+otherwise (a `cmp T` or `sbc T`, a byte access, an indirection). The saving of an access is its measured cost minus the
+replacement's (12 mclk for a transfer or a step, 18 for `ldx #`; all of it for a removed `ldx T` or the `lda` of
+`lda T / cmp #k`). **High** bound: every rewritable slot, the register assumed free. **Middle**: X (else Y) free over the
+slot's textual span (first to last access in the function; optimistic for loops, pessimistic where a slot hosts several
+temporaries), slots of one register not overlapping, greedy by saving.
+
+| % of busy time | game 1 | game 2 |
+|---|--:|--:|
+| accesses to direct-page temporaries in compiled C (whole cost) | 19.9 | 22.8 |
+| S3 high bound (register assumed free) | 2.73 | 6.63 |
+| **S3 middle (register free over the span)** | **1.11** | **2.21** |
+| the same with the loop rules off (`QBE_NO_PEEP_LOOPX=1 QBE_NO_PEEP_LOOPY=1`) | 1.54 | 2.20 |
+| excluded slots read by `cmp T` / `sbc T` (whole cost of their accesses) | 7.5 / 7.0 | 3.9 / 5.7 |
+| **stack slots `n,S` in compiled C (whole cost; L4's reach)** | **9.8** | **19.2** |
+
+Checks: the direct-page share agrees with the contest's independent estimate (18.0 / 19.0); the busy time per frame of the
+traces is within 5 % of the gauge's on its wider window; with the loop rules off both games' state is identical to the
+reference at every step (gauge, 341 and 700 steps), and game 1 is 2.6 % busier (what the loop rules already give).
+
+**Decision, by the rule written before the count: S3 does not open as written; L4 goes first.** The middle figure is under
+3 % on both games, with the loop rules on or off. By form, the saving is mostly `sta`/`lda` pairs (0.4 + 0.35 and 0.75 +
+0.77 of the middle), not the index held in X the hand used: that needs X freed of the emitter's own use (the `tax` of every
+indexed access), which is instruction selection; the IR-side spike of the contest (change 2) is the way to measure it, after
+L4. What the count also shows:
+- the slots read by a non-commutative operation (`cmp T`, `sbc T`) weigh more than all rewritable ones (whole cost 14.5 and
+  9.6 % against 2.7 and 6.6 high): an operand that could stay in A, or a reversed compare, is the larger axis (S4's, and
+  L5's for the compares);
+- the stack is 9.8 and 19.2 % of busy time, the largest single class of temporaries. That is L4's whole cost, not its
+  saving: L4 gets its own count first (accesses that a static direct-page frame would make cheaper, and what they enable:
+  `inc`, `ldx` from the slot, no frame setup), with a decision rule written before it.
+
+S0 and S1 (the instruction model and the proven liveness) are kept in the plan as the verifier of any later rewriting, not
+started now.

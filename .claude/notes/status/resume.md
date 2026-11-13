@@ -193,11 +193,11 @@ quota; a Fable sub-agent may be called by this session alone when needed, and th
    `oamPlaceWorld` unrolling waits as a short lot for a quiet day.
 3. **Next**: (a) the private measurement through the other 65816 C compiler is BLOCKED on its linker (vlink 0.18, sources
    not reachable at their origin on 2026-11-12; private note `dumps/opensnes-etalons/vbcc/LISEZMOI.md`); three ways asked of the
-   conductor (thread `…opensnes-en-fable-5-2-reduire`, message 034). (b) **L3 is designed and contested**
-   (`chantiers/gap_lots/L3_machine_optimiser.md`, Fable sub-agent 2026-11-12: go with changes, all six taken). Its next step is
-   **M0, the count, before any compiler code**: master cycles of accesses to direct-page slots rewritable while X or Y is
-   free, weighted by both games' traces, by form, loop rules on and off, plus the stack share (L4's). Under ~3 % of busy time
-   on both games, S3 does not open as written and L4 goes first. R1 (light pseudo-random) stays in the plan.
+   conductor (thread `…opensnes-en-fable-5-2-reduire`, message 034). (b) **L3 is designed, contested and counted** (`chantiers/gap_lots/L3_machine_optimiser.md`): M0 (2026-11-13) gives
+   values in X/Y 1.1 and 2.2 % of busy time (high bound 2.7 / 6.6), under the 3 % rule written before the count: S3 does not
+   open as written. **Next: L4's own count** (the stack is 9.8 and 19.2 % of busy time in compiled C: what a static
+   direct-page frame would save, with its decision rule written first), then L4. Tooling of the count:
+   `dumps/opensnes-etalons/l3m0/` (private; `trace.py TAG`, `m0.py TAG sb|x2`). R1 stays in the plan.
 4. **Threads waiting for others**: advance 2 (the second game's return on the map engine lot); the capacities thread to
    luna (its point 10, the mirror fold per mapper, also explains the false slowdowns game 2 saw in its own profile list).
 5. **Models (owner, 2026-11-12)**: no Fable sub-agent without need; the complex pair is Opus / Opus; Fable only for the written
