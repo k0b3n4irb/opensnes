@@ -286,3 +286,39 @@ takes a stack slot `n,s` (same proof, nothing moves the stack between), so (b) m
 Limits stated before: M3 classified on the executed path of one run (the compiler decides statically, so the real (a) is at
 most its figure); M5's deadness was read on the executed path too (the rule asks `pp_slot_live_at` over all paths, so it
 accepts at most what M5 counted, plus the stack sources).
+
+### Measured (2026-11-13), against the prediction
+
+Gauge (busy master cycles per game step, the gauge's window; both games' state identical to the reference at every step,
+341 and 700 steps; builds of this worktree before the change, `lfm5-avant`, and after), each axis alone by its switch
+(`QBE_LF_WORDS=16` keeps the old 16 words, `QBE_NO_PEEP_FUSE_SRC=1` turns the new sources off):
+
+| % of busy time saved | game 1 | game 2 |
+|---|--:|--:|
+| (a) `tcc__lf` +4 words alone, predicted | 0.64 | 1.14 |
+| (a) measured | **0.00** | **0.24** |
+| (b) operand in place alone, predicted | 0.58 | 0.21 |
+| (b) measured | **1.41** | **0.29** |
+| together, predicted | 1.2 | 1.35 |
+| **together, measured** | **1.42** | **0.53** |
+| code size | -0.72 % | -0.58 % |
+
+gapbench: no row moves (its kernels have neither shape and fit 16 words). The corpus: 65/65 MATCH at equal PPU frame
+(`diff_corpus.py`), eleven examples' C and four library files change.
+
+Why (a) gives so little: M3 called a stack value movable when none of its reads came after a call **on the executed path**;
+`color_slots` decides statically, and a temp live after a call on any path is `cross` and stays on the stack. With (a) alone,
+three cold functions of game 1 change and none of the hot ones; in game 2 seven change, one of them hot (-4.3 % on it).
+M3's figure was a ceiling, not a prediction, and the ranked list read it as a gain. Why (b) gives more in game 1: M5 counted
+the `lda` / `sta` pair only; once it goes, the base peephole removes the `sta T0 / lda T0` that fed it (554 lines removed for
+148 rewritten in game 1); hypothesis that this chain is the whole gap, not separated by a measurement. Lesson: a count that
+classifies values for a decision the compiler takes statically replays that decision, or its figure is written "ceiling".
+
+Gates of the lot: `difftest.py` and `difftest_stmt.py` 20 000 seeds each, clean; `make test-compiler` 150/150 (checks
+`fuse_src`, `fuse_src_off` new; `leaf_split`, `peephole`, `test_global_vars` follow the new shapes); `diff_corpus.py` 65/65.
+Three oracles moved, each explained: the WRAM streams of every example (every variable after `tcc__lf` and the NMI page
+moves by 8 bytes); `audio/sfx_from_wav` (the sound 2 samples later, `luna diff --audio --align-onset` MATCH, max delta
+0.00 %); two manifests: `hdma_gradient_colors_indirect` reads RAM addresses (recomputed from `band_data`, +8) and
+`state_rooftop_run` checked Kit's height at the frame he reaches the gap's edge: the build after has two lag frames fewer by
+frame 450 (59 -> 57, `luna profile`, one at the respawn), so its game runs a frame ahead and Kit is one pixel into the fall
+at 600 (`kit_x` one step ahead from the respawn on, the trajectories otherwise identical); the checkpoint moved to 560.

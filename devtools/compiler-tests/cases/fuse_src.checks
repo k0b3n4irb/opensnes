@@ -1,0 +1,5 @@
+# the global read after the call is the operand of the add, not staged in tcc__lf
+in after_call: present \tclc\n\tadc\.w out\n
+in after_call: absent \tlda\.w out\n\tsta\.b tcc__lf
+# a store to T that SRC is read from later keeps the pair (room: T read in another block)
+in room: present \tlda\.w g_free\n\tsta\.b tcc__lf\+\d+\n\tcmp\.b tcc__lf\+\d+\n

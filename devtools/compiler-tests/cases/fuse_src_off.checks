@@ -1,0 +1,3 @@
+env QBE_NO_PEEP_FUSE_SRC=1
+# the rule off: the global is staged in tcc__lf and the add reads the slot
+in after_call: present \tlda\.w out\n\tsta\.b tcc__lf\+(\d+)\n[\s\S]*\tadc\.b tcc__lf\+\1\n

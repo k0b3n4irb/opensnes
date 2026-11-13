@@ -120,15 +120,16 @@
 ;------------------------------------------------------------------------------
 ; The frame of a leaf C function (since 2026-10-09)
 ;------------------------------------------------------------------------------
-; A function that calls nothing and needs at most 16 words keeps its
+; A function that calls nothing and needs at most 20 words keeps its
 ; temporaries here instead of on the stack (compiler/qbe/w65816/emit.c,
 ; dp_frame). At $0080: $0040-$007F is SNESMOD's direct-page block
 ; (lib/source/snesmod.asm, .snesmod_zp), and .registers above must stay
 ; below $40. Direct-page relative, so the NMI handler's own page gives the
-; code it runs its own copy: tcc__nmi_registers below MUST cover $80-$9F.
+; code it runs its own copy: tcc__nmi_registers below MUST cover $80-$A7.
+; 40 bytes since 2026-11-13 (32 before): DPF_WORDS in emit.c is 20.
 ;------------------------------------------------------------------------------
 .RAMSECTION ".leaf_frame" BANK 0 SLOT 1 ORGA $80 FORCE
-    tcc__lf      dsb 32
+    tcc__lf      dsb 40
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -140,13 +141,13 @@
 ; no save/restore of compiler registers needed (~260 cycle savings).
 ;
 ; MUST be page-aligned ($XX00) to avoid 65816 DP cycle penalty.
-; MUST cover .registers AND tcc__lf at $80-$9F (160 bytes since 2026-10-09; 48
-; before): a leaf C function called from the NMI callback keeps its frame at
+; MUST cover .registers AND tcc__lf at $80-$A7 (168 bytes since 2026-11-13,
+; 160 from 2026-10-09, 48 before): a leaf C function called from the NMI callback keeps its frame at
 ; tcc__lf relative to this page.
 ;------------------------------------------------------------------------------
 
 .RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ALIGN $0100
-    tcc__nmi_registers dsb 160  ; the main direct page's layout, up to the end of tcc__lf ($A0)
+    tcc__nmi_registers dsb 168  ; the main direct page's layout, up to the end of tcc__lf ($A8)
 .ENDS
 
 ;------------------------------------------------------------------------------

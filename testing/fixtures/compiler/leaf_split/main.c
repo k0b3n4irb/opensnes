@@ -4,7 +4,8 @@
  * emit.c). Until then such a leaf had all of its temps on the stack.
  *
  * Three leaves needing 17, 21 and 25 words (the stack-only colouring's count)
- * accumulate 32-bit values through a loop. Their results are checked against
+ * accumulate 32-bit values through a loop (with the 20 words of tcc__lf since
+ * 2026-11-13, leaf17 fits it whole and the two others are split). Their results are checked against
  * values computed on the host (test_leaf_split.py), and leaf21 also runs in
  * the NMI callback with other arguments, counting every wrong result on
  * either side: the split frame is half in the direct page, half on the

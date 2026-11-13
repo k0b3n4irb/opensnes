@@ -1,7 +1,7 @@
 ; gapbench — the assembly side: the driver, and each routine of kernels.c
 ; written by hand on the same data, the way a 65816 programmer writes it.
 ; Entry and exit as the C ABI has them: A, X, Y 16 bits, D = 0, DBR = 0.
-; tcc__lf (32 bytes of direct page) is scratch for the length of a call.
+; tcc__lf (40 bytes of direct page) is scratch for the length of a call.
 ;
 ; What each twin allows itself that C does not say is listed in README.md
 ; (block move, unrolling, the hardware multiplier, arguments in registers,

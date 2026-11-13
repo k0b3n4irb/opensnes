@@ -250,7 +250,7 @@ either SDK's boot or per-frame handler in it.
   them.
 - **The stack is level or shallower on 22 workloads of 23.** `grid` is the
   exception (44 bytes against 39): a single large function whose
-  temporaries do not fit the 16 words of the direct-page block.
+  temporaries do not fit the 20 words of the direct-page block.
 
 What is left has named causes — a stack frame in every function that
 calls another, X reloaded after every instruction that is not an access,
