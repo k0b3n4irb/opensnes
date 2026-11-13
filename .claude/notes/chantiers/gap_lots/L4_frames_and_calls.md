@@ -229,3 +229,33 @@ estimate rests on a 136-byte window the direct page does not have today. **L4 as
 F1 + change 3 together, with the window and the NMI page as its first cost, against the `tcc__lf` axis above, which the
 same count shows to be as large and has no window problem (it is the same direct page, used better).** Next: count that axis
 (M3) before any code. Figures to re-take after any compiler change; nothing here is a measurement of a change made.
+
+### M3, the `tcc__lf` axis counted (2026-11-13)
+
+Private tooling `m3.py` (same traces and builds as M1/M2). Unit: a value (one stack write and its reads). A value is movable
+to `tcc__lf` if none of its reads came after a call; the words it needs are bounded above by the number of stack slots that
+host such values. Saving per access: one cycle (`lda n,S` 4 to `lda dp` 3), 6 mclk. Slot-level counting was tried first and
+discarded: slots are reused by unrelated temps, nearly every slot also hosted a crossing value, so it showed 0.03 / 0.28 %.
+
+| extra words of `tcc__lf` per function | game 1, % of busy | game 2, % of busy |
+|---|--:|--:|
+| 2 | 0.54 | 0.79 |
+| 4 | 0.64 | 1.14 |
+| 8 | 0.66 | 1.42 |
+| 16 | 0.66 | 1.62 |
+| unlimited (ceiling) | **0.66** | **1.66** |
+
+- **Correction to M2's wording**: M2's 3.4 / 7.2 % is the *whole cost* of those accesses; what a direct-page slot saves is one
+  cycle of each, so the ceiling of this axis is 0.7 and 1.7 % of busy, not "as large as" F1 + change 3. Nobody should read
+  the M2 table row as a gain.
+- By the rule (3 %): this axis does not open either, in the game 1 case by a factor of four. Game 2 gets 1.1 % at 4 extra
+  words (`tcc__lf` 40 bytes instead of 32, the NMI mirror 8 bytes bigger), the cheapest part of any option so far.
+- Game 2's functions with the need: one needs 23 words, the rest 1 to 8; a +4-word `tcc__lf` is the knee.
+- Limit: the classification is from the executed path of one run each (hypothesis for paths not run); the compiler
+  decides statically, so the real gain is at most this, at best.
+
+**Where this leaves the gap plan**: three counts (L3 M0, L4 M2, L4 M3) each below the 3 % rule on its own: values in X/Y
+1.1 / 2.2, static frames 2.4 / 2.7 (2.9 / 3.3 with change 3), `tcc__lf` 0.7 / 1.7. Their sum is not additive (same
+instructions in places). The honest reading: the remaining distance to hand assembly is not in frame slots. Next, to
+propose to the conductor, no code: a `lourd` M4 on what the top-cost *instructions* are in the traces (by mnemonic and
+shape, whole program) to find the class the plan has not named.
