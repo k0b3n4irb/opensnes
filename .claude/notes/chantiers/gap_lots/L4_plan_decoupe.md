@@ -300,3 +300,47 @@ stand, written in `KNOWN_LIMITATIONS.md`.
 6. **The stop rule** (under 2.0 % on both games after S0, stop): too lenient, given the lot was opened under the 3 % rule?
 7. **The per-file switch as the only first remedy**: acceptable against `PHILOSOPHY.md` (hidden quirk with a documented
    escape), or must S7 come with S3?
+
+## Contest (Fable, 2026-11-13, written): the plan does not start as written; changes taken
+
+Finding that moves everything (counted on the examples' `.c.asm`): of 98 non-leaf `static` functions emitted, 85 call directly a symbol
+no project `.c.asm` defines (library or assembly), and 92 % reach one by transitivity. With the plan's "unknown callee reaches every
+exported function" edge each of them is its own ancestor and is refused: M2's refusals (1 of 143 / 233) do not hold for the rule as
+written. H4 is therefore under-estimated; the library's closure table is not an economy to skip. Taken, in order:
+1. **S0 counts under three edge models** (coarse edge; library closure table; M2's approximation) and separates the structural gain
+   (frame made and undone, pushes, stack restore) from the "one cycle per `n,S` access" part (40 to 53 % of M1's F1). It reports the
+   NMI bytes under the sound root set, the single-band RAM cost per game (window plus NMI mirror: up to 2 x 136 bytes, 23 % of the
+   tight game's free bytes) and the deepest chain with parameters against 88 / 131 / 164.
+2. **S1 carries the library's closure table**: C of the library emits its call table (comments) even with frames off and installs it
+   with the objects; assembly (library and project) is read by `place`: a routine is closed if its `jsl/jml/jsr/jmp` reach closed
+   routines, with no indirect jump and no `pea` + `rtl`. Table absent = the coarse edge (the safe default). The runtime helpers
+   (`__*`, `tcc_*`) are named explicitly (the allow-list of `pp_slot_live_at`), with a provoked case.
+3. **The link check derives the edges and each frame's extent from the instruction lines** of the `.c.asm` (`call_target` exists in
+   `tools/opensnes-rom/src/asm.c`), `jml` tail calls included, and compares them to the tables: otherwise the placer and the check
+   share one source and agree on a missed edge. Equality of the `sf.*` of the `.sym` with the tables; the exact list of linked
+   objects comes from `make`, not from a directory; provoked fault `QBE_SFRAME_FAULT=noedge` (the table hides a call) must fail the link.
+4. **`place` refuses to write `sframe.asm` on a re-entry**, known before the link, so a project that links otherwise fails on an
+   undefined label instead of getting an unchecked ROM.
+5. **NMI page = the whole window in the first delivery** (size zero without candidates); confining low frames is a later
+   optimisation on a root set made of the literal arguments of `nmiSet` / `nmiSetLag` (the `pea` + `jsl` pattern `check_nmi_race`
+   reads), falling back to "every address-taken and every exported function" when an argument is not constant or an assembly file
+   writes `nmi_callback`. `irqSet(C function)` and assembly naming a decorated `static` are refused at link.
+6. **Tail calls**: S3 handles them or turns them off for candidates; S5 covers the four quadrants (candidate or not, to candidate or
+   not); a check `sframe_tco` and a `difftest_stmt` form (`return g(...)` between `static` functions with two sites). The tail-call
+   branch is taken before the normal one and stores arguments in the caller's own stack parameter slots, which a candidate lacks.
+7. **Emitter guard**: an internal error if an `SFSLOT` number reaches a path other than the three printers (`slot >= DPSLOT`
+   tests would take it for a `tcc__lf` word: `color_slots`, `SOFF`, 25 uses of `DPSLOT` / `DPF_BASE`); the invariant "every rule
+   that re-emits an `sf.*` operand keeps its `.b`" gets its check (no line carries `sf.` without `.b`) and its provoked fault; S4's
+   rules are written on `sf.<self>+N` only, the words of a callee's parameters stay write-only.
+8. **S2b decided by contiguity alone**: deepest chain with parameters at most 88 bytes on both games = no S2b in this lot; above =
+   S2b mandatory, in its own commit before S3. Its gate compares by symbol (addresses move). A provoked fault: the window forced
+   over `.snesmod_zp` or `tcc__lf` must fail the link.
+9. **Stop rule rewritten**: stop if the structural part plus half of the access-cycle part is under 2.0 % on both games, under the
+   edge model actually delivered and net of refusals; a second, measured stop after S3: the gauge must return at least 60 % of
+   S3's prediction, else back to the conductor before S4 and S5 (the LF lot returned 0.00 / 0.24 for 0.64 / 1.14); the RAM cost enters the rule.
+10. **S7 with S3**, or S3 ships off by default (`SFRAME := 1` to enable) until S7: an optimisation on by default that fails a link
+    that passed yesterday is not a sane default (PHILOSOPHY.md); S0 and S3 count the refusals on the corpus and both games, and one
+    refusal on a program that links today makes S7 mandatory before default activation.
+11. Minor: the separator of `sf` fixed and tested with a file named `b.c` (WLA may read `sf.fn.b+2` as a size suffix; hypothesis);
+    `argsearly` requalified as a proof of the set-up, not of a rule; S2b's gate and the SNESMOD-linked case beyond 131 bytes are a
+    link refusal, not a silent shrink.
