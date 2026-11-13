@@ -269,12 +269,17 @@ $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_LOROM)/$*.asm
 
 # ASM compilation for LoROM (core source/ + non-core contrib/)
+# Each object keeps the text it was assembled from beside it (X-asm.text.asm,
+# as each C object keeps X.c.asm): opensnes-rom place and check read the
+# call graph of the linked objects from their texts (L4 static frames).
 $(BUILDDIR_LOROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_LOROM)
 	@echo "[AS-LOROM] $<"
 	@$(AS) $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_LOROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_LOROM)
 	@echo "[AS-LOROM-CONTRIB] $<"
 	@$(AS) $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_LOROM):
 	@mkdir -p $(BUILDDIR_LOROM)
@@ -304,9 +309,11 @@ $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
 $(BUILDDIR_HIROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_HIROM)
 	@echo "[AS-HIROM] $<"
 	@$(AS) -D HIROM $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_HIROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_HIROM)
 	@echo "[AS-HIROM-CONTRIB] $<"
 	@$(AS) -D HIROM $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_HIROM):
 	@mkdir -p $(BUILDDIR_HIROM)
@@ -336,9 +343,11 @@ $(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
 $(BUILDDIR_SA1)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SA1)
 	@echo "[AS-SA1] $<"
 	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_SA1)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SA1)
 	@echo "[AS-SA1-CONTRIB] $<"
 	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_SA1):
 	@mkdir -p $(BUILDDIR_SA1)
@@ -368,9 +377,11 @@ $(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SUPERFX)
 	@echo "[AS-SUPERFX] $<"
 	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SUPERFX)
 	@echo "[AS-SUPERFX-CONTRIB] $<"
 	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_SUPERFX):
 	@mkdir -p $(BUILDDIR_SUPERFX)

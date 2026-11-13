@@ -679,6 +679,9 @@ project_sa1_boot.asm: $(SA1_BOOT_SRC)
 crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boot.asm .opensnes_config
 	@echo "[AS] crt0"
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
+	@# its text beside it, as X.wrap.asm beside every other object: the
+	@# call graph opensnes-rom place / check read (L4 static frames)
+	@cp $< crt0.text.asm
 
 # Initialized data start marker
 data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP) .opensnes_config
@@ -816,7 +819,7 @@ test test-update: $(TARGET)
 
 clean:
 	@echo "Cleaning $(TARGET)..."
-	@rm -f crt0.o
+	@rm -f crt0.o crt0.text.asm
 	@rm -f data_init_start.o data_init_start.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)

@@ -6,6 +6,8 @@
 combined.asm
 *.c.asm
 *.wrap.asm
+*.text.asm
+sframe.asm
 linkfile
 project_config.inc
 project_hdr.asm
