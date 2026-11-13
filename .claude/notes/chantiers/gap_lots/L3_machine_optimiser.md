@@ -234,3 +234,26 @@ whole cost of the slots. It opens if the executed saving on accepted sites is **
 the other is not worse. Count: in the traces, each `sta T` ... `cmp/sbc T` pair where A is dead after the compare or T can be
 replaced by the reversed operation; and each compare that is a signed range test with a provable range (L5). Report by shape.
 If it fails the rule, the conductor gets M4 (top-cost instruction shapes, whole program) instead of a lot.
+
+### M5 and M4 (2026-11-13), and the ranked list the conductor asked for
+
+**M5** (private `m5.py`, same traces): `lda SRC / sta T ... cmp|sbc|adc|ora T`, T in `tcc__lf` dead afterwards on the executed
+path, SRC an immediate, direct-page or absolute operand untouched in between: the `lda` and `sta` go, the compare takes SRC.
+2 809 sites, **0.58 %** of busy (game 1); 1 311 sites, **0.21 %** (game 2). By the rule written before the count (3 %), the narrow
+form does not open. It counts only the adjacent pair; the wider A-cache across blocks (M0 bound 3.4 / 3.9) is not measured by it.
+**M4** (`m4.py`, executed cost by instruction shape, compiled C = 93 % of busy): game 2 spends 11.8 % in `lda n,S`, **10.9 % in
+`lda long,X`**, 9.9 % in `sta dp`, 7.2 % in `lda dp`, 5.9 % in `sta n,S`; the pair `tax ; lda long,X` alone is 7.1 %. Game 1 has
+`lda abs,X` at 9.0 % where game 2 has the long form. Hypothesis, not yet checked: a long-indexed read costs a cycle more than the
+absolute-indexed one; 96 187 executions x 6 mclk = **1.6 % of busy** in game 2 if the bank could be a data-bank register
+(why the bank-$00 rule makes C const reads far, and what a DB switch would cost, is the first thing to read).
+
+**Ranked list (gain / cost, overlaps flagged; none opens alone under the 3 % rule, the set is what the conductor asked to keep):**
+| axis | gain, game 1 / 2 (% busy) | cost | overlap |
+|---|--:|---|---|
+| `tcc__lf` +4 words (M3) | 0.64 / 1.14 | 8 bytes of direct page, one constant, S | with static frames (same slots) |
+| long-indexed reads to absolute (M4, hypothesis) | ? / 1.6 | DB handling, to be read | none known |
+| static frames F1 + change 3 (M2) | 2.9 / 3.3 | 136-byte window, link-time placement, L | with `tcc__lf` axis, X/Y values |
+| values in X/Y (L3 M0 middle) | 1.1 / 2.2 | instruction model (S0/S1), L | with static frames' temps |
+| operand in place, adjacent (M5) | 0.58 / 0.21 | local rule, S | with X/Y values |
+Not additive; the conductor's estimate for the set is 5 to 8 % on game 2. The next count that serves the list is the
+long-indexed one (game 1 first: why it uses `abs,X`), then the union of the sites of the others, to give the overlap a number.
