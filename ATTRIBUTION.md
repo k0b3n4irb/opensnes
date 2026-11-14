@@ -224,10 +224,11 @@ Incompatible (do not use without isolation):
 - `res/water.bmp` — original work: procedurally generated water caustics
   (sum-of-sines field, 256-color indexed), created for this example.
   The HDMA technique it demonstrates is a C port of "SNES Wave HDMA Demo"
-  by krom (Peter Lemon), github.com/PeterLemon/SNES — code technique
-  credited, no krom assets used. `res/wavetable.bin` is krom's HDMA
-  table, extracted verbatim from the demo (data of the technique,
-  credited).
+  by krom (Peter Lemon), github.com/PeterLemon/SNES — technique credited,
+  no krom assets used. `res/wavetable.bin` is generated for OpenSNES by
+  `devtools/art_assets/hdma_wave.py` (a sum of three sines, original work,
+  CC0). It replaced krom's HDMA table, whose repository carries no
+  explicit licence; not one byte of it remains.
 
 ## examples/audio/soundboard
 

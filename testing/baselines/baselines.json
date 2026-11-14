@@ -277,15 +277,15 @@
   },
   "hdma_hdma_wave": {
     "fbhash": [
-      "70fc48c92d2fa444",
-      "83d0351cc669bfc4"
+      "b9cf62d33f8e1504",
+      "c30070976c6c45c4"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.39.0",
-    "rom_sha256": "6f041664f854a3550e6a45f205a6c1f1ad694c69c6592e04230a724e51c359f1"
+    "luna_version": "v1.43.0",
+    "rom_sha256": "d8513add2ab6516065dc7e0b3e1e3f635fd5c9f2f556937abe2f6cf1ce2d2d58"
   },
   "input_controller": {
     "fbhash": "ebb6b698ab0a03c5",

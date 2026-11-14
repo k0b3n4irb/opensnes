@@ -136,6 +136,10 @@ windows/window_multi_hdma:
                       reflection in a canal), 8bpp; colour 0 is the tram's
                       wall, never in the picture
 
+hdma/hdma_wave (devtools/art_assets/hdma_wave.py):
+  res/wavetable.bin   the HDMA table of the hand-built ripple: 896 entries of
+                      [1][lo][hi] and a terminator, three sines of ours
+
 scrolling/mixed_scroll, the title screen:
   res/logo.png        the 256x224 logo on a transparent sky (as for the
                       HDMA examples), the fixed layer
@@ -221,6 +225,7 @@ from mode7 import indexed as mode7_indexed  # noqa: E402
 from breakout import build_breakout  # noqa: E402
 from blocks import build_blocks  # noqa: E402
 from rpg import build_rpg  # noqa: E402
+from hdma_wave import build_hdma_wave  # noqa: E402
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -259,6 +264,7 @@ PLATFORM_OBJECTS = ROOT / "examples" / "demos" / "platform_objects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
+HDMA_WAVE = ROOT / "examples" / "hdma" / "hdma_wave" / "res"
 MODE7 = ROOT / "examples" / "mode7"
 RACING = ROOT / "examples" / "mode7" / "mode7_racing" / "res"
 BREAKOUT = ROOT / "examples" / "games" / "breakout" / "res"
@@ -1913,6 +1919,7 @@ def main() -> int:
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),
             (RPG, town),
+            (HDMA_WAVE, build_hdma_wave()),
             (BLOCKS, {"tiles.png": png(well["tiles"]), "font2bpp.bin": well["font2bpp"]}),
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
