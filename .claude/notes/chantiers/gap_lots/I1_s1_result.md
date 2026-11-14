@@ -76,7 +76,7 @@ What would contradict it: one changed `.c.asm` (a cut the corpus already had: it
 - `make tests`: `ALL CHECKS PASSED (luna)` (the fixture's four lines PASS inside it; `176 passed, 0 failed` in its
   fixture block).
 - `make lint`: exit 0. `make verify-toolchain`: `OK: toolchain pins match` (PINS.md names `f2e1f03`, 155 patches).
-- `make test-sanitizers` was not run (the plan's common gates list it for a code step; the task's list does not).
+- `make test-sanitizers` (run after the result commit, ASan + UBSan, `halt_on_error=1`): exit 0; inside it `Compiler checks: 155 passed, 0 failed`, the library, the tool goldens and the corpus built sanitized, `test-toolchain-suites` and `fuzz-replay: OK`; the normal binaries restored at the end.
 
 ### What is left
 - qbe `f2e1f03` is on the submodule's local branch `i1s1`: it must reach the fork before `develop` can carry `5378e7e5`.
