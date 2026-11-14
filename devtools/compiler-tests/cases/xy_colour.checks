@@ -1,0 +1,18 @@
+# The X/Y colour (lot XY, 2026-11-14): a counter in Y indexes the word arrays
+# as `sym,y` (no `tyx` before each access, the table read through `tax`
+# keeps X); a counter in X steps with `inx` and is compared with `cpx`; the
+# inner counter that is an ALU operand stays the loop rule's (in X), and the
+# outer counter beside it takes no register (it would stop the rule).
+in glide: present ldy\.w #0
+in glide: present lda\.w px,y\n\tsec\n\tsbc\.w ppx,y
+in glide: present sta\.w out,y
+in glide: present iny\n\tiny\n\tcpy\.w #96
+in glide: absent tyx
+in glide: present tax\n\tlda\.w tab,x
+in fill: present ldx\.w #0
+in fill: present sta\.w out,x
+in fill: present inx\n\tinx\n\tcpx\.w #96
+in fill: absent tcc__lf
+in nest: present inx\n\tcpx\.w #32
+in nest: present txa\n\tora\.b tcc__lf
+in nest: absent ldy

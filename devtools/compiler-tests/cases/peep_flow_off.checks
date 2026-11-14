@@ -1,3 +1,7 @@
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 env QBE_NO_PEEP_FLOW=1
 env QBE_NO_PEEP_SLOTDEAD=1
 # Since 2026-10-25 the multiply by the element size of an index whose high

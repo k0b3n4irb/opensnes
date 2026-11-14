@@ -1,6 +1,10 @@
 # A6a R2: the counter of a rotated loop goes to Y when the body writes X
 # (peephole_loop_x, second pass). The twin loop_index_in_y_off pins the
 # slot form with the Y pass off.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in lookup: present ldy\.b tcc__lf\+\d+\n\tcpy\.w #32\n\tbcs
 in lookup: present @for_body\.\d+:\n\ttyx\n\tlda\.w idx,x
 in lookup: present tya\n\tasl a\n\ttax

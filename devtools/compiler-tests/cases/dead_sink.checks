@@ -1,4 +1,8 @@
 # no high word of an index is computed (it was: xba / and #$00FF / lsr x7)
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in sort_step: absent xba
 # no bank byte of the array is added to anything
 in sort_step: absent adc\.w #:arr

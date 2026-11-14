@@ -1,6 +1,10 @@
 # L2: a dense switch is a jump table (jt_find / emit_jt). The twin
 # jump_table_off pins the compare tree; jump_table_tree the shapes that keep
 # it with the table on.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in dense: present lda 4,s\n\tcmp\.w #8\n\tbcs @switch_default\.\d+\n\tasl a\n\ttax\n\tjmp \(@jtt\.\d+,x\)
 in dense: present @jtt\.\d+:\n\t\.dw @switch_case\.\d+, @switch_case
 in dense: absent cmp\.w #[1-7]\n

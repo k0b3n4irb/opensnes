@@ -2,6 +2,10 @@
 # are set again before anything reads them (peephole_xflow), and the
 # reload of `sta S / tyx / lda S` goes across the transfer and a block
 # label (peephole). The twin a_across_blocks_off pins the loads.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in fill: present @for_body\.\d+:\n\tsta\.l fbuf,x\n
 in fill: present @for_join\.\d+:\n\tclc\n\tadc\.w #257
 in column: present lda\.w tab,x\n\ttyx\n\tsta\.w out,x

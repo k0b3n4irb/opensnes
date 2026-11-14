@@ -1,3 +1,7 @@
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 env QBE_NO_PEEP_LOOPX=1
 in fill: absent cpx
 in fill: present cmp\.w #512

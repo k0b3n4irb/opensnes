@@ -1,3 +1,7 @@
 # The step keeps A as the counter for its second store; no inx before it.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in counted: present \tinc a\n\tsta\.b tcc__lf\+0\n\tsta 2,s\n
 in counted: absent \tinx\n\tsta 2,s

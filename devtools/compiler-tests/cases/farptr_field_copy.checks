@@ -10,6 +10,10 @@
 # The pin: every far load feeding a far store must spill before A is
 # clobbered — i.e., an indirect load is IMMEDIATELY followed by a store
 # of its result. Two field copies in getinfo -> at least 2 such pairs.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 
 # Re-pinned 2026-07-22 (issue #132): the invariant is "an indirect load
 # is IMMEDIATELY followed by a spill of its result", not one particular

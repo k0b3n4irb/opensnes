@@ -1,5 +1,9 @@
 # A6a R3 (a load of what A holds goes, peephole_xflow) is a mechanism of its own:
 # off here, the shape pinned is the one before it.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 env QBE_NO_PEEP_AFLOW=1
 # The twin of per_object_loop: each mechanism off, the old shape back.
 env QBE_NO_SINK_LOAD=1

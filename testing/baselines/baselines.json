@@ -90,10 +90,10 @@
     "rom_sha256": "65991e352eaa7cccb5a45309176d3c89e02394fce5b6f975a28a3e1bd2d0e5e6"
   },
   "basics_collision_demo": {
-    "fbhash": "b6018512d8d11963",
+    "fbhash": "afadea30f5d341eb",
     "frames": 200,
-    "luna_version": "v1.40.0",
-    "rom_sha256": "3f7b1297714dfb961cc1cdb847c351868b463a4f9583095bcd98ef76b94240f3"
+    "luna_version": "v1.43.0",
+    "rom_sha256": "5fca562444d8c42fa1fd4dbdf0b145b82e1ed76b1ef86d1956f5f56854856dd9"
   },
   "basics_game_skeleton": {
     "fbhash": "1218d2ec94260063",
@@ -451,15 +451,15 @@
   },
   "sprites_sprite_swarm": {
     "fbhash": [
-      "63e9a15866400b9c",
-      "75b7f303cfb91e09"
+      "e18a9d7d84e6140d",
+      "af99fd05210d5699"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.40.0",
-    "rom_sha256": "37e566f824b02085c0415fced575cb6494a9c4aef22e0d6b5ec3c66b2e1952cc"
+    "luna_version": "v1.43.0",
+    "rom_sha256": "def334b78674c9d2320ebc838cd4cc38156b936edd280a0b92f3353b407f5c69"
   },
   "sprites_world_sprites": {
     "fbhash": "76f6cdd02875ef4c",

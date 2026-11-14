@@ -50,6 +50,8 @@ input = "180:0x0200,189:0"
 "collision_flags.main" = { eq = 8, width = 1 }
 [asserts.dma]
 unsafe_writes = 0
-# The image after the whole script: the drone's lights green over Kit.
+# The image after the whole script: the drone's lights green over Kit. Re-captured
+# 2026-11-14 (the X/Y colour): one lag frame fewer at boot, the same game a frame
+# earlier (every value above unchanged).
 [asserts]
-fbhash = "26e13a032e493b9c"
+fbhash = "d1f63fd5e77f2c43"
