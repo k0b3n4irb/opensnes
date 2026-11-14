@@ -273,3 +273,20 @@ Incompatible (do not use without isolation):
   two byte-identical copies, created for this example by the project and
   added with it by commit f67b6abb (2026-11-06) as test data. No third-party
   content is known; no script that generated them was kept.
+
+## Tiled maps (`.tmj`) of the examples
+
+- `examples/demos/rpg/res/town.tmj`, `house.tmj` — written by
+  `devtools/art_assets/rpg.py` (through `make art-assets`; rewritten, they
+  are byte-identical to the committed files). No Tiled editor involved.
+- `examples/maps/map_scroll/res/rooftops.tmj` — written by
+  `build_map_scroll()` in `devtools/art_assets/build.py` (same check). It
+  declares a Tiled version string (`1.10.2`) as the format requires; no
+  Tiled session is known.
+- `.m16 .b16 .t16 .o16` of both examples (and `map_scroll`'s tracked ones) —
+  not written by a script of `devtools/art_assets`: they are the output of
+  `opensnes-level convert` on the `.tmj` above; `make clean && make` on both
+  examples reproduces the tracked files byte for byte.
+- Other `.tmj` of the repository (`testing/fixtures/retired_examples/tiled`,
+  the tool fixtures under `tools/`) are outside this entry: editor not
+  recorded.
