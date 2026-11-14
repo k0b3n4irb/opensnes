@@ -7,6 +7,13 @@ checkout ("upload-pack: not our ref"), and the commit cannot be un-pushed
 OpenSNES). The pre-push hook runs this on the commit about to leave.
 
     python3 devtools/check_submodule_pins.py [COMMIT]     # default HEAD
+    python3 devtools/check_submodule_pins.py --coherent RANGE
+
+--coherent: in every commit of RANGE, the submodule commit the tree names is the one
+compiler/PINS.md writes in the same commit. A series whose code commit moves the
+submodule and whose later commit updates PINS.md leaves a commit that
+`make verify-toolchain` refuses: a bisect or a clone built at it fails (2026-11-14,
+three commits of the X/Y lot).
 """
 import subprocess
 import sys
@@ -38,7 +45,28 @@ def on_remote(path, sha):
     return bool(git("branch", "-r", "--contains", sha, cwd=sub).stdout.strip())
 
 
+def coherent(rng):
+    import re
+    bad = []
+    for c in git("rev-list", "--reverse", rng).stdout.split():
+        table = git("show", f"{c}:compiler/PINS.md").stdout
+        if not table:
+            continue
+        for sha, path in pins(c):
+            m = re.search(r"^\|\s*" + re.escape(path) + r"\s*\|\s*([0-9a-f]{12,40})\s*\|", table, re.M)
+            if m and not sha.startswith(m.group(1)[:12]):
+                bad.append((c, path, sha, m.group(1)))
+    for c, path, sha, pinned in bad:
+        print(f"check_submodule_pins: commit {c[:12]} names {path} at {sha[:12]} but compiler/PINS.md "
+              f"says {pinned[:12]}: move the pin and PINS.md in the same commit", file=sys.stderr)
+    if not bad:
+        print(f"check_submodule_pins: PINS.md agrees with the submodule pins in every commit of {rng}")
+    return 1 if bad else 0
+
+
 def main():
+    if len(sys.argv) > 2 and sys.argv[1] == "--coherent":
+        return coherent(sys.argv[2])
     commit = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
     bad = [(path, sha) for sha, path in pins(commit) if on_remote(path, sha) is False]
     for path, sha in bad:

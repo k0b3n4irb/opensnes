@@ -25,6 +25,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     python3 "$top/devtools/lint_commits.py" "$range" || status=1
     # A submodule commit must be on its fork before the commit that names it.
     python3 "$top/devtools/check_submodule_pins.py" "$local_sha" || status=1
+    # Each commit moves a submodule pin and compiler/PINS.md together (a bisect builds at every one).
+    python3 "$top/devtools/check_submodule_pins.py" --coherent "$range" || status=1
     # Every example must build from the pushed commit alone, as CI builds it.
     python3 "$top/devtools/check_clean_export.py" "$local_sha" || status=1
 done
