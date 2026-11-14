@@ -219,3 +219,64 @@ today's splicer copies a `static inline` callee at every site, nested, bottom-up
   one-site callees will decline copies into the big callers. What would contradict it: a measured gain above the count
   (constant propagation, the text rules gaining on the new shapes), or under 1 % (the register part and the declines
   eating most of it).
+
+## Result of the recompiled check (2026-11-14, after the prediction above was committed, `f7f76365`)
+
+**The recompiled text confirms the verdict: 1.80 % (jeu 1) and 1.71 % (jeu 2) of busy time per step, equivalence
+identical, +47 KB and +146 KB of code.** Above the 1.5 % rule on both games, measured, not priced.
+
+| | jeu 1 | jeu 2 |
+|---|--:|--:|
+| callees marked `static inline` (the games' own units, up to 256 B) | 146 | 181 |
+| the count for that set (nested, lower bound) | 2.47 % | 2.35 % |
+| **measured, busy per step, `i1-temoin` -> `i1-256b`** | **368 101 -> 361 476 mclk (-1.80 %)** | **609 299 -> 598 864 (-1.71 %)** |
+| measured / count | 0.73 | 0.73 |
+| equivalence, tick by tick against `ref1114` | identical (341 steps) | identical (700 steps) |
+| late frames | 156 -> 147 | 417 -> 419 |
+| code bytes (`.sym` sections), count's ROM | 115 892 -> 163 069 (+47 177), count +62 285 | 134 396 -> 280 026 (+145 630), count +158 984 |
+
+- The gauge's own windows (aligned on the games' steps, images 330-1010 and 402-1602), not the traces' 4 x 40 frames
+  the count used; the private copy of the gauge (its frozen sources copied, then marked) and the SDK of
+  `ref1114` (`812a168b` sources, `bin/` of 09:59): the unmarked copy rebuilt **`cmp`-identical** to `ref1114` first.
+- The prediction (1.0 to 2.5 %, most likely about 1.5 %; the ROM within 30 % of the count; equivalence identical)
+  holds on every point; the measurement is a little above the most likely figure (1.80 / 1.71 against 1.5). The count
+  overstates by a quarter, the same on both games; its ROM by a quarter and a tenth (hypothesis, not read: fewer copies
+  than counted where the temporary room declines, and copies smaller once the text rules run on them).
+- **Found on the way, a loud defect of today's splicer** (not fixed here, no compiler change in this lot): the first
+  build failed to link (`Reference to an unknown label "...inl4_hText"`). A cloned block's label is
+  `inl%d_%.22s.%d.%.40s` (`compiler/qbe/inline.c`, `splice_fn`): nested three deep, the block name of the inner copy is
+  cut at 40 characters, and the cut fell right after `hText.l` (of `hText.lscreens`); WLA reads a trailing `.b` / `.w` /
+  `.l` of a label operand as a size suffix (the rule L4 S1 met with `sf.foo.b`), so `jmp @...hText.l` names a label
+  that does not exist. Any cut of a function name (`%.22s`) or block name (`%.40s`) that ends in `.b`, `.w` or `.l`
+  does it; nothing in today's corpus or games nests deep enough (they build), a lot that copies more will. The run
+  above leaves that one callee (cold, 0.000 % in the count) unmarked (`i1-256b`). Fix for the next step: never end a
+  cut on a dot and one letter (or end every cloned label with a character WLA does not read as a suffix), with a
+  compiler check that nests a `x.b` name three deep.
+
+### What neither the count nor the check measures
+
+- The count prices today's text minus the call; the check measures one set (up to 256 B, the games' units). Neither
+  says what a compiler heuristic would choose on other programs, nor the library's 21 eligible callees (left alone).
+- No constant propagation in the lower bound; the upper bound (7.6 / 7.2 %) is a hypothesis, and the measurement sits
+  far under it.
+- RAM: a copy merges the callee's frame into the caller's; the stack depth at the caller's other calls grows. Not
+  measured (the gauge's equivalence and late frames are unchanged; the stack floor gate of `rom_coverage.py` is the
+  corpus's).
+- Compile time with 160-instruction copies raised to 100 000 (`CC_INLINE_MAX_BIG`): not measured.
+- The 0.81 / 0.75 % held by one-site callees the splicer declines today: their cause is a hypothesis (the temporary
+  room), not read in the source's decision.
+- The examples: census only (no trace).
+- luna's DRAM-refresh bias of the busy figures (the gauge's notes) is the same on both sides of the check.
+
+### Replay
+
+```
+make clean && CC65816_KEEP_IR=$PWD/build/a1_ir make            # the SDK, the library and the corpus with their IR kept
+make count-i1 A1_IR=build/a1_ir                                # census of the corpus and of the library
+# the two games (private, the gauge's i1s0 folder): run.sh = i1_count.py on ref1114 with the a1s0 IR and traces
+#   (--casm-dir <game> --casm-dir lib/build/lorom --ir-dir <game IR> --ir-dir <SDK IR> --rom --sym --trace
+#    [--frames A-B] [--write-set 256 PATH] [--set PATH] --json)
+# the recompiled check: a copy of the gauge, marque_inline.py <set> <copy>/sources/<game>/game, then
+#   CC65816_KEEP_IR unset, CC_INLINE_MAX_BIG=100000 python3 jauge.py --sdk <SDK of ref1114> --etiquette i1-256b
+#   --ref ref1114, and jauge.py --compare i1-temoin i1-256b
+```
