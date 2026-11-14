@@ -128,7 +128,9 @@ flow and not emitted (no keyword needed: the code exists once either way);
 a `static inline` function called from several places is copied at each, up
 to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function, unless it
 is tiny, stays a function when its caller still calls something else:
-apart, it keeps the direct-page frame that makes it fast.
+apart, it keeps the direct-page frame that makes it fast. A function
+marked `__attribute__((noinline))` (or `[[gnu::noinline]]`) is never
+inlined, by either inliner.
 `QBE_NO_AUTO_INLINE=1` turns the second inliner off, to measure.
 
 (†) `helper` appears as 0 cycles because its standalone is suppressed

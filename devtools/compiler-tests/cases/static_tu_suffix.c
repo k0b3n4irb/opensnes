@@ -5,7 +5,8 @@
 typedef unsigned short u16;
 static u16 counter = 7;
 u16 shared = 9;
-static u16 bump(u16 x) { static u16 calls; calls++; return x + calls; }
+static u16 __attribute__((noinline)) bump(u16 x) { static u16 calls; calls++; return x + calls; }
 u16 entry(void) { counter = bump(counter); return counter + shared; }
-/* a second call site: with one, `bump` would be inlined (2026-10-10) */
+/* noinline keeps `bump` a function (I1 S3); this second call site alone did
+ * until then */
 u16 entry2(void) { return bump(3); }

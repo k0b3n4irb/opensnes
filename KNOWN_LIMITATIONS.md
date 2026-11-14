@@ -542,8 +542,9 @@ ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
 pattern. Pinned by `cases/negative/inline_asm.c`.
 
 ### 🟡 GNU attributes that change the program are refused
-cproc skips the GNU attributes that are hints (`noinline`, `unused`, `format`,
-`noreturn`, `may_alias`, `deprecated`...), honours `packed` on a structure, and
+cproc skips the GNU attributes that are hints (`unused`, `format`,
+`noreturn`, `may_alias`, `deprecated`...), honours `packed` on a structure and
+`noinline` on a function (no inliner copies it into a caller), and
 refuses, with a message naming the attribute, those it does not implement and
 whose omission would compile a different program: `mode` and `vector_size` /
 `ext_vector_type` (they change a type's width), `alias`, `cleanup`, `section`,

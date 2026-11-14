@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 7bd86840d04e7022fa1bebd1dec5e6fd9dac6960 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 18eecca664b0f348f7f06c467bd11ea9328aeb31 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 0f524569e1ce7184c92a238e904e355331efc6d1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 50 patches since upstream merge-base 7051114
+### compiler/cproc — 51 patches since upstream merge-base 7051114
 
 ```
+18eecca attr: noinline reaches QBE as a linkage keyword — `__attribute__((noinline))` / `[[gnu::noinline]]` was skipped like any unknown hint and a one-site static marked noinline was absorbed all the same; kept per declarator (a parameter's or a member's is not the function's), merged across declarations, emitted before `function`; ignored on an object, as GCC does (I1 S3, 2026-11-14)
 82e1c1d attr: GNU attributes whose omission changes the program are refused — `mode`, `vector_size`, `ext_vector_type`, `alias`, `cleanup`, `section`, `noinit`, `persistent`, `ms_struct`, `scalar_storage_order` were skipped like any unknown attribute: `sizeof` of a `mode(QI)` type was 2, of a `vector_size(8)` type 2; the message names the attribute and why, in every spelling (`__mode__`, `[[gnu::mode]]`); weak, ifunc, may_alias, noreturn, naked, transparent_union stay skipped (harmless or a loud link error) (gcc.c-torture 20020108-1, scal-to-vec2, 2026-11-09)
 d337fd5 expr: an address above `$FFFF` cast to a plain pointer is refused — `(u8 *)0x708040` kept its bank only at a constant index, `p[i]` went to bank $00; a `__far` or `const` pointee, a function pointer and a negative sentinel pass; the value of `(u8 *)(BASE + 0x40 * n)` is computed without folding the tree (STRUCTURAL_DEFECTS A10, 2026-10-25)
 075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
@@ -102,7 +103,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 156 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 157 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +115,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+0f52456 feat(inline): `noinline` is a linkage keyword every inliner refuses — `Lnk.noinline`; the small inliner's eligibility, `auto_inline_ok` (reason `noinline`) and the leaf rule's guess refuse it; `QBE_INLINE_FAULT=noinline` forgets it (check `noinline`); output byte-identical for code that does not write it (I1 S3, 2026-11-14)
 7bd8684 feat(inline): `CC_TRACE_INLINE` names why each call stays a call — one `decline` line per call auto_inline_ok or splice_fn refuses (the reason, the test before or after the callee's own inlining, the temporaries counted and those still used, the reason with the site count left out) and one `final` line per function (its IR size after its own copies); stderr only, the output byte-identical (I1 S2, 2026-11-14)
 f2e1f03 fix(w65816): no label ends in `.b`, `.w` or `.l`, which WLA-DX reads as an operand size — `inl_label` adds `_` after a copied block's cut label that would (three levels of copies failed the link), `wla_label_guard` refuses any function, block or datum label of that shape (a `static` of a source `b.c` / `w.c` / `l.c` linked to the wrong function); `QBE_INLINE_FAULT=label`, `QBE_LABEL_FAULT=noguard` (I1 S1, 2026-11-14)
 3f469bf perf(w65816): a far pointer read in its direct-page slot, stepped on 16 bits when one object of the unit is all it can point into — `peephole_dp_ptr` (the staging into tcc__r9 goes, `[tcc__lf+N]`, last of the text rules) and `farptr_web` / `farptr_step` (an object never crosses a bank; a pointer from one object of the unit, only dereferenced, adds on its low word); `QBE_NO_FARPTR_DP=1` byte-identical, `QBE_FARPTR_TRACE`, `QBE_FARPTR_FAULT=1..4`, `QBE_FARPTR_ASSERT=1` (lot E1, 2026-11-14)
