@@ -111,6 +111,91 @@ tests (2000 fresh seeds each, 52001-54000), the two fixtures and their
 faults, the corpus at equal frame, the games' state at every step.
 `QBE_NO_FARPTR_DP=1` turns both off.
 
-## Measured
+## Measured (2026-11-14, same day)
 
-(filled at the end of the lot)
+Binôme: one session wrote and measured it alone (no sub-agent, as the lot asked).
+
+| Gauge | Before | Predicted | Measured | Verdict |
+|---|--:|--:|--:|---|
+| `unpack` C SlowROM | 603 353 | 280 000-350 000 | **281 068 (-53.4 %)** | at the optimistic edge of the range |
+| `unpack` C FastROM | 517 898 | same ratio | 246 234 (-52.5 %) | yes |
+| `slots` | 27 765 | ~22 100 | 21 928 (-21.0 %) | yes |
+| `ents` | 28 253 | ~25 400 | 25 320 (-10.4 %) | yes |
+| `col` | 16 078 | ~13 300 | 13 178 (-18.0 %) | yes |
+| the 20 other rows | | 0 | within ±3 mclk (refresh phase) | yes; all 34 checksums equal |
+| bench, weighted mean | 1.91 | ~1.86 | 1.85 | yes |
+| bench, geometric mean, 20 rows | 2.32 | ~2.19 | 2.18 | yes |
+| game 1, busy mclk a step | 368 399 | 0 to -0.2 % | 368 101 (-0.08 %) | yes |
+| game 2, busy mclk a step | 610 292 | 0 to -0.2 % | 608 740 (-0.25 %) | a little better than predicted |
+| game 1 / game 2, bytes of code | 116 169 / 135 154 | -300 to -1 200 | -277 / -772 | game 1 just under the range |
+| sdkbench `bytes` / `strings` | 2 630 718 / 1 410 602 | not predicted | 2 055 930 (-21.8 %) / 1 314 002 (-6.8 %) | the 21 other workloads unchanged (A/B with the switch) |
+
+Both games: state identical to the reference at every game step (341 and 700
+steps). The prediction counted the emitted text instruction by instruction,
+not a replayed trace; it held this time.
+
+What the corpus does with it: 182 compiled units, 28 change (20 library units:
+anim, asset, collision, panel, scene in the four builds; 8 examples). Stagings
+into `tcc__r9`: 81 -> 65 in the examples, 300 -> 156 in the library (four
+builds); `adc.w #0` / `sbc.w #0`: 13 -> 12 and 24 -> 24 (the corpus walks few
+pointers by a counter from an object of its own unit); instruction lines 36 531 ->
+36 456 (examples), 46 616 -> 46 024 (library). `QBE_NO_FARPTR_DP=1`: 182 of 182
+units byte-identical to the compiler before the lot.
+
+## The gates
+
+- `make clean && make`: zero warnings. `make test-compiler`: 154 / 154 (ten
+  checks that pinned `[tcc__r9]` accept `[tcc__lf+N]` for the access they
+  name; `test_phi_acache`, which pins the staging itself, sets the switch).
+- `make tests`: ALL CHECKS PASSED, after three explained re-captures:
+  - audio, `chips/superfx_game_skeleton` (its own code and `asset` changed):
+    `luna diff --audio --align-onset <before> <after> --until-frame 300` says
+    DIFF, max delta 2.33 % (one window, 4000 ms; the others 0.00-0.57 %), the
+    music starting 6 samples earlier; over 600 frames the windows go back to
+    0.0x % with the same 6-sample shift. The picture is identical at every
+    10th frame from 20 to 300. The C before `snesmodProcess` got faster: the
+    phase of the music's processing, not the music.
+  - WRAM, 13 ROMs: exactly the 13 that link a changed unit (their own
+    `main.c`, or anim / asset / collision / panel / scene); the stagings no
+    longer write `tcc__r9`. Journal line in `testing/baselines/WRAM_JOURNAL.md`.
+  - manifest `string_nmi`: `r_cb_runs` (one NMI callback a frame while the
+    main loop runs) 2 007 -> 1 808 with the bound at 2 000: the loop got
+    faster, the bound measured its duration. Bound lowered to 1 500; the race
+    counts (`r_cb_inside` 493, bad counts 0) unchanged.
+- `diff_corpus` against the ROMs built before: 65 / 65 MATCH at equal frame.
+- Differential tests, fresh seeds 52001-54000: `difftest` 2 000 / 2 000
+  (48 000 expressions), `difftest_stmt` 2 000 / 2 000 (20 000 programs);
+  `difftest_stmt` 52001-52300 under `QBE_FARPTR_ASSERT=1` clean.
+- Fixture `testing/fixtures/compiler/farptr_dp` (in `make tests`): values
+  against a host model, the placement it rests on read in the `.sym`, and its
+  two provoked faults red (`QBE_FARPTR_FAULT=1`: `r_ext` reads `$7E:0000`;
+  `=2`: `n_cmp` runs to its bound).
+- The text rule's faults: `QBE_FARPTR_FAULT=3` (tcc__r9 taken for dead) fails
+  22 of 30 `difftest_stmt` seeds; `QBE_FARPTR_FAULT=4` (a write of the slot
+  ignored) changes no emitted text on the bench or the examples sampled and
+  200 seeds stay clean: the emitter never writes a pointer's slot between its
+  staging and its access today, the guard has no case to catch.
+- The independent check, `QBE_FARPTR_ASSERT=1`: the staging stays and every
+  rewritten access first compares the slot with `tcc__r9` (three bytes,
+  `stp` on a difference): the rule's claim checked on every access executed.
+  An assertion for the 16-bit step was not written: it could fire only where
+  an object touches a bank edge (only the fixture places one), and there it
+  would fire on valid code (a walk to one past the end).
+
+## What failed, what is left
+
+- Found on the way, older than the lot and loud: a pointer compared with the
+  CONSTANT `obj + size` of an object ending at `$xx:FFFF` stops the link
+  (`cmp.w #tail+16`, "out of 16-bit range"; its bank half `#:tail` would be
+  wrong too). The fixture computes its end at run time.
+- The games do not walk far pointers in their hot code (their hottest
+  functions have no staging and no high-half step): the lot is worth a
+  quarter of a percent there, as predicted. The bench's other idea from the
+  same comparison (first argument in A, deferred popping: `call`, `chain`)
+  is where the games' time is.
+- The step is refused for a pointer compared with its end
+  (`for (; p < end; p++)`): only a counted walk gains it. Widening that needs
+  a proof that the end is not the one-past of an object ending at `$FFFF`
+  (the linker knows; the compiler does not).
+- `devtools/cyclecount/bench.py` reads 1 215 cycles against a baseline of
+  1 211 with or without the lot (an earlier lot's drift, not refreshed here).
