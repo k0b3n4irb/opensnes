@@ -176,3 +176,63 @@ check touched. The two examples one frame early re-captured after a frame-by-fra
 test (30001-50000), the injected fault still caught, and an independent check of the lesson: an assertion build
 (`QBE_XY_ASSERT=1`) that keeps every coloured value's slot as a shadow and compares the register with it at every use on
 the emitted text (`brk` on a difference), run under `difftest_stmt`: a proof that does not rest on the interference graph.
+
+### Lot XY measured (2026-11-14), against the prediction
+
+Reference: the same tree built with `QBE_NO_XY_COLOUR=1` (`develop` fc63dc0a with the colour switched off; its gauge equals
+the probe's reference to the cycle, and its kernel text equals `develop`'s but for the L4 side table's comments).
+
+| | predicted | measured |
+|---|--:|--:|
+| `collide`, `bytes`, `tilemap` (sdkbench, limit +2 %) | within +-0.5 % | **-0.20 / -2.06 / 0.00 %** (from +4.1 / +5.1 / +7.5 %) |
+| sdkbench, every workload | unchanged or better | **none slower** (`calls`, `copy`, `dist` +0.00 / +0.01 / +0.00 %; total -2.28 %; `crc` -6.2, `depot` -3.8, `farfill` -3.8 %) |
+| libbench | unchanged | 23 / 23 within 10 % (`oambatch` +4 mclk) |
+| gapbench weighted mean / first twelve rows | 1.91 | **1.91 / 2.15**; `oam` 1.87 -> 1.81, `state` 1.35 -> 1.21, no row slower than its baseline (`probe` gives back the probe's gain: 1.42 -> 1.40 against 1.35) |
+| game 1, busy time saved | -1.4 to -1.6 % | **-1.72 %** (lag frames 172 -> 156, code -1.38 %) |
+| game 2, busy time saved | -1.8 to -1.9 % | **-1.69 %** (lag frames 430 -> 417, code -1.04 %) |
+| leaf A / leaf B / leaf B with its caller, share of the gap to the hand | (probe: 0 / 20 / 20 %) | **0.0 / 20.3 / 22.8 %** |
+| compile time, the two largest C files of game 2 | +5 % at most | **+2.5 %** (best of five, user + system) |
+
+State identical to the reference at every step of both games (341 and 700), and in the three builds of each leaf.
+
+Game 2 lands under the prediction and under the probe's -1.78: the rules that keep the loop rule's registers (a web beside
+a rule counter left in memory does not take its register; a lighter one beside a refused rule counter takes none) and the
+`if`-merge rule give back some of the probe's colours there (not separated by a measurement). Game 1 lands above: its
+sprite update went from +2.7 % to -1.1 %, the function that the probe's `if`-merge phi made slower (an absolute value in X
+that evicted the index the text rules kept there) from +5.7 % to +1.7 %.
+
+**How it was reached, and what was wrong on the way** (each found by a gate or a measure, not by reading):
+- the three slower workloads had two causes: the colour switched the loop rule off for the whole function on a register
+  it used (`tilemap`), and two counters joined into one web through a phi argument they shared (`i + 1` feeding `i` and
+  `j = i + 1` in `collide`), which kept the inner one out of every register. Fixed by the region-aware loop rule, the
+  joins that refuse interference, and the loop rule's counters learned first. A static cost estimator that chose between
+  the coloured and the plain text was tried and dropped: weighting blocks by loop nesting counts a rare `hits++` as often
+  as the loop's own step, and a frequency estimate from the CFG mis-weighted the blocks after a loop; it made `box` and
+  `slots` lose their gain;
+- the region ranges were merged as if they came in text order; they come from the last block to the first, so the merge
+  kept one range and the loop rule converted a loop to Y where a coloured `j` lived: `difftest_stmt` seed 961160 (1 of
+  200). `QBE_XY_FAULT=3` reproduces it on purpose;
+- the probe's compile time "+5 %" compared the compiler with itself: the script passed `QBE_NO_XY_COLOUR=` empty, which
+  switches the colour off as well (the switch tests presence). Measured right: +116 %; the plain emission's full text pass
+  was the cost (clock per phase), it now stops after the loop rule;
+- the assertion build itself had three defects before it could be trusted, each a false alarm found on its first 100
+  seeds (8 stops): no shadow store for a phi whose argument already sat in the register, nor for a copy left out of the
+  text, and an anonymous `+` label in its check that captured the `bxx +` of a branch whose moves it sat among (now a named
+  label). After them: 100 / 100 seeds clean, and with `QBE_XY_FAULT=1` (a `tax` too many the proof trusts) 8 of 20 seeds
+  stop on `stp`.
+
+**Gates of the lot** (branch `probe-xy`, qbe 1888e97): `make clean && make` no new warning; `make test-compiler` 152 / 152
+(with `QBE_NO_XY_COLOUR=1` everything but `xy_colour` passes: the 17 adapted checks pin the old shapes, with the switch);
+`make tests` ALL CHECKS PASSED after the re-captures below; `diff_corpus` 63 / 65 MATCH, the two DIFFs the same pictures
+a frame earlier (`collision_demo` 24 of 26, `sprite_swarm` 394 of 397, offset -1), and every C global of both equal one
+frame earlier but the frame counters (the build has one lag frame fewer at boot): their compare baselines and the frame
+hash of `movement_collision_demo` re-captured (every value of that manifest unchanged); the WRAM streams 50 of 65
+(journal line); audio: `luna diff --audio --align-onset` before / after, four MATCH (max 0.01 %), `superfx_game_skeleton`
+DIFF 2.46 % in its last window with a 6-sample shift, the first sound at the same sample, its WRAM identical outside the
+stack at frames 100 and 299: the music commands reach the APU at other cycles within the same frames (measured, not
+listened to; the author's ear decides). Hunts of 20 000 seeds (30001-50000): `difftest.py` 20 000 clean;
+`difftest_stmt.py` 19 998 clean and 2 compiler stops (an assertion in `bsset`: a near dereference's stale base and index
+entries, fixed in qbe 1888e97; the two seeds then clean, the 65 ROMs and both games' ROMs byte-identical before and
+after the fix). Provoked faults: `QBE_XY_FAULT=1` 50 of 100 seeds red, `QBE_XY_FAULT=2` 100 / 100 clean (the proof
+refuses), `QBE_XY_FAULT=3` seed 961160 red; the assertion build 300 / 300 clean (50001-50300), and with `QBE_XY_FAULT=1`
+8 of 20 seeds stop on `stp`.
