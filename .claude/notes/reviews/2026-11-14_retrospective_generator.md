@@ -129,7 +129,7 @@ rows (`unpack` 0.34 of ours, `call` 0.41); taking the better of both on each row
 - An entity loop over a table at 20 entities: array of structures 11 180, one array per word field 8 419 (-25 %), hand assembly
   5 217: factor 2.14 then 1.61. An assembly iterator that copies the entity to a fixed address for absolute-addressed C made it
   worse (16 541, +96 %).
-- Losses the compiler caused the games: a `static` with one caller goes back to `jsl` when its caller grows (+11 000 a tick); a leaf
+- Losses the compiler caused the games: a leaf
   that gains a call on a cold branch loses its direct page (+1 800 a frame); a loop that calls, or indexes a `u8` without a
   constant step, is not turned into an index; a variable shift made the peephole liveness give up on the whole function; one
   miscompilation (a counter whose address is taken, a stale copy) lasted four days unseen.
@@ -210,7 +210,9 @@ difference of two runs to a program counter)**:
   G1: the arbiter is the rebuilt game replayed at each stop, not a snapshot or twelve routines.
 - On "the target is the SNES": on that game the multiplier, divider and hardware copies can return only 0.23 %; the 19 % of assembly in
   the library is a library lever. What G1 must bring there: allocate A, X, Y and the direct page around calls, stop rescaling a known
-  index, **inline stably and report when an inlining decision flips**, compose neighbouring byte writes by words in FAR.
+  index, inline stably and report when an inlining decision flips (a good practice, **without a case as proof**: see the correction below), compose neighbouring byte writes by words in FAR.
+
+**Correction (2026-11-14, the game's own, 22:07)**: the claim that a small function "was no longer inlined since 2026-11-04, about 3 %", and the kit's "a `static` with one caller goes back to `jsl` when its caller grows (+11 000 a tick)" built on it, are **false**: re-measured, the function was never inlined since its caller loop was created (2026-10-10), on three rebuilt chains; the compiler refuses it for room (`AUTO_INLINE_TMP_ROOM` 1 800, the caller having absorbed two other functions in source order); forcing it gains 0.04 % of busy time. It is neither a regression nor a lever; the cause was a figure of October copied without re-measuring. The case of the room rule goes to its own thread, low priority. The need for a build-to-build integration report stays as a practice, with no proof case. Removed from the synthesis.
 
 All eight answers are in. The contests to carry into the plan: the gauge's 1.72 against 0.08 (open), several natural formulations in
 the bench, correctness before gain, the cartridge check, the multiplier delay known to the compiler, invariants with fault tests.
