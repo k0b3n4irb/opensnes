@@ -58,6 +58,8 @@ bench_table:
     .dl s_ents,  k_entsi_asm, c_ents
     .dl s_call,  k_call_c,    c_call
     .dl s_call,  k_call_asm,  c_call
+    .dl s_call,  k_callst_c,  c_call
+    .dl s_call,  k_callst_asm, c_call
     .dl s_soa,   k_soa_c,     c_soa
     .dl s_soa,   k_soa_asm,   c_soa
     .dl s_glide, k_glide_c,   c_glide
@@ -74,6 +76,8 @@ bench_table:
     .dl s_probe, k_probe_asm, c_probe
     .dl s_chain, k_chain_c,   c_chain
     .dl s_chain, k_chain_asm, c_chain
+    .dl s_chain, k_chainst_c, c_chain
+    .dl s_chain, k_chainst_asm, c_chain
     .dl s_sprites, k_sprites_c, c_sprites
     .dl s_sprites, k_sprites_asm, c_sprites
     .dl s_unpack, k_unpack_c, c_unpack
@@ -588,6 +592,7 @@ k_ents_asm:
 .SECTION ".gap_call" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_callst_asm:                   ; the same twin: only the C differs
 k_call_asm:
     ldy.w #0
 @loop:
@@ -1212,6 +1217,7 @@ k_probe_asm:
 .SECTION ".gap_chain" SUPERFREE
 .ACCU 16
 .INDEX 16
+k_chainst_asm:                  ; the same twin: only the C differs
 k_chain_asm:
     ldx.w #0
 @loop:

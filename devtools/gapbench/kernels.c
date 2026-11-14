@@ -389,6 +389,26 @@ void k_call_c(void) {
 
 u16 c_call(void) { return sum((const u8 *)ca_acc, 16); }
 
+/* ---- callst: the same 64 calls, the function static (I1 S3). Two call
+ * sites keep it a function today (the second, callst_site2, is never run),
+ * so this row reads as `call` does; a compiler that copies small statics at
+ * several sites moves it. Same data, setup, checksum and assembly twin. --- */
+
+static u16 k_callst_f(u16 a, u16 b, u16 lim) {
+    u16 r = a + b;
+    if (r >= lim)
+        r -= lim;
+    return r;
+}
+
+void k_callst_c(void) {
+    u16 i;
+    for (i = 0; i < 64; i++)
+        ca_acc[i & 7] = k_callst_f(ca_acc[i & 7], i, 1000);
+}
+
+u16 callst_site2(u16 a) { return k_callst_f(a, 1, 2); }
+
 /* ---- soa: 18 actors in parallel arrays, bounded, moved, recorded as
  * sprites with a depth. The shape of the heaviest routine of a real game's
  * profile (11 % of its busy time). ------------------------------------- */
@@ -941,6 +961,63 @@ void k_chain_c(void) {
 }
 
 u16 c_chain(void) { return sum((const u8 *)ch_act, sizeof(ch_act)) + ch_loops; }
+
+/* ---- chainst: the same update, its functions static (I1 S3). Each has two
+ * call sites (the second in chainst_site2, never run), so none is absorbed
+ * today and the row reads as `chain` does; a compiler that copies small
+ * statics at several sites moves it. Same data, setup, checksum and
+ * assembly twin. ---------------------------------------------------------- */
+
+static u16 chs_test(u16 flags, u16 mask) { return flags & mask; }
+
+static u16 chs_clamp(u16 v, u16 max) { return v > max ? max : v; }
+
+static u16 chs_anim(u16 frame) {
+    frame++;
+    if (frame >= 6)
+        frame = 0;
+    return frame;
+}
+
+static u16 chs_decay(u16 life) { return life ? life - 1 : 0; }
+
+static void chs_update(Act *a) {
+    s16 y;
+    if (chs_test(a->flags, CH_MOVE))
+        a->x = chs_clamp(a->x + a->v, 300);
+    a->frame = chs_anim(a->frame);
+    if (a->frame == 0)
+        a->flags ^= CH_BLINK;
+    y = a->y + a->vy;
+    if (y < 20 || y > 200)
+        a->vy = -a->vy;
+    else
+        a->y = y;
+    a->life = chs_decay(a->life);
+    if (a->life == 0 && chs_test(a->flags, CH_LOOP)) {
+        a->life = 20;
+        a->x = 0;
+        ch_loops++;
+    }
+    if (a->tick) {
+        a->tick--;
+    } else {
+        a->tick = a->rate;
+        a->score += a->frame + 1;
+    }
+    a->cell = (a->x >> 4) + (a->y & 0xF0) + ((a->flags & CH_BLINK) << 6);
+}
+
+void k_chainst_c(void) {
+    u16 i;
+    for (i = 0; i < 16; i++)
+        chs_update(&ch_act[i]);
+}
+
+u16 chainst_site2(Act *a) {
+    chs_update(a);
+    return chs_clamp(a->x, 9) + chs_anim(a->frame) + chs_decay(a->life);
+}
 
 /* ---- sprites: 12 objects of 1 to 4 tiles (a table of tile offsets a
  * frame), world to screen, each tile culled, the ninth x bit, written to

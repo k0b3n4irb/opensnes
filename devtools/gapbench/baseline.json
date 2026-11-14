@@ -128,6 +128,15 @@
    "asm_bytes": 30,
    "ratio": 1.98
   },
+  "callst": {
+   "c": 63043,
+   "c_sum": 13401,
+   "c_bytes": 74,
+   "asm": 32642,
+   "asm_sum": 13401,
+   "asm_bytes": 30,
+   "ratio": 1.93
+  },
   "soa": {
    "c": 36377,
    "c_sum": 18949,
@@ -199,6 +208,15 @@
    "asm_sum": 28225,
    "asm_bytes": 18,
    "ratio": 2.24
+  },
+  "chainst": {
+   "c": 81380,
+   "c_sum": 28225,
+   "c_bytes": 65,
+   "asm": 37103,
+   "asm_sum": 28225,
+   "asm_bytes": 18,
+   "ratio": 2.19
   },
   "sprites": {
    "c": 93263,
@@ -348,6 +366,15 @@
    "asm_bytes": 30,
    "ratio": 2.01
   },
+  "callst": {
+   "c": 54928,
+   "c_sum": 13401,
+   "c_bytes": 74,
+   "asm": 27880,
+   "asm_sum": 13401,
+   "asm_bytes": 30,
+   "ratio": 1.97
+  },
   "soa": {
    "c": 30624,
    "c_sum": 18949,
@@ -419,6 +446,15 @@
    "asm_sum": 28225,
    "asm_bytes": 18,
    "ratio": 2.25
+  },
+  "chainst": {
+   "c": 70280,
+   "c_sum": 28225,
+   "c_bytes": 65,
+   "asm": 31860,
+   "asm_sum": 28225,
+   "asm_bytes": 18,
+   "ratio": 2.21
   },
   "sprites": {
    "c": 77892,

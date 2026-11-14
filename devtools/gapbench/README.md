@@ -1,6 +1,6 @@
 # gapbench — what C costs against assembly written by hand
 
-Twenty routines (and four of them written a second way in C) of the kind a game runs every frame, each written twice on the
+Twenty routines (and six of them written a second way in C) of the kind a game runs every frame, each written twice on the
 same data: in C (`kernels.c`, compiled by cc65816) and in 65816 assembly by
 hand (`kernels.asm`). `run.py` builds one ROM, SlowROM and FastROM, and reads
 from luna the master cycles of 16 calls of each, interrupts off, minus the same
@@ -90,6 +90,7 @@ twelve rows 2.55; `baseline.json` in the history holds every figure of that day.
 | ents | 25320 | 14740 | 1.72 | 20976 | 12344 | 1.70 | 169 | 85 |
 | entsi * | 18095 | 14738 | 1.23 | 15079 | 12342 | 1.22 | 119 | 85 |
 | call | 64494 | 32642 | 1.98 | 56115 | 27880 | 2.01 | 74 | 30 |
+| callst * | 63043 | 32642 | 1.93 | 54928 | 27880 | 1.97 | 74 | 30 |
 | soa | 36377 | 24865 | 1.46 | 30624 | 20809 | 1.47 | 286 | 171 |
 | glide | 93704 | 67682 | 1.38 | 78638 | 56049 | 1.40 | 242 | 163 |
 | slots | 21928 | 7486 | 2.93 | 17990 | 6194 | 2.90 | 75 | 85 |
@@ -98,6 +99,7 @@ twelve rows 2.55; `baseline.json` in the history holds every figure of that day.
 | blocks | 24409 | 10673 | 2.29 | 20816 | 8967 | 2.32 | 200 | 829 |
 | probe | 29955 | 21351 | 1.40 | 25358 | 17932 | 1.41 | 135 | 96 |
 | chain | 83208 | 37106 | 2.24 | 71775 | 31857 | 2.25 | 65 | 18 |
+| chainst * | 81380 | 37103 | 2.19 | 70280 | 31860 | 2.21 | 65 | 18 |
 | sprites | 93263 | 51216 | 1.82 | 77892 | 42647 | 1.83 | 545 | 323 |
 | unpack | 281068 | 51736 | 5.43 | 246234 | 44475 | 5.54 | 225 | 67 |
 | mean, weighted by real games' profiles |  |  | 1.85 |  |  | 1.86 |  |  |
@@ -105,10 +107,19 @@ twelve rows 2.55; `baseline.json` in the history holds every figure of that day.
 | geometric mean of the first twelve rows |  |  | 2.09 |  |  | 2.11 |  |  |
 
 A row marked `*` is the same routine written another way in C (`fillu` unrolled by
-hand, `coli` / `rowi` / `entsi` with an index instead of a walked pointer), against
+hand, `coli` / `rowi` / `entsi` with an index instead of a walked pointer, `callst` /
+`chainst` with `static` callees of two call sites each), against
 the same assembly. They are not in the mean: they are there because the way
 the C is written must not matter this much, and because an unrolled fill must
 not be slower than the loop.
+
+`callst` and `chainst` (rows added 2026-11-14, measured on the compiler of
+that day) are what a compiler that copies small `static` functions at several
+call sites must move: today two call sites keep each callee a function, and
+the rows differ from `call` and `chain` only by the `rep #$20` a static
+function leaves out at its entry: `callst` is 1 451 master cycles under `call`
+SlowROM and 1 187 FastROM for its 64 calls, 22.7 and 18.5 a call, the cost
+of one `rep #$20` (two opcode fetches and an internal cycle).
 
 `copy` through the library's `memcpy`: 15 266 (SlowROM) since it copies with
 the block move; it was 24 276, slower than the C loop, when the bench started.

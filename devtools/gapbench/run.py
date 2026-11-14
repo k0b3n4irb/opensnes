@@ -127,7 +127,7 @@ def measure(luna, speed):
         r[variant] = round((s - seg[0]) / calls)
         r[variant + "_sum"] = c
         if variant != "lib":
-            r[variant + "_bytes"] = size.get(sym) or size.get(re.sub(r"[ui]_asm$", "_asm", sym))
+            r[variant + "_bytes"] = size.get(sym) or size.get(re.sub(r"(?:[ui]|st)_asm$", "_asm", sym))
     for kernel, r in res.items():
         bad = [v for v in ("asm", "lib") if v in r and r[v + "_sum"] != r["c_sum"]]
         if bad or r["c_sum"] == 0:
@@ -143,9 +143,10 @@ def geomean(xs):
 
 
 def other_source(kernel, res):
-    """fillu, coli, rowi, entsi: the same routine written another way in C,
-    against the same assembly. Shown, not counted in the mean."""
-    return kernel[-1] in "ui" and kernel[:-1] in res
+    """fillu, coli, rowi, entsi, callst, chainst: the same routine written
+    another way in C (callst / chainst: the callees static, I1 S3), against
+    the same assembly. Shown, not counted in the mean."""
+    return (kernel[-1] in "ui" and kernel[:-1] in res) or (kernel.endswith("st") and kernel[:-2] in res)
 
 
 def summary(res):
