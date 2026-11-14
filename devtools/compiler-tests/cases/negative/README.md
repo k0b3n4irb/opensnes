@@ -42,3 +42,9 @@ structure's layout and byte order. `gnu_attr_mode_c23` is the C23
 spelling with underscores. They are refusals of the frontend, not features
 waiting to land; the hints (`noinline`, `unused`, `noreturn`, `may_alias`,
 `weak`...) keep compiling.
+
+`b`, `w` and `l` (2026-11-14, I1 S1) pin a refusal of the back end: a
+file-scope `static` of a source with one of those names is emitted `g.b`, and
+the assembler reads `jsl g.b` as `jsl g` with an operand size. It failed the
+link, or called a global `g` of another file without a word. The name of the
+fixture is the test: the source's stem is what ends the label.

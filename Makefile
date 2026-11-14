@@ -53,7 +53,7 @@ STRIP ?= strip
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels libtests_region libtests_region_pal libtests_bigrom
-FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals farptr_dp jump_table leaf_frame leaf_split static_dup
+FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals farptr_dp inline_label_cut jump_table leaf_frame leaf_split static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race koff_hold race_sweep timing_probe string_block string_nmi world_place
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.

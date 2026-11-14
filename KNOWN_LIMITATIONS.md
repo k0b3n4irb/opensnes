@@ -284,6 +284,17 @@ span banks; split it.` (A `static` is named `name.file`.)
 table per level, per variant, per screen). The compiler itself has no limit
 on the number of elements.
 
+### 🟢 A source named `b.c`, `w.c` or `l.c` cannot hold a `static` (refused)
+A file-scope `static` is named `name.file` in the assembly, and the assembler
+reads a trailing `.b`, `.w` or `.l` (either case) as an operand size: in a
+source `b.c`, `jsl g.b` would call a function `g` and `lda.w v.b` read a
+variable `v`. The compiler stops instead, naming the symbol:
+`function g.b ends in .b, which the assembler reads as a size suffix …;
+rename the file`.
+
+**Mitigation:** give the source a longer name (`board.c`, `bank.c`); a file
+of that name with only global functions and variables compiles.
+
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**
 PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
 **left-to-right**. ASM functions ported from PVSnesLib without changing the stack
