@@ -153,7 +153,24 @@ rows (`unpack` 0.34 of ours, `call` 0.41); taking the better of both on each row
   5A22 multiplier is an instruction choice of the compiler outside interrupts; only the PPU multiplier (shared with Mode 7)
   stays with the library.
 
-Pending: the emulator, and the other two games.
+**A port's entity-loop benches (identical step by step to a model; against a 1993 hand-written assembly and a second console's)**:
+- Entity loop, one array per word field, one small function per entity on a `u16` index: 8 419 against 5 217 by hand, factor 1.61
+  (needs 1.5 or less to change its verdict). What it pays: a `sta.w f,x` then `lda.w f,x`, an `and` stored in the direct page and
+  never read, the per-entity call.
+- A byte table read through an index, four bytes written to four arrays: 913 against 510 to 540, factor 1.69 to 1.79 (2.7 to 2.9
+  earlier in the month). What remains: an `and.w #$00FF` before each byte store, a `sep/rep` per byte instead of staying 8-bit for
+  the four, a constant offset recomputed, a direct-page intermediate.
+- Formulation weighs as much as an advance: array of structures 11 180 against 8 419 by field (1.33), a grid of pointers 1 447 against
+  913 indexed (1.58), an iterator that copies the entity into a global 16 541 (3.17).
+- A technique to measure, hypothesis: put the direct page on the entity (`tcd` to its base) and read each field with `lda.b`, so a
+  structure stays a structure; to be measured by hand before G1.
+- Four invariants a generator must never break: order and number of accesses to console registers (VRAM port, multiplier waits,
+  DMA and HDMA registers); size or position of the VBlank code; layout of an array the DMA sends as it is; bank or calling
+  convention of a function called from assembly or the NMI.
+- Challenges: the 1993 yardstick holds routine by routine, not game by game (a large part of the largest gains is algorithmic and
+  belongs to the game); the bench of G1 must count several natural formulations of the same C, or G1 fits our workarounds.
+
+Pending: the emulator, and the third game.
 
 ## Open in this note
 
