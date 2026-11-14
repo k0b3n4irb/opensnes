@@ -58,49 +58,51 @@ shape each, nothing of a game. What they are there for:
   instructions executed (a luna trace of the row, FastROM); `call` alone is
   a loop of nothing but calls. A code-generation gain that lowers the
   instructions between calls raises this figure: read it again then.
-- `unpack`: 1 102 master cycles a byte produced in C, 87 in assembly
-  (FastROM): two far pointers walked a byte at a time against a block move.
+- `unpack`: 481 master cycles a byte produced in C, 87 in assembly
+  (FastROM): two far pointers walked a byte at a time against a block move
+  (1 102 before lot E1, which reads each pointer in its slot and steps it on
+  16 bits).
 - `blocks` and `probe` read a map of words above `$2000` (`FAR`), as a
   level map is; `blocks` reads the four words of a block there too.
 
 The byte count of an assembly twin is its entry routine only: the handlers
 of `fptr` and the callees of `chain` (and of `call`) are not in it.
 
-## The table (2026-11-12, after lot L2, the jump table)
+## The table (2026-11-14, after lot E1, far pointers read in their slot)
 
-Master cycles a call. `C/asm` is the factor to bring down. At the start
+Master cycles a call (the lots between L2 and E1 are in it too; E1 alone moved `unpack`, `slots`, `ents` and `col`). `C/asm` is the factor to bring down. At the start
 (2026-11-11) the weighted mean was 2.24, every row equal 2.74, the first
 twelve rows 2.55; `baseline.json` in the history holds every figure of that day.
 
 | routine | C | asm | C/asm | C fast | asm fast | C/asm fast | C bytes | asm bytes |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|
-| copy | 22276 | 13842 | 1.61 | 18563 | 12236 | 1.52 | 26 | 15 |
-| fill | 32422 | 16180 | 2.00 | 26574 | 13442 | 1.98 | 33 | 56 |
-| fillu * | 17718 | 16177 | 1.10 | 14698 | 13445 | 1.09 | 71 | 56 |
-| oam | 42886 | 22893 | 1.87 | 35544 | 18937 | 1.88 | 340 | 169 |
-| col | 16582 | 6452 | 2.57 | 14080 | 5412 | 2.60 | 98 | 505 |
-| coli * | 14178 | 6454 | 2.20 | 11918 | 5414 | 2.20 | 74 | 505 |
-| row | 12890 | 6452 | 2.00 | 11046 | 5412 | 2.04 | 88 | 505 |
-| rowi * | 14771 | 6452 | 2.29 | 12512 | 5414 | 2.31 | 74 | 505 |
-| box | 18469 | 12408 | 1.49 | 15560 | 10298 | 1.51 | 206 | 127 |
-| fixed | 93277 | 10474 | 8.91 | 78991 | 8772 | 9.00 | 223 | 83 |
+| copy | 22236 | 13842 | 1.61 | 18522 | 12236 | 1.51 | 25 | 15 |
+| fill | 32380 | 16177 | 2.00 | 26536 | 13445 | 1.97 | 32 | 56 |
+| fillu * | 17678 | 16177 | 1.09 | 14660 | 13442 | 1.09 | 70 | 56 |
+| oam | 41486 | 22893 | 1.81 | 34334 | 18937 | 1.81 | 336 | 169 |
+| col | 13178 | 6452 | 2.04 | 11206 | 5412 | 2.07 | 89 | 505 |
+| coli * | 13674 | 6452 | 2.12 | 11481 | 5414 | 2.12 | 72 | 505 |
+| row | 12848 | 6454 | 1.99 | 11008 | 5412 | 2.03 | 87 | 505 |
+| rowi * | 14768 | 6452 | 2.29 | 12512 | 5414 | 2.31 | 74 | 505 |
+| box | 17992 | 12408 | 1.45 | 15146 | 10298 | 1.47 | 207 | 127 |
+| fixed | 93277 | 10474 | 8.91 | 78994 | 8772 | 9.01 | 223 | 83 |
 | mul | 26234 | 7772 | 3.38 | 24035 | 6398 | 3.76 | 78 | 52 |
-| ents | 30667 | 14740 | 2.08 | 25657 | 12342 | 2.08 | 182 | 85 |
-| entsi * | 18735 | 14738 | 1.27 | 15644 | 12342 | 1.27 | 127 | 85 |
-| call | 66876 | 32642 | 2.05 | 58233 | 27880 | 2.09 | 74 | 30 |
-| soa | 37082 | 24865 | 1.49 | 31233 | 20809 | 1.50 | 291 | 171 |
-| glide | 98814 | 67680 | 1.46 | 83062 | 56049 | 1.48 | 249 | 163 |
-| slots | 32330 | 7486 | 4.32 | 27121 | 6194 | 4.38 | 82 | 85 |
-| state | 21826 | 16161 | 1.35 | 17854 | 13187 | 1.35 | 336 | 209 |
-| fptr | 52486 | 16628 | 3.16 | 45111 | 14132 | 3.19 | 98 | 26 |
-| blocks | 24452 | 10670 | 2.29 | 20856 | 8967 | 2.33 | 201 | 829 |
-| probe | 30322 | 21351 | 1.42 | 25674 | 17930 | 1.43 | 134 | 96 |
-| chain | 84378 | 37103 | 2.27 | 72835 | 31860 | 2.29 | 65 | 18 |
-| sprites | 97178 | 51216 | 1.90 | 81384 | 42647 | 1.91 | 568 | 323 |
-| unpack | 633456 | 51736 | 12.24 | 545960 | 44472 | 12.28 | 362 | 67 |
-| mean, weighted by real games' profiles |  |  | 1.99 |  |  | 2.01 |  |  |
-| geometric mean, every row equal |  |  | 2.40 |  |  | 2.43 |  |  |
-| geometric mean of the first twelve rows |  |  | 2.20 |  |  | 2.23 |  |  |
+| ents | 25320 | 14740 | 1.72 | 20976 | 12344 | 1.70 | 169 | 85 |
+| entsi * | 18095 | 14738 | 1.23 | 15079 | 12342 | 1.22 | 119 | 85 |
+| call | 64494 | 32642 | 1.98 | 56115 | 27880 | 2.01 | 74 | 30 |
+| soa | 36377 | 24865 | 1.46 | 30624 | 20809 | 1.47 | 286 | 171 |
+| glide | 93704 | 67682 | 1.38 | 78638 | 56049 | 1.40 | 242 | 163 |
+| slots | 21928 | 7486 | 2.93 | 17990 | 6194 | 2.90 | 75 | 85 |
+| state | 19568 | 16161 | 1.21 | 15876 | 13185 | 1.20 | 297 | 209 |
+| fptr | 52486 | 16631 | 3.16 | 45111 | 14130 | 3.19 | 98 | 26 |
+| blocks | 24409 | 10673 | 2.29 | 20816 | 8967 | 2.32 | 200 | 829 |
+| probe | 29955 | 21351 | 1.40 | 25358 | 17932 | 1.41 | 135 | 96 |
+| chain | 83208 | 37106 | 2.24 | 71775 | 31857 | 2.25 | 65 | 18 |
+| sprites | 93263 | 51216 | 1.82 | 77892 | 42647 | 1.83 | 545 | 323 |
+| unpack | 281068 | 51736 | 5.43 | 246234 | 44475 | 5.54 | 225 | 67 |
+| mean, weighted by real games' profiles |  |  | 1.85 |  |  | 1.86 |  |  |
+| geometric mean, every row equal |  |  | 2.18 |  |  | 2.19 |  |  |
+| geometric mean of the first twelve rows |  |  | 2.09 |  |  | 2.11 |  |  |
 
 A row marked `*` is the same routine written another way in C (`fillu` unrolled by
 hand, `coli` / `rowi` / `entsi` with an index instead of a walked pointer), against

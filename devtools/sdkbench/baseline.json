@@ -2,25 +2,25 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 1018322,
-      "size": 100,
+      "cycles": 1018282,
+      "size": 99,
       "stack": 23,
       "res": 172
     },
     "sort": {
-      "cycles": 777966,
-      "size": 218,
+      "cycles": 773362,
+      "size": 209,
       "stack": 36,
       "res": 12563
     },
     "physics": {
-      "cycles": 2109602,
-      "size": 393,
+      "cycles": 2101480,
+      "size": 386,
       "stack": 41,
       "res": 12530
     },
     "collide": {
-      "cycles": 4660640,
+      "cycles": 4651170,
       "size": 398,
       "stack": 41,
       "res": 162
@@ -44,26 +44,26 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 2686076,
-      "size": 271,
+      "cycles": 2055930,
+      "size": 222,
       "stack": 23,
       "res": 819
     },
     "calls": {
-      "cycles": 2563034,
+      "cycles": 2563038,
       "size": 57,
       "stack": 159,
       "res": 1597
     },
     "switch": {
-      "cycles": 664268,
-      "size": 236,
+      "cycles": 660538,
+      "size": 230,
       "stack": 23,
       "res": 9705
     },
     "crc": {
-      "cycles": 1338098,
-      "size": 107,
+      "cycles": 1254716,
+      "size": 105,
       "stack": 23,
       "res": 2842
     },
@@ -80,68 +80,68 @@
       "res": 10608
     },
     "grid": {
-      "cycles": 1935900,
+      "cycles": 1935404,
       "size": 421,
       "stack": 44,
       "res": 40897
     },
     "entities": {
-      "cycles": 2992856,
-      "size": 485,
+      "cycles": 2992378,
+      "size": 484,
       "stack": 41,
       "res": 12530
     },
     "copy": {
-      "cycles": 923130,
-      "size": 282,
+      "cycles": 923184,
+      "size": 280,
       "stack": 29,
       "res": 20921
     },
     "strings": {
-      "cycles": 1425290,
-      "size": 680,
-      "stack": 44,
+      "cycles": 1314002,
+      "size": 652,
+      "stack": 41,
       "res": 65535
     },
     "state": {
-      "cycles": 945840,
-      "size": 270,
-      "stack": 27,
+      "cycles": 926040,
+      "size": 268,
+      "stack": 29,
       "res": 24876
     },
     "place": {
-      "cycles": 4518340,
-      "size": 326,
-      "stack": 28,
+      "cycles": 4386948,
+      "size": 324,
+      "stack": 23,
       "res": 30752
     },
     "dist": {
-      "cycles": 6668592,
+      "cycles": 6668708,
       "size": 434,
       "stack": 23,
       "res": 29147
     },
     "depot": {
-      "cycles": 11755294,
-      "size": 3095,
-      "stack": 56,
+      "cycles": 11307716,
+      "size": 3047,
+      "stack": 59,
       "res": 54047
     },
     "div32": {
-      "cycles": 4531784,
+      "cycles": 4531506,
       "size": 397,
       "stack": 35,
       "res": 54707
     },
     "farfill": {
-      "cycles": 51077432,
-      "size": 2749,
+      "cycles": 49161026,
+      "size": 2681,
       "stack": 63,
       "res": 18907
     },
     "stepseq": {
-      "cycles": 56709468,
-      "size": 2975,
+      "cycles": 55541164,
+      "size": 2929,
       "stack": 62,
       "res": 30034
     }
