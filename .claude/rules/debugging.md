@@ -24,3 +24,6 @@ Never add a workaround to an example to "make it work" (an `extern` plus a manua
 - luna (`docs/tutorials/debugging.md`): `run_until_mem_write` (who writes this buffer), `peek_memory` / `state`, `assets-dump` against the PVSnesLib original, `oam.json` / `ppu.oam_full`. A figure read over MCP depends on what the session did before; a number for a manifest or a baseline is taken again at the CLI from power-on.
 - `python devtools/symmap/symmap.py --check-overlap x.sym` (bank $00 overflow), `python3 testing/luna_runner.py --compare` (framebuffer), `xxd x.sfc | head` (header, vectors).
 - Black screen: init order (`consoleInit()`, `setScreenOn()`). Garbage tiles: VRAM write outside VBlank. Wrong colours: sprite palettes start at CGRAM 128. Crash: bank $00 overflow.
+
+## A third party's build run in the background gets its input and a bounded output
+A build we did not write (another compiler's, a vendor's script) can ask a question on its input. Started in the background without input it loops on the prompt and writes the same line forever: one such task filled 4.45 GB of `/tmp` (a RAM file system) before anyone looked (2026-11-12). So: give it its input (`yes n |`, `< /dev/null`, or its non-interactive options) and send its output to a file bounded in size (`| head -c 5M > log`, or `timeout` plus a size check), never to an unbounded task output.
