@@ -142,3 +142,37 @@ the same sample: hypothesis, a game event a few cycles earlier; not listened to)
 with the code, not re-captured on a measurement branch); fixtures, ROM coverage, race gate, NMI budget, VRAM DMA, link of
 the modules, bank spill, the user project, torture subset, `bench.py`, `libbench` all pass; `sdkbench` and `gapbench
 --check` fail on the slower rows above. Nothing re-baselined.
+
+## Lot XY (2026-11-14): the probe made a lot, prediction written before the code
+
+Asked by the conductor and the owner (L4 frozen at S3): the colour as a mergeable lot. Pair: Opus alone, as for the probe.
+
+**The three slower workloads.** Cause read on `tilemap` (above): the colour refuses the hot inner counter (an ALU operand),
+gives Y to a colder value, and switches the loop rule off for the whole function on that register. Two changes, in this
+order: (a) the loop rule is switched off only over the text where a coloured value of that register lives (the emission
+already knows, chunk by chunk, which coloured values are live: the byte ranges of those chunks are passed to the rule,
+which refuses a loop whose lines fall in one); (b) a function is emitted with and without the colour and the cheaper text
+is kept, by a static cost (cycles of each line from the 65816 timing table, weighted by its block's loop weight), so that
+the colour never loses to the text rules it displaces. (b) alone is enough for "never worse" by the estimator; (a) keeps
+the loop rule's gain where both can coexist.
+Prediction: `collide`, `bytes`, `tilemap` back within +-0.5 % of their baselines (each the colour's loss undone; any gain
+left is (a)'s); the rest of `sdkbench` and `libbench` unchanged or better; gapbench weighted mean 1.91 (unchanged:
+its rows gained already), `oam` back to its baseline.
+
+**Net gain on the games** (busy time, today -1.37 / -1.78 %): the regressions of the probe in the hot functions of game 1
+(its sprite update +2.7 %, 8.6 % of busy time: 0.23 points) and game 2 (a sprite routine +1.1 %, 4.8 %: 0.05 points) are
+of the same family if (b) catches them (hypothesis): **game 1 -1.4 to -1.6 %, game 2 -1.8 to -1.9 %**. State identical
+at every step. What could make it less: (b)'s estimator choosing the plain text where the colour was in fact faster
+(it counts cycles, not the frequency a run gives); that would show as a game figure under -1.37 / -1.78.
+
+**Compile time** (+5 % on the two largest files of game 2 for the probe): (b) adds one emission and one text pass per
+function the colour touches. Target: no more than +5 % after (b), by cutting the attempts (a refused web is not tried
+again in a register it was refused, already; the plain text emitted once and reused as the fallback).
+
+**Gates.** The 17 compiler checks that pin the old shapes: each moved to the new shape where the check's subject is still
+seen, or given `QBE_NO_XY_COLOUR=1` where it pins a mechanism the colour replaces (the loop rule's own shape); no value
+check touched. The two examples one frame early re-captured after a frame-by-frame comparison (same pictures, offset 1);
+`superfx_game_skeleton`'s audio compared and explained before its hash moves. A hunt of 20 000 seeds of each differential
+test (30001-50000), the injected fault still caught, and an independent check of the lesson: an assertion build
+(`QBE_XY_ASSERT=1`) that keeps every coloured value's slot as a shadow and compares the register with it at every use on
+the emitted text (`brk` on a difference), run under `difftest_stmt`: a proof that does not rest on the interference graph.
