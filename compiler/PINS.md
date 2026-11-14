@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | ca352683911297c1b1f20ada41858fffd3a93b54 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 1888e978f008fcc4ac9021686d35f1c800438a22 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 152 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 153 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1888e97 fix(w65816): the X/Y colour reads a decomposed address's base and index only for the kinds that set them — a near dereference's entries were a former function's (an assertion on two programs of the 20 000-seed statement hunt) (lot XY, 2026-11-14)
 ca35268 perf(w65816): the X/Y colour as a lot, the loop rule kept where no coloured value lives — byte ranges of the coloured values passed to `peephole_loop_x`, the loop rule's counters learned from a plain emission stopped after it, webs joined only when no two members live together; `QBE_XY_ASSERT=1` (shadow slots, `stp` on a difference), `QBE_XY_FAULT=3`; compile time +2.5 % (lot XY, 2026-11-14)
 b7883df perf(w65816): G1 probe, a value that lives in X or Y, proved by its own emission — a third colour in `color_slots` (a web of 16-bit temps with an index use or a loop phi, never across a call, in X or Y), the function emitted again until its own text proves every coloured value; `QBE_NO_XY_COLOUR=1`, `QBE_XY_TRACE=1`, `QBE_XY_FAULT=1|2` (G1 probe, 2026-11-13)
 1aeda99 feat(w65816): the static-frame side table is written for every function, frames on or off — the S0 comment lines always, `sf=` (0 until a frame is given) and `; sframe table 1`; read by opensnes-rom place / check --objects; `QBE_SFRAME_FAULT=noedge` drops a call from the table (the check must refuse); the ROMs do not change (L4 S1, 2026-11-14)
