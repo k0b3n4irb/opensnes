@@ -169,6 +169,18 @@ PINNED = [
      "pin_far[i + 8] = (pin_far[i + 8] & m) | q[2]; } "
      "for (n = 0; n < 16; n++) h = h * 31 + pin_far[n]; return h; }",
      "p15()", 0x0A8E68AE),
+    # two statics copied into a loop (the size rule), the second's return a
+    # 16-bit compare that the optimizer leaves as the operand of the 32-bit
+    # xor: the dead-store rule for a commutative operand took its slot, the
+    # pair path read it, and the build stopped (seed 9922, I1 S4, 2026-11-14)
+    ("a 16-bit compare xored into a 32-bit accumulator, from copies",
+     "static inline s32 p16c(u16 x0, u32 x1) { return !x0 ? (s32)1L : (x1 >= 1024L); } "
+     "static inline s8 p16s(u8 x) { switch (x & 7) { case 0: return x <= x; case 1: return ~x; "
+     "case 2: return ~x; case 3: return x && (s8)127; case 4: return x; case 5: return x && (s8)85; "
+     "case 6: return 1877980014UL; default: return x ^ 0L; } } "
+     "u32 p16(void) { s8 v2 = 85; u32 u = 3; u16 i; "
+     "for (i = 2; i > 0; i--) u ^= p16c(p16s((s8)-128), 32768U >= v2); return u; }",
+     "p16()", 3),
 ]
 
 PROGS_PER_ROM = 10

@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 18eecca664b0f348f7f06c467bd11ea9328aeb31 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 0f524569e1ce7184c92a238e904e355331efc6d1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 5a4c27530590b1a85f5cdafd1460d82792b8f950 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -103,7 +103,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 157 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 158 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -115,6 +115,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+5a4c275 fix(w65816): the dead-store rule for a commutative operand is for a 16-bit operation only — `mark_dead_stores` case 3 dropped the store of arg[1] of a commutative operation trusting an A-cache swap the 32-bit pair path never makes; a 16-bit compare xored into a 32-bit accumulator lost its slot and the build stopped on `temp_noslot` (difftest_stmt seed 9922, pinned as `p16`, reachable with `static inline` helpers); the corpus and the library byte-identical (2026-11-14)
 0f52456 feat(inline): `noinline` is a linkage keyword every inliner refuses — `Lnk.noinline`; the small inliner's eligibility, `auto_inline_ok` (reason `noinline`) and the leaf rule's guess refuse it; `QBE_INLINE_FAULT=noinline` forgets it (check `noinline`); output byte-identical for code that does not write it (I1 S3, 2026-11-14)
 7bd8684 feat(inline): `CC_TRACE_INLINE` names why each call stays a call — one `decline` line per call auto_inline_ok or splice_fn refuses (the reason, the test before or after the callee's own inlining, the temporaries counted and those still used, the reason with the site count left out) and one `final` line per function (its IR size after its own copies); stderr only, the output byte-identical (I1 S2, 2026-11-14)
 f2e1f03 fix(w65816): no label ends in `.b`, `.w` or `.l`, which WLA-DX reads as an operand size — `inl_label` adds `_` after a copied block's cut label that would (three levels of copies failed the link), `wla_label_guard` refuses any function, block or datum label of that shape (a `static` of a source `b.c` / `w.c` / `l.c` linked to the wrong function); `QBE_INLINE_FAULT=label`, `QBE_LABEL_FAULT=noguard` (I1 S1, 2026-11-14)
