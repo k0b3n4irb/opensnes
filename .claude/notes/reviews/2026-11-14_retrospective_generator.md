@@ -125,7 +125,35 @@ rows (`unpack` 0.34 of ours, `call` 0.41); taking the better of both on each row
 - Its own challenge: the gain comes mostly from the shape of the C (-14 %) and from advances of a few percent each, so a
   generator must be worth more than about +3 % on that game to repay its risk (hypothesis, to prove on the same bench).
 
-Pending: emulator, corpus, kit, the other two games.
+**The porting kit (what the ports learned from compiled C)**:
+- An entity loop over a table at 20 entities: array of structures 11 180, one array per word field 8 419 (-25 %), hand assembly
+  5 217: factor 2.14 then 1.61. An assembly iterator that copies the entity to a fixed address for absolute-addressed C made it
+  worse (16 541, +96 %).
+- Losses the compiler caused the games: a `static` with one caller goes back to `jsl` when its caller grows (+11 000 a tick); a leaf
+  that gains a call on a cold branch loses its direct page (+1 800 a frame); a loop that calls, or indexes a `u8` without a
+  constant step, is not turned into an index; a variable shift made the peephole liveness give up on the whole function; one
+  miscompilation (a counter whose address is taken, a stale copy) lasted four days unseen.
+- A bench gain does not transfer: the same lot gave -2.26 % on one game and -0.08 % on the other; a bench gain is read only with the
+  `.asm` of the real case. A 1993 commercial game written in assembly holds its step in 2.12 frames: a factor 1.0 to 1.1 would
+  be needed to match it, 1.61 is measured.
+- Asks: `field,x` on global arrays at the hand's price; loop-body variables kept in registers without copy or reload; an index
+  kept when the body calls; integration and direct page that stay stable when the code grows; no 8/16 switch per byte; correctness
+  before gain. Its own challenge: judge G1 on the games' hot shapes, not on the bench, and keep correctness as the first criterion.
+
+**The reference corpus (what it settles, and its holes)**:
+- Time is not a number of cycles: a memory access costs 6, 8 or 12 master cycles by region and MEMSEL, an internal operation 6; FastROM
+  only for banks `$80+`. So the cost model counts master cycles per access, by the region of each access.
+- `+1` cycle when m=0 (`+2` for read-modify-write), `+1` when the low byte of D is not zero, `+1` on an indexed page cross; `rep` /
+  `sep` 2 bytes 3 cycles (a round trip is 6 cycles, 4 bytes); the multiplier 8 and the divider 16 CPU cycles; DMA 8 master
+  cycles a byte plus 8 a channel, DRAM refresh 40 per line; `mvn` 7 per byte.
+- Holes, costliest first: the state of the art of 6502-family code generation is absent (llvm-mos, Calypsi, vbcc's 65816 back end,
+  the WDC compiler), no reference emulator CPU core, the bus-level step tests only as a README, the 1993 commercial assembler has
+  no document (a measure on a ROM). Documents may be captured privately with their licence written in a provenance card.
+- Its challenge: "the target is the SNES, not only the 65816" holds (the same access costs 6 or 8 master cycles by placement); the
+  5A22 multiplier is an instruction choice of the compiler outside interrupts; only the PPU multiplier (shared with Mode 7)
+  stays with the library.
+
+Pending: the emulator, and the other two games.
 
 ## Open in this note
 
