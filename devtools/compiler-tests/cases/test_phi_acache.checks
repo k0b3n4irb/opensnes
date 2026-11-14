@@ -15,6 +15,9 @@ env QBE_NO_PHI_SHARE=1
 # pointer st stays in tcc__r9 for the whole loop (see peep_r9loop): the case
 # pins the moves to and from its slots.
 env QBE_NO_PEEP_R9LOOP=1
+# Since lot E1 (2026-11-14) the pointer is read in its slot, `[tcc__lf+N]`,
+# without the staging the last line pins (see farptr_dp).
+env QBE_NO_FARPTR_DP=1
 # Several phi moves in a row each load their own source: the A-cache must
 # not believe A still holds a value a previous move replaced (the
 # writestring() regression). Ported from opensnes-emu test_phi_acache

@@ -21,9 +21,9 @@ in idx_wr16: absent adc\.w #:fwords
 
 # far pointer + constant field offset: the base staged ONCE in tcc__r9,
 # the field reached with `,y`
-in fld_rd: present ldy\.w #2\n\tlda \[tcc__r9\],y
-in fld_wr: present ldy\.w #4\n\tlda[^\n]*\n\tsta \[tcc__r9\],y
-in fld_wr: present ldy\.w #6\n\tsta \[tcc__r9\],y
+in fld_rd: present ldy\.w #2\n\tlda \[tcc__(?:r9|lf\+\d+)\],y
+in fld_wr: present ldy\.w #4\n\tlda[^\n]*\n\tsta \[tcc__(?:r9|lf\+\d+)\],y
+in fld_wr: present ldy\.w #6\n\tsta \[tcc__(?:r9|lf\+\d+)\],y
 in fld_wr: absent (?s)sta\.b tcc__r9\+2.*sta\.b tcc__r9\+2
 
 # far pointer + runtime index: [tcc__r9],y with Y = index

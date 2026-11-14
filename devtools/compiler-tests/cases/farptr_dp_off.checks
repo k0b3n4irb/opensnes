@@ -1,0 +1,4 @@
+env QBE_NO_FARPTR_DP=1
+in copy2: present sta\.b tcc__r9\n\tlda\.b tcc__lf\+\d+\n\tsta\.b tcc__r9\+2\n\tlda \[tcc__r9\]
+in copy2: present adc\.w #0
+in copy2: absent \[tcc__lf

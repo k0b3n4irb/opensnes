@@ -7,7 +7,7 @@ in far_indexed:   present lda\.l farr,x\n\tand\.w #\$00FF
 in const_indexed: present lda\.l tab,x\n\tand\.w #\$00FF
 in through_ptr:   present lda\.l \$000000,x\n\tand\.w #\$00FF
 in field:         present lda\.l \$000003,x\n\tand\.w #\$00FF
-in far_ptr:       present lda \[tcc__r9\],y\n\tand\.w #\$00FF
+in far_ptr:       present lda \[tcc__(?:r9|lf\+\d+)\],y\n\tand\.w #\$00FF
 in plain:         absent sep
 in indexed:       absent sep
 in far_indexed:   absent sep

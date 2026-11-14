@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 82e1c1d888f5c3858ba5e41fbed1636fd0b88d30 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 1888e978f008fcc4ac9021686d35f1c800438a22 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 3f469bfe2f8cddab064f3ac256f9b79b47a4c246 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -102,7 +102,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 153 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 154 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -114,6 +114,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+3f469bf perf(w65816): a far pointer read in its direct-page slot, stepped on 16 bits when one object of the unit is all it can point into — `peephole_dp_ptr` (the staging into tcc__r9 goes, `[tcc__lf+N]`, last of the text rules) and `farptr_web` / `farptr_step` (an object never crosses a bank; a pointer from one object of the unit, only dereferenced, adds on its low word); `QBE_NO_FARPTR_DP=1` byte-identical, `QBE_FARPTR_TRACE`, `QBE_FARPTR_FAULT=1..4`, `QBE_FARPTR_ASSERT=1` (lot E1, 2026-11-14)
 1888e97 fix(w65816): the X/Y colour reads a decomposed address's base and index only for the kinds that set them — a near dereference's entries were a former function's (an assertion on two programs of the 20 000-seed statement hunt) (lot XY, 2026-11-14)
 ca35268 perf(w65816): the X/Y colour as a lot, the loop rule kept where no coloured value lives — byte ranges of the coloured values passed to `peephole_loop_x`, the loop rule's counters learned from a plain emission stopped after it, webs joined only when no two members live together; `QBE_XY_ASSERT=1` (shadow slots, `stp` on a difference), `QBE_XY_FAULT=3`; compile time +2.5 % (lot XY, 2026-11-14)
 b7883df perf(w65816): G1 probe, a value that lives in X or Y, proved by its own emission — a third colour in `color_slots` (a web of 16-bit temps with an index use or a loop phi, never across a call, in X or Y), the function emitted again until its own text proves every coloured value; `QBE_NO_XY_COLOUR=1`, `QBE_XY_TRACE=1`, `QBE_XY_FAULT=1|2` (G1 probe, 2026-11-13)

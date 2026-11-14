@@ -4,7 +4,7 @@
 # the main thread is executing. Bad counts 0; the iteration count and the
 # callbacks that landed inside a main thread's call prove the race was run.
 rom = "string_nmi.sfc"
-frames = 2600                    # the loop ends near frame 2200
+frames = 2600                    # the loop ends near frame 1800 (2000 before lot E1)
 
 [asserts]
 wdm_empty = true
@@ -16,5 +16,7 @@ wdm_empty = true
 "r_bad_mov" = 0                  # main: memmove backward in $7F (MVP)
 "r_bad_set" = 0                  # main: memset of $7F
 "r_cb_bad" = 0                   # the callback's memcpy, memmove, memset
-"r_cb_runs" = { ge = 2000, width = 2 }   # one a frame: the race ran for thousands of frames
+"r_cb_runs" = { ge = 1500, width = 2 }   # one a frame: the race ran for thousands of frames
+                                         # (2007 measured, then 1808 once the C between the calls got
+                                         # faster, lot E1: the bound is the duration, not the result)
 "r_cb_inside" = { ge = 300, width = 2 }  # ... and landed inside a main thread call hundreds of times (518 measured)

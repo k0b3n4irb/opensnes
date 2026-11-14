@@ -1,6 +1,6 @@
 # A6a R5: `and.w #K1 / and.w #K2` is `and.w #(K1 & K2)` (peephole). The
 # twin and_and_off pins the two masks.
-in lookup: present lda \[tcc__r9\]\n\tand\.w #\$00FF\n\tasl a
+in lookup: present lda \[tcc__(?:r9|lf\+\d+)\]\n\tand\.w #\$00FF\n\tasl a
 in lookup: absent and\.w #\$00FF\n\tand
 in bit3: present lda\.w flags\n\tand\.w #8\n
 absent and\.w #[^\n]*\n\tand\.w #
