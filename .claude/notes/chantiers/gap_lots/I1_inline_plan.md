@@ -444,3 +444,7 @@ Changes taken in the plan:
 3. **The S4 prediction is rewritten with the measured ratio: -1.23 % (game 1) and -1.26 % (game 2)** instead of -1.7 / -1.6 %, range -0.9 to -1.6; with the old 32 KB budget game 2 would fall near -0.8 %, under the stop bar of 1.02 %: the stop bar stays 1.02 % and the budget is part of what S4 must show.
 4. **S5 starts with the exact count of the margin** (the callee's 64 temporary registers not counted), before any idea of raising the 1 800.
 5. The dense callees (190 instructions and above) are out of this lot's reach; if they are wanted, it is a second rule with its own count.
+
+## Status after S4 (2026-11-14, night): frozen
+
+S1 to S3 are on `develop`. S4 (the size rule) was built, passed every gate and its switch is byte-identical, but the private gauge stops it: game 2 -1.30 % (predicted -1.26), **game 1 +0.48 %** (predicted -1.23, bar 1.02 %), compile time 3.5 times. The code stays on the worktree branch `i1s4`; the result and the verdict are in `I1_s4_result.md`. S5 (the room accounting) waits; a defect found by the hunt is landed alone.
