@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe count-a1 count-i1 test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe count-a1 count-i1 count-i1-calib test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -750,6 +750,11 @@ count-i1:
 	@test -d $(A1_IR) || { echo "count-i1: no IR in $(A1_IR); build it first: make clean && CC65816_KEEP_IR=$(abspath $(A1_IR)) make"; exit 1; }
 	@python3 devtools/sframe/i1_count.py --corpus examples --lib-casm lib/build/lorom --ir-dir $(A1_IR)
 
+count-i1-calib:
+	@test -d $(A1_IR) || { echo "count-i1-calib: no IR in $(A1_IR); build it first: make clean && CC65816_KEEP_IR=$(abspath $(A1_IR)) make"; exit 1; }
+	@python3 devtools/sframe/i1_calib.py compile --qbe bin/qbe --ir-dir $(A1_IR) --out build/i1_calib
+	@python3 devtools/sframe/i1_calib.py report --dir build/i1_calib
+
 test-sframe:
 	@python3 devtools/sframe/test_sframe_link.py --oracle
 
@@ -934,6 +939,7 @@ help:
 	@echo "  count-sframe - L4 S0: the static-frame count (every .c.asm carries the side table since S1)"
 	@echo "  count-a1 - A1 S0: what the first integer argument in A would take (census from the side table, the text and the kept IR)"
 	@echo "  count-i1 - I1 S0: what inlining the same-file calls would take (eligible callees, sites, ROM; same inputs as count-a1)"
+	@echo "  count-i1-calib - I1 S2: the inliner's decline reasons and the size rule's calibration (kept IR recompiled with CC_TRACE_INLINE)"
 	@echo "  test-sframe - L4 S1: opensnes-rom place / check --objects on the corpus, the noedge fault, the S0 count as oracle"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
