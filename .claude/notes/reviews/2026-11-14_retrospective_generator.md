@@ -206,7 +206,7 @@ difference of two runs to a program counter)**:
 - **A challenge to our gauge**: it followed the game's measures on advances 3, 4, 5 (-2.83 % against -2.84 % a frame; predicted 0 to -0.3 %,
   measured -0.072 %; 1.42 % against -1.35 %), but predicted -1.72 % for the X/Y colour lot where the game measured -0.08 % in NTSC.
   We attributed the gap to the source freeze of 2026-11-11; the game disputes it (between the two versions the C gained only the 3/4
-  frame, under an `#ifdef`; the NTSC path barely moved). **The cause is open** (hypothesis: the gauge's window or method). Consequence for
+  frame, under an `#ifdef`; the NTSC path barely moved). **Cause found at 00:00 by the game itself**: the gauge's reference was the compiler with the colour switched off, not the lot's parent (which already coloured): the lot's own part is -0.35 %, the whole colour -1.65 %; the freeze and the method were not at fault. Consequence for
   G1: the arbiter is the rebuilt game replayed at each stop, not a snapshot or twelve routines.
 - On "the target is the SNES": on that game the multiplier, divider and hardware copies can return only 0.23 %; the 19 % of assembly in
   the library is a library lever. What G1 must bring there: allocate A, X, Y and the direct page around calls, stop rescaling a known

@@ -197,3 +197,7 @@ Total 13 to 19 days of the pair (hypothesis until R-1 and R0 are measured; the c
 ### Conductor's answer on the free convention (2026-11-14)
 
 Yes: the free convention between `static` functions of one file is in the scope, as an option of the prototype measured apart, and the line stays at 10 %. Conditions: **two columns everywhere** (every figure of R3 and R4 is given twice, "ABI kept" and "free convention"); **the public boundary does not move** (a function visible from another file, or called from assembly or the NMI, keeps the ABI: the games' invariant, tested under an injected fault); **L4's finished work is reused**, not redone; two additions enter the plan: an **integration report compared from one build to the next**, signalling when an inlining decision flips, and the library's share of hand assembly noted as a library lever outside G1. The owner is asked only if R3 or R4 shows the line out of reach even with the free convention. Order confirmed: I1 S4, then R-1 (the gauge's gap), then R0.
+
+### R-1 closed (2026-11-15, 00:00)
+
+The gauge's gap was a reference that was not the one named: `xylot-ref` was the compiler with the X/Y colour off (`QBE_NO_XY_COLOUR=1`); the parent of the lot already coloured. The lot's own part is -0.35 % on game 1, the whole colour -1.65 % (the gauge's -1.72 % was the whole colour). No error bar is needed from this cause; **the rule that remains**: every figure names its reference by commit and by switches. R-1 costs 0 days: the plan starts at R0 (with that rule in its harness); total 11 to 17 days.
