@@ -353,3 +353,16 @@ written. H4 is therefore under-estimated; the library's closure table is not an 
 11. Minor: the separator of `sf` fixed and tested with a file named `b.c` (WLA may read `sf.fn.b+2` as a size suffix; hypothesis);
     `argsearly` requalified as a proof of the set-up, not of a rule; S2b's gate and the SNESMOD-linked case beyond 131 bytes are a
     link refusal, not a silent shrink.
+
+## Stop reached after S3 (2026-11-14): S2 and S3 are NOT on `develop`
+
+S3's prediction was written before its builds and measurements (1.4-1.8 / 1.9-2.2 % of busy time, jeu 1 / jeu 2); the stop rule (contest point 9)
+asked for at least 1.07 / 1.31 %. Measured with the ROMs built `SFRAME=1`, state identical to the reference at every step:
+**+0.54 % (slower) on game 1 and -1.06 % on game 2**. The functions with a frame lose 0.66 % of game 1's profile and gain 1.20 % of game 2's;
+the others (code unchanged) move -0.11 / +0.15 % (data and code displaced by the window). In the lines of the losers `lda.b sf... / tax` comes back
+at the head of each block: on a stack slot `N,s`, `peephole_xflow` knew X already held the value and `lda S / sta S` and `peephole_entry` applied;
+the opaque `sf.*` operand loses what the text rules did on the stack, and S0's count (a replay of traces without recompiling) could not see it.
+Lesson in the kit. Per the rule the lot stops and goes back to the conductor before S4. What stays: the notes `L4_s2_result.md`,
+`L4_s3_result.md`; the code stays on the worktree branch `l4s23` (S2 `be8da548`, S3 `e13266df`, QBE `a4dcb1b`, local to the submodule: not on the
+fork, not on `develop`) for a later S4. With `SFRAME := 1` as is, `place` refuses both games' links (chains of 98 / 90 bytes with the
+reviewed-routine closure; both link with 2 and 1 excluded functions): S7 is a precondition of any default activation, and S2b of S5.
