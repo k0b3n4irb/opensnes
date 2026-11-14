@@ -170,7 +170,26 @@ rows (`unpack` 0.34 of ours, `call` 0.41); taking the better of both on each row
 - Challenges: the 1993 yardstick holds routine by routine, not game by game (a large part of the largest gains is algorithmic and
   belongs to the game); the bench of G1 must count several natural formulations of the same C, or G1 fits our workarounds.
 
-Pending: the emulator, and the third game.
+**The emulator (costs measured by a versioned script, `tools/console-costs.py` of the emulator at `d577a67`; master cycles, each figure the
+difference of two runs to a program counter)**:
+- A CPU cycle costs 6 (internal, fast ROM, registers `$2000-3FFF` and `$4200-5FFF`), 8 (WRAM, slow ROM, SRAM) or 12 (`$4000-41FF`, pads).
+  WRAM is always 8, even with FastROM: RAM is slower than fast ROM. `NOP` 14 / 12 (slow / fast ROM); `LDA dp` 24 / 20; `LDA abs` WRAM
+  32 / 26; `LDA long` WRAM 40 / 32; `PHA` 22 / 20; `PLA` 28 / 26. `MVN` 7 cycles a byte (52 / 46 master).
+- General DMA: 8 a byte whatever the ROM, plus a fixed part (32 on the probe); 256 bytes 2 080, 1 024 bytes 8 224; the CPU is halted.
+  DRAM refresh 40 a line, 10 480 of 357 364 a frame (2.9 %). Multiplier right 8 CPU cycles after the `$4203` write (2 NOPs read a
+  partial value), divider 16.
+- What a bench in instructions gets wrong: a byte of instruction costs a read cycle, so the time of a straight line is in its **size**
+  (FastROM saves 2 master cycles per ROM access, 15 to 20 % and no more); DMA, HDMA and refresh steal time the CPU does not see; the
+  multiplier and divider are one shared unit (a write while it works clears the result).
+- Its challenges: bench in master cycles per window and separate slow and fast ROM; a technique that lengthens the code or moves
+  bytes into RAM can lose; the compiler must know the 8 / 16 cycle delay (to schedule useful work in it and guarantee no interrupt
+  shares the unit), against the objection that the multiplier stays with the library; the PPU multiplier shared with Mode 7 is not
+  modelled by the emulator (a hole: a measurement on a cartridge).
+- Limit to keep: these costs are a model faithful to a reference emulator (CPU validated on the public single-step vectors), not a
+  capture from a console, and the corpus holds no measurement on hardware. **A gain the generator announces must be confirmed on a
+  physical cartridge before it is declared.**
+
+Pending: the third game.
 
 ## Open in this note
 
