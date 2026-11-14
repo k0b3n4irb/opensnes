@@ -19,6 +19,10 @@ reports a new index fingerprint.
 `corpus sources`: **41 326 chunks, 221 of 248 sources, built 2026-11-14T03:30:24Z, chunker v11, fingerprint `a8d438cfc4ab`**;
 `luna-docs` recaptured 2026-11-14 but still under `Changelog / [Unreleased]` (no `[1.44.0]` section: reported,
 the tag was published the same day). Golden queries **10/10**; negative control `opensnes-docs` at ranks 1 and 2.
+Same day, later: re-captured at v1.44.0 and served (`41 328` chunks, fingerprint `d3c68216eebf`): "luna changelog 1.44.0
+race-sweep audio-check sprite time-over" returns `Changelog / [1.44.0] — 2026-11-14` at ranks 2 and 3 (verified); the
+longer phrasing "luna Changelog 1.44.0 released time over sprites mirrors profile audio-check" does not bring it (ranks
+1 and 2 are older changelog sections): the lexical side of the ranking is strong, phrase with the tool's own words.
 
 ## Index state (2026-10-18, read at the luna v1.39.0 pin: `4cc278d08305`)
 
