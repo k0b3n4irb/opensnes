@@ -114,3 +114,53 @@ functions that call also gain, and most of what they lose is the stack traffic t
 cheap order is: L4's counting step (S0) and the IR-side probe first (about two days together), the vbcc ideas as short lots
 (they are our own backend's), and the prototype's remaining cost is 7 to 11 days of the pair after the probe (hypothesis; the
 figure was 8 to 12 before the probe and the contest's cuts), with its first stop at the hot loops of the leaves.
+
+## Revision 2 after the retrospective (2026-11-14): the step plan to be contested before any code
+
+Sources: `reviews/2026-11-14_retrospective_generator.md` (the three readings and the eight neighbours' answers) and the owner's direction
+of the same day (one comparative bench for every solution, the best of each world technique by technique, the target is the SNES, do not
+scatter; he asked to be challenged). Nothing of G1 enters `develop`; this runs in a worktree started from `develop`.
+
+### What the retrospective changes
+
+1. **The unit of cost is the master cycle of an access, by region** (6 / 8 / 12; code size is time: a byte of instruction is a read).
+   The bench counts master cycles per window, slow and fast ROM apart. Instruction counts alone are not accepted as a figure.
+2. **The bench takes several natural formulations of the same C** (structures, one array per field, pointers, grid): formulation moves
+   the cost by 1.33 to 1.58, more than most advances (1 to 2 %). Otherwise G1 fits our workarounds.
+3. **The arbiter is the rebuilt game replayed at each stop**, not a snapshot nor twelve routines. The gauge's own gap (predicted -1.72 %,
+   measured -0.08 % on one game, cause open) is settled first or its limit written in every figure.
+4. **Correctness before gain**: the invariants of the games are tests that must go red under an injected fault: order and number of
+   console register accesses; no growth or move of the VBlank path; layout of an array the DMA sends as it is; bank and convention of a
+   function called from assembly or the NMI; no datum above `$1FFF` read as bank `$00`; no inlining or renaming of a probe entry.
+5. **A technique table first, a generator second.** Each technique reproduced by hand or by a small pass and measured alone: direct page on
+   the entity (measured by hand by a port: 5 080 against 5 217, -2.6 %, NMI contract confirmed; two conditions: structure in bank 0 below
+   `$2000`, no C direct-page variable accessed while D is moved), far pointer as `[dp]` with a 16-bit step, first argument in A, hardware
+   multiplier as a typed operation with its 8 / 16 cycle slack, `mvn` stub, signed 16 by unsigned 16 to 32 multiply, word composition
+   of neighbouring byte writes in FAR, stable inlining that reports a flip. Techniques of other compilers enter the same way (their
+   documents captured privately with the licence written; their binaries run only where the licence allows a private bench).
+6. **A gain is confirmed on a cartridge before it is declared**: the emulator is a faithful model, not a console capture.
+
+### Steps (each the size of one sub-agent, a prediction written before, a stop rule, the lesson to the kit)
+
+- **R0, the bench and its truth (2 to 3 days)**: one harness: the twelve gapbench rows plus the neighbours' hot shapes in several
+  formulations, in master cycles by window on both ROM speeds, for today's generator, the other 65816 compiler at the same state, the
+  hand yardstick; equivalence proven at every row; the gauge gap explained or bounded. Prediction: the table reproduces 2.20 / 2.56 / 1.0
+  to within 3 %. Stop: if it does not reproduce, nothing after R0 is read.
+- **R1, the technique table (3 to 5 days)**: each technique of point 5 alone, on the rows that name it; the table "technique x measured
+  gain x who does it" with a column "ours already". Prediction per technique before the run; expected: no technique alone above 3 % of a
+  game's busy time except the call boundary. Stop: a technique under its prediction by half is dropped from G1's scope with its figure.
+- **R2, the invariants (1 to 2 days, parallel to R1)**: the six invariants as fixtures with injected faults, running against today's
+  generator first (they must pass) so that any generator is judged by them. The mutation score of the equivalence harness (50 to 100
+  one-instruction faults, 90 % caught) is part of R2.
+- **R3, the prototype on the hot loops of the leaves (the first stop of the owner's rule)**: allocation of A, X, Y and direct-page
+  slots as one bank, selection by master-cycle cost, the SDK ABI at the boundary, built from the winning techniques of R1; within 1.1 of the
+  hand on the two leaves or a written reason. Stop: not within 1.2, the prototype stops and says so.
+- **R4, 6 to 8 functions drawn by profile weight (the second stop)**: the functions that call, the games rebuilt and replayed; the line
+  is 10 % of game 2's busy time; the figure goes to the conductor with the prediction written before.
+- **R5, closure**: the table, the lessons, a cartridge confirmation of the claimed gains, and the decision that belongs to the owner.
+
+### Cost, honest range
+
+R0 to R2: 6 to 10 days of the pair; R3: 3 to 4; R4: 2 to 3; total 11 to 17 days (the earlier 7 to 11 did not include the bench of formulations,
+the technique table nor the invariants; hypothesis until R0 is measured). Fable is called only to contest this plan, to review one
+diff before a whole-corpus change, and on one named diagnosis, one task at a time.
