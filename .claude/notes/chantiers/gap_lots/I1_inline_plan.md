@@ -428,3 +428,19 @@ Checked in the code before keeping anything: `splice_fn` guards only `nargs != n
 7. **The new seed class bites into the old one** (8k+5 is half of 4k+1, the only class that hunts single-site absorption) and never produces a partial copy: run the class under a tiny `CC_INLINE_CALLER_BUDGET` to force per-site refusals.
 8. **The `-d` trace mode** calls `inline_check(fn)` alone (`main.c:370-374`) and shows an IR without the copies: a `.checks` case comparing the `call` count of the traced IR with the emitted `jsl`.
 Out of the contest's field and left to measurement: the budgets, the predictions, the priority criterion.
+
+## Revision after S2 (2026-11-14): the stop rule of S2 fired, the plan is changed
+
+S2 (`I1_s2_result.md`, output byte-identical, gates replayed) measured, with the predictions written before:
+- the size threshold of 72 IR instructions holds on the corpus (376 right, 5 wrong, 15 missed for 256 bytes); the games are denser (2.94 / 2.63 bytes per instruction against 3.36), their best threshold is around 80 to 100; on the final size (H5) the own size is the right criterion (the final size would lose 19 / 12 % of the count);
+- the ratio between the set the static criterion picks (at most 72, two sites or more) and S0's 256-byte set is **0.683 (game 1) and 0.734 (game 2)**, not the 0.95 the plan assumed: the missing gain sits in a few dense callees (one of 190 instructions is worth 0.64 % alone; no threshold under 190 catches it);
+- the unit growth of S0's recompiled copy is 22.6 KB at most on game 1 and **+124 KB in one unit on game 2**, with no function growing past 5.1 KB and no section past 16 KB: the per-caller (8 KB) and per-section (16 KB) caps never bind; with 32 KB per unit and a priority by size, game 2 would lose 35 % of its count (1.73 to 1.12 %);
+- the temporaries margin is real (96 to 98 % of the counted temporaries are live: H8 falls), but the test over-counts the 64 temporary registers of the callee, which a copy never clones (counted right, 4 of 7 and 39 of 97 refused calls would pass at their test: instantaneous, the cumulative effect is not measured); the recompiled check of S0 lost 14 of 42 single-site absorptions the compiler makes today (the copies took the margin first), which is the plan's own argument for running today's rule before the size rule;
+- H7 (priority by loop depth) is not settled: the trace does not give the loop depth; the stake is up to 0.6 point of game 2.
+
+Changes taken in the plan:
+1. **Unit budget 128 KB estimated** (was 32 KB, whose justification, one LoROM bank, does not hold for code placed function by function); per caller 8 KB and per section 16 KB kept.
+2. **Threshold kept at 72**; the free copies (no budget) drop from "6 instructions or fewer" to "2 or fewer".
+3. **The S4 prediction is rewritten with the measured ratio: -1.23 % (game 1) and -1.26 % (game 2)** instead of -1.7 / -1.6 %, range -0.9 to -1.6; with the old 32 KB budget game 2 would fall near -0.8 %, under the stop bar of 1.02 %: the stop bar stays 1.02 % and the budget is part of what S4 must show.
+4. **S5 starts with the exact count of the margin** (the callee's 64 temporary registers not counted), before any idea of raising the 1 800.
+5. The dense callees (190 instructions and above) are out of this lot's reach; if they are wanted, it is a second rule with its own count.
