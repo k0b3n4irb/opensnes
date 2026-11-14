@@ -266,3 +266,10 @@ Incompatible (do not use without isolation):
 - krom's PlayTwoSong demo, whose *protocol* this example ports, ships
   songs built from samples ripped from commercial games — none of
   those assets are used here.
+
+## examples/memory/lzss_ram
+
+- `res/tiles.png`, `res/tiles_lz.png` — a synthetic blue pattern (256x512),
+  two byte-identical copies, created for this example by the project and
+  added with it by commit f67b6abb (2026-11-06) as test data. No third-party
+  content is known; no script that generated them was kept.
