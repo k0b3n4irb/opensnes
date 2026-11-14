@@ -189,7 +189,31 @@ difference of two runs to a program counter)**:
   capture from a console, and the corpus holds no measurement on hardware. **A gain the generator announces must be confirmed on a
   physical cartridge before it is declared.**
 
-Pending: the third game.
+**A sports game (busy time 368 101 master cycles a step NTSC, 392 619 on the PAL 3/4 frame; 340-step reference scenario)**:
+- Workarounds written in its C and what they bought: composing by words instead of bytes 1 890 524 to 974 464 (-49 %); a cheap
+  reject before the computation 3 500 to 1 100 a pair; a ring in `u16` not `u32` 43 000 to 19 000 a step; glyphs shifted outside the
+  console, no variable `>> s` (a menu from 80 to 37 frames); `(x<<2)+(x<<1)` for `x*6` (about 2 400 saved a product); a leaf that
+  sets a flag and a caller that calls (+1 800 a frame avoided). The cost in readability: the source now carries the layout of the
+  planes in the tile, a precomputed mask, two branches duplicated by phase.
+- What it cost: a miscompilation of four days (a counter whose address is taken kept a stale copy); the peephole gave up on a
+  whole function because of a shift loop (4 to 9 instructions a word once integrated); two measurement errors on its side (a budget
+  read on the wrong ROM, a renamed wait label reading "100 % busy").
+- Six things a generator must never do: delete or delay a write into a buffer whose address went to the VRAM queue or an HDMA table;
+  assume an assembly routine or a `wai` touches no global; lengthen the path after `WaitForVBlank` (6 frames of sprites fit, 7 overflow);
+  read a `volatile` once in a wait, or reorder two PPU register writes; put an ordinary datum above `$1FFF` (read with `lda.w` in bank
+  `$00`, wrong silently); inline, rename or remove an entry point used as a probe (the step entry, `main`, the wait label), or keep
+  in a register across them a global the tests read by symbol.
+- **A challenge to our gauge**: it followed the game's measures on advances 3, 4, 5 (-2.83 % against -2.84 % a frame; predicted 0 to -0.3 %,
+  measured -0.072 %; 1.42 % against -1.35 %), but predicted -1.72 % for the X/Y colour lot where the game measured -0.08 % in NTSC.
+  We attributed the gap to the source freeze of 2026-11-11; the game disputes it (between the two versions the C gained only the 3/4
+  frame, under an `#ifdef`; the NTSC path barely moved). **The cause is open** (hypothesis: the gauge's window or method). Consequence for
+  G1: the arbiter is the rebuilt game replayed at each stop, not a snapshot or twelve routines.
+- On "the target is the SNES": on that game the multiplier, divider and hardware copies can return only 0.23 %; the 19 % of assembly in
+  the library is a library lever. What G1 must bring there: allocate A, X, Y and the direct page around calls, stop rescaling a known
+  index, **inline stably and report when an inlining decision flips**, compose neighbouring byte writes by words in FAR.
+
+All eight answers are in. The contests to carry into the plan: the gauge's 1.72 against 0.08 (open), several natural formulations in
+the bench, correctness before gain, the cartridge check, the multiplier delay known to the compiler, invariants with fault tests.
 
 ## Open in this note
 
