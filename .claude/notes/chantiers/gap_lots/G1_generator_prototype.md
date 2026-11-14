@@ -193,3 +193,7 @@ On the owner's direction (one bench for all, the best of each world): its cost i
 - **R3 (4 to 6 days)**, **R4 (2 to 3 days)**: as in revision 2, with the differential gates (20 000 seeds, paranoid build, `jsl` / `rtl` contract) and the rewritten prediction.
 - **R5**: closure, the observable and its tolerance, the owner's decision.
 Total 13 to 19 days of the pair (hypothesis until R-1 and R0 are measured; the contest adds R-1, the debt and the gates).
+
+### Conductor's answer on the free convention (2026-11-14)
+
+Yes: the free convention between `static` functions of one file is in the scope, as an option of the prototype measured apart, and the line stays at 10 %. Conditions: **two columns everywhere** (every figure of R3 and R4 is given twice, "ABI kept" and "free convention"); **the public boundary does not move** (a function visible from another file, or called from assembly or the NMI, keeps the ABI: the games' invariant, tested under an injected fault); **L4's finished work is reused**, not redone; two additions enter the plan: an **integration report compared from one build to the next**, signalling when an inlining decision flips, and the library's share of hand assembly noted as a library lever outside G1. The owner is asked only if R3 or R4 shows the line out of reach even with the free convention. Order confirmed: I1 S4, then R-1 (the gauge's gap), then R0.
