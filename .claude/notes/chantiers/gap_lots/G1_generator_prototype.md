@@ -164,3 +164,32 @@ scatter; he asked to be challenged). Nothing of G1 enters `develop`; this runs i
 R0 to R2: 6 to 10 days of the pair; R3: 3 to 4; R4: 2 to 3; total 11 to 17 days (the earlier 7 to 11 did not include the bench of formulations,
 the technique table nor the invariants; hypothesis until R0 is measured). Fable is called only to contest this plan, to review one
 diff before a whole-corpus change, and on one named diagnosis, one task at a time.
+
+### Contest of revision 2 (the strongest model, 2026-11-14, one task: where the revised step plan is wrong, costs more or cannot be tested), checked, and what is taken
+
+Instruction given (journal, rule of 2026-11-14): read-only; the question above; pieces: this file, the retrospective, `G1_ir_probe.md` (Measured, Two defects), `L4_s3_result.md` (Result); out of field: redesign, inlining, the owner's authority, style; form: at most ten objections with piece, consequence and fix, two short paragraphs (the bench direction, R0 to R2 before code). Checked by me against the pieces before keeping (2.15 in `G1_ir_probe.md` l.89 and 190; "S4 is therefore what makes the static frames pay" in `L4_s3_result.md` l.68; `tilemap` +7.5 % l.98); the objection on the lost cost targets is half wrong (points 5 to 10 of the 2026-11-13 contest still stand, this revision only did not repeat them: they are in force).
+
+Taken, in this order:
+1. **The 10 % line (R4) is predicted lost by our own sources**: since the X/Y colour belongs to the baseline, the generator that keeps today's ABI at the boundary adds 1 to 2 %. The 2026-11-13 contest's point 2 (the scope contradiction) was asked of the conductor and is unanswered. **Before R3: the prediction of condition 2 is rewritten on the post-X/Y baseline, and the question "free convention inside one file, yes or no" goes to the conductor** (it is L4's territory: a "no" lowers the line, a "yes" widens the lot).
+2. **R1 does not measure alone what pays only together** (L4: correct and slower until S4; the colour made `tilemap` +7.5 % by cutting a loop rule). No technique is dropped on an isolated measure: it is dropped only after a combined measure with the technique it depends on, named in advance. Each technique is written "isolated pass" or "exists only inside an allocator" (direct page on the entity moves D, the register bank itself; `[dp]` and the first argument in A are allocation decisions; the multiplier's slack is scheduling); the second kind is costed inside R3.
+3. **The starting debt is a step of its own**: in R0, the leaves and the R4 sample are measured with the old text rules cut (`QBE_NO_*`), and R3 is re-estimated from it; otherwise the first stop measures the loss of the rules, not the allocator.
+4. **The gauge's gap (-1.72 predicted, -0.08 measured) is a step before R0** with a cost (1 to 2 days) and a stop: if the cause stays open, R4 is read on the rebuilt game with an error bar written (about 1.6 points), and its 9.0 to 10.7 % margin is read against it.
+5. **R0's prediction is wrong by construction**: the first twelve rows read 2.15 today (not 2.20), and the other compiler's 2.56 is a static cost weighted by block counters, not master cycles per window. R0 replays the old method at the frozen commit, then publishes the new unit as its own base, with no inherited target.
+6. **"Within 1.1 of the hand on the two leaves"**: the 2026-11-13 targets stand (master cycles per perimeter, leaf B defined, two lines per leaf, held-out set, frozen reference commit); leaf B is no longer a leaf once inlined, leaf A is at 0.0 % from the probe (the gap is the allocation of A and the 32-bit accumulators): both written again in R0.
+7. **The differential proof is a gate of R3 and R4**, not only R2's mutation score: 20 000 seeds through the prototype with the fallback rate, the paranoid build, the `jsl` / `rtl` contract on the luna trace; their cost is in the steps.
+8. **R1 re-measures what is measured**: the column "already measured" is filled first from the notes (first argument in A 0.90 / 0.97 %, far pointer in the direct page 0.25 %, `mvn` and the multiplier delivered); only the unknown is measured, on the rebuilt game (a bench gain does not transfer: -2.26 against -0.08 %).
+9. **R0 is narrower**: the twelve rows and two neighbour forms (the entity loop, the byte table), not the whole matrix; the other forms after, one at a time.
+10. **R5**: the cartridge confirmation has a defined observable (late frames on a fixed scenario) and a tolerance, or the gains are declared "model" and say so.
+
+On the owner's direction (one bench for all, the best of each world): its cost is the matrix times each third-party compiler (licences, emulation, different measuring methods); its biggest risk is that gains are not additive (L4, `tilemap`), and "the better of both per row = 1.99" is a calculation, not a generator. **The narrow first step: the twelve rows, two compilers, one unit, to settle whether 0.34 on `unpack` and 0.41 on `call` hold in master cycles.** R0 and R2 before code: yes; R1 as written hides the generator's cost: it is split as item 2 says.
+
+### The plan after the contest
+
+- **R-1 (1 to 2 days)**: the gauge's gap, with its stop (error bar if the cause stays open).
+- **R0 (2 to 3 days)**: the twelve rows and two forms, three generators (today's, the other compiler, the hand), both ROM speeds, master cycles per window, the old method replayed at the frozen commit, the starting debt (old rules cut). Prediction: the new base reads 2.15 on the first twelve rows within 3 % of the old method re-run; the debt is written as a number.
+- **R1 (3 to 5 days)**: the table; the "already measured" column first; isolated passes measured alone, allocator-only techniques only listed and costed for R3; no drop without a combined measure.
+- **R2 (1 to 2 days)**: the six invariants and the mutation score, against today's generator first.
+- **Conductor's answer on the free convention** (before R3): decides the line of condition 2.
+- **R3 (4 to 6 days)**, **R4 (2 to 3 days)**: as in revision 2, with the differential gates (20 000 seeds, paranoid build, `jsl` / `rtl` contract) and the rewritten prediction.
+- **R5**: closure, the observable and its tolerance, the owner's decision.
+Total 13 to 19 days of the pair (hypothesis until R-1 and R0 are measured; the contest adds R-1, the debt and the gates).
