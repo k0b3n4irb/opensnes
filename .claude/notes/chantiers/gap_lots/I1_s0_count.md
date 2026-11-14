@@ -76,3 +76,146 @@ cycles (1 fetch, 2 internal, 3 pulls at 8) = **44**.
   an upper bound of the call-overhead part and blind to the register part; the step after S0 must recompile.
 - **Coherence check announced**: the census's executed `jsl` to a C function of the same unit must equal A1 S0's
   6 248 / 7 913 on the same `ref1114` traces (and M1's rule on the trace).
+
+## Result of the count (2026-11-14, measured after the prediction above was committed, `180bc1bf`)
+
+**Verdict of the rule: the lot goes on.** In the lower bound (no constant propagation), inlining every eligible callee of
+at most 256 bytes, nested as today's splicer nests, reaches **2.55 % of busy time (jeu 1) and 2.35 % (jeu 2)** for
+**+68 KB and +160 KB of ROM**, against 885 KB and 1 581 KB free: above 1.5 % on both games, and in every gauge window
+(jeu 1 2.26 to 3.83, jeu 2 1.62 to 2.75). Inlining *everything* eligible would give 4.89 / 4.54 % but does **not** fit
+(nested: +7.5 MB and +2.2 MB): a compiler needs a size criterion, and 256 bytes is one that holds. Nothing here is
+recompiled text; the check that is comes next, with its own prediction written before it runs.
+
+### Build, trace, method
+
+- The same inputs as A1 S0 (`A1_s0_count.md`): the gauge's frozen reference `ref1114`, both games' `.c.asm` with the side
+  table, ROM, `.sym`; the IR kept by `CC65816_KEEP_IR` on builds whose ROMs are `cmp`-identical; the library's LoROM
+  `.c.asm` and IR; the same luna traces (4 x 40 frames a game; busy 27 866 030 and 34 243 412 mclk).
+- `devtools/sframe/i1_count.py` (generic, `make count-i1`; it imports `a1_count.py`: table, text, IR, ROM placement,
+  trace, prices). Sites: every direct `jsl` of a C function to a C function of the same unit in the text (a `jml`, a
+  tail call, apart). Every instruction is placed at its ROM address (390 / 389 functions, 0 mismatch, as in A1 S0) and
+  weighted by its executions; each removed instruction is priced at the median measured cost of its shape in the same
+  trace (`jsl` 54 mclk, `rtl` 42, `pha` 28, `pea` 34, `plx` 34, `tsc` / `tcs` / `clc` / `sec` 12, `adc #` / `sbc #` 18).
+- **Lower bound, per executed site**: the `jsl`; the argument pushes, except that a pushed value with no home the copy
+  could read (anything but a constant `pea`, a `pei`, or `lda n,s` / `lda tcc__lf+N` / `lda #k` just before the `pha`)
+  is charged a direct-page store; the cleanup (`plx`, or `[tax] tsc clc adc tcs [txa]`); and, per entry of the callee
+  (its executions divided by its entries), the frame carve at its head, the undo before each `rtl`, the `rtl`, and a
+  `jml` inside it becoming a `jsl` in the copy (+30 mclk). The callee's reads of its parameters are kept at today's cost
+  (read as an access to the argument's home). **Upper bound (hypothesis)**: also every parameter read free and every
+  argument load free (the value already where it is used, a constant folded into its use); no branch folding counted.
+- **ROM**: bytes from the ROM placement (the text estimate is within 0.2 % on the placed functions: 335 / 310 exact,
+  the others count an 8-bit immediate as 3 bytes); a copy is the callee without its head and tail pieces and its `rtl`,
+  plus a 3-byte jump per extra return; minus each site's call sequence; minus the standalone when nothing else calls it.
+  **Nested** (bottom-up, a copy holds the copies of its own inlined callees: today's splicer) and **one level** (a site
+  inside an inlined callee stays a call, and that callee's standalone stays for it).
+
+### The coherence check (mission point 6)
+
+Executed same-file `jsl`, summed over the text's sites: **6 248 (jeu 1), 7 913 (jeu 2)**, the same figures as A1 S0 on
+the same trace; M1's rule replayed on the trace 6 247 and 7 909 (the calls followed by the NMI, as A1 S0 listed); M1's
+own figure on its build `l2`: 6 248 and 8 011 (jeu 2's compiler has changed since). Totals agree.
+
+### (1) Census: same-file calls not inlined today
+
+| | corpus (65 examples) | library alone | jeu 1 (project + library) | jeu 2 |
+|---|--:|--:|--:|--:|
+| same-file `jsl` sites (text) / `jml` | 438 / 4 | 151 / 7 | 928 / 18 | 1 455 / 103 |
+| callees called | 139 | 49 | 276 | 349 |
+| of which **eligible** (not exported, address never taken, not recursive) | **122** | **21** | **228** | **305** |
+| refused: exported / address taken / recursive | 17 / 0 / 0 | 28 / 0 / 0 | 46 / 1 / 1 | 42 / 0 / 2 |
+| eligible `jsl` sites | 418 | 99 | 847 | 1 309 |
+| executed same-file calls / of which to an eligible callee | | | 6 248 / **6 089** (97.5 %) | 7 913 / **7 010** (88.6 %) |
+| eligible callees executed in the window | | | 50 | 57 |
+| eligible callee size, bytes: min / quartiles / max | | 23 / 49 / 79 / 128 / 358 | 4 / 61 / 127 / 301 / 4 364 | 11 / 78 / 179 / 335 / 5 696 |
+
+None of the eligible callees keeps an alloc, none is variadic, no unit lacks its IR. Sites per eligible callee (jeu 1 /
+jeu 2): 2 sites 93 / 85, 3 sites 57 / 45, 4 to 8 sites 50 / 45, 9 or more 18 / 29 (jeu 2's hottest callee has 72), and
+**one site 10 / 101**: callees the whole-function inliner should already take (static, one call in the cproc IR too)
+and declines. Read with `CC_TRACE_INLINE=1` on jeu 2's object unit: its two big callers absorb some and decline the rest
+(one absorbs 17 and declines 18, the other 10 and 90); hypothesis, the trace does not print the reason: the
+1 800-temporary room (`AUTO_INLINE_TMP_ROOM`) of a caller that grows with each absorption. Those one-site callees hold
+**0.81 % (jeu 1) and 0.75 % (jeu 2)** of busy time in the lower bound, inside the figures above (jeu 1's fourth callee
+is one). 13 / 96 sites whose push sequence is not straight (a label or a nested call among the pushes) are priced with
+the `jsl` and the callee part only.
+
+### (2) Gain per site (lower bound) and (3) in % of busy time
+
+| | jeu 1 | jeu 2 |
+|---|--:|--:|
+| mean saving per executed eligible call (mclk) | 223.9 | 221.9 |
+| caller side (`jsl`, pushes, cleanup), % of busy | 3.050 | 2.718 |
+| callee side (frame carve and undo, `rtl`), % of busy | 1.842 | 1.823 |
+| **every eligible callee, nested (does not fit in ROM)** | **4.892** | **4.542** |
+| upper bound, hypothesis (parameter reads and argument loads free) | 7.604 | 7.216 |
+| tail calls (`jml`) added | +0.003 | +0.009 |
+| executed calls by arity 0 / 1 / 2 / 3+ | 526 / 3 781 / 849 / 933 | 619 / 4 142 / 1 676 / 573 |
+| framed callees: calls, % of busy | 2 457, 2.64 | 3 139, 2.47 |
+
+By callee size (a compiler's criterion; % of busy, lower bound; ROM in bytes):
+
+| callees up to | jeu 1 nested | ROM | one level | ROM | jeu 2 nested | ROM | one level | ROM |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| 32 B | 0.01 | +1 258 | 0.01 | +1 254 | 0.10 | +718 | 0.10 | +718 |
+| 64 B | 0.27 | +4 511 | 0.27 | +4 312 | 0.74 | +19 002 | 0.74 | +16 538 |
+| 128 B | 0.74 | +24 540 | 0.71 | +15 332 | 1.28 | +45 655 | 1.26 | +27 718 |
+| **256 B** | **2.55** | **+68 163** | 2.48 | +35 781 | **2.35** | **+160 370** | 1.90 | +54 033 |
+| 512 B | 3.87 | +292 621 | 3.29 | +49 987 | 3.99 | +259 179 | 2.39 | +58 813 |
+| 1 024 B | 4.08 | +355 608 | 3.46 | +56 170 | 4.31 | +428 406 | 2.70 | +62 869 |
+| all | 4.89 | +7 505 187 | 1.54 | +39 690 | 4.54 | +2 203 724 | 1.26 | +81 291 |
+
+"One level" with every callee falls to 1.5 / 1.3 because the big callees then hold the calls of the small ones as calls:
+one level only makes sense under a size limit, where it stays close to nested. The gain is concentrated: in the
+profile's order (gain per byte, which no compiler knows) three callees reach 1.64 % for +1.5 KB in jeu 1, six reach
+1.80 % for +8.8 KB in jeu 2. Per gauge window, callees up to 256 B nested: jeu 1 3.83 / 2.41 / 2.26 / 2.29, jeu 2 2.74 /
+2.75 / 2.52 / 1.62; every eligible callee: jeu 1 4.46 to 5.08, jeu 2 2.39 to 5.75.
+
+### (4) Eligibility, and the table it reuses
+
+Safe by construction for a copy that replaces the function: **not exported** (`; sframe fn ... export=0`: nothing
+outside the unit can call it), **address never taken** (`addrtaken=0`, and not in the unit's `; sframe addr` lines: no
+indirect call), **not recursive** (not in a cycle of the unit's direct calls, itself included: Tarjan on the text's
+`jsl` / `jml` edges, the edges L4 S1's `; sframe call` lines carry and `opensnes-rom check --objects` re-derives from
+the instructions), **not variadic** (IR). Today's splicer adds: no alloc kept, no section of its own (none among the
+eligible), the temporary room. "One level" is the second ROM reading above; the splicer nests (bottom-up), and the rule's
+figure is the nested one with its ROM.
+
+Variant **W** (not in the rule): an exported or address-taken callee copied at its direct calls of the unit, its
+standalone kept. Jeu 1: 45 callees, 159 executed calls, **0.13 %**, +6.7 KB; jeu 2: 40 callees, 896 calls, **0.71 %**,
++16.9 KB. **The gapbench routine `call` is this variant**: its callee `k_call_f` is global (`devtools/gapbench/kernels.c`;
+the benches' workloads are not static, `compiler.md`), so I1 as scoped (static callees) does not move it: the other
+compiler's 0.41 there comes from copying a global function into its caller.
+
+### (5) ROM against the free space
+
+`opensnes-rom budget --json` on the `ref1114` ROMs: **885 KB free (jeu 1, 2 MB ROM), 1 581 KB free (jeu 2, 4 MB)**; bank
+$00 is full (60 bytes) on both, which no longer fails a link (code is `SUPERFREE`). Up to 256 B nested costs **+68 KB
+(8 % of the free space) and +160 KB (10 %)**: it fits. Everything nested does not (+7.5 MB, +2.2 MB); everything one
+level does (+40 KB, +81 KB) but gains 1.5 / 1.3 %. Corpus: +24 KB one level, +39 KB nested over 65 ROMs (42 with an
+eligible callee; the largest, `games/rooftop_run`, +7.6 KB nested).
+
+### Against the prediction
+
+Predicted 3.4 / 3.5 % (2.4 to 4.7) for every eligible callee, with the ROM "it fits". Wrong twice. **H1 is contradicted
+upwards on jeu 1** (97.5 % of the executed same-file calls go to eligible callees, not 85 %; jeu 2 88.6 %) and the saving
+per call is at the top of the range (224 and 222 mclk, against 180 in 140 to 220): every eligible callee gives 4.9 /
+4.5 %, above my range on jeu 1. **The ROM prediction is wrong**: everything nested does not fit (+7.5 MB). The rule
+passes only under a size limit, at 2.55 / 2.35 % for 256 bytes, inside the predicted range for the wrong reason (a limit
+I did not foresee halves the figure). The verdict ("above 1.5 %, the lot goes on") holds.
+
+## Prediction of the recompiled check (written before it runs)
+
+The count prices today's text minus the call; this check measures what the compiler does. Private: a copy of the gauge
+(its frozen sources, its scenes, its windows aligned on the games' steps, its tick-by-tick equivalence against
+`ref1114`), the 147 / 181 eligible callees up to 256 B of the games' own units (the library's are left alone: they are
+the SDK's) marked `static inline`, built with `CC_INLINE_MAX_BIG=100000` by the SDK of `ref1114` (no compiler change:
+today's splicer copies a `static inline` callee at every site, nested, bottom-up). The unmarked copy was rebuilt first:
+**ROMs `cmp`-identical to `ref1114`** on both games (label `i1-temoin`).
+- The count for exactly that set: **2.47 % (jeu 1), 2.35 % (jeu 2)** nested, ROM **+64 KB, +159 KB**.
+- **My prediction of the measurement**: the equivalence holds (every tick identical to `ref1114`); ROM within 30 % of
+  the count, or less where the temporary room declines copies; busy per step down by **1.0 to 2.5 %**, most likely
+  **about 1.5 % on each game** (0.6 of the count): the count is blind to what the bigger caller costs (callee temps
+  crossing the caller's calls go to the stack, leaf frames lost, the text rules' lines changed), which the 2026-10-10
+  measurement saw at -2 % then +0.7 % for the one-site splices; and the same temporary room that declines today's
+  one-site callees will decline copies into the big callers. What would contradict it: a measured gain above the count
+  (constant propagation, the text rules gaining on the new shapes), or under 1 % (the register part and the declines
+  eating most of it).
