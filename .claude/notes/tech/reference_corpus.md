@@ -362,3 +362,7 @@ generic compiler words; the lexical side of the ranking is strong.
   the owner's machine on 2026-09-22) and `OPEN_rag-partner.md`, the report
   being accumulated for the next send. The contract with the corpus team
   is `.claude/rules/partners.md`.
+
+## Language of the question (2026-11-15)
+
+The corpus ranks English questions over English arbiter documents better than French ones: two generator questions (the cycles of `rep`/`sep`/`phb`/`plb`, and the manual's chapter on compiled code) missed their arbiter, the WDC manual, while French-language notes and supplementary pages outranked it; asked in English over an English document they pass (the rag-partner's measure, which also ruled out making the manual the arbiter of its class). Rule: ask the corpus in English when the arbiter is an English document; French stays for our notes. The generator's ten questions (sealed 2026-11-14) read 7 of 10 with the compiler documents of other 65816 compilers and the reference emulator's CPU core served, Calypsi being a named hole (its licence forbids copying).
