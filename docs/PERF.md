@@ -116,10 +116,10 @@ compilers.
 | `text` | 20 characters printed and shown | 82,796 | 17,366 | -79.0 % |
 | `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 167,840 | 91,385 | -45.6 % |
 | `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,336 | 53,409 | -58.7 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 31,747 | -75.5 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 23,767 | -81.6 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 17,626 | +1.3 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,545 | -39.4 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,309 | -73.4 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 27,803 | -79.7 % |
 | `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,588 | -44.6 % |
 | `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 4,614 | -91.6 % |
 | `mapcol` | the map engine streaming one new column (29 entries), one `mapUpdate` | — | 13,158 | |

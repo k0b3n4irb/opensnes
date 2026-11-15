@@ -458,9 +458,19 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  *   `count` bytes. `visible[]` stays indexed by the sprite. An `order`
  *   byte that is not under `count` hides its slot. A batch declared without
  *   the field (the eight initialisers of the example below) has `order` 0.
- *   Cost, measured (devtools/libbench, rows `world` and `worldo`): with
- *   `order`, about 240 master cycles more a sprite (+14 %); without it,
- *   one test a call, about 180 master cycles whatever the count.
+ *   Cost, measured (devtools/placebench, SlowROM): with `order`, about
+ *   230 master cycles more a placed sprite, 260 a hidden one.
+ * - **Cost** (devtools/placebench, master cycles, SlowROM): a call of one
+ *   sprite about 3 200; in a large batch, about 940 a placed sprite and
+ *   590 a hidden one (FastROM: 2 700, 810, 510). The code is about 7.7 KB,
+ *   placed by the linker in any bank.
+ * - **What the call touches besides the OAM shadow and `visible[]`**: the
+ *   two camera arguments it was given are left as they were; the tile and
+ *   attribute bytes of a sprite it hides are left as they were (only x, y
+ *   and the ninth x bit say hidden, as oamHide() does); it uses up to 30
+ *   bytes of the `tcc__lf` block as scratch, which the ABI gives any
+ *   callee (compiler/ABI.md). Within the call, the ninth x bits of a group
+ *   of eight OAM entries are written together after the group's entries.
  *
  * @param batch The sprites (see OamWorldBatch)
  * @param cam_x World x of the screen's left edge

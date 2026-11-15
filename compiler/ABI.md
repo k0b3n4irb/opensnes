@@ -233,8 +233,10 @@ stack (a local whose address is taken, a dynamic allocation) and no call
 keeps all its temporaries on the stack. So nothing in `tcc__lf` is expected
 to survive a `jsl`, and hand-written assembly called from C may use its 40
 bytes as scratch for the length of the call, like the `tcc__r*` slots.
-First user in the library: `oamPlaceWorld()` with an `order` array
-(`lib/source/sprite_world.asm`, 2026-10-10). Assembly that is NOT called
+First user in the library: `oamPlaceWorld()` (`lib/source/sprite_world.asm`,
+2026-10-10), which uses up to 30 of the 40 bytes (its camera constants,
+group limits and, with an `order` array, the order pointer and the slot;
+14 bytes with `order` only before 2026-11-15). Assembly that is NOT called
 from C — a handler — must not touch it: it would be writing the
 interrupted function's temporaries.
 
