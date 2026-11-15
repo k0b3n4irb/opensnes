@@ -1,0 +1,120 @@
+function $k_soa_c() {
+@start.247
+@body.248
+@for_cond.249
+	%.1.2 =w phi @body.248 0, @for_cont.251 %.137
+	%.3 =w cultw %.1.2, 18
+	jnz %.3, @for_body.250, @for_join.252
+@for_body.250
+	%.6 =l extuh %.1.2
+	%.7 =l mul %.6, 2
+	%.8 =l add %.7, $ac_dx
+	%.9 =w loadsw %.8
+	%.13 =l add %.7, $ac_dy
+	%.14 =w loadsw %.13
+	%.15 =w or %.9, %.14
+	jnz %.15, @if_true.253, @if_false.254
+@if_true.253
+	%snk.17 =l add %.7, $ac_x
+	%.21 =w loadsw %snk.17
+	%snk.18 =l add %.7, $ac_y
+	%.27 =w loadsw %snk.18
+	%.29 =w csgtw %.21, 623
+	jnz %.29, @if_true.255, @if_false.256
+@if_true.255
+	jmp @if_join.257
+@if_false.256
+	%.31 =w csltw %.21, 16
+	jnz %.31, @if_true.258, @if_false.259
+@if_true.258
+@if_false.259
+	%.16.14 =w phi @if_false.256 %.21, @if_true.258 16
+@if_join.257
+	%.16.9 =w phi @if_false.259 %.16.14, @if_true.255 623
+	%.33 =w csgtw %.27, 455
+	jnz %.33, @if_true.260, @if_false.261
+@if_true.260
+	jmp @if_join.262
+@if_false.261
+	%.35 =w csltw %.27, 24
+	jnz %.35, @if_true.263, @if_false.264
+@if_true.263
+@if_false.264
+	%.22.11 =w phi @if_false.261 %.27, @if_true.263 24
+@if_join.262
+	%.22.10 =w phi @if_false.264 %.22.11, @if_true.260 455
+	%snk.19 =l add %.7, $ac_dx
+	%.41 =w loadsw %snk.19
+	%.42 =w add %.41, %.16.9
+	%snk.20 =l add %.7, $ac_x
+	storew %.42, %snk.20
+	%snk.21 =l add %.7, $ac_dy
+	%.52 =w loadsw %snk.21
+	%.53 =w add %.52, %.22.10
+	%snk.22 =l add %.7, $ac_y
+	storew %.53, %snk.22
+	jmp @if_join.265
+@if_false.254
+	%snk.23 =l add %.6, $ac_dirty
+	%.62 =w loadub %snk.23
+	jnz %.62, @if_false.267, @if_true.266
+@if_true.266
+	jmp @for_cont.251
+@if_false.267
+@if_join.265
+	%snk.24 =l add %.6, $ac_dirty
+	storeb 0, %snk.24
+	%.72 =l add %.7, $ac_frame
+	%.73 =w loadsw %.72
+	%.75 =w cultw %.73, 24
+	jnz %.75, @if_true.268, @if_false.269
+@if_true.268
+	%.80 =l add %.7, $sp_frame
+	storew %.73, %.80
+@if_false.269
+	%snk.25 =l add %.7, $ac_x
+	%.85 =w loadsw %snk.25
+	%.87 =l extuh %.73
+	%.88 =l mul %.87, 2
+	%.89 =l add %.88, $frame_off
+	%.90 =w volat loadsw %.89
+	%.91 =w add %.85, %.90
+	%.92 =w sub %.91, 16
+	%.96 =l add %.7, $sp_x
+	storew %.92, %.96
+	%snk.26 =l add %.7, $ac_y
+	%.101 =w loadsw %snk.26
+	%.102 =w sub %.101, 16
+	%.106 =l add %.7, $sp_y
+	storew %.102, %.106
+	storeb 1, $sp_changed
+	%snk.27 =l add %.7, $ac_y
+	%.112.5 =w loadsw %snk.27
+	%.116 =l add %.6, $ac_flags
+	%.117 =w loadub %.116
+	%.119 =w and %.117, 16
+	jnz %.119, @cond_true.270, @cond_false.271
+@cond_true.270
+	jmp @cond_join.272
+@cond_false.271
+@cond_join.272
+	%.120 =w phi @cond_true.270 16, @cond_false.271 0
+	%.121 =w sub %.112.5, %.120
+	%.125 =l add %.7, $sp_depth
+	%.126 =w loadsw %.125
+	%.128 =w cnew %.121, %.126
+	jnz %.128, @if_true.273, @if_false.274
+@if_true.273
+	%snk.28 =l add %.7, $sp_depth
+	storew %.121, %snk.28
+	%.134 =w loadsw $sp_depth_changed
+	%.135 =w add %.134, 1
+	storew %.135, $sp_depth_changed
+@if_false.274
+@for_cont.251
+	%.137 =w add %.1.2, 1
+	jmp @for_cond.249
+@for_join.252
+	ret0
+}
+
