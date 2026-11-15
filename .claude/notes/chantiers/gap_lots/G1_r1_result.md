@@ -175,3 +175,11 @@ Method (private gauge, reference `develop` `3139a9ef`, no switch, the frozen sou
 | T1 direct page on the entity | depends on the allocator | — | — | — |
 
 Reading: **no isolated technique alone passes about 1 % of either game's busy time**, the same order as the last cheap lots (about 1 % each); the three together, if their eligible time were fully taken, stay under about 2.5 %. The pointer-parameter descent is the one whose share is unknown and whose bench cost is the largest (x2.02 on its row): its census belongs to the games' sessions. Two limits: the blocks with `sep` hold other instructions, so the share is an upper bound of the pattern's time; the unmapped part (20 % of game 1) is assembly and NMI code no pass of the C generator touches.
+
+### The games' own census (2026-11-15, 02:12, game 1's session, its tools, NTSC with PAL in brackets, upper bounds)
+
+- **Pointer or array parameter**: 1.6 % (1.5) of the busy time in the game's compiled code; **no caller of the hot path passes `&tab[k]`** (0 %): they pass the address of a named constant structure of the same file, and the match loop receives no pointer (global arrays indexed). So the pointer-to-index descent has **no hot-path site in this game**. The library's hand-written sprite placement, which also takes a pointer, is up to 11.8 % (11.1) of the time, itself 10.3 % (9.7): outside any generator, a library lever.
+- **Neighbouring byte writes**: 0.35 % (0.37) strict, up to 0.7 % (0.4) with parallel-array copies; its heaviest case, a tile composition into a far buffer, was already rewritten by words by hand (-49 %).
+- **Width switch `sep`/`rep`**: 2.5 % (2.0) for a round trip in the block, 1.6 % (1.2) in a loop; the game's own compiled code alone 1.9 % (1.5), the rest two library audio functions; heaviest: the sprite update 0.88 %.
+- Not counted: the SDK's assembly functions (sprite placement, VRAM queue, NMI).
+Reading (the game's): none of the three forms passes 3 %; the bulk is the call boundary and the library. This agrees with the bound read from the gauge (T6+T7 up to 2.5 % / 1.4 %), and **removes the pointer descent as a lever for game 1** (game 2's census is asked; the structure-pointer form belongs to a port's bench shape, not to the two games' hot path).
