@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap count-sframe count-a1 count-i1 count-i1-calib test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap bench-place count-sframe count-a1 count-i1 count-i1-calib test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -733,6 +733,12 @@ bench-gap:
 	@scripts/install-luna.sh
 	@python3 devtools/gapbench/run.py
 
+# oamPlaceWorld() against its previous body (place_old.asm) on the same batches,
+# SlowROM and FastROM, on luna (devtools/placebench/run.py). A report, no gate.
+bench-place:
+	@scripts/install-luna.sh
+	@python3 devtools/placebench/run.py
+
 # L4 S0, a count before any code: what static frames would take, under three edge
 # models (.claude/notes/chantiers/gap_lots/L4_s0_count.md). Reads the comments
 # QBE_SFRAME_DUMP=1 adds to the .c.asm (the ROMs do not change): build with it first.
@@ -936,6 +942,7 @@ help:
 	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
 	@echo "  bench-slots - Sprites at fixed VRAM slots against the dynamic engine, on luna"
 	@echo "  bench-gap - What C costs against hand-written assembly, twelve routines, on luna"
+	@echo "  bench-place - oamPlaceWorld() against its previous body, same batches, on luna"
 	@echo "  count-sframe - L4 S0: the static-frame count (every .c.asm carries the side table since S1)"
 	@echo "  count-a1 - A1 S0: what the first integer argument in A would take (census from the side table, the text and the kept IR)"
 	@echo "  count-i1 - I1 S0: what inlining the same-file calls would take (eligible callees, sites, ROM; same inputs as count-a1)"
