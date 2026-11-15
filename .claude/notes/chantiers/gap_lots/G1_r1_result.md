@@ -162,3 +162,16 @@ What it settles:
 2. **The direct page on the entity (T1) is worth much less than its first hand figure** except where the indexed form already paid the unaligned-D cycle: -7.8 % (`mobaos`), -2.5 % (`mobfp`), -0.2 % (`mobptr`); each field access gains 10 / 6 master cycles, each direct-page temporary forced absolute while D is moved loses 8 / 6. Marked "under prediction", not dropped: it depends on the allocator keeping the function's temporaries off the direct page (R3).
 3. **The pointer parameter alone costs 2.02 times the indexed form** (`mobfp`): the largest recoverable item of the entity shape, which T1 recovers only 2.5 % of; descending a pointer parameter to an index (the call-boundary work) is what pays.
 4. **R3's rewritten prediction does not reach 1.1 in either column** (leaf A 1.18 to 1.24; leaf B with its caller 1.20 to 1.25 ABI kept, 1.12 to 1.18 free convention). With R0 (the debt of 6.07 to re-earn) this is the honest state: **the cheap path first**: T4, T6, T7 and the pointer-parameter descent are lots of the *current* generator (each a pass with a switch, a prediction, the games' census), measured on the games before any prototype of a new one; G1 stays open as the option that must earn what those passes leave, and its line (1.1 of the hand on the leaves AND -10 % of game 2) stays the owner's.
+
+## Share of the games' busy time, as bounds (2026-11-15, the maintainer session; asked by the conductor)
+
+Method (private gauge, reference `develop` `3139a9ef`, no switch, the frozen sources of 2026-11-11, per-label profile of the two games; busy = total minus the cycles the emulator marks idle; the bounds are **upper bounds of the time a pattern could touch, not predictions of a gain**; their product with the bench's relative gain is the ceiling written below):
+
+| technique | what is read | game 1 | game 2 | ceiling of the gain (x the bench's relative gain) |
+|---|---|--:|--:|---|
+| T4 typed multiply, wait used | self time of the `tcc_*` / `__*` helpers (multiply and divide) | 0.23 % | 1.47 % (multiply 0.74, divide 0.42) | game 1 <= 0.1 %, game 2 <= 0.9 % (x 0.44 to 0.59; the divide is not in T4) |
+| T6 + T7 byte stores composed, one width per region | time of the basic blocks that contain a `sep #$20` and a `rep #$20` (a round trip) | <= 2.5 % (20 % of the time is in labels not mapped to a C block: the NMI and library assembly) | <= 1.4 % (8 % unmapped) | game 1 <= 0.7 to 1.4 %, game 2 <= 0.4 to 0.8 % (x 0.29 to 0.55) |
+| pointer parameter descended to an index | not readable from the assembly (a 4-byte pointer copied from the caller's frame); asked of the games | ? | ? | ? |
+| T1 direct page on the entity | depends on the allocator | — | — | — |
+
+Reading: **no isolated technique alone passes about 1 % of either game's busy time**, the same order as the last cheap lots (about 1 % each); the three together, if their eligible time were fully taken, stay under about 2.5 %. The pointer-parameter descent is the one whose share is unknown and whose bench cost is the largest (x2.02 on its row): its census belongs to the games' sessions. Two limits: the blocks with `sep` hold other instructions, so the share is an upper bound of the pattern's time; the unmapped part (20 % of game 1) is assembly and NMI code no pass of the C generator touches.
