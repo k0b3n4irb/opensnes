@@ -75,3 +75,23 @@ the gap mostly in the allocation (21 %: false on every reading). The figures at 
 Caveat on the paper rules: E, F, P, B1, C1, C2 are not in the rules' idiom list (range test, `cond ? k : 0` only), so the paper
 could not use them: that is the rules' narrowness, not the allocator's. The one the allocator itself loses is B2, and the paper's
 own agent chose it (idx in a slot, 28 assignments).
+
+## Second paper of `path` (2026-11-15; rules `G1_r3_paper_rules_v2.md` `f025ec9c`/`71b39109`, thresholds frozen before the text)
+Written by a third Sonnet agent (not the rules' author; rules v1, v2 and the IR only); 5 assignments costed by hand after pruning;
+idioms I1 (mask built once), I2 (idx carried scaled in X, `$7E` mask), I3, I4; F and P refused; no D, no DBR.
+`g1_r3_0/path_paper2.asm`. Measured in the scratch bench (row `pathp2`: C copy against the paper), checksum equal to the C:
+
+| speed | C | hand | paper 2 | paper 2 / hand |
+|---|---|---|---|---|
+| SlowROM | 124 223 | 81 744 | 91 545 | **1.120** |
+| FastROM | 106 084 | 69 671 | 78 178 | **1.122** |
+
+**Threshold 1 (≤ 1.20): met**, both speeds. What is left above the hand is F (0.115, refused) and P (0.002): the remainder equals
+the attribution's refused posts, as predicted. One construct outside I1-I4 for the conductor: the IR's first table address is
+`path_sin + 2·idx16` with `idx16` arbitrary (17 bits); the paper takes the carry out of the entry `asl` to pick a second form of the
+first load (`path_sin+$10000,x`), entering the loop after it: exact, no per-iteration cost, but a loop with two entry points.
+**Threshold 2 (gap ≥ 0.05 against "today + the same idioms"): not measurable at paper stage.** The idioms said in C
+(`g1_r3_0/path_idioms_c.c`, checksum equal) are *slower* with today's generator: 171 480 / 81 742 = 2.10 against 1.52 of the
+plain C, because carries and masks by C comparisons are not an IR pass. The column needs the idioms as IR passes (written once for
+both emitters, R3-1's first step), then today's generator on them. Only the allocation part measured by substitution is known:
+B2, 0.067 of ratio, on the paper's own text, not on today's output.
