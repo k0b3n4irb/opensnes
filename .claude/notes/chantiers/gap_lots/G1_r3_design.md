@@ -333,3 +333,83 @@ Next: the conductor's answer on item 1, then a revision 2 of this note taking 2 
 3. **The verdict reads two figures**: (a) the cell under 1.2 (else the stop); (b) the gap between G1 and "today + idioms" on the same cell.
 4. **Minimal margin for (b), committed before R3-1: 0.05 of ratio to the hand on each leaf.** Under it, G1 below 1.2 does not justify a new generator: the idioms go to today's generator and the report says so to the owner. Check against 6.4 (hypotheses): leaf B 1.10 vs 1.23 (1.269 without the data bank) is a gap of 0.13; leaf A has no IR idiom, today 1.288 vs 1.12 is 0.17. The margin is met by the prediction with room; it is the figure R3 must measure, not a target to tune. Unchanged by the contest; to revisit only on a fact.
 5. Data bank (contest point 5): decided in revision 2 before R3-1. Revision 2 takes points 2 to 10, then R3-0 with a stop that is testable (paper rules frozen before the text, applied by a second agent). Sonnet executes, Opus reviews.
+
+## Revision 2 (2026-11-15; Sonnet writes, Opus reviews): contest points 2 to 10
+
+Supersedes sections 6.4 and 7 (R3-0, R3-2, R3-3, R3-5 rows) and the stop of R3-0. Everything else of the note stands. Still
+hypotheses: nothing here is measured; the measurements are R3-0's, written below as tasks with their pass rule.
+
+### R2.1 (point 2) 6.4 recomputed from 6.2 x 6.3, arithmetic replayed
+Leaf A (today 16 367 410, hand 12 707 660): values 912 000 x 72.5 %, stack re-read 152 000 x 100 %, outside the loop
+2 090 000 x 55 %, data bank 304 000 x 90 % (G1's own, R2.4). Allocation and selection (no data bank): **1.134** (low takes
+1.174, high 1.096). With the data bank: **1.112** (low 1.153, high 1.075). Leaf A has no IR idiom, so "with idioms" equals
+this line. Leaf A's real bet is the **outside-loop item** (57 % of what is left, 55 % taken, no source): with none of it
+taken the line reads 1.224, with 30 % of the values only 1.164. R3-0's paper covers whole functions, not only hot loops, to
+test exactly this item.
+Leaf B alone (today 8 828 590, hand 6 107 176): allocation item 1 187 000 x 72.5 %, idioms 1 534 000 x 85 %, data bank
+(9 / 156 of 4 601 198 = 265 000) x 90 %. Allocation and selection **1.266** (the stop would fire if the cell read this
+line, as the contest said); with the data bank and the idioms **1.052** (low takes 1.138, high 0.98: read as "at the
+hand"); today + the same IR idioms **1.232**. Gap (b): leaf A 0.18 (1.112 against 1.288), leaf B 0.18 (1.052 against 1.232);
+margin 0.05 met with room. The earlier 1.31 / 1.10 / 1.23 of 6.4 were wrong by the arithmetic of the data bank (R2.4).
+Debt margin: see R2.3. Free-convention column and "with caller": unchanged until R3-0 reads the call count (6.4's text).
+
+### R2.2 (point 3) R3-0 measures the attribution, it does not assume it
+At the frozen reference (commit and switches written in the first line of the result): per-item decomposition of both leaves
+(values, counter / index, data bank, stack re-read, `clc`, range test, `cond ? k : 0`, outside the loop), by luna counts
+per instruction, by the two games' sessions on their study copies. Questions it answers: is leaf B still one function in the
+reference build (inlined or not: its perimeter changes); why `soa` reads 35 813 after the probe and 36 377 in R0 (same
+source, same switches? name the difference: code, pin or harness). Pass rule: the sum of the items is within 3 % of the
+measured gap; else R2.1's take rates are not read and the table is redone from the measured items.
+
+### R2.3 (point 4) the debt margin gets a source
+R3-0 measures the loss per family **on `soa` and `glide` alone** (R0's switch rows already exist: run them again at the
+frozen commit, both speeds). Until then the margin is a stress case, not a point: +0.05 on **both** leaves (A 1.16, B 1.10
+on the "with idioms" line), still under 1.2; if the measured loss on the leaves' shapes exceeds 0.05, the cell is redone
+with the measured loss before R3-1.
+
+### R2.4 (point 5) the data bank is G1's own, decided
+DBR is a location of the bank, set by the allocator: it is not an IR rewrite and today's generator cannot take it as a
+pass. It counts on the allocation-and-selection line of G1 (both lines) and **never** in "today + the same IR idioms".
+Written before R3-1; revisit only on a fact (a pass that does it on today's generator, measured).
+
+### R2.5 (point 6) the doors must be able to fail on the prototype
+- Mutation: `mutate.py` re-run on **five seeds (1 to 5)**, on the prototype's text; each seed at least 90 % detected, and every
+  surviving mutant read by hand and classed (equivalent, or a hole: a hole stops the step). Report per mutated function the
+  share the prototype **accepted** (a refused function is mutated on today's text and proves nothing about G1).
+- Floor for the 20 000 seeds: the count is of seeds whose functions the prototype **accepted**, not generated: 20 000
+  accepted per differential test; and acceptance at least 50 % of the generated functions and 100 % of the hot loops of the
+  twins and leaves. Under the floor, the 20 000 prove today's generator and no figure is read.
+
+### R2.6 (point 7) R3-0's stop is testable
+1. Before any paper text, the **paper rules are frozen in a file** (the allocation algorithm of 2.2, the cost unit of 3,
+   the refusals), committed alone. 2. The paper text of `soa` and `path` is written by a **second agent** that gets only the
+   file and the IR, not this note's predictions. 3. It is measured in the bench (same harness, both speeds), whole
+   functions, with the IR idioms applied as the IR pass would. 4. **Stop before any code if the paper reads above 1.2 of the
+   hand on the cell** (the owner's stop, same cell: "with idioms", alone, static weight); a paper above 1.12 is reported as
+   a warning (the paper is a floor of what the prototype reaches: it cannot do better than its own rules). The 1.25 of the
+   first draft had no source and is withdrawn.
+
+### R2.7 (point 8) the cost model is checked against luna before the search uses it
+R3-0 prices the 31 R0 rows with the model of section 3 and compares with luna, both speeds. Tolerance written before the
+comparison, committed alone (hypothesis, no source): per row within 3 %, mean absolute error under 1 %, and the rank of the
+rows' variants (switch on / off) the same. A row outside it: the model is corrected and the comparison re-run; the search
+(R3-2) starts only after.
+
+### R2.8 (point 9) NMI with D and DBR moved
+Fixture `testing/fixtures/g1_nmi_dmove` (to write in R3-1): a main-loop function the prototype accepts, moving D and DBR
+inside its loop, while an NMI handler increments a canary and writes plain RAM through its own direct page; checksum and
+canary equal to the reference build. `templates/crt0.asm` NMI entry (checked 2026-11-15: `phd`, `phb`, D set to
+`tcc__nmi_registers`, DBR to `$00` by `pea $0000 / plb / plb`) makes it safe by construction; the fixture checks that it
+stays so. A fault that must go red: `QBE_G1_FAULT=dbr_nmi` (DBR left moved across the `wai` in the wait loop and an
+absolute read of an NMI-written variable in the loop). R3-0 also greps the corpus for IRQ handlers using the direct page.
+
+### R2.9 (point 10) T1 predicted per row, before R3-5
+At R3-1's end, committed alone: a prediction per row (`mobfp`, `mobptr` and each other row with an entity in bank 0 below
+`$2000`): saving in percent of the row's master cycles, and which temps leave the page. The 3 to 5 % of R1 stays a
+hypothesis; T1 is dropped if the measure is under half the per-row prediction summed.
+
+### R2.10 Steps after revision 2
+R3-0 is now: R2.2, R2.3, R2.6 (rules frozen, second agent), R2.7, corpus grep of R2.8, the neutral twin of leaf A, the call
+count of leaf B. R3-3 takes R2.5. R3-1 adds the NMI fixture; R3-5 reads R2.9. Cost: R3-0 1.5 days (was 1), the rest as
+before, **about 8.5 days**. Next, in a fresh conversation: R3-0 (Sonnet executes, Opus reviews), starting with the paper
+rules file and the tolerance file, each committed alone, then the measurements.
