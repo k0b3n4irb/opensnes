@@ -325,3 +325,11 @@ allocator does not subsume) were read. Verdict: **the note is not a base for R3-
 10. T1: write a per-row prediction (committed alone); the 3 to 5 % was "hypothesis, not measured".
 
 Next: the conductor's answer on item 1, then a revision 2 of this note taking 2 to 10, then R3-0.
+
+## Conductor's decision (2026-11-15, thread of the same date) and the margin committed before R3-1
+
+1. **The cell the 1.2 stop reads**: the "with idioms" line, leaves A and B **alone**, **static weight**, at the ROM speed the two games build (the other speed reported beside it). "With its caller" and the profile weight are reported, they do not decide.
+2. **No credit to G1 for what is not its own**: IR-rewrite idioms (range test, `cond ? k : 0`) are written **once**, as passes behind a switch, feeding both emitters; the column "today's generator + the same IR idioms" is measured on the same cell. An idiom that serves one emitter only is named and justified here.
+3. **The verdict reads two figures**: (a) the cell under 1.2 (else the stop); (b) the gap between G1 and "today + idioms" on the same cell.
+4. **Minimal margin for (b), committed before R3-1: 0.05 of ratio to the hand on each leaf.** Under it, G1 below 1.2 does not justify a new generator: the idioms go to today's generator and the report says so to the owner. Check against 6.4 (hypotheses): leaf B 1.10 vs 1.23 (1.269 without the data bank) is a gap of 0.13; leaf A has no IR idiom, today 1.288 vs 1.12 is 0.17. The margin is met by the prediction with room; it is the figure R3 must measure, not a target to tune. Unchanged by the contest; to revisit only on a fact.
+5. Data bank (contest point 5): decided in revision 2 before R3-1. Revision 2 takes points 2 to 10, then R3-0 with a stop that is testable (paper rules frozen before the text, applied by a second agent). Sonnet executes, Opus reviews.
