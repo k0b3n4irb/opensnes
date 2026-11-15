@@ -183,3 +183,13 @@ Reading: **no isolated technique alone passes about 1 % of either game's busy ti
 - **Width switch `sep`/`rep`**: 2.5 % (2.0) for a round trip in the block, 1.6 % (1.2) in a loop; the game's own compiled code alone 1.9 % (1.5), the rest two library audio functions; heaviest: the sprite update 0.88 %.
 - Not counted: the SDK's assembly functions (sprite placement, VRAM queue, NMI).
 Reading (the game's): none of the three forms passes 3 %; the bulk is the call boundary and the library. This agrees with the bound read from the gauge (T6+T7 up to 2.5 % / 1.4 %), and **removes the pointer descent as a lever for game 1** (game 2's census is asked; the structure-pointer form belongs to a port's bench shape, not to the two games' hot path).
+
+### Game 2's own census (2026-11-15, 04:18, its session, its tools, heavy level, frames 4 500 to 7 000, busy 509 M of 893 M master cycles, upper bounds, one scenario)
+
+- **Pointer or array parameter**: 3.8 % of the busy time; strict (`&tab[k]` or `tab+k`, one file) **1.0 %**: two callers only (the history `memmove` 0.65 %, the VRAM queue push 0.4 %); the entities are addressed by a `u16` index into one array per field.
+- **Neighbouring byte writes**: 0 % detected (separate arrays per field).
+- **Width switch in a loop**: 30 % for the functions whose loop holds a `sep`/`rep` (a very loose bound: the whole function), 56 % for any function containing one; heaviest the entity update list 18.2 % (8 `sep` and 8 `rep` in its loop). Not measured: the share of the instruction, the real cost of the pointer in the game, other levels.
+
+**Correction of my own bound (same day)**: the "blocks with a `sep`/`rep` round trip" bound above (<= 2.5 % / <= 1.4 %) is not an upper bound for a width region that spans several blocks; the tighter figure is the **direct cost of the executed `sep`/`rep`** (visits of each block from the profile's instruction count, times the number of switches in it, times 3 CPU cycles: 18 to 24 master cycles each): **0.40 to 0.53 % (game 1) and 0.26 to 0.35 % (game 2)** of the busy time, ~28 000 and ~36 000 executed switches in the window. So taking away **every** width switch saves at most about 0.3 to 0.5 % directly; what T7 can add beyond (byte operations replaced by word operations, fewer instructions) is not in that figure and is what the game-2 list update (18.2 % with 8 round trips in its loop) would show: to measure on that function, not to assume.
+
+Reading across the two games: pointer descent 0 % of the hot path (game 1) and about 1 % (game 2); neighbouring bytes 0.35 to 0.7 % (game 1) and 0 % (game 2); width switches 0.3 to 0.5 % direct. **Each isolated pass stays at or under about 1 % of a game's busy time.**
