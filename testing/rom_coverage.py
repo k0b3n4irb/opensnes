@@ -91,7 +91,7 @@ FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 260),
             # the sound CPU's memory: audioLoadSampleBegin / Step; done by frame 200
             (FIXTURES_DIR / "libtests_aram" / "libtest_aram.sfc", "libtest_aram", 260)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
-    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
+    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals", "far_bank7f")
 ]
 
 

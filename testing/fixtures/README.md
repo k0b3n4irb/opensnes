@@ -35,6 +35,7 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `a6_farptr/` | the 4-byte pointer ABI: the bank byte through every lib boundary |
 | `a7_32bit/` | 32-bit arithmetic: add/sub carry, mul, div, mod, shifts, signed folds |
 | `b2_far_ram/` | `FAR` objects in bank $7E with bank-honouring codegen |
+| `far_bank7f/` | `FAR` objects in bank $7F placed by assembly: every access form, `memcpy`/`memset`, no overlap |
 | `c_features/` | switch forms, function pointers, struct members, the C features a game uses |
 | `const_div/` | a divide or remainder of two constants folded at compile time (signed and unsigned, 16 and 32 bits, negatives, limits, a numerator folded just before): no division helper called, every value against one written by hand; INT_MIN / -1, INT_MIN % -1 and a zero divisor kept as run-time calls |
 | `debug_channel/` | the debug channel to luna (nocash / WDM) |
