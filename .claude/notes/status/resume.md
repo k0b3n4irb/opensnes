@@ -300,3 +300,5 @@ Reactive work goes on beside it (the games, luna, the porting tools):
 - **Done 2026-11-11**: (3) the >99 LSB sample differences reported to luna (note `partners/luna/2026-11-11_to_luna_v1.43.0-sample-diff-above-99-lsb.md`, `e87f18da`); waits for its answer.
 - **To do next**: (4) the main tree's `compiler/` submodules are behind the pins: a
   `git submodule update` and a full rebuild are due, announced to the partners first.
+
+3u. **Harness at 96.2 % (2026-11-15)**: boundary contract, guard zones, poisoned registers and direct page, bounds; replayed by me (77/80, 3 equivalent survivors, `run.py --check` OK; cost +29 % frames, 98 s a full run). Code on `g1-r2` (`98c3703d`), note on `develop`. CI of `ccdf9216` green. **Next**: R3's design note (Opus planner, contested by the strongest model on one task, two columns), then the always-loaded context cut (3r). Still waiting: the consumer game's figures on `oamPlaceWorld`.

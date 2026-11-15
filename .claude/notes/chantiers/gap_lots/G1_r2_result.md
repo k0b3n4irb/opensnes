@@ -75,7 +75,7 @@ the result reports the failing one with its assembly.
 
 ## Result (2026-11-15)
 
-Commits on `g1-r2`: `6084dfd5` (this prediction, alone), `143fe733` (the six fixtures), the mutation script, this result.
+Commits on `g1-r2`: `6084dfd5` (this prediction, alone), `143fe733` (the six fixtures), the mutation script, this result; then `98c3703d` (the harness strengthened, section below).
 Pair: Opus alone (no other model called, as the brief says). The fixture files were drafted while the gate that the commit
 hook asks for (`make tests`) ran before the prediction's commit; nothing was built or run before that commit.
 
@@ -141,6 +141,59 @@ each named by the survivors it would catch (hypotheses until re-measured with th
 All four together would leave only the 3 equivalent mutants on this seed (to be measured, not claimed). The I1-I6 suite
 already covers the kind of item 1 for the functions it names (I4 `width`), not for every function a generator emits.
 
+### The mutation score strengthened: 96.2 % detected, 100 % of the non-equivalent mutants (2026-11-15)
+
+Commit `98c3703d` on `g1-r2`, `devtools/gapbench/` and `devtools/g1bench/mutate.py` only (nothing of the compiler, the
+library or develop). Same seed (1), same 80 faults: the instructions drawn are the same, line for line, in every run below
+(only the local label numbers and the line numbers move, since `kernels.c` grew). Pair: Opus alone. Each line is a full
+replay of `python3 devtools/g1bench/mutate.py --seed 1`; the clean ROM passes the harness at the start of each (the script
+stops otherwise):
+
+| step (cumulative) | detected / 80 | moved | survivors caught |
+|---|---|---|---|
+| before (`471e5308`) | 65 (81.2 %) | | |
+| 1. boundary contract: after the 16 timed calls, untimed, `gap_check` calls the routine once more, a C row entered with A in 8 bits (X, Y 16), and checks after `rtl` A and X in 16 bits, S as saved, D = 0, DBR = 0 (`bench_abi`, read by `run.py` and `mutate.py`) | 71 (88.8 %) | +6 | 8 (by the extra call's inputs, checksum), 9 `k_fill_c` (checksum), 10 `k_col_c` (hang), 11 `k_box_c` (contract: A 8 bits, DBR), 12 `k_call_c` (hang), 15 `k_fixed_c` (contract: A 8 bits) |
+| 2a. + direct page poisoned (`tcc__r0..r10h`, `tcc__lf`, `$A55A`) before each checked call | 71 (88.8 %) | **+0** | none: 8 was already caught by step 1 |
+| 2b. + guard zones: each setup hashes the 8 bytes on each side of each output buffer, each checksum adds the hash now XOR the hash armed (the compiler's and runtime's scratch left out) | 73 (91.2 %) | +2 | 4 `k_fill_c` `#513`, 5 `k_col_c` `#65` |
+| 2c. + edge hooks between the two checked calls (`e_box`: `px` lands on 251; `e_soa`: flags `$01/$10/$11/$00`, positions on and one past each clamp, frames 23 and 24) | 75 (93.8 %) | +2 | 6 `k_box_c` `#251`, 7 `k_soa_c` `and #17` |
+| 3a. + probes of the exported callees no row calls itself (`gap_probe_k_call_f`, `gap_probe_ch_update`: arguments pushed from assembly, A in 8 bits, result compared with the same call made from C) | 76 (95.0 %) | +2 / **-1** | 13 `k_call_f`, 14 `ch_update` (contract: A 8 bits, result differs); **lost**: `k_fill_c` `ldx.w #0 -> ldy.w #0`, caught until then: the argument loop left X = 0 at entry, the right value by chance, and the two checked calls rewrote the buffer the timed calls had left wrong |
+| 3b. + A, X, Y poisoned at entry too (`$A55A`) | **77 (96.2 %)** | +1 | the `ldy` mutant again (crash) |
+
+Final: `detected 77 (96.2 %), survived 3` — by kind imm 12/14, reg 14/14, drop 12/13, branch 13/13, width 13/13, dp 13/13;
+by a hang or crash 12, by the boundary contract 6, by a checksum 59. Over the 77 non-equivalent mutants: **77 / 77 = 100 %**
+(the line was 90 %). The three survivors are the three equivalent mutants of the first run, unchanged:
+
+| # | mutant | why it is equivalent |
+|---|---|---|
+| 1 | `k_fixed_c` `cmp.w #32 -> #33` | the entry test of a rotated loop, run once with i = 0: 0 < 32 and 0 < 33 alike |
+| 2 | `k_ents_c` `cpy.w #32 -> #33` | the same, Y = 0 |
+| 3 | `k_soa_c` `lda.w #16` dropped | the branch to it is taken only when `and.w #16` left exactly 16 in A |
+
+Facts found on the way:
+- **X in 8 bits at entry is not the contract**: the brief asked for A and X in 8 bits; `compiler/ABI.md` (constraints) says
+  the caller has X/Y in 16 bits and only A may be 8 (an exported C function opens with `rep #$20`, not `rep #$30`). Measured:
+  entering the C rows with `sep #$30` hangs the **clean** ROM (`bench_done not reached`), a false positive by construction.
+  So C rows are entered with A in 8 bits and X, Y in 16 bits; the assembly twins (written for 16 bits, the file's header)
+  are entered in 16 bits; X in 8 bits is still caught **on return** (bit 0), which caught two `sep #$20 -> #$10` mutants.
+- **Guard zones need the scratch left out**: the first version (no exclusion) failed the clean ROM on `sprites`: `mo_order`
+  ends at `$80` = `tcc__lf`, and `mo_hi`, `mo_oam` touch `div32_ql`, `tcc__nmi_registers`; C and assembly use that scratch
+  differently. `scratch()` in `kernels.c` leaves out `tcc__r0..tcc__fp` (`$00-$2F`), `tcc__lf` (40), `tcc__nmi_registers`
+  (168), `mul32_hi..rt32_save` (16), `div32_ql..` (10), `mul32_lo` (2); the guard bytes are read, never written.
+- **More calls can hide a fault**: step 3a lost a mutant that step 1 caught (above). Rule kept in the driver: every register
+  and scratch slot the callee may not read before writing holds the poison at entry.
+
+False positives: **0**. The clean ROM is judged at the start of every `mutate.py` run (7 runs, all green); `python3
+devtools/gapbench/run.py --check` (SlowROM and FastROM, the row check now includes `bench_abi`): `gapbench: OK, nothing
+above baseline.json`, no `note:` line; `make bench-gap` exit 0. The timed loop is not touched: 46 of the 104 figures move by
+2 or 3 master cycles (the driver grew, the refresh falls elsewhere), none by more, under the 0.2 % tolerance; `baseline.json`
+is not rewritten.
+
+Cost, measured: the clean SlowROM run reaches `bench_done` at frame 535 instead of 414 (+29 %); `run.py --check` 18.2 s
+against 14.6 s on `471e5308` (same machine, back to back); a full `mutate.py` 98 to 99 s (92 s at step 1).
+
+Replay: `python3 devtools/g1bench/mutate.py --seed 1 --json out.json` (the summary and the survivors at the end);
+`python3 devtools/gapbench/run.py --check`.
+
 ### Gates (replayed on `g1-r2` after the three code commits)
 
 `make clean && make`: `OpenSNES SDK build complete!` (the only warnings are the host's `-rdynamic` and a CMake deprecation,
@@ -162,12 +215,6 @@ into `make tests` and `mutate.py` into no `make` target: the brief allowed new f
 | detected by a hang or crash | a third | 10 / 65 (15 %) | **no** |
 | under 90 % | yes | yes | yes |
 
-## Verdict of the maintainer session (2026-11-15)
+### Verdict of the session (2026-11-15)
 
-Replayed by me on the branch `g1-r2`: `testing/fixtures/g1_invariants/run.py` reads `G1 invariants: 6/6 as expected` (the six clean cases pass on today's generator, each injected fault goes red, the one allowed change of convention, `free`, stays green). The mutation score (81.2 %, 80 faults, seed 1) is **the agent's, not replayed by me** (a long run; to replay at the start of R3: `python3 devtools/g1bench/mutate.py --json out.json`). The prediction was committed alone before any test run (`6084dfd5`).
-
-What R2 settles:
-1. **The six invariants are testable and hold today** (register order and count read on the emulator and in the text, the NMI path's budget, the layout of what the DMA sends, the boundary convention of functions called from assembly or the NMI, bank-blind reads, probe entry points). They are the acceptance tests of any generator: a prototype is run against them first.
-2. **The equivalence harness of the bench is not enough to accept a generator: 81.2 % of one-instruction faults detected, under the 90 % the contest set.** Of the 15 survivors, 3 are equivalent mutants and 12 are real escapes: 7 are width faults at the entry or exit of a function (the bench driver always calls with A and X 16 bits wide and restores `rep #$30` after each return, so a wrong `rep` at the boundary is invisible), 2 are writes past the checked buffers, 2 are bounds or bits the inputs never reach, 1 is a stale direct-page slot. **Before R3's figures count, the harness gets the checks that catch them**: the `jsl` / `rtl` contract at the boundary entered with 8-bit registers and checked on exit (7), guard zones or a hash of WRAM (2), a poisoned direct page before each call (1), inputs on the bounds (2); then the score is replayed on the same seed: the target is 90 % on the 77 non-equivalent mutants (84.4 % today).
-3. **A defect of the emulator pinned at 1.44.0 found on the way** (a peek of a region named `oam` is refused: the label is taken for the `OAM:` region without regard to case): to report to its session.
-4. **Not wired**: the fixtures are not in `make tests` and the mutation script has no target: a decision for the owner of the prototype's gates; the fixtures belong to `develop` when the prototype needs them.
+Replayed by the session in the `g1-r2` worktree: `mutate.py --seed 1` gives 77 detected of 80 (96.2 %), the 3 survivors being the 3 equivalent mutants; `gapbench/run.py --check` OK. The harness passes the 90 % bar; R3's figures may count. The code stays on branch `g1-r2` (`98c3703d`); nothing of it enters `develop`.
