@@ -50,3 +50,28 @@ the two twins disagree widely: the stop depends on leaf A's shape and is **for t
 Open: whether the hand's 32-bit trick (sign built once per sub-step) is a pass an IR idiom may carry; that decides if the
 paper rules were too strict for 32-bit composition, which only a rules change (new dated file, paper void) can test.
 Scratch: kernels/run.py patch not kept (disposable): rows `path` (C+hand, the files above) and `pathpp` (C copy + paper).
+
+## Attribution of the `path` gap (2026-11-15, outcomes frozen in `G1_r3_0_attribution_rules.md`, `39cf05f3`)
+Method: from the paper, one post at a time moved to the hand's way (forward chain f0..f7) and the reverse from the hand
+(c0..c7, r_*), every variant checksum-equal; I replayed f0, f3, f7 (107 551 / 90 778 / 81 764 SlowROM). Posts are additive
+within 3 cycles in both directions; f7 (the hand's way everywhere) = 81 764, the hand 81 744, the 20 left are the paper's `rep #$20`.
+Files: `g1_r3_0/attrib/` (gen.py, measure.py, results.tsv, variants).
+
+| Post | Paper vs hand | SlowROM | FastROM | Class |
+|---|---|--:|--:|---|
+| P prologue composition | `hi \| sext(lo)` select vs plain copy | 157 | 122 | idiom, data-conditional (equal here only because no `lo` is negative) |
+| E acc3 += s sar 1 | 32-bit pair rotated vs low rotate + M as high word | 7 252 | 6 332 | idiom, **exact on all s16** (high word of a sign-extended sar is the sign) |
+| F acc2 += s*2 | 32-bit pair shifted vs low shift + M as high word | 9 364 | 8 173 | **range-conditioned**: exact only for \|s\| < 16384; the table is 3 000, the IR does not carry it |
+| B1 index scaling | idx doubled each turn vs 2·idx carried | 881 | 755 | idiom (scaled induction variable) |
+| C1 loop rotation | test at top vs bottom | 1 109 | 834 | idiom (shape) |
+| C2 count down | `cpy #64` vs `dey/bne` | 1 580 | 1 188 | idiom (induction reversal) |
+| B2 idx in X | idx in a slot (`lda/tax/sta`) vs in X | 5 444 | 4 780 | **allocation** |
+| residual | `rep #$20` | 20 | 15 | |
+
+Shares of the 25 807 SlowROM gap: allocation (B2) **21.1 %**; idioms without F **42.5 %** (P+E+B1+C1+C2 10 979); F **36.3 %**
+(9 364). Neither outcome of the frozen file holds as written: (a) needs more than half in idioms (true only if F counts), (b) needs
+the gap mostly in the allocation (21 %: false on every reading). The figures at hand: paper + the uncontested idioms 96 572 =
+1.18 of the hand; + B2 (the allocation the paper did not make, idx kept in a slot) 91 128 = 1.115; + F 81 764.
+Caveat on the paper rules: E, F, P, B1, C1, C2 are not in the rules' idiom list (range test, `cond ? k : 0` only), so the paper
+could not use them: that is the rules' narrowness, not the allocator's. The one the allocator itself loses is B2, and the paper's
+own agent chose it (idx in a slot, 28 assignments).
