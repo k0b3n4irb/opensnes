@@ -201,3 +201,15 @@ Yes: the free convention between `static` functions of one file is in the scope,
 ### R-1 closed (2026-11-15, 00:00)
 
 The gauge's gap was a reference that was not the one named: `xylot-ref` was the compiler with the X/Y colour off (`QBE_NO_XY_COLOUR=1`); the parent of the lot already coloured. The lot's own part is -0.35 % on game 1, the whole colour -1.65 % (the gauge's -1.72 % was the whole colour). No error bar is needed from this cause; **the rule that remains**: every figure names its reference by commit and by switches. R-1 costs 0 days: the plan starts at R0 (with that rule in its harness); total 11 to 17 days.
+
+### Plan update (2026-11-15, conductor's go) and R0, predicted before any measure
+
+Updated: R-1 is closed (above). The case "an inlining decision was lost since 2026-11-04, about 3 %" is **withdrawn** (a game's own correction: never inlined since its loop was written, the room rule refuses it, forcing it gains 0.04 %): it supports nothing in this plan; the integration report stays a practice without a proof case.
+
+**R0 (2 to 3 days; a pair on a worktree branch `g1-r0`; nothing enters `develop`)**: one bench, in master cycles per window on both ROM speeds, naming every reference by commit and switches (the lesson of R-1).
+1. **Establish the method that gave 2.56 for the other 65816 compiler** (a measure of its built ROM on the emulator, or a static weighted cost: read its script), re-run it at the present state, and never put two units in one column.
+2. **The twelve rows** of `gapbench` and **two neighbour forms written neutral**: the entity loop in three formulations of the same C (an array of structures, one array per word field, a pointer walk) with its hand yardstick, and the byte table (four bytes written to four arrays from an index) with its hand yardstick. Equivalence by checksum, as the existing rows.
+3. **Three generators**: today's (`develop` `3139a9ef`), the other 65816 compiler at the same state (private, script in the private folder), the hand.
+4. **The starting debt**: the same rows with the generator's switches off one family at a time (`QBE_NO_PEEP*`, `QBE_NO_X_CACHE`, `QBE_NO_SLOT_COLOR`, `QBE_NO_XY_COLOUR`, `QBE_NO_DP_*`, ...) and all at once, the weighted mean of the twelve rows for each: what today's generator owes to its rules, and what a new allocator would have to earn back first.
+
+Predictions (hypotheses, written before the run): (a) the new base reads **2.15 within 3 %** on the first twelve rows (the probe's figure, `G1_ir_probe.md`); (b) the other compiler's figure in the same unit is **within 10 % of 2.56**, the sign of its six better rows unchanged (`unpack`, `call`); (c) the structure form and the field-array form of the entity loop differ by **1.3 to 1.6** (a port measured 1.33 and 1.61 at N = 20); (d) switching off every text rule at once raises the twelve-row mean from 2.15 to **2.6 to 3.4**, and no single family accounts for more than a third of the rise. Stop: if (a) is missed by more than 5 % nothing after item 2 is read until the cause is named.
