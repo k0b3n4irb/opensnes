@@ -406,7 +406,9 @@ g.expect_stdout("inspect --json", ["inspect", "--json", "bg.png", "banks.png"], 
 g.expect_outputs("convert --save writes bg.png.toml", ["convert", "-q", "--colors", "16", "--flip", "--save", "bg.png"],
                  copy=["bg.png"], outputs=["bg.png.toml"])
 g.expect_refused("convert toomany_bg.png (1056 distinct tiles)", ["convert", "--no-palette", "toomany_bg.png"],
-                 copy=["toomany_bg.png"], needles=["1024 at most"])
+                 copy=["toomany_bg.png"], needles=["1024 at most", "--flip"])
+g.expect_refused("convert --flip toomany_flip.png (the advice is not given back)", ["convert", "--no-palette", "--flip", "toomany_flip.png"],
+                 copy=["toomany_flip.png"], needles=["1024 at most", "already merged"])
 g.expect_refused("convert toomany_m7.png --mode 7 (tile 256 in a byte)", ["convert", "--bpp", "8", "--mode", "7", "--no-palette", "toomany_m7.png"],
                  copy=["toomany_m7.png"], needles=["exceeds 255"])
 g.expect_refused("convert mixed_map.png (two palette banks in a tile)", ["convert", "--colors", "32", "mixed_map.png"],
