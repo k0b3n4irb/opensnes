@@ -24,4 +24,3 @@ file, the first rules file and `g1_r3_0/path_ir.ssa` only (not the attribution, 
 2. Gap with "today's generator + the same idioms" (the C of `path` rewritten once to say I1, I2, I3, I4 and compiled by the current
    build, checksum equal, measured on the same bench): **at least 0.05 of ratio to the hand**.
 Both hold: R3-1. Above 1.20, or a gap under 0.05: G1 stops and the conductor takes the report to the owner.
-Reference points from the attribution (not given to the agent): 1.18 with the idioms, 1.115 with the index in X.
