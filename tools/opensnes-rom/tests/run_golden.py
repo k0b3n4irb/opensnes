@@ -36,6 +36,8 @@ g.expect_refused("check datainit_late.sym (sentinel not last)", ["check", "--no-
                  copy=["datainit_late.sym"], needles=["data-init sentinel is not last"])
 g.expect_refused("check bankblind.sym (bank-blind read)", ["check", "bankblind.sym"],
                  copy=["bankblind.sym", "bankblind.c.asm"], needles=["read bank-blind in bankblind.c.asm", "mapdata"])
+g.expect_stdout("check wram7f.sym --json (a table of WRAM bank $7F above $8000 is RAM, not bank-blind ROM data)", ["check", "--json", "wram7f.sym"],
+                golden="wram7f.json", copy=["wram7f.sym", "wram7f.c.asm"])
 g.expect_refused("check sa1_bank1.sym (SA1Start out of bank $00)", ["check", "--no-nmi-race", "sa1_bank1.sym"],
                  copy=["sa1_bank1.sym"], needles=["SA1Start is at $01:8000", "16-bit", "BANK 0"])
 g.expect_refused("check nmirace.sym (WRAM port from an NMI callback)", ["check", "nmirace.sym"],

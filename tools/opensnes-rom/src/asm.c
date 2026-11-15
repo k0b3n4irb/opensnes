@@ -167,7 +167,9 @@ int check_bank_reads(cli_ctx *ctx, const sym_file *s, const char *dir)
         for (size_t i = 0; i < blind.n; i++) {
             const sym_label *l = sym_find(s, blind.v[i]);
             if (!l) continue;                       /* registers, defines: not linked symbols */
-            if (l->bank >= 0x01 && l->address >= 0x8000) {
+            /* WRAM ($7E-$7F) is RAM, not LoROM data: an address of $8000 or more
+             * in it is a plain offset, read through its own bank by `lda.l`. */
+            if (l->bank >= 0x01 && l->bank != 0x7E && l->bank != 0x7F && l->address >= 0x8000) {
                 if (!bad) cli_error(ctx, base, "C code reads bank $01+ data with bank-$00 addressing (the read returns garbage at runtime: cc65816 near deref). Keep C-read data in bank $00 or RAM, or pass it to a lib function as a far pointer:");
                 fprintf(stderr, "  $%02X:%04X  %s  (read bank-blind in %s)\n", l->bank, l->address, blind.v[i], base);
                 bad = 1;
