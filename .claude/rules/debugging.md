@@ -1,4 +1,13 @@
-# Debugging and regressions (always loaded)
+---
+paths:
+  - "lib/**"
+  - "templates/**"
+  - "compiler/**"
+  - "make/**"
+  - "examples/**"
+---
+
+# Debugging and regressions
 
 ## Fix the root cause, never the symptom
 A bug seen in an example is almost never in the example. Name the layer before touching anything:

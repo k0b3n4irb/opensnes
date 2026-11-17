@@ -1,4 +1,12 @@
-# luna, rag-partner and the game: working jointly (always loaded)
+---
+paths:
+  - "testing/**"
+  - "devtools/**"
+  - "scripts/**"
+  - ".claude/notes/**"
+---
+
+# luna, rag-partner and the game: working jointly
 
 Roles, authorisations, pushes, "one lot = one conversation" and the scientific method are in the tree's `CLAUDE.md`, not here. This file is what is specific to OpenSNES.
 

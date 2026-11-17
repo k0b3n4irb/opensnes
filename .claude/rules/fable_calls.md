@@ -1,4 +1,9 @@
-# Calling the most capable model (always loaded)
+---
+paths:
+  - ".claude/**"
+---
+
+# Calling the most capable model
 
 The owner's decision of 2026-11-14: the strongest model is very powerful but can stray, so it gets one simple, bounded task at a time and very precise instructions. Only this project may call it (rule of 2026-11-12, still valid), and only where the cheaper pair cannot do the job: the written contest of a compiler lot's plan, a diagnosis of one precise gap, the review of one diff before a lot that touches the whole corpus closes.
 
