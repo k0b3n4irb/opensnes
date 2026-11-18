@@ -35,6 +35,7 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `a6_farptr/` | the 4-byte pointer ABI: the bank byte through every lib boundary |
 | `a7_32bit/` | 32-bit arithmetic: add/sub carry, mul, div, mod, shifts, signed folds |
 | `b2_far_ram/` | `FAR` objects in bank $7E with bank-honouring codegen |
+| `bswap/` | the byte swap of a 16-bit word as one `xba`: `(w << 8) \| (w >> 8)` in both orders, from a FAR read and on a global in place, swept over the 65 536 values of w against the swap built without the shape and a host checksum; the shapes left alone (a signed `>>`, 32 bits, the masked idiom) still right; a branch on the swapped value; the provoked fault (`QBE_BSWAP_FAULT=1`, a `sar` taken) makes the s16 form wrong, `QBE_NO_BSWAP=1` keeps the values and loses the `xba` |
 | `far_bank7f/` | `FAR` objects in bank $7F placed by assembly: every access form, `memcpy`/`memset`, no overlap |
 | `c_features/` | switch forms, function pointers, struct members, the C features a game uses |
 | `const_div/` | a divide or remainder of two constants folded at compile time (signed and unsigned, 16 and 32 bits, negatives, limits, a numerator folded just before): no division helper called, every value against one written by hand; INT_MIN / -1, INT_MIN % -1 and a zero divisor kept as run-time calls |
