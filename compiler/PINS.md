@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 18eecca664b0f348f7f06c467bd11ea9328aeb31 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 8591689ac2e8d762983bc7914c60d73aa2900aba | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 71b528dd411d5b09389d43d2b99db626efc8ca2e | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -103,7 +103,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 159 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 160 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -116,6 +116,7 @@ Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/
 
 ```
 8591689 perf(w65816): the byte swap of a 16-bit word is one `xba` — `mark_bswap` rewrites `or (shl x, 8), (shr x, 8)` (either order, all `w`) into the emitter's own `bswap` op before every analysis; `sar`, `l` and a count other than 8 refused; `QBE_NO_BSWAP=1` byte-identical, `QBE_BSWAP_FAULT=1` the provoked fault (fixture `bswap`)
+71b528d perf(w65816): an equality is compared from the operand A already holds — `eq_swap` for `ceqw`/`cnew` only, when A holds the second operand and not the first, `cmp` the first (Z is the same either way); refused if an operand lives in X/Y or the second is a 16-bit load; `QBE_NO_EQ_SWAP=1` byte-identical, `QBE_EQ_SWAP_FAULT=1` the provoked fault (fixture `eq_swap`)
 5a4c275 fix(w65816): the dead-store rule for a commutative operand is for a 16-bit operation only — `mark_dead_stores` case 3 dropped the store of arg[1] of a commutative operation trusting an A-cache swap the 32-bit pair path never makes; a 16-bit compare xored into a 32-bit accumulator lost its slot and the build stopped on `temp_noslot` (difftest_stmt seed 9922, pinned as `p16`, reachable with `static inline` helpers); the corpus and the library byte-identical (2026-11-14)
 0f52456 feat(inline): `noinline` is a linkage keyword every inliner refuses — `Lnk.noinline`; the small inliner's eligibility, `auto_inline_ok` (reason `noinline`) and the leaf rule's guess refuse it; `QBE_INLINE_FAULT=noinline` forgets it (check `noinline`); output byte-identical for code that does not write it (I1 S3, 2026-11-14)
 7bd8684 feat(inline): `CC_TRACE_INLINE` names why each call stays a call — one `decline` line per call auto_inline_ok or splice_fn refuses (the reason, the test before or after the callee's own inlining, the temporaries counted and those still used, the reason with the site count left out) and one `final` line per function (its IR size after its own copies); stderr only, the output byte-identical (I1 S2, 2026-11-14)

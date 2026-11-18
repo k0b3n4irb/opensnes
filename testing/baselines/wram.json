@@ -4,24 +4,24 @@
     "rom_sha256": "b679a41cd68364654cf8b651929c20398af9ef681112c4f969a3cbbb558692ac"
   },
   "audio_sample_swap": {
-    "stream": "cb675159fc7ba8b7f7da48acf06ca12f690a45c0f880df869f32bedb9967621b",
-    "rom_sha256": "43261662b2dfb9638d7ff9773588823abf09d4cb3ce7b528dea33da1a835cf9c"
+    "stream": "da662f31216a083372bd6e5ac081d602f5e36e1bfeb47849a02d7f95916daa6f",
+    "rom_sha256": "994c24d9e50bdb2d5345b4a53a47c8b4b13b4db5ba0d7afd09ee48469971c8c0"
   },
   "audio_sfx_from_wav": {
-    "stream": "1cdc0f0fef3e52e5fe140b8271fe28ce9a2dd11a83c0e50270b781f572907143",
-    "rom_sha256": "c03dc518bb797ab562ccb3c983f2a6b9f0f2c14e9f16ef216855f042a7e4dc65"
+    "stream": "2d18b9d868af9104f928f3341f1a37ff6114bca4fbad6336292424bbac95e668",
+    "rom_sha256": "76e9178e65bc6856e4cfae6e112dd6b42b4941f0f7fd6db6b24a6c8e12ee19a2"
   },
   "audio_sfx_voices": {
-    "stream": "3d9e8b13286587d12c5ca0cbc7152b47fee9bda2d1fedc826d75e6dfb49974eb",
-    "rom_sha256": "54cff7f490678d4435035f8269a0b652029fb6ef80ea770fde87f15b2ba31140"
+    "stream": "141690362b9fbbd4e3980d95f69c8f35afe1d4a74e338ed789fedc083a4b6565",
+    "rom_sha256": "e8af2b8d1d21843f57e50a2d080ae3d4c17c805432b34968463f41622d53c5c8"
   },
   "audio_snesmod_music": {
     "stream": "46147af8bb00bbdb3b42ee315f7cfbe43e3a4c24e0a164111970a422464416ba",
     "rom_sha256": "26a210b65c9c88bc8ddcc4243c5175518c4b5977309493445c59c330c924971c"
   },
   "audio_soundboard": {
-    "stream": "1ff51639ec91f7527bc58c499fa26bc28cbb31731e06b5463f9b8623941ac6bc",
-    "rom_sha256": "0807b9e174f6877e2ed1a5191ed496d1ce11bf591e9ccc48c3cfd04122a8dbf8"
+    "stream": "2bb348b9791af4741330762256dec1b179c21a01d02551546d5d49342831539d",
+    "rom_sha256": "049b5ee4492b4a25b4ee4185618becf4f6a7232ae435daa0359e9d08edb9d295"
   },
   "audio_speech_synth": {
     "stream": "c72c03693e124db20b611ae4d83dd4325ad27cbf4f8ad746d6055f84fceeb6a5",
@@ -81,7 +81,7 @@
   },
   "chips_superfx_game_skeleton": {
     "stream": "a8e7a8c5454fd0f3dfce1952c32e9b4e14131ac5110526b5bbff0636c2d11cdc",
-    "rom_sha256": "61129e9132408e549ffd3061c090de3fe855c76b0b8c3ead63e78e50378980da"
+    "rom_sha256": "11461e4b1a71a429c14cb03230b94c48203c05b5a1a4d65f0d646e4e590176b2"
   },
   "color_direct_color": {
     "stream": "645dc03af28aa9852d10f1773fafa58478e7e294b0e921c11eda54a0e167f042",
@@ -109,7 +109,7 @@
   },
   "demos_rpg": {
     "stream": "4ea5011c788a5343745f6ba3213c6eb54c86a98a57c8e84dbc80e05c577ead5c",
-    "rom_sha256": "9b7be552fe5df0b626b924da3a9abb1280ae34cb72c76575f24be606fe320f71"
+    "rom_sha256": "23c491eb1980b281d945a2227b6d7c2067340840148e35b5cc18d322370bfc2b"
   },
   "demos_shmup": {
     "stream": "84a07b0b35f54040e78a1503d9027a5fce0e7fc0646390f7e0716fec6e906e3c",
@@ -128,12 +128,12 @@
     "rom_sha256": "ac940bd703e71458cfded9bdde01e15234a7c80ea809a73ab23d87cd9bd8c160"
   },
   "games_rooftop_run": {
-    "stream": "3fda06631ec808c258fb28157ee9808d7a83cd29faf88828797674af6855be19",
-    "rom_sha256": "f190405923df333bc0414666493dec661c43f89e760127fe4250b8bee4581e3b"
+    "stream": "7533e273ca86970fdb5853fd822bad5464123fcb4c9eee37c7afc1dcc052bacb",
+    "rom_sha256": "fef8d65fa090e183034632fb336ce9e017e435c4f1fcaf25def9b8808139309f"
   },
   "games_shard_dash": {
     "stream": "c5245b5249e1e75944d49ba33870f1ad3ab87ebbf106e0c1965fa14c2f91e5dc",
-    "rom_sha256": "61e9da88ceb409450aa5a626e8dd57681068b35940095ad8669dd0a4664ee4f1"
+    "rom_sha256": "1f7be65e57f89f628aaf44b657bc5788705cc228786abc32a57baa2dd6180cac"
   },
   "hdma_gradient_colors": {
     "stream": "e19871f7032bc1208fb0b577c7d4b5992e9caa53129b46f2dcfe42ae6f67a5ad",
@@ -141,11 +141,11 @@
   },
   "hdma_hdma_helpers": {
     "stream": "7941c7a59f70cd4047e11b4afdb5310a1cda14069183810ce9f31c9399e4d8f2",
-    "rom_sha256": "edd36832e9b9209c91df99ecd44ac977cab0ffe48c83577fddc3062a62aaed77"
+    "rom_sha256": "87b79325d23cf1418d6ff6ec6d371d9bc3515a0c3e86440dd5ae4dd7191033c0"
   },
   "hdma_hdma_wave": {
     "stream": "130fa65c73404c6bf4ea0d1f637a6be3a62a93f6079c2a2b374132e5bf85c5d5",
-    "rom_sha256": "0b14ed271ca475f3924e7f179c7c0561058b5f828c4f2a53e2726963dfed2a07"
+    "rom_sha256": "d8513add2ab6516065dc7e0b3e1e3f635fd5c9f2f556937abe2f6cf1ce2d2d58"
   },
   "input_controller": {
     "stream": "c388c4b52be177297f004215372225eee980b23296f38ec1ce21aa0e50d2e162",
@@ -168,8 +168,8 @@
     "rom_sha256": "52818aa18e0494d13d257b5636edcfb9aa8e3deb0206601eb6a2d554c0e3654c"
   },
   "memory_lzss_ram": {
-    "stream": "9c2812452dd2063b2ffffaeff2d8011bd0ea436db13371b4afaa978fe8aaec86",
-    "rom_sha256": "5a4668bc84dbb4b9a00d4b984a6470f0d1b4dbf9c9ef2158e0289dde62b8eb72"
+    "stream": "8482e3f02c4a1779beb9a513bbd01b3adb078fe4ff1863e63660b64fa634bcac",
+    "rom_sha256": "dd59ffc5e2e2d889ffca931173cbe68e1736fab932356148771fa277bfa013a5"
   },
   "memory_save_game": {
     "stream": "be7f4772d6979df15104bce1128bfb160bf6f2bc18346b5798d2804940bd849c",
