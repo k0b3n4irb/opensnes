@@ -13,14 +13,14 @@
       "peak": 23167
     },
     "audio/sample_swap": {
-      "sha256": "441a793240c54be8a7add5e17bea4c61da07bba3cbc8e7f3efdcb7751fc3b124",
+      "sha256": "fadedb2e821deae1d60598c64d6eedcb9c4fda29f135d0fe63311db5ff09d946",
       "samples": 159936,
       "peak": 6259
     },
     "audio/sfx_voices": {
-      "sha256": "3f5fa50c380e4dfa3988c4c69e38d90a578cc99b9d6ba134b59312cc6094ed27",
+      "sha256": "13ff2897f930bb19790f4dc00476773021539f605a0742b578074ac432d96d6d",
       "samples": 159936,
-      "peak": 27019
+      "peak": 27017
     },
     "fixtures/snesmod_music_large": {
       "sha256": "eae5c859cfb02557dea5060f45b984cca20f11b9d5fe63467ecdc0872699bcb6",

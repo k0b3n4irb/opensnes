@@ -111,6 +111,8 @@ audioSetVoiceVolumePitch:
     lda.b #127                  ; signed on the DSP: 128 and above inverts the phase
 +   sta.b tcc__r2
 
+    inc.w audio_port_lock       ; the ports are ours until an exit (audioQueueDrain skips)
+
     ; the driver holds a pan for the voice: tell it only when it changed
     lda.w audio_voice_mirror+AV_PAN,x
     cmp.w audio_voice_mirror+AV_PAN_DRV,x
@@ -192,6 +194,7 @@ audioSetVoiceVolumePitch:
     ora.b #$03
     sta.w audio_voice_mirror+AV_SENT,x
 @m_pitch:
+    dec.w audio_port_lock
     rep #$20
     .ACCU 16
     lda.b tcc__r1
@@ -201,6 +204,7 @@ audioSetVoiceVolumePitch:
     rtl
 
 @timeout:
+    dec.w audio_port_lock
     rep #$20
     .ACCU 16
     lda.w #4                    ; AUDIO_ERR_TIMEOUT

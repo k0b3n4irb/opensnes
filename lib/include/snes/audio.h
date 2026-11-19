@@ -256,6 +256,46 @@ typedef struct {
 u8 audioInit(void);
 
 /**
+ * @brief Queue a key-off of the voices of @p mask (bit n = voice n)
+ *
+ * The command queue lets a game loop slower than the music say what to do
+ * and have it sent at the driver's pace, without waiting: the queue holds
+ * 16 orders (AUDIO_ERR_NO_MEMORY when full, nothing queued), and
+ * audioQueueDrain() sends them. Only the three below are queued; every
+ * other function sends at once.
+ *
+ * **One sender, one lock.** The queue is filled from the main thread and
+ * drained from one place (an nmiSetLag() callback, or the loop). While the
+ * main thread writes the ports ($2140-$2143: any command, a VSET, the block
+ * of a sample load) an interrupt-time drain sends nothing and tries again at
+ * its next call, so a load in steps (audioLoadSampleStep()) and a drain from
+ * a callback can share the ports. The queued orders keep their order; they
+ * are not dated.
+ */
+u8 audioQueueStopVoices(u8 mask);
+
+/** @brief Queue a master volume (0..AUDIO_VOL_MAX); see audioQueueStopVoices() */
+u8 audioQueueSetVolume(u8 volume);
+
+/** @brief Queue a voice pitch (14-bit); see audioQueueStopVoices(). The
+ *         mirrors (audioGetVolume(), audioGetVoiceState()) are not touched
+ *         by the queued functions. */
+u8 audioQueueSetVoicePitch(u8 voice, u16 pitch);
+
+/** @brief Orders queued and not yet sent */
+u8 audioQueueCount(void);
+
+/**
+ * @brief Send queued orders, at most @p maxCmds, without waiting
+ *
+ * Stops at the first order the driver cannot take yet (the previous command
+ * is not acknowledged) or when the ports are in use by the interrupted code.
+ * Call it once a frame from the nmiSetLag() callback.
+ * @return orders still queued
+ */
+u8 audioQueueDrain(u8 maxCmds);
+
+/**
  * @brief Check if audio system is ready
  *
  * audioInit() blocks until the driver answers, so there is no
