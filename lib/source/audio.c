@@ -16,8 +16,10 @@
  * so apuReset() hot-swap works over the driver. Every wait is bounded
  * — the audio API returns AUDIO_ERR_TIMEOUT instead of hanging.
  *
- * Main-thread only: do not call audio functions from an NMI callback
- * (same stance as the DMA queue).
+ * One sender at a time. An nmiSetLag() callback may be that sender (the
+ * ports are written by long address, the state is in WRAM below $2000:
+ * the callback's data bank $7E changes nothing); the list of what is safe
+ * there is in audio.h, and testing/fixtures/stress/audio_nmi runs it.
  */
 
 #include <snes/audio.h>

@@ -336,6 +336,15 @@ goes: unload them first.
 | `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
 | `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
 
+**From an `nmiSetLag()` callback.** When the main loop is too slow to send
+the music on time, the callback of lag frames can be the one place that sends
+(the main thread then calls no `audio*()`: two senders corrupt the
+handshake). The note start, volume, pitch, envelope, pan, stop and echo on/off
+calls are safe there, and so is `audioCommandDone()`; the calls that wait for
+a reply or stream bytes (`audioInit()`, the sample loaders,
+`audioGetVoiceState()`, `audioSetEcho()`) are not. The full list is in
+`audio.h`.
+
 There is no per-frame audio call: the
 engine sends each command as you call it, nothing is deferred.
 

@@ -8,8 +8,33 @@
  *       volume, per-voice control, dynamic BRR loading, playback with
  *       pan/pitch, echo with FIR filter, and live voice-state readback.
  *
- * @warning Main-thread only — do not call audio functions from an NMI
- *          callback. One engine per ROM: do not link `audio` and
+ * @par Callbacks
+ * One sender at a time: the main thread OR one callback, never both (two
+ * senders interleave on the four ports and corrupt the handshake).
+ * Whoever sends may be an nmiSetLag() callback (one sender, the main thread
+ * no longer calls audio*()): the ports are written by long address and the
+ * state is in WRAM below $2000, so the callback's data bank ($7E) changes
+ * nothing. Safe there (each one a posted command or a read of the WRAM
+ * mirror): audioSetVolume(), audioStopVoice(), audioStopVoices(),
+ * audioStopAll(), audioSetVoiceVolume(), audioSetVoicePitch(),
+ * audioSetADSR(), audioSetVoicePan(), audioSetVoiceVolumePitch(),
+ * audioPlaySample(), audioPlaySampleEx(), audioPlaySampleOn(),
+ * audioEnableEcho(), audioDisableEcho(), audioCommandDone(),
+ * audioGetVolume(), audioIsReady(), audioGetSampleInfo(),
+ * audioGetFreeMemory(). Run from a callback by
+ * `testing/fixtures/stress/audio_nmi`: audioSetVolume(), audioStopVoices(),
+ * audioSetVoiceVolume(), audioSetVoicePitch(), audioSetADSR(),
+ * audioSetVoicePan(), audioSetVoiceVolumePitch(), audioPlaySampleOn(),
+ * audioEnableEcho(), audioDisableEcho(); audioCommandDone() by
+ * `audio_done`; the others (thin wrappers, mirror reads, audioSetGain())
+ * take the same path and are not run there. Not for a callback: the ones
+ * that wait for a reply or stream bytes (audioInit(), audioLoadSample*(),
+ * audioLoadSampleStep(), audioGetVoiceState(), audioSetEcho(),
+ * audioSetEchoFilter(), audioReleaseEcho()): they spend
+ * frames in the handler. A command waits, bounded, for the acknowledgement
+ * of the previous one; in a callback gate the send with audioCommandDone().
+ *
+ * @warning One engine per ROM: do not link `audio` and
  *          `snesmod` together (both own the APU). `apuReset()` hot-swap
  *          works over this driver ($FE stays reserved).
  *
