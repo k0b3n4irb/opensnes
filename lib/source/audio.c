@@ -268,6 +268,22 @@ u8 audioIsReady(void) {
     return audio_ready;
 }
 
+/* cmd_wait() without the loop: one look at the ack port. No refusal is
+ * counted and nothing is written to the ports: a 0 is not an error, the
+ * caller asks again later. */
+u8 audioCommandDone(void) {
+    u8 cmd = audio_pending;
+
+    if (!cmd) {
+        return 1;
+    }
+    if (APU_IO0 != cmd) {
+        return 0;
+    }
+    audio_pending = 0;
+    return 1;
+}
+
 /*============================================================================
  * Master volume
  *============================================================================*/

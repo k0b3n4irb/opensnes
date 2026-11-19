@@ -332,6 +332,7 @@ goes: unload them first.
 | Call | Returns |
 |---|---|
 | `audioIsReady()` | 1 once `audioInit()` has started the driver; 0 if the driver did not answer |
+| `audioCommandDone()` | 1 when the driver has taken the last command (or none is pending), 0 while it has not; never waits, so a game that spreads its commands over frames, from its loop or an `nmiSetLag()` callback, sends on a 1 and never blocks |
 | `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
 | `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
 

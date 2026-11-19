@@ -241,6 +241,43 @@ u8 audioInit(void);
  */
 u8 audioIsReady(void);
 
+/**
+ * @brief Has the sound CPU taken the last command? (never waits)
+ *
+ * A function that sends a command returns once the ports are written; the
+ * next command waits, bounded, for the sound CPU to acknowledge it before it
+ * writes its own (see audioInit()). This function is that wait without the
+ * wait: one read of the acknowledgement port. A caller that spreads its
+ * commands over several frames, from the main loop or from an nmiSetLag()
+ * callback, asks it first and sends only on a 1, so that no send ever
+ * spends the frame waiting for the previous one.
+ *
+ * On a 1 for an acknowledged command it forgets the command, as the next
+ * send would have, so the send that follows does not look at the port
+ * again. It never loops, sends nothing, writes no port and counts no error
+ * (`audio_error_count` does not move on a 0).
+ *
+ * Cost: a handful of instructions. Measured on luna
+ * (`testing/fixtures/stress/audio_done`): after audioStopVoices(), whose
+ * key-off the sound CPU holds about 2 scanlines, the function reads 0 for
+ * a few calls in a row before it reads 1.
+ *
+ * @note One sender only: the main loop or the callback, not both. Called
+ *       in an interrupt that lands inside a send of the main loop, it could
+ *       read the port before that send records its command.
+ *
+ * @return 1 when no command is pending or the sound CPU acknowledged it
+ *         (the command is then forgotten), 0 while it has not yet
+ *
+ * @code
+ * if (audioCommandDone()) {             // never blocks
+ *     audioSetVoiceVolume(v, vol[v]);   // posted at once, no wait inside
+ *     v = (u8)((v + 1) & 7);
+ * }
+ * @endcode
+ */
+u8 audioCommandDone(void);
+
 /** @} */
 
 /*============================================================================
