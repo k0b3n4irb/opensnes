@@ -776,6 +776,21 @@ u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
     pan_to_lr(volume, pan, &l, &r);
     lr = (u16)((u16)r << 8 | l);
     vm = &audio_voice_mirror[voice];
+    vm->pan = pan;
+    if ((!(vm->sent & SENT_VOL) || vm->vol_lr != lr)
+            && (!(vm->sent & SENT_PITCH) || vm->pitch != pitch)) {
+        /* both change: one VSET (volume split by the driver's pan weight,
+         * and pitch) instead of VVOL then VPITCH. The note is two
+         * handshakes, VSET then KON, when the envelope is already set;
+         * a pan that changed costs one VPAN in front, as VVOL did before. */
+        if (audioSetVoiceVolumePitch(voice, volume, pitch) != AUDIO_OK) {
+            return AUDIO_VOICE_NONE;
+        }
+        /* the driver holds this volume and pitch: what the mirror cleared
+         * for an inner pan is nothing left to send */
+        vm->sent |= SENT_VOL;
+        vm->vol_lr = lr;
+    }
     if (!(vm->sent & SENT_VOL) || vm->vol_lr != lr) {
         if (cmd_post(OP_VVOL, voice, lr) != AUDIO_OK) {
             return AUDIO_VOICE_NONE;

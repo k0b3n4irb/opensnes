@@ -601,6 +601,11 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
  *
  * An explicit voice does not advance the round-robin counter.
  *
+ * A note is two commands, VSET then KON, when its volume and its pitch both
+ * differ from what the voice holds (three when its pan changed too); only the
+ * one that changed, or none, is sent otherwise
+ * (`testing/fixtures/stress/audio_note`).
+ *
  * @param voice Voice 0-7, or AUDIO_VOICE_AUTO for the round-robin choice
  * @param sampleId Sample slot (0-63)
  * @param volume Volume level (0-127)

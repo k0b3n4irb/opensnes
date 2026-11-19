@@ -13,14 +13,14 @@
       "peak": 23167
     },
     "audio/sample_swap": {
-      "sha256": "81903e819b4dcd5317492a5093f93598a4b523c1667c70712c8a6e8226d8c2a3",
+      "sha256": "441a793240c54be8a7add5e17bea4c61da07bba3cbc8e7f3efdcb7751fc3b124",
       "samples": 159936,
-      "peak": 6154
+      "peak": 6259
     },
     "audio/sfx_voices": {
-      "sha256": "e7acb2a0ddfea809cc54b78777bb347f1b7aff917a484d3cd81d587939e63d56",
+      "sha256": "3f5fa50c380e4dfa3988c4c69e38d90a578cc99b9d6ba134b59312cc6094ed27",
       "samples": 159936,
-      "peak": 27041
+      "peak": 27019
     },
     "fixtures/snesmod_music_large": {
       "sha256": "eae5c859cfb02557dea5060f45b984cca20f11b9d5fe63467ecdc0872699bcb6",
@@ -33,7 +33,7 @@
       "peak": 8321
     },
     "audio/soundboard": {
-      "sha256": "4b6d3d786250a13d9950edd30b1195036ea16d10a81e05f5886d321ed85c4974",
+      "sha256": "2c13757b5164bb2bca4cda9cd0d43ccb8501e6de5b304298760677e93d9cc99c",
       "samples": 159936,
       "peak": 9939
     },
@@ -43,7 +43,7 @@
       "peak": 13532
     },
     "audio/sfx_from_wav": {
-      "sha256": "e9bdac7f940fa9b996478d7477c36d91512c4acda8b3b8568c3b58ecd5d96c5f",
+      "sha256": "00fbddf85dd25c6ee66ad095e453134ec782569f44beb13f649786627a0fa12c",
       "samples": 159936,
       "peak": 12192
     }
