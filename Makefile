@@ -149,9 +149,15 @@ lint-cproc-widths:
 # push leaves (scripts/githooks/). Opt-in: a clone has no hooks until this
 # runs once. Two non-conforming subjects reached develop in two days
 # (756da353, 0d30ec65) with the lint only in CI, after the push.
+# An existing core.hooksPath is left alone (FORCE=1 replaces it).
 hooks:
-	@git config core.hooksPath scripts/githooks
-	@echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"
+	@cur=$$(git config --get core.hooksPath || true); \
+	if [ -n "$$cur" ] && [ "$$cur" != "scripts/githooks" ] && [ "$(FORCE)" != "1" ]; then \
+		echo "hooks: core.hooksPath is already set to $$cur, left unchanged (make hooks FORCE=1 to override)"; \
+	else \
+		git config core.hooksPath scripts/githooks; \
+		echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"; \
+	fi
 
 # Every example built from a clean export of HEAD (git archive, make clean,
 # make), the way CI builds it: a file the commit leaves out fails here
