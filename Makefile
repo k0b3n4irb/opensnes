@@ -305,6 +305,10 @@ tests: test-compiler
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
 	@python3 testing/nmi_budget.py
+	@# The tilering module's worst frames (characters and tilemap flushed
+	@# after the NMI handler) against the vertical blank, NTSC and PAL, and
+	@# no lag frame over a lap of scrolling/tile_ring (2026-11-20).
+	@python3 testing/tile_ring_budget.py
 	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
 	@# PPU drops such a write silently), and gsuPresent's frames whole,
 	@# double-buffered and swapped in blank (2026-09-29).
@@ -512,6 +516,7 @@ test-tools:
 	@python3 tools/opensnes-palette/tests/run_golden.py
 	@python3 tools/opensnes-image/tests/run_golden.py
 	@python3 tools/opensnes-save/tests/run_golden.py
+	@python3 tools/opensnes-tilering/tests/run_golden.py
 	@python3 tools/opensnes/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,

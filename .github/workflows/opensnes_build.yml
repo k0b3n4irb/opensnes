@@ -498,7 +498,7 @@ jobs:
   # ====================================================================== #
   # The same sources must give the same ROMs on every system               #
   #                                                                        #
-  # Each build leg writes the sha256 of its 65 example ROMs                #
+  # Each build leg writes the sha256 of its 66 example ROMs                #
   # (devtools/rom_hashes.py); this job compares the lists. Until 2026-11-10 #
   # macOS and Windows differed from Linux on all 65 (wlalink sorted equal  #
   # sections with an order that was not one, and qsort() placed them as    #

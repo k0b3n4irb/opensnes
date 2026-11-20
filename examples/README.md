@@ -24,7 +24,7 @@ The table below counts them per folder.
 | [color/](color/) | 5 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 2 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
-| [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
+| [scrolling/](scrolling/) | 4 | Layer scrolling: parallax, streaming, per-scanline HDMA, maps with more characters than VRAM |
 | [mode7/](mode7/) | 6 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground and objects, EXTBG, a racing camera with sprites on the plane |
 | [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 7 | Music and sound effects: SNESMOD and raw APU/DSP |

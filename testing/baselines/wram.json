@@ -211,6 +211,10 @@
     "stream": "2d10c003a725d5dd0078738c083dd5b66177561bf231059ad7939a2a19d500a4",
     "rom_sha256": "c49595d494237e2481211ba606800578b943074a6910b960dea77e049995cd89"
   },
+  "scrolling_tile_ring": {
+    "stream": "6b99e84f577198c55cc4fe2b33150afe6b819da72f3d02230ca098c2b9ee7f6c",
+    "rom_sha256": "ade29326db05218e73ace72bd6b9283dac770f93706bdd5b35619b42fe4d49c4"
+  },
   "sprites_animated_sprite": {
     "stream": "d12559aecfc590e6d0d4fedda47636ee7d0b38eb1abb1f39674bf30a3b3b6730",
     "rom_sha256": "5edb32e41adf0019406eb3b142485d0aed7a5f309bce8e7f8e7cb07ac5e0f545"

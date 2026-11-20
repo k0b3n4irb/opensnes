@@ -407,6 +407,12 @@
     "luna_version": "v1.39.0",
     "rom_sha256": "fcf7c30e86b79e9efc6902e1890bb928c24294134b94d61ff7f97b3e193ee886"
   },
+  "scrolling_tile_ring": {
+    "fbhash": "050712d9bdab7ffe",
+    "frames": 200,
+    "luna_version": "v1.44.0",
+    "rom_sha256": "ade29326db05218e73ace72bd6b9283dac770f93706bdd5b35619b42fe4d49c4"
+  },
   "sprites_animated_sprite": {
     "fbhash": "45da2d81933a4f94",
     "frames": 200,

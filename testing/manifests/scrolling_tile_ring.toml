@@ -1,0 +1,36 @@
+# scrolling/tile_ring, NTSC, staging mode: one lap of the course (1,052
+# frames: up, across, down at 5 + 5 px a diagonal, at 3 to 7 px a frame)
+# over a map of 1,433 distinct characters (two parts of characters, two of
+# map) with a ring of 640 slots.
+# The module's figures, kept by the example in WRAM over the first lap:
+# - no character without a slot, no transfer refused by the queue;
+# - the queue's cost before a flush (bytes, x 8 = master cycles) and its
+#   entries: the characters of a frame leave in one or two transfers, the
+#   tilemap in up to four;
+# - the latest line a flush ended on, counted from the start of the
+#   vertical blank (line 225): the blank is lines 225-261 on NTSC, so 36 at
+#   most; the NMI handler is in it.
+# Measured 2026-11-20 (luna v1.44.0): 21 characters at most a frame, 5
+# entries, 922 bytes, 323 slots in use at most, line 10; 1,542 characters
+# loaded over the lap. testing/tile_ring_budget.py measures the master cycles.
+rom = "../../examples/scrolling/tile_ring/tile_ring.sfc"
+frames = 1150
+
+[[checkpoint]]
+at_frame = 1150
+[checkpoint.values]
+tr_laps         = { eq = 1, width = 2 }
+tr_frames       = { eq = 1052, width = 2 }
+tr_starved      = { eq = 0, width = 2 }
+tr_refused      = { eq = 0, width = 2 }
+tr_max_chars    = { ge = 1, le = 24, width = 2 }
+tr_max_entries  = { ge = 4, le = 8, width = 2 }
+tr_max_cost     = { ge = 600, le = 1300, width = 2 }
+tr_max_resident = { ge = 250, le = 389, width = 2 }
+tr_max_lines    = { le = 36, width = 2 }
+tr_total_chars  = { ge = 1200, le = 2000, width = 2 }
+tr_cost_7       = { eq = 23, width = 2 }
+tr_cost_55      = { eq = 49, width = 2 }
+
+[asserts]
+fbhash = "3a3db9d5c3d67de2"

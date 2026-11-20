@@ -226,6 +226,7 @@ from breakout import build_breakout  # noqa: E402
 from blocks import build_blocks  # noqa: E402
 from rpg import build_rpg  # noqa: E402
 from hdma_wave import build_hdma_wave  # noqa: E402
+from tile_ring import build_tile_ring  # noqa: E402
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -265,6 +266,7 @@ LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 HDMA_WAVE = ROOT / "examples" / "hdma" / "hdma_wave" / "res"
+TILE_RING = ROOT / "examples" / "scrolling" / "tile_ring" / "res"
 MODE7 = ROOT / "examples" / "mode7"
 RACING = ROOT / "examples" / "mode7" / "mode7_racing" / "res"
 BREAKOUT = ROOT / "examples" / "games" / "breakout" / "res"
@@ -1920,6 +1922,7 @@ def main() -> int:
                         "backpal.bin": arcade["backpal"]}),
             (RPG, town),
             (HDMA_WAVE, build_hdma_wave()),
+            (TILE_RING, build_tile_ring()),
             (BLOCKS, {"tiles.png": png(well["tiles"]), "font2bpp.bin": well["font2bpp"]}),
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
