@@ -18,6 +18,7 @@ beside it naming the tool, and `make` converts it; the generated `.inc`
 | a background picture `res/bg.png` | `res/bg.png.toml`: `tool = "opensnes-tileset"`, `[convert]` | tiles, tilemap and palette, and a `BgAsset` for `bgLoad()` |
 | a sprite sheet `res/hero.png` | `res/hero.png.toml`: `tool = "opensnes-sprite"`, `[sheet]` with `size` | sprite tiles and palette (and metasprites with `metasprite`) |
 | an Aseprite export `res/hero.json` | `res/hero.json.toml`: `tool = "opensnes-sprite"`, `[anim]` | one `AnimClip` per tag, for `animPlay()` |
+| a map picture with more characters than VRAM `res/world.png` | `res/world.png.toml`: `tool = "opensnes-tilering"`, `[convert]` | a `TileRingMap` for `tileRingInit()` |
 | a Tiled level `res/level.tmj` | `res/level.tmj.toml`: `tool = "opensnes-level"`, `[convert]` with `tileset` | the map data `mapLoad()` reads |
 | a font picture `res/font.png` | `res/font.png.toml`: `tool = "opensnes-text"`, `[font]` | text tiles for the text module |
 | a sound `res/jump.wav` | `res/jump.wav.toml`: `tool = "opensnes-sample"`, `[encode]` | a BRR sample for `audioLoadSample()` |
@@ -41,6 +42,7 @@ you tried by hand.
 | @subpage tools_opensnes_sample | a PCM `.wav` | a `.brr` sample + its sizes |
 | @subpage tools_opensnes_music | Impulse Tracker `.it` modules | a SNESMOD soundbank; a standalone `.spc` |
 | @subpage tools_opensnes_rom | a linked ROM | the post-link checks, its header, its budget |
+| @subpage tools_opensnes_tilering | a map picture with more than 1,024 distinct characters | characters (mirrors merged), a 16-bit map, the worst window, for `tilering` |
 | @subpage tools_opensnes_save | a ROM or a `.srm` | a battery save file, read or patched |
 | @subpage tools_opensnes | your project | `init`, `build`, `clean`, `run`, `test`, `budget`, `release`, `doctor`, `upgrade` |
 

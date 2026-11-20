@@ -1,0 +1,1 @@
+{"tool": "opensnes-tilering", "version": "1.0.0", "maps": [{"input": "small.png", "width": 8, "height": 6, "cells": 48, "characters": 41, "characters_without_mirrors": 44, "palettes": 2, "character_bytes": 1312, "map_bytes": 96, "window": {"width": 4, "height": 3, "worst_characters": 12, "worst_at_x": 0, "worst_at_y": 0, "worst_row": 4, "worst_column": 3}}]}

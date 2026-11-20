@@ -20,6 +20,7 @@ converts it. The user guide is `docs/tools/README.md`.
 | [`opensnes-sample/`](opensnes-sample/) | WAV → BRR samples for the DSP | `docs/tools/opensnes-sample.md` |
 | [`opensnes-music/`](opensnes-music/) | Impulse Tracker modules → SNESMOD soundbank (the build runs it for `SOUNDBANK_SRC`) | `docs/tools/opensnes-music.md` |
 | [`opensnes-rom/`](opensnes-rom/) | the post-link checks of every build, the cartridge header and checksum, the budgets | `docs/tools/opensnes-rom.md` |
+| [`opensnes-tilering/`](opensnes-tilering/) | maps with more characters than VRAM holds, for the `tilering` module | `docs/tools/opensnes-tilering.md` |
 | [`opensnes-save/`](opensnes-save/) | battery save files (`.srm`): create, read, patch, compare | `docs/tools/opensnes-save.md` |
 | [`sa1-patch/`](sa1-patch/) | sets the SA-1 map-mode bits of the ROM header (the build runs it for `USE_SA1`) | [`sa1-patch/README.md`](sa1-patch/README.md) |
 
