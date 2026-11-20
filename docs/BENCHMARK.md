@@ -126,9 +126,12 @@ takes what that one declines: a `static` function with exactly one call
 site in its file, whose address is not used, is inlined with its control
 flow and not emitted (no keyword needed: the code exists once either way);
 a `static inline` function called from several places is copied at each, up
-to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function, unless it
-is tiny, stays a function when its caller still calls something else:
-apart, it keeps the direct-page frame that makes it fast. A function
+to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function is inlined
+even when its caller still calls something else (the rule that kept it apart
+is off by default; `CC_INLINE_LEAF_MAX=N` turns it back on for leaves larger
+than N IR instructions, to measure). In such a caller the leaf's temporaries
+that cross a call live on the stack, so a long hot loop can run faster as a
+function of its own: mark it `__attribute__((noinline))` and measure. A function
 marked `__attribute__((noinline))` (or `[[gnu::noinline]]`) is never
 inlined, by either inliner.
 `QBE_NO_AUTO_INLINE=1` turns the second inliner off, to measure.
