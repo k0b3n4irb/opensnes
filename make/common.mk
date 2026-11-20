@@ -268,13 +268,9 @@ endif
 # The VRAM queue's capacity (snes/vramqueue.h): the library is built once,
 # so the queue's arrays are assembled per project (templates/vramqueue_ram.asm)
 # and C is told the same number. 10 bytes of the C RAM band per entry.
+# Whether the project has the queue is decided after the module dependencies
+# are resolved (below): a module that queues (tilering) brings it in.
 VRAM_QUEUE_MAX ?= 32
-ifneq ($(filter vramqueue,$(LIB_MODULES)),)
-ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
-$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
-endif
-VRAMQ_OBJ := vramqueue_ram.o
-endif
 
 # Assembler flags
 ASFLAGS := -D VRAM_QUEUE_MAX_VAL=$(VRAM_QUEUE_MAX) -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
@@ -346,6 +342,8 @@ _DEP_panel           := dma console
 _DEP_ppu_reset       := console background colormath mosaic window mode7 hdma sprite   # ppuReset: the shadows of each, oamClear
 _DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
+_DEP_tilering        := vramqueue dma tilering_cells                            # vramQueuePush, dmaCopyVram, the cell loops
+_DEP_tilering_cells  := tilering                                                # tr_hot_*: the context tilering.c sets
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
 _DEP_audio           := apu audio_blob audio_stream audio_vset
@@ -355,6 +353,15 @@ _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 # four rounds: sprite_dynamic_dispatch -> sprite_dynamic -> sprite -> dma -> console
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1))))))
 LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
+# The queue's arrays (see VRAM_QUEUE_MAX above), for a project that lists
+# vramqueue or a module that depends on it (until 2026-11-20 this was tested
+# before the resolution: `LIB_MODULES := tilering` alone failed to link).
+ifneq ($(filter vramqueue,$(LIB_MODULES)),)
+ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
+$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
+endif
+VRAMQ_OBJ := vramqueue_ram.o
+endif
 
 #------------------------------------------------------------------------------
 # Library Object Resolution

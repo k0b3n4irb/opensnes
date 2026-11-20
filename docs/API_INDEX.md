@@ -199,6 +199,7 @@ topic without naming most of the API.
 | `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
 | `object.h` | [The Object Engine](tutorials/object.md), [how it works](tutorials/object_engine.md) | ✅ |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
+| `tilering.h` | [Scrolling](tutorials/scrolling.md) — maps with more characters than VRAM | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
 Every public header is covered: 16.16 maths in the [Math](tutorials/math.md)
