@@ -29,15 +29,11 @@ out of range) is thrown away and another is drawn.
     python3 testing/difftest_stmt.py --seeds 100-499    # hunt
     python3 testing/difftest_stmt.py --seeds 7 --keep   # keep build/difftest/stmt_7
     python3 testing/difftest_stmt.py --cc /tmp/old/cc65816
-    python3 testing/difftest_stmt.py --census 50 --seeds 1-300   # each G1 idiom fired 50 times or more
 
 Each seed builds two ROMs: its first batch (`stmt_<seed>`, the programs it
 always gave) and its G1 batch (`stmti_<seed>`, another random stream whose
-programs also carry loops and widenings shaped for the IR idioms I1-I4 of
-compiler/qbe/idiom.c, see "the G1 idioms' shapes" below); `--batch` runs
-one of them. `--census N` turns OPENSNES_G1_IDIOMS and OPENSNES_G1_TRACE on,
-counts the rewrites the compiler traced per idiom and batch, and fails when
-the G1 batch fired an idiom fewer than N times.
+programs also carry loops and widenings shaped like the G1 campaign's sites,
+see "the G1 idioms' shapes" below); `--batch` runs one of them.
 
 A failing program is reduced: statements are removed one at a time for as
 long as the result still differs, and what is left is printed.
@@ -805,7 +801,7 @@ def gen_prog(rng, idioms: bool = False) -> Prog:
 # ------------------------------------------------- the G1 idioms' shapes --
 # The second batch of a seed (`stmti_<seed>`) draws its programs from another
 # random stream and adds to each two to four statements shaped for the IR
-# idioms of compiler/qbe/idiom.c (OPENSNES_G1_IDIOMS=1), every one written
+# idioms of the G1 campaign (retired 2026-11-21, the shapes are kept), every one written
 # with the statement kinds above, so the interpreter computes them as it
 # computes the rest:
 #   I1  s16 w = E; acc ^= (u32)(s32)w; acc += (u32)(s32)(w >> K), and the
@@ -1408,13 +1404,8 @@ def make_cases(seed: int, idioms: bool = False) -> list:
     return cases
 
 
-IDIOMS = ("I1", "I2", "I3", "I4")
-TRACE_RE = re.compile(r"g1idioms: \S+: (I[1-4]) rewrote (\d+)")
 
-
-def run_batch(cases: list, name: str, luna: str, census: dict = None):
-    """census: filled with the rewrites of each G1 idiom the build traced
-    (OPENSNES_G1_TRACE=1)."""
+def run_batch(cases: list, name: str, luna: str):
     d = D.WORK / name
     shutil.rmtree(d, ignore_errors=True)
     d.mkdir(parents=True)
@@ -1437,9 +1428,6 @@ def run_batch(cases: list, name: str, luna: str, census: dict = None):
     rom = d / "difftest.sfc"
     if proc.returncode != 0 or not rom.is_file():
         return f"build failed in {d}:\n" + (proc.stdout + proc.stderr)[-1500:]
-    if census is not None:
-        for idiom, n in TRACE_RE.findall(proc.stderr):
-            census[idiom] = census.get(idiom, 0) + int(n)
     steps = 4_000_000
     while True:
         out = subprocess.run([luna, "state", "-n", str(steps), "--peek", f"r:{len(cases) * 4:x}",
@@ -1521,11 +1509,11 @@ def run_pinned(luna: str):
     return "pinned", (1 if msgs else 0), msgs
 
 
-def verdicts(cases: list, name: str, luna: str, census: dict = None):
+def verdicts(cases: list, name: str, luna: str):
     """True per case that fails. A ROM that does not finish (a program that
     crashes takes the others with it) is run again one program at a time; a
     program that does not finish alone fails. A build error is returned as text."""
-    res = run_batch(cases, name, luna, census)
+    res = run_batch(cases, name, luna)
     if not isinstance(res, str):
         return [got != c.expected for c, got in zip(cases, res)]
     if "never reached" not in res:
@@ -1594,24 +1582,23 @@ def reduce_case(case: Case, luna: str, name: str) -> Case:
 
 
 def run_seed(seed, luna: str, keep: bool, batches=("stmt", "idiom")):
-    """Both batches of a seed: (seed, worst code, messages, census per batch)."""
+    """Both batches of a seed: (seed, worst code, messages)."""
     if seed == "pinned":
         res = run_pinned(luna)
         if res[1] == 0 and not keep:
             shutil.rmtree(D.WORK / "stmt_pinned", ignore_errors=True)
-        return res + ({},)
-    worst, msgs, census = 0, [], {}
+        return res
+    worst, msgs = 0, []
     for batch in batches:
-        census[batch] = {}
         code, m = run_cases(make_cases(seed, batch == "idiom"),
                             f"stmt_{seed}" if batch == "stmt" else f"stmti_{seed}",
-                            seed, luna, keep, census[batch])
+                            seed, luna, keep)
         worst, msgs = max(worst, code), msgs + m
-    return seed, worst, msgs, census
+    return seed, worst, msgs
 
 
-def run_cases(cases: list, name: str, seed, luna: str, keep: bool, census: dict):
-    res = verdicts(cases, name, luna, census)
+def run_cases(cases: list, name: str, seed, luna: str, keep: bool):
+    res = verdicts(cases, name, luna)
     if isinstance(res, str):
         return 2, [f"seed {seed}: {res}"]
     msgs = []
@@ -1639,43 +1626,22 @@ def main() -> int:
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
     ap.add_argument("--cc", help="path of another cc65816 to test (e.g. one built before a change)")
     ap.add_argument("--batch", choices=["all", "stmt", "idiom"], default="all",
-                    help="the seed's first batch, its G1 batch (shapes of compiler/qbe/idiom.c), or both (default)")
-    ap.add_argument("--census", type=int, metavar="N",
-                    help="build with OPENSNES_G1_IDIOMS=1 and OPENSNES_G1_TRACE=1, count each idiom's "
-                         "rewrites per batch, and fail unless the G1 batch fires every idiom N times or more")
+                    help="the seed's first batch, its G1 batch (loops and widenings), or both (default)")
     args = ap.parse_args()
-    if args.census is not None:
-        os.environ["OPENSNES_G1_IDIOMS"] = "1"
-        os.environ["OPENSNES_G1_TRACE"] = "1"
     batches = ("stmt", "idiom") if args.batch == "all" else (args.batch,)
     if args.cc:
         D.MAKE_ARGS.append(f"CC={Path(args.cc).resolve()}")
     seeds = D.parse_seeds(args.seeds) if args.seeds else GATE_SEEDS
     luna = find_luna()
     worst = failed = 0
-    total = {b: {} for b in batches}
-    fired = {b: {} for b in batches}           # batches (ROMs) where the idiom fired at least once
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
-        for seed, code, msgs, census in pool.map(lambda s: run_seed(s, luna, args.keep, batches), seeds):
+        for seed, code, msgs in pool.map(lambda s: run_seed(s, luna, args.keep, batches), seeds):
             worst = max(worst, code)
             failed += code != 0
             for m in msgs:
                 print(m)
-            for b, counts in census.items():
-                for idiom, n in counts.items():
-                    total[b][idiom] = total[b].get(idiom, 0) + n
-                    fired[b][idiom] = fired[b].get(idiom, 0) + (n > 0)
     nprog = sum(len(PINNED) if x == "pinned" else PROGS_PER_ROM * len(batches) for x in seeds)
     print(f"difftest-stmt: {len(seeds) - failed}/{len(seeds)} seeds clean, {nprog} programs")
-    if args.census is not None:
-        nrom = sum(x != "pinned" for x in seeds)
-        for b in batches:
-            print(f"census {b}: " + ", ".join(
-                f"{i} {total[b].get(i, 0)} rewrites in {fired[b].get(i, 0)}/{nrom} ROMs" for i in IDIOMS))
-        short = [i for i in IDIOMS if "idiom" in batches and total["idiom"].get(i, 0) < args.census]
-        if short:
-            print(f"census: the G1 batch fired {', '.join(short)} fewer than {args.census} times")
-            worst = max(worst, 1)
     return worst
 
 
