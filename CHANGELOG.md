@@ -4,6 +4,8 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.56.0] — 2026-11-21
+
 ### Fixed
 - fix(tools): `opensnes-rom check` no longer takes a table of WRAM bank `$7E` or `$7F` at `$8000` or above for bank-blind ROM data: the 16-bit address of such a table (`pea.w tab`, an offset handed to a WRAM-port copy) is a plain offset of RAM, read by `lda.l tab,x` through its own bank. The check still refuses a table of ROM bank `$01` or above read with a 16-bit address. A golden case pins the first.
 - fix(tools): `opensnes-tileset convert` names `--flip` (not the nonexistent `-F`) when a map needs more than 1 024 tiles, and no longer advises it when it was already given: the message then says the mirrored tiles are already merged and to reduce the image. Two golden cases pin both messages.
