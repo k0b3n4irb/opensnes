@@ -131,7 +131,16 @@ even when its caller still calls something else (the rule that kept it apart
 is off by default; `CC_INLINE_LEAF_MAX=N` turns it back on for leaves larger
 than N IR instructions, to measure). In such a caller the leaf's temporaries
 that cross a call live on the stack, so a long hot loop can run faster as a
-function of its own: mark it `__attribute__((noinline))` and measure. A function
+function of its own: mark it `__attribute__((noinline))` and measure.
+Measured (2026-11-21, luna, a `static` ray-walking loop of about 25 IR
+instructions with one caller that also calls two other functions, 1,024 rays;
+`CC_INLINE_LEAF_MAX=16` against the default): keeping the leaf apart costs a
+fixed ~410 master cycles a call (the call, its four arguments, the direct-page
+frame) and saves ~18 a loop iteration, so it pays from about 23 iterations a
+call: rays of 2, 5 and 12 cases run 14 %, 9 % and 4.5 % slower apart, rays of
+40 run 0.5 % faster. That is why the default stays off: the loops of a game's
+inner code are short more often than long. For a loop known to run long, the
+explicit `noinline` is the tool. A function
 marked `__attribute__((noinline))` (or `[[gnu::noinline]]`) is never
 inlined, by either inliner.
 `QBE_NO_AUTO_INLINE=1` turns the second inliner off, to measure.

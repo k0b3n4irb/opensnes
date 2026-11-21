@@ -59,6 +59,11 @@ else, because the saving usually wins (`docs/BENCHMARK.md`, "Inlining").
 `CC_INLINE_LEAF_MAX=N` makes the compiler keep a leaf apart when it has more
 than N IR instructions and its caller still calls something. It is a
 measuring switch, not a setting to ship: build twice, compare the profile.
+The break-even measured on a ray-walking loop is about 23 iterations a call
+(the call and its arguments cost ~410 master cycles, the direct-page frame
+saves ~18 an iteration): under that the default (inlined) is faster, above it
+`noinline` on that one loop pays. Count the iterations of your own loop before
+choosing.
 
 ## 4. Do not multiply inside the loop
 

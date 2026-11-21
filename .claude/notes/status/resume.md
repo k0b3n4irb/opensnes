@@ -372,3 +372,7 @@ Next: (b) CC_INLINE_LEAF_MAX — measure with/without on the consuming game's ra
 
 ## 2026-11-21 — NEXT LOT: prepare a new version (the owner's decision, relayed 2026-11-21)
 Start after 06:00 on 2026-11-22 (quota), fresh conversation, before (b) CC_INLINE_LEAF_MAX. Prepare only: merge to main, tag, publication are the owner's. Dossier: scope = develop (>= 4be20332, now 375fb76b), honest notes (audio command queue, two-command note start, tile ring, OamWorldBatch two sizes, hot-loop guide, make hooks; G1 removed, said plainly; breaking changes), proposed number by `.claude/rules/release.md` with its reason, gates (make tests + CI green on the commit, compiler hunt included, vitrine checked), one consuming game builds its ROM on that commit (ask by thread), the three exact commands for the owner.
+
+## 2026-11-21 — CC_INLINE_LEAF_MAX (b) DONE: verdict, default stays off
+Measured on the consumer's reduced case (feuille-recopiee.c, a ROM harness: 1,024 rays, luna profile, `CC_INLINE_LEAF_MAX=16` vs default): apart costs ~410 mclk a call, saves ~18 an iteration; rays of 2/5/12 cases +14/+9/+4.5 % slower, 40 cases -0.5 %; break-even ~23 iterations. Verdict in `docs/BENCHMARK.md` and `docs/craft/hot-loops.md`. The consumer's real rays are 6 cases at most: default right; its 41-case path search: hand `noinline` (-26 % measured by it).
+Next: the consumer tries OamWorldBatch.size on its side; release preparation from 06:00 on 2026-11-22.
