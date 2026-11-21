@@ -1398,6 +1398,146 @@ static const s16 w_sy[8] = { 0,  10,  10, 223, 100, 224, -31, -32 };
 static u8 w_old_seen[2];
 static const OamWorldBatch w_old = { w_sx, w_sy, w_rev, w_rev, w_old_seen, 108, 2, 32 };
 
+/* oamPlaceWorld with `big`: ten sprites of two sizes (16 small, 32 large) in
+ * ONE order, on sprites 90-99 (part of byte 22 of the high table, all of 23
+ * and 24: a first and a last group the batch covers in part). Camera at
+ * (100, 50). On screen: 0 (small, 0, 0), 1 (large, x = -31), 3 (large,
+ * x = -17: a small one there would be hidden), 4 (large, 255, 223), 5 (small),
+ * 7 (large, y = -31). Hidden: 2 (small, x = -16), 6 (large, y = 224), 8
+ * (small, y = -16), 9 (small, x = 256). Each call is compared byte for byte
+ * with a C model of the contract (the ten entries, the three bytes of the
+ * high table, visible[]), and a few bytes are pinned by hand as well. */
+u16 r_worldm[8];
+static const s16 m_sx[10] = { 0, -31, -16, -17, 255, 240, 100, 100, 100, 256 };
+static const s16 m_sy[10] = { 0,  10,  10,  20, 223, 100, 224, -31, -16,   0 };
+static const u8 m_big[10] = { 0, 1, 0, 2, 255, 0, 1, 1, 0, 0 };   /* any value but 0 is large */
+static const u8 m_rev[10] = { 9, 8, 7, 6, 5, 4, 3, 200, 1, 0 };  /* slot 7: not a sprite */
+static s16 m_x[10];
+static s16 m_y[10];
+static u8 m_tile[10];
+static u8 m_attr[10];
+static u8 m_seen[10];
+static FAR u8 m_eseen[10];
+static FAR u8 m_exp[43];      /* the ten entries, then bytes 22-24 of the high table */
+static FAR u8 m_save[43];
+static FAR u8 m_hid[10];
+
+static void m_hide(u16 slot)
+{
+    u16 id = 90 + slot, sh = (id & 3) << 1, hb = 40 + (id >> 2) - 22;
+    m_exp[slot * 4] = 0x01;
+    m_exp[slot * 4 + 1] = 0xF0;
+    m_exp[hb] = (u8)((m_exp[hb] & ~(3 << sh)) | (1 << sh));   /* x bit set, small */
+    m_hid[slot] = 1;
+}
+
+static void m_model(const u8 *order, u16 cx, u16 cy)
+{
+    u16 i, spr, id, o, sz, tx, ty, xs, sh, hb;
+    for (i = 0; i < 40; i++) m_exp[i] = oamMemory[90 * 4 + i];
+    for (i = 0; i < 3; i++) m_exp[40 + i] = oamMemory[512 + 22 + i];
+    for (i = 0; i < 10; i++) {
+        m_eseen[i] = m_seen[i];
+        m_hid[i] = 0;
+    }
+    for (i = 0; i < 10; i++) {
+        spr = order ? order[i] : i;
+        if (spr >= 10) {
+            m_hide(i);
+            continue;
+        }
+        sz = m_big[spr] ? 32 : 16;
+        tx = (u16)m_x[spr] - (u16)(cx - sz);
+        ty = (u16)m_y[spr] - (u16)(cy - sz);
+        if (tx == 0 || tx >= 256 + sz || ty == 0 || ty >= 224 + sz) {
+            m_hide(i);
+            m_eseen[spr] = 0;
+            continue;
+        }
+        id = 90 + i;
+        o = i * 4;
+        sh = (id & 3) << 1;
+        hb = 40 + (id >> 2) - 22;
+        xs = tx - sz;
+        m_exp[o] = (u8)xs;
+        m_exp[o + 1] = (u8)(ty - sz);
+        m_exp[o + 2] = m_tile[spr];
+        m_exp[o + 3] = m_attr[spr];
+        m_exp[hb] = (u8)((m_exp[hb] & ~(3 << sh))
+                         | ((xs & 0x8000) ? (1 << sh) : 0)
+                         | (m_big[spr] ? (2 << sh) : 0));
+        m_eseen[spr] = 1;
+    }
+}
+
+/* the bytes that differ from the model (a hidden entry's tile and attr are
+ * not part of the contract) */
+static u16 m_compare(void)
+{
+    u16 i, bad = 0;
+    for (i = 0; i < 40; i++) {
+        if (m_hid[i >> 2] && (i & 3) >= 2) continue;
+        if (oamMemory[90 * 4 + i] != m_exp[i]) bad++;
+    }
+    for (i = 0; i < 3; i++)
+        if (oamMemory[512 + 22 + i] != m_exp[40 + i]) bad++;
+    for (i = 0; i < 10; i++)
+        if (m_seen[i] != m_eseen[i]) bad++;
+    return bad;
+}
+
+static u16 m_seen_mask(void)
+{
+    u16 i, m = 0;
+    for (i = 0; i < 10; i++) m |= (u16)(m_seen[i] == 1) << i;
+    return m;
+}
+
+static void test_world_mixed(void)
+{
+    static OamWorldBatch mb;
+    u8 flag = oam_update_flag;
+    u16 i;
+    for (i = 0; i < 40; i++) m_save[i] = oamMemory[90 * 4 + i];
+    for (i = 0; i < 3; i++) m_save[40 + i] = oamMemory[512 + 22 + i];
+    for (i = 0; i < 10; i++) {
+        m_x[i] = m_sx[i] + 100;
+        m_y[i] = m_sy[i] + 50;
+        m_tile[i] = (u8)(0x40 + i);
+        m_attr[i] = (u8)(0x20 | i);
+        m_seen[i] = 0xEE;
+    }
+    /* every size bit of the three bytes set first: the call must clear the
+     * small ones and the hidden ones */
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] |= 0xAA;
+    mb.x = m_x; mb.y = m_y; mb.tile = m_tile; mb.attr = m_attr; mb.visible = m_seen;
+    mb.first_id = 90; mb.count = 10; mb.size = 16;
+    mb.order = 0; mb.big = m_big; mb.size_big = 32;
+    m_model(0, 100, 50);
+    oamPlaceWorld(&mb, 100, 50);
+    r_worldm[0] = m_compare();                                           /* 0 */
+    r_worldm[1] = oamMemory[91 * 4] | (oamMemory[91 * 4 + 1] << 8);      /* $E1, 10 */
+    r_worldm[2] = (oamMemory[512 + 22] & 0xF0) | (oamMemory[512 + 23] << 8);  /* $C0, $2D */
+    r_worldm[3] = oamMemory[512 + 24] | ((m_seen_mask() & 0xFF) << 8);  /* $59; 0,1,3,4,5,7 seen: $BB */
+    /* the same sprites by `order`: a reversal, slot 7 not a sprite (hidden,
+     * small), sprite 2 named by no slot (its visible byte untouched) */
+    for (i = 0; i < 10; i++) m_seen[i] = 0xEE;
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] |= 0xAA;
+    mb.order = m_rev;
+    m_model(m_rev, 100, 50);
+    oamPlaceWorld(&mb, 100, 50);
+    r_worldm[4] = m_compare();                                           /* 0 */
+    r_worldm[5] = (oamMemory[512 + 22] & 0xF0) | (oamMemory[512 + 23] << 8);  /* $50, $86 */
+    r_worldm[6] = oamMemory[512 + 24] | ((m_seen_mask() & 0xFF) << 8);  /* $37; $BB (8 and 9 hidden) */
+    /* sprite 2, named by no slot, keeps its visible byte; a batch written
+     * before `big` existed (w_old, eight initialisers) has it 0 */
+    r_worldm[7] = 0x0168 ^ ((m_seen[2] == 0xEE && (m_seen_mask() >> 8) == 0
+                             && w_old.big == 0 && w_old.size_big == 0) ? 0 : 0xFFFF);
+    for (i = 0; i < 40; i++) oamMemory[90 * 4 + i] = m_save[i];
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] = m_save[40 + i];
+    oam_update_flag = flag;
+}
+
 static void test_string(void) {
     u16 i;
     volatile u16 zero = 0;
@@ -1755,6 +1895,8 @@ int main(void) {
     test_glyph_blit();
 
     test_string();
+
+    test_world_mixed();
 
     /* Sprites 100-102, which nothing else in this ROM uses, and the upload
      * flag put back: the OAM the probe reads at the end was placed there by

@@ -415,6 +415,8 @@ typedef struct {
     u8   count;          /**< 21: number of sprites */
     u8   size;           /**< 22: width and height in pixels: 8, 16, 32 or 64 */
     const u8 *order;     /**< 24: optional, one byte per slot: slot i shows sprite order[i]. 0: slot i shows sprite i */
+    const u8 *big;       /**< 28: optional, one byte per sprite: not 0 = large (`size_big`), 0 = small (`size`). 0: one size, size bits untouched */
+    u8   size_big;       /**< 32: width and height in pixels of a large sprite; read only with `big` */
 } OamWorldBatch;
 
 /* Not under the host's syntax check (clang, 8-byte pointers): the layout
@@ -428,6 +430,8 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, first_id) == 20, "OamWorldBatch
 _Static_assert(__builtin_offsetof(OamWorldBatch, count) == 21, "OamWorldBatch.count offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.size offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.order offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, big) == 28, "OamWorldBatch.big offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, size_big) == 32, "OamWorldBatch.size_big offset (sprite_world.asm)");
 #endif
 
 /**
@@ -443,8 +447,23 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  * - **`visible[]`** tells the game which sprites were placed, so that it
  *   can skip its own work (animation, streaming) for the others without
  *   testing again. Pass 0 if it is not wanted.
- * - **The size bit is not touched**: set it once with oamSetSize(). A batch
- *   has one size; a game with two sizes makes two calls.
+ * - **Without `big`, the size bit is not touched**: set it once with
+ *   oamSetSize(). The batch has one size, `size`.
+ * - **`big`, for sprites of two sizes in one drawing order.** One byte per
+ *   sprite (indexed by the sprite, as `tile`): 0 is small, `size` pixels,
+ *   any other value large, `size_big` pixels (the two sizes the game chose
+ *   with oamInit(), e.g. OBJ_SIZE16_L32: 16 and 32). The screen test
+ *   uses each sprite's own size, and the call writes the size bit of every
+ *   slot of the batch: set for a placed large sprite, clear for a placed
+ *   small one AND for every hidden slot (a hidden entry is small). Two calls of one size each would put the sprites
+ *   in OAM order by size, which is not the game's drawing order. Only the
+ *   byte is read, but as a word: the byte after the last sprite's is read
+ *   too, as for any array (harmless in RAM and ROM).
+ *   Cost, measured (devtools/placebench, rows `mix`, SlowROM): about
+ *   1 090 master cycles a placed small sprite, 1 200 a large one and 770
+ *   a hidden one in a large batch (with `order`, about 100 more each);
+ *   a call of one sprite about 6 800, since a batch with `big` always
+ *   takes the path of the large batches.
  * - **`cam_y` is the y you give bgSetScroll()**: a sprite and the
  *   background it stands on take the same camera value.
  * - A batch that runs past sprite 127 stops there.
@@ -457,20 +476,22 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  *   `order[i]`: the arrays stay indexed by the sprite and the sort permutes
  *   `count` bytes. `visible[]` stays indexed by the sprite. An `order`
  *   byte that is not under `count` hides its slot. A batch declared without
- *   the field (the eight initialisers of the example below) has `order` 0.
+ *   the field (the eight initialisers of the example below) has `order` 0,
+ *   and `big` 0 likewise.
  *   Cost, measured (devtools/placebench, SlowROM): with `order`, about
  *   230 master cycles more a placed sprite, 260 a hidden one.
  * - **Cost** (devtools/placebench, master cycles, SlowROM): a call of one
- *   sprite about 3 200; in a large batch, about 940 a placed sprite and
- *   590 a hidden one (FastROM: 2 700, 810, 510). The code is about 7.7 KB,
+ *   sprite about 3 300; in a large batch, about 940 a placed sprite and
+ *   590 a hidden one (FastROM: 2 800, 810, 510). The code is about 13 KB,
  *   placed by the linker in any bank.
  * - **What the call touches besides the OAM shadow and `visible[]`**: the
  *   two camera arguments it was given are left as they were; the tile and
  *   attribute bytes of a sprite it hides are left as they were (only x, y
  *   and the ninth x bit say hidden, as oamHide() does); it uses up to 30
- *   bytes of the `tcc__lf` block as scratch, which the ABI gives any
- *   callee (compiler/ABI.md). Within the call, the ninth x bits of a group
- *   of eight OAM entries are written together after the group's entries.
+ *   bytes of the `tcc__lf` block as scratch (all 40 with `big`), which the
+ *   ABI gives any callee (compiler/ABI.md). Within the call, the ninth x
+ *   bits of a group of eight OAM entries are written together after the
+ *   group's entries.
  *
  * @param batch The sprites (see OamWorldBatch)
  * @param cam_x World x of the screen's left edge
@@ -489,6 +510,12 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  * static u8 by_depth[12];                 // by_depth[0]: the actor in front
  * static const OamWorldBatch sorted = {
  *     ax, ay, atile, aattr, aseen, 0, 12, 32, by_depth
+ * };
+ *
+ * // two sizes in one order, oamInit(OBJ_SIZE16_L32, ...): abig[i] != 0 is 32x32
+ * static u8 abig[12];
+ * static const OamWorldBatch mixed = {
+ *     ax, ay, atile, aattr, aseen, 0, 12, 16, by_depth, abig, 32
  * };
  * @endcode
  */

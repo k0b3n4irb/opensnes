@@ -30,7 +30,12 @@ actors; each faces the way it walks (its back turned going up).
   cheaply; an `OamWorldBatch` is filled with their addresses once.
 - A batch has one size: the shards are the SMALL size of `OBJ_SIZE16_L32`
   (16 × 16), the residents the LARGE one (32 × 32), set once with
-  `oamSetSize()`: the call never touches the size bit.
+  `oamSetSize()`: the call never touches the size bit. The shards drift
+  over the square and never pass between two residents, so two batches
+  are enough here; a game whose small and large sprites share one depth
+  order gives one batch a `big` array instead (one byte per sprite, small
+  or large), and the call then writes each slot's size bit itself
+  (`docs/tutorials/sprites.md`, "Two sizes in one order").
 - A sprite's frame is its entry of the batch's `tile` array: a resident
   walking up gets its north frame, one walking down its south frame, and
   the call writes whichever is there. Each resident has its OBJ palette

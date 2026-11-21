@@ -245,6 +245,13 @@ CASES = [
     # sprite 7), visible[] by sprite, then order bytes out of range
     ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
+    # oamPlaceWorld with `big` (sizes 16 and 32 in one order): the whole
+    # region against the fixture's C model (0 bytes differ), with and without
+    # order, and pinned by hand: entry 91 at x = -31, the high-table bytes
+    # (ninth and size bits; hidden slots small), visible[] by sprite, sprite 2
+    # named by no slot left untouched, an old static batch with big == 0
+    ("r_worldm", 16, sum(w << (16 * i) for i, w in enumerate([
+        0, 0x0AE1, 0x2DC0, 0xBB59, 0, 0x8650, 0xBB37, 0x0168]))),
     # oamSetBatch: x/y only keeps tile, attr and size bits; the ninth bit set
     # and cleared; tile and attr from an unaligned id; one pointer only; cut at
     # 127; count 0 and a bad id write nothing

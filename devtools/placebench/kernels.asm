@@ -136,6 +136,34 @@ bench_table:
     .dl s_one0_vis, k_new, c_sum ; one0_vis new
     .dl s_one0_ordvis, k_old, c_sum ; one0_ordvis old
     .dl s_one0_ordvis, k_new, c_sum ; one0_ordvis new
+    .dl s_mvis32s_plain, k_new, c_sum ; mvis32s_plain mix
+    .dl s_mvis32s_order, k_new, c_sum ; mvis32s_order mix
+    .dl s_mvis32s_vis, k_new, c_sum ; mvis32s_vis mix
+    .dl s_mvis32s_ordvis, k_new, c_sum ; mvis32s_ordvis mix
+    .dl s_mvis32b_plain, k_new, c_sum ; mvis32b_plain mix
+    .dl s_mvis32b_order, k_new, c_sum ; mvis32b_order mix
+    .dl s_mvis32b_vis, k_new, c_sum ; mvis32b_vis mix
+    .dl s_mvis32b_ordvis, k_new, c_sum ; mvis32b_ordvis mix
+    .dl s_mhid32_plain, k_new, c_sum ; mhid32_plain mix
+    .dl s_mhid32_order, k_new, c_sum ; mhid32_order mix
+    .dl s_mhid32_vis, k_new, c_sum ; mhid32_vis mix
+    .dl s_mhid32_ordvis, k_new, c_sum ; mhid32_ordvis mix
+    .dl s_mvis1s_plain, k_new, c_sum ; mvis1s_plain mix
+    .dl s_mvis1s_order, k_new, c_sum ; mvis1s_order mix
+    .dl s_mvis1s_vis, k_new, c_sum ; mvis1s_vis mix
+    .dl s_mvis1s_ordvis, k_new, c_sum ; mvis1s_ordvis mix
+    .dl s_mvis1b_plain, k_new, c_sum ; mvis1b_plain mix
+    .dl s_mvis1b_order, k_new, c_sum ; mvis1b_order mix
+    .dl s_mvis1b_vis, k_new, c_sum ; mvis1b_vis mix
+    .dl s_mvis1b_ordvis, k_new, c_sum ; mvis1b_ordvis mix
+    .dl s_mhid1_plain, k_new, c_sum ; mhid1_plain mix
+    .dl s_mhid1_order, k_new, c_sum ; mhid1_order mix
+    .dl s_mhid1_vis, k_new, c_sum ; mhid1_vis mix
+    .dl s_mhid1_ordvis, k_new, c_sum ; mhid1_ordvis mix
+    .dl s_mmix16_plain, k_new, c_sum ; mmix16_plain mix
+    .dl s_mmix16_order, k_new, c_sum ; mmix16_order mix
+    .dl s_mmix16_vis, k_new, c_sum ; mmix16_vis mix
+    .dl s_mmix16_ordvis, k_new, c_sum ; mmix16_ordvis mix
 bench_table_end:
 
 bench_run:

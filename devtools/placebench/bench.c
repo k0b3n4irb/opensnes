@@ -24,7 +24,7 @@
 extern u8 oam_max_id;   /* sprite module state (sprite_oamset.asm) */
 
 s16 wx[N], wy[N];
-u8 wt[N], wa[N], wv[N], wo[N];
+u8 wt[N], wa[N], wv[N], wo[N], wb[N];
 OamWorldBatch bt;
 u16 cur_camx, cur_camy;
 u32 cur_batch;
@@ -38,6 +38,11 @@ static u16 rng(void) {
 /* placement: how each sprite is drawn */
 enum { P_MIX, P_VIS, P_HID, P_QUARTER, P_HALF };
 enum { S_PLAIN, S_ORDER, S_VIS, S_ORDVIS };
+/* `big` (the `mix` rows: the library alone, no old body to compare with;
+ * their correctness is the stress fixture's world_place and the libtest's):
+ * none, all small, all large, one in two large */
+enum { B_NONE, B_SMALL, B_LARGE, B_HALF };
+static u16 bigmode;
 
 static void setup(u16 seed, u16 size, u16 count, u16 first, u16 place, u16 shape, u16 badorder) {
     u16 i, mode;
@@ -48,6 +53,9 @@ static void setup(u16 seed, u16 size, u16 count, u16 first, u16 place, u16 shape
         s16 sx, sy;
         u16 r = rng();
         u16 sz = size ? size : 1;
+        wb[i] = (u8)(bigmode == B_LARGE || (bigmode == B_HALF && (i & 1)));
+        if (bigmode)
+            sz = wb[i] ? 32 : 16;
         if (place == P_VIS) mode = 0;
         else if (place == P_HID) mode = 2 + (i & 1);
         else if (place == P_QUARTER) mode = (i % 9 == 1 || i % 9 == 5) ? (i & 2 ? 1 : 0) : 2 + ((i >> 1) & 1);
@@ -90,6 +98,9 @@ static void setup(u16 seed, u16 size, u16 count, u16 first, u16 place, u16 shape
     bt.count = (u8)count;
     bt.size = (u8)size;
     bt.order = (shape == S_ORDER || shape == S_ORDVIS) ? wo : 0;
+    bt.big = bigmode ? wb : 0;
+    bt.size_big = 32;
+    bigmode = B_NONE;
     cur_batch = (u32)&bt;
 }
 
@@ -125,6 +136,22 @@ ROWS4(size1, 21, 1, 23, 5, P_MIX, 1)
 ROWS4(size24, 22, 24, 23, 5, P_MIX, 1)
 ROWS4(two, 23, 16, 2, 7, P_MIX, 0)
 ROWS4(one0, 24, 0, 1, 9, P_MIX, 0)
+
+/* the mixed path (`big`): size 16, size_big 32 */
+#define MROW(name, seed, count, place, shape, bm) \
+    void s_##name(void) { bigmode = bm; setup(seed, 16, count, 0, place, shape, 0); }
+#define MROWS4(k, seed, count, place, bm) \
+    MROW(k##_plain, seed, count, place, S_PLAIN, bm) \
+    MROW(k##_order, seed, count, place, S_ORDER, bm) \
+    MROW(k##_vis, seed, count, place, S_VIS, bm) \
+    MROW(k##_ordvis, seed, count, place, S_ORDVIS, bm)
+MROWS4(mvis32s, 30, 32, P_VIS, B_SMALL)
+MROWS4(mvis32b, 31, 32, P_VIS, B_LARGE)
+MROWS4(mhid32, 32, 32, P_HID, B_HALF)
+MROWS4(mvis1s, 33, 1, P_VIS, B_SMALL)
+MROWS4(mvis1b, 34, 1, P_VIS, B_LARGE)
+MROWS4(mhid1, 35, 1, P_HID, B_HALF)
+MROWS4(mmix16, 36, 32, P_MIX, B_HALF)
 
 void s_nop(void) { setup(0, 16, 32, 0, P_MIX, S_PLAIN, 0); }
 u16 c_nop(void) { return 0; }

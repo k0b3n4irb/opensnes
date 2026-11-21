@@ -25,6 +25,9 @@
 ;   22 size     u8            width and height in pixels
 ;   24 order    const u8 *    optional: slot i shows sprite order[i]; 0 = slot i
 ;                             shows sprite i
+;   28 big      const u8 *    optional, by sprite: not 0 = large (size_big),
+;                             0 = small (size); 0 = one size, the paths above
+;   32 size_big u8            the large size in pixels (read only with big)
 ;
 ; How (devtools/placebench times it against the body it replaced, and
 ; .claude/notes/chantiers/gap_lots/LIB_place_prod.md has the figures):
@@ -51,6 +54,15 @@
 ;     bit. Y = 2 * sprite for the word arrays, halved for the byte arrays.
 ;   - x is stored first, as a word (its high byte lands on y, rewritten
 ;     next); y as a word (its high byte lands on tile, rewritten next).
+;   - with `big` (two sizes in one order), a path of its own, tested once
+;     at entry (the one-size paths pay that test, nothing a sprite): always
+;     the groups, one checked copy of each (the end tested before every
+;     sprite), the sprite's big byte choosing one of two copies of the
+;     screen test (the small constants, or the large ones in tcc__lf+30..39);
+;     a group's high-table word is written whole, size bits included (set
+;     for a placed large sprite, clear for a placed small one and for every
+;     hidden slot), under masks that keep both bits of the slots outside
+;     the batch.
 ;
 ; What differs from the body before 2026-11-15 (sprite.h says it too):
 ;   (a) the two camera arguments on the stack are left as they were (the old
@@ -58,7 +70,7 @@
 ;   (b) the tile and attribute bytes of a HIDDEN sprite are left untouched
 ;       (the old body could leave its y byte's high half in the tile byte);
 ;   (c) up to 30 bytes of tcc__lf are used as scratch (the old body 14; the
-;       ABI gives a callee 40, compiler/ABI.md).
+;       ABI gives a callee 40, compiler/ABI.md); all 40 with `big`.
 ; Within a call, the ninth x bits of a group of eight land together after
 ; the group's entries (the old body wrote each right after its entry);
 ; oam_max_id and oam_update_flag are still set last. Nobody sees the table
@@ -66,16 +78,20 @@
 ; waits in WaitForVBlank(), never in the middle of a call.
 ;
 ; Measured (devtools/placebench, master cycles, SlowROM / FastROM): a call
-; of one sprite 3 181 / 2 730 placed (the old body 4 372 / 3 780); a sprite
-; of a large batch 939 / 814 placed, 588 / 509 hidden (1 301 / 1 121 and
-; 936 / 803). The section is about 7.7 KB (the old one 530 bytes),
-; SUPERFREE: the linker may put it in bank $01 or above.
+; of one sprite 3 289 / 2 824 placed (the old body 4 372 / 3 780; 3 181 /
+; 2 730 before the test of `big`); a sprite of a large batch 939 / 814
+; placed, 588 / 509 hidden (1 301 / 1 121 and 936 / 803). With `big`, no
+; order: 1 086 / 946 a placed small sprite, 1 195 / 1 041 a large one,
+; 768 / 669 hidden, 6 838 / 5 852 a call of one sprite. The section is
+; 12 970 bytes (7 751 before `big`, the old body 530), SUPERFREE: the
+; linker may put it in bank $01 or above.
 ;
 ; Every tcc__r* is the callee's to use (compiler/ABI.md): r0 x, r1 y, r2
 ; tile, r3 attr, r4 visible (24-bit pointers, never stepped); r5 the high-
 ; table word of the current group; r5h the OAM offset of the first group;
 ; r9 the jump into the first group; r9h the last OAM id of the batch; r10
-; size; r10h first_id. tcc__lf: the defines below.
+; size; r10h first_id (with big: r10-r10h the big pointer once the setup has
+; read them). tcc__lf: the defines below.
 ;==============================================================================
 
 .ifdef SA1
@@ -107,6 +123,17 @@
 .DEFINE LAST  tcc__r9+2     ; last OAM id of the batch
 .DEFINE FIRST tcc__r10+2    ; first_id
 .DEFINE SMALL 8             ; batches of 2 to SMALL sprites: the per-sprite loop
+; With `big` (the mixed path): the large size's constants in the last ten
+; bytes of tcc__lf, the big pointer in tcc__r10 once the setup has read the
+; size and first_id there. MBIG and MSZB hold the batch's fields until then.
+.DEFINE NCXB  tcc__lf+30    ; size_big - 1 - cam_x
+.DEFINE PCYB  tcc__lf+32    ; cam_y + 1 - size_big
+.DEFINE RLIMB tcc__lf+34    ; 255 + size_big
+.DEFINE BLIMB tcc__lf+36    ; 223 + size_big
+.DEFINE NSZB  tcc__lf+38    ; 1 - size_big
+.DEFINE MBIG  tcc__lf+30    ; (setup) the big pointer, 4 bytes
+.DEFINE MSZB  tcc__lf+34    ; (setup) size_big
+.DEFINE BIG   tcc__r10      ; the big pointer, 24 bits
 
 ; One sprite of a group. K: its place in the group (0-7); ORDERED, VIS: the
 ; shape; CHK: test the end of the batch first (EXIT when reached). Entry: A,
@@ -573,6 +600,177 @@ sl_next\@:
 +   jmp ph_done
 .ENDM
 
+; One sprite of the mixed path (`big` given). K: its place in the group;
+; ORDERED, VIS: the shape; EXIT: where to go when the batch ends before it.
+; The end is tested before every sprite (one copy of the group, not two).
+; Entry: A, X, Y 16 bits, X = the group's OAM offset, SLOT = the slot. The
+; sprite's big byte picks one of two copies of the screen test (the small
+; constants, the large ones); a placed large sprite sets its size bit in ACC,
+; a hidden slot leaves it clear (small). Exit: SLOT + 1.
+.MACRO MSPR ARGS K, ORDERED, VIS, EXIT
+    ldy.b SLOT
+    cpy.b EE
+    bcc +
+    jmp EXIT
++
+.IF ORDERED == 1
+    lda [ORD],y
+    and.w #$00FF
+    cmp.b GIVEN
+    bcc +
+    jmp mh_bad\@
++   sta.b SPR
+    tay
+.ENDIF
+    lda [BIG],y             ; the sprite's big byte (and the byte after it)
+    and.w #$00FF
+    bne mh_big\@
+    tya
+    asl a                   ; (clears the carry: sprite < 128)
+    tay
+    lda [tcc__r0],y         ; world x
+    adc.b NCX               ; screen x + size - 1
+    cmp.b RLIM
+    bcs mh_hid\@
+    adc.b NSZ               ; (C clear) screen x
+    sta.w oamMemory+K*4,x   ; as a word: the high byte lands on y, rewritten below
+    bmi mh_sl\@
+mh_sy\@:
+    lda [tcc__r1],y         ; world y
+    sec
+    sbc.b PCY               ; screen y + size - 1
+    cmp.b BLIM
+    bcs mh_hid\@
+    adc.b NSZ               ; (C clear) screen y
+    sta.w oamMemory+K*4+1,x ; as a word: the high byte lands on tile, rewritten below
+mh_tile\@:
+.IF ORDERED == 1
+    ldy.b SPR
+.ELSE
+    ldy.b SLOT
+.ENDIF
+    sep #$20
+    .ACCU 8
+    lda [tcc__r2],y
+    sta.w oamMemory+K*4+2,x
+    lda [tcc__r3],y
+    sta.w oamMemory+K*4+3,x
+.IF VIS == 1
+    lda #1
+    sta [tcc__r4],y
+.ENDIF
+    rep #$20
+    .ACCU 16
+    bra mh_nx\@
+mh_sl\@:                    ; x < 0: the ninth bit
+    lda.w #1<<(K*2)
+    tsb.b ACC
+    bra mh_sy\@
+mh_big\@:                   ; the same with the large constants
+    tya
+    asl a
+    tay
+    lda [tcc__r0],y
+    adc.b NCXB
+    cmp.b RLIMB
+    bcs mh_hid\@
+    adc.b NSZB
+    sta.w oamMemory+K*4,x
+    bmi mh_bl\@
+mh_by\@:
+    lda [tcc__r1],y
+    sec
+    sbc.b PCYB
+    cmp.b BLIMB
+    bcs mh_hid\@
+    adc.b NSZB
+    sta.w oamMemory+K*4+1,x
+    lda.w #2<<(K*2)         ; placed and large: the size bit
+    tsb.b ACC
+    bra mh_tile\@
+mh_bl\@:
+    lda.w #1<<(K*2)
+    tsb.b ACC
+    bra mh_by\@
+mh_hid\@:
+    .ACCU 16
+.IF VIS == 1
+.IF ORDERED == 1
+    ldy.b SPR
+.ELSE
+    ldy.b SLOT
+.ENDIF
+    sep #$20
+    .ACCU 8
+    lda #0
+    sta [tcc__r4],y
+    rep #$20
+    .ACCU 16
+.ENDIF
+mh_bad\@:
+    .ACCU 16
+    lda.w #$F001            ; as oamHide(): x = 257, y = 240 (and small)
+    sta.w oamMemory+K*4,x
+    lda.w #1<<(K*2)
+    tsb.b ACC
+mh_nx\@:
+    inc.b SLOT
+.ENDM
+
+; A whole shape of the mixed path, entered after its setup (GSETUP 0, then
+; the large constants, KEEP and TAILM over both bits). The first group is
+; entered at the batch's first sprite; every group runs the checked copy; a
+; group's word of the high table is written whole (ninth AND size bits),
+; under KEEP (the slots before the batch, first group only) and TAILM (those
+; after it, last group only).
+.MACRO MLOOP ARGS ORDERED, VIS, NAME
+\3:
+    ldx.b DUFF
+    lda.l ml_tab\@,x
+    sta.b DUFF
+    ldx.b XB
+    stz.b ACC
+    jmp (DUFF)
+ml_c0\@:
+    MSPR 0, ORDERED, VIS, ph_done
+ml_c1\@:
+    MSPR 1, ORDERED, VIS, ml_cx\@
+ml_c2\@:
+    MSPR 2, ORDERED, VIS, ml_cx\@
+ml_c3\@:
+    MSPR 3, ORDERED, VIS, ml_cx\@
+ml_c4\@:
+    MSPR 4, ORDERED, VIS, ml_cx\@
+ml_c5\@:
+    MSPR 5, ORDERED, VIS, ml_cx\@
+ml_c6\@:
+    MSPR 6, ORDERED, VIS, ml_cx\@
+ml_c7\@:
+    MSPR 7, ORDERED, VIS, ml_cx\@
+    lda (tcc__r5)           ; the group is done, the batch may go on
+    and.b KEEP
+    ora.b ACC
+    sta (tcc__r5)
+    stz.b KEEP              ; the next groups are the batch's alone
+    stz.b ACC
+    inc.b tcc__r5
+    inc.b tcc__r5
+    txa
+    clc
+    adc.w #32
+    tax
+    jmp ml_c0\@
+ml_cx\@:                    ; the batch ends inside this group
+    lda.b KEEP
+    ora.b TAILM
+    and (tcc__r5)
+    ora.b ACC
+    sta (tcc__r5)
+    jmp ph_done
+ml_tab\@:
+    .dw ml_c0\@, ml_c1\@, ml_c2\@, ml_c3\@, ml_c4\@, ml_c5\@, ml_c6\@, ml_c7\@
+.ENDM
+
 .SECTION ".text.oamPlaceWorld" SUPERFREE
 
     .ACCU 16
@@ -644,6 +842,9 @@ oamPlaceWorld:
     sta.b ORD
     ora.w 25,x              ; all 24 bits of order (0: none)
     tay
+    lda.w 28,x
+    ora.w 29,x              ; all 24 bits of big (0: one size, the paths below)
+    bne ph_mixed_j          ; (the data bank still the batch's)
     plb                     ; the caller's data bank: the OAM shadow's
     tyx
     bne ph_ordered
@@ -678,6 +879,8 @@ ph_small_oj:
     jmp ph_small_o
 ph_ord_j:
     jmp ph_ord_n
+ph_mixed_j:
+    jmp ph_mixed
 
 ph_one_sz:
     lda.b tcc__r10
@@ -873,6 +1076,70 @@ ph_small_set:
     inc a
     rts
 
+    ;--------------------------------------------------------------------------
+    ; With `big`: two sizes in one batch. Data bank still the batch's, X the
+    ; batch, Y the order bits (0: none).
+    ;--------------------------------------------------------------------------
+ph_mixed:
+    lda.w 28,x
+    sta.b MBIG
+    lda.w 30,x
+    sta.b MBIG+2
+    lda.w 32,x
+    and.w #$00FF
+    sta.b MSZB              ; size_big
+    plb                     ; the caller's data bank
+    GSETUP 0
+    lda.b MBIG              ; size and first_id read: big goes to r10
+    sta.b BIG
+    lda.b MBIG+2
+    sta.b BIG+2
+    lda.b MSZB
+    tay
+    clc
+    adc.w #255
+    sta.b RLIMB
+    adc.w #223-255          ; (C clear: size_big < 256)
+    sta.b BLIMB
+    tya
+    eor.w #$FFFF
+    inc a
+    inc a
+    sta.b NSZB              ; 1 - size_big
+    clc
+    adc 5,s                 ; the camera's y + 1 - size_big
+    sta.b PCYB
+    lda.b NSZB
+    clc
+    adc 7,s                 ; the camera's x + 1 - size_big
+    eor.w #$FFFF
+    inc a
+    sta.b NCXB              ; size_big - 1 - the camera's x
+    lda.b KEEP              ; the slots before the batch keep both their bits
+    and.w #$5555
+    sta.b SPR
+    asl a
+    ora.b SPR
+    sta.b KEEP
+    lda.b TAILM             ; ...and so do those after it
+    asl a
+    ora.b TAILM
+    sta.b TAILM
+    lda.b ORD
+    ora.b ORD+1
+    bne ph_mx_o
+    lda.b tcc__r4
+    ora.b tcc__r4+1
+    bne +
+    jmp ph_mpl
++   jmp ph_mplvis
+ph_mx_o:
+    lda.b tcc__r4
+    ora.b tcc__r4+1
+    bne +
+    jmp ph_mord
++   jmp ph_mordvis
+
 ph_done:
     .ACCU 16
     ; the table changed, up to the last sprite of the batch
@@ -896,6 +1163,10 @@ ph_done:
     PLOOP 0, 1, ph_plvis
     PLOOP 1, 0, ph_ord
     PLOOP 1, 1, ph_ordvis
+    MLOOP 0, 0, ph_mpl
+    MLOOP 0, 1, ph_mplvis
+    MLOOP 1, 0, ph_mord
+    MLOOP 1, 1, ph_mordvis
 
 ; the x bits of the places before k in a group's word of the high table
 ow_low:

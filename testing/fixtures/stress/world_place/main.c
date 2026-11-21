@@ -14,12 +14,15 @@
  *   - positions put on the culling limits (-size - 1 .. -size + 1, -1, 0, 1,
  *     223, 224, 255, 256, 257) or anywhere;
  *   - the table filled with random bytes first, so that the size bits and
- *     the other sprites' x bits are there to be kept.
+ *     the other sprites' x bits are there to be kept;
+ *   - `big` absent, in plain RAM or in FAR RAM (bytes 0, 1 or any), with
+ *     size_big 8 to 64: each sprite tested at its own size, the size bit of
+ *     every slot written (placed large: set; placed small and hidden: clear).
  * A hidden entry's tile and attribute bytes are not part of the contract
  * (the routine may leave anything there): they are not compared.
  *
  * Read by world_place.toml: r_bad = 0, r_batches, r_placed, r_hidden,
- * r_done.
+ * r_large, r_done.
  */
 #include <snes.h>
 
@@ -41,6 +44,7 @@ u16 r_bad;          /* wrong bytes, flags, DBR                        -> 0 */
 u16 r_batches;      /* batches run */
 u16 r_placed;       /* sprites the model placed (proves the mix) */
 u16 r_hidden;       /* sprites the model hid */
+u16 r_large;        /* sprites the model placed large (the mixed path ran) */
 u16 r_first_batch;  /* the first failing batch (diagnosis) */
 u16 r_first_what;   /* 0x0xxx table byte, 0x1xxx visible, 0x2000 max id, 0x2001 flag, 0x2002 DBR */
 u16 r_done;         /* 0xC0DE at the end */
@@ -51,6 +55,8 @@ static u8 lo_tile[N];
 static u8 lo_attr[N];
 static u8 lo_vis[N];
 static u8 lo_order[N];
+static u8 lo_big[N];
+static FAR u8 fa_big[N];
 static FAR s16 fa_x[N];
 static FAR s16 fa_y[N];
 static FAR u8 fa_tile[N];
@@ -62,7 +68,7 @@ static FAR u8 dont_care[128];   /* 1: entry hidden, its tile and attr not compar
 
 static OamWorldBatch b;
 static u16 seed = 0xACE1;
-static u16 src, vsrc, osrc, off, size, cam_x, cam_y, dbr0;
+static u16 src, vsrc, osrc, bsrc, off, size, size_big, cam_x, cam_y, dbr0;
 static u8 exp_max;
 
 static u16 rnd(void)
@@ -76,11 +82,13 @@ static u16 rnd(void)
 
 static s16 edge(u16 limit)
 {
-    u16 r = rnd() & 15;
+    u16 r = rnd();
+    u16 sz = (bsrc && (r & 16)) ? size_big : size;   /* with big: either size's limits */
+    r &= 15;
     switch (r) {
-    case 0: return -(s16)size - 1;
-    case 1: return -(s16)size;
-    case 2: return -(s16)size + 1;
+    case 0: return -(s16)sz - 1;
+    case 1: return -(s16)sz;
+    case 2: return -(s16)sz + 1;
     case 3: return -1;
     case 4: return 0;
     case 5: return 1;
@@ -128,6 +136,12 @@ static u8 get_order(u16 i)
     return wp_rom_order[i];
 }
 
+static u8 get_big(u16 i)
+{
+    if (bsrc == 1) return lo_big[i];
+    return fa_big[i];
+}
+
 static u8 get_vis(u16 i)
 {
     if (vsrc == 1) return lo_vis[i];
@@ -149,14 +163,15 @@ static void model_hide(u16 id)
     exp_oam[o] = 0x01;
     exp_oam[o + 1] = 0xF0;
     exp_oam[512 + (id >> 2)] |= (u8)(1 << ((id & 3) << 1));
+    if (bsrc) exp_oam[512 + (id >> 2)] &= (u8)~(2 << ((id & 3) << 1));   /* small */
     dont_care[id] = 1;
     r_hidden++;
 }
 
 static void model(void)
 {
-    u16 first = b.first_id, given = b.count, cc, i, id, spr, o, ty, tx, xs;
-    u8 bit;
+    u16 first = b.first_id, given = b.count, cc, i, id, spr, o, ty, tx, xs, sz;
+    u8 bit, large;
     if (first >= 128) return;
     cc = given;
     if (first + cc > 128) cc = 128 - first;
@@ -172,22 +187,29 @@ static void model(void)
         } else {
             spr = i;
         }
-        ty = (u16)get_y(spr) - (u16)(cam_y - size);
-        tx = (u16)get_x(spr) - (u16)(cam_x - size);
-        if (ty == 0 || ty >= 224 + size || tx == 0 || tx >= 256 + size) {
+        large = bsrc ? (get_big(spr) != 0) : 0;
+        sz = large ? size_big : size;
+        ty = (u16)get_y(spr) - (u16)(cam_y - sz);
+        tx = (u16)get_x(spr) - (u16)(cam_x - sz);
+        if (ty == 0 || ty >= 224 + sz || tx == 0 || tx >= 256 + sz) {
             model_hide(id);
             if (vsrc) exp_vis[spr] = 0;
             continue;
         }
         o = id << 2;
-        xs = tx - size;
+        xs = tx - sz;
         bit = (u8)(1 << ((id & 3) << 1));
         exp_oam[o] = (u8)xs;
-        exp_oam[o + 1] = (u8)(ty - size);
+        exp_oam[o + 1] = (u8)(ty - sz);
         exp_oam[o + 2] = get_tile(spr);
         exp_oam[o + 3] = get_attr(spr);
         if (xs & 0x8000) exp_oam[512 + (id >> 2)] |= bit;
         else exp_oam[512 + (id >> 2)] &= (u8)~bit;
+        if (large) r_large++;
+        if (bsrc) {
+            if (large) exp_oam[512 + (id >> 2)] |= (u8)(bit << 1);
+            else exp_oam[512 + (id >> 2)] &= (u8)~(bit << 1);
+        }
         if (vsrc) exp_vis[spr] = 1;
         r_placed++;
     }
@@ -216,6 +238,10 @@ static void one_batch(void)
     b.size = (u8)size;
     cam_x = rnd() % 1024;
     cam_y = rnd() % 512;
+    r = rnd();
+    bsrc = r % 3;
+    size_big = 8 << ((r >> 2) & 3);
+    b.size_big = (u8)size_big;
 
     /* the arrays */
     if (src == 2) {
@@ -250,6 +276,18 @@ static void one_batch(void)
             b.tile = (const u8 *)(fa_tile + off); b.attr = (const u8 *)(fa_attr + off);
         }
     }
+    /* big: 0 or 1 mostly, sometimes any byte (not 0 = large) */
+    if (bsrc) {
+        for (i = 0; i < N; i++) {
+            r = rnd();
+            u8 v = (u8)((r & 3) == 3 ? (r >> 8) : ((r >> 2) & 1));
+            lo_big[i] = v;
+            fa_big[i] = v;
+        }
+    }
+    if (bsrc == 0) b.big = 0;
+    else if (bsrc == 1) b.big = lo_big;
+    else b.big = (const u8 *)fa_big;
     for (i = 0; i < N; i++) {
         u8 v = (u8)(0xA0 + i);
         lo_vis[i] = v;

@@ -278,9 +278,10 @@ What it does for each sprite, and what it leaves to you:
 - **Structure of arrays.** One array per property is what this CPU indexes
   cheaply, and each array can live where it suits: positions in RAM, tile
   numbers in a `const` table if they never change.
-- **One size per batch.** A game with 32x32 heroes and 16x16 coins makes
-  two calls; the second batch can point into the same arrays
-  (`actor_x + 18`).
+- **One size per batch, unless you give `big`.** A game with 32x32 heroes
+  and 16x16 coins that do not overlap makes two calls; the second batch
+  can point into the same arrays (`actor_x + 18`). When the two sizes must
+  share one drawing order, see "Two sizes in one order" below.
 - **A sprite the game wants hidden although it is on screen** (its
   graphics are not loaded yet, say) is one `oamHide(id)` after the call.
 
@@ -323,12 +324,60 @@ oamPlaceWorld(&actors, cam_x, cam_y);
 - **`visible[]` stays indexed by the actor**: `actor_seen[n]` still answers
   "is actor n on screen", whichever slot shows it.
 - **The size bit belongs to the slot**, as before: every slot of a batch
-  has the batch's size, so a sort changes nothing there.
+  has the batch's size, so a sort changes nothing there (with `big`,
+  below, the call writes it from the actor the slot shows).
 - **An `order` byte that is not under `count` hides its slot** and reads
   no array.
 - Cost (rows `world` and `worldo`): about 240 master cycles more a sprite
   than the unsorted call, 36,400 a frame for the same 19 sprites; the C
   loop with the same indirection costs 136,700 with PVSnesLib's compiler.
+
+### Two sizes in one order: `big`
+
+A sort by depth mixes sizes: a 16x16 shot passes in front of or behind a
+32x32 character depending on where each stands. Two batches of one size
+each would put all the small sprites in OAM before (or after) all the large
+ones, which is not the sorted order. Give the batch a `big` array, one byte
+per actor (indexed by the actor, like `tile`): 0 is small, `size` pixels;
+any other value is large, `size_big` pixels — the two sizes chosen with
+`oamInit()` (`OBJ_SIZE16_L32` below).
+
+```c
+static u8 actor_big[ACTORS];      /* 1: this actor is 32x32 */
+
+static const OamWorldBatch actors = {
+    actor_x, actor_y, actor_tile, actor_attr, actor_seen,
+    0, ACTORS,
+    16,                           /* size: the small one */
+    by_depth,                     /* or 0 */
+    actor_big,
+    32                            /* size_big: the large one */
+};
+
+oamInit(OBJ_SIZE16_L32, 0);       /* once */
+oamPlaceWorld(&actors, cam_x, cam_y);
+```
+
+- **Each actor is culled at its own size**: a large one at x = -31 is
+  drawn, a small one there is hidden.
+- **The call writes the size bit of every slot of the batch**: set for a
+  placed large actor, clear for a placed small one and for every hidden
+  slot (a hidden entry is small). Do not call `oamSetSize()` for those
+  slots. Without `big`, the size bits are not touched, as before.
+- **A batch written without the field** (8 or 9 initialisers) has `big`
+  0: one size, the call costs what it did.
+- **The screen test is the screen's**, 256 x 224. A play area smaller than
+  the screen (a status bar under it) is not a bound the call knows: a
+  sprite over the bar is placed, and a game that must not show or count it
+  hides it after the call with `oamHide()`, the slot read from the game's
+  own order.
+- Cost (`devtools/placebench`, rows `mix`, SlowROM): about 1,090 master
+  cycles a placed small sprite, 1,200 a large one and 770 a hidden one in
+  a large batch without `order` (the one-size call: 939 and 588), about
+  100 more each with `order`; about 6,800 a call of one sprite (a batch
+  with `big` always takes the path of the large batches: give a lone
+  sprite its own one-size batch). The one-size call pays about 110 master
+  cycles a call for the test of `big`, nothing a sprite.
 
 ## Many alike objects: `oamSetBatch`
 

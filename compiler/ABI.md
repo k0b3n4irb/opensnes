@@ -236,7 +236,8 @@ bytes as scratch for the length of the call, like the `tcc__r*` slots.
 First user in the library: `oamPlaceWorld()` (`lib/source/sprite_world.asm`,
 2026-10-10), which uses up to 30 of the 40 bytes (its camera constants,
 group limits and, with an `order` array, the order pointer and the slot;
-14 bytes with `order` only before 2026-11-15). Assembly that is NOT called
+14 bytes with `order` only before 2026-11-15), and all 40 with a `big`
+array (the large size's camera constants, since 2026-11-21). Assembly that is NOT called
 from C — a handler — must not touch it: it would be writing the
 interrupted function's temporaries.
 

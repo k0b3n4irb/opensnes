@@ -100,6 +100,8 @@ def measure(luna, speed):
         r[variant] = round((s - seg[0]) / calls)
         r[variant + "_sum"] = c
     for row, r in res.items():
+        if "mix" in r:
+            continue                # the mixed path alone: no old body
         if r["old_sum"] != r["new_sum"]:
             sys.exit(f"placebench ({speed}): {row}: the checksums differ "
                      f"(old {r['old_sum']:#06x}, new {r['new_sum']:#06x}): no figure")
@@ -133,6 +135,8 @@ def main():
     print(f"{'row':16} {'old':>8} {'new':>8} {'margin':>7}   {'old fast':>8} {'new fast':>9} {'margin':>7}")
     for row in slow:
         s, f = slow[row], fast[row]
+        if "mix" in s:
+            continue
         print(f"{row:16} {s['old']:8} {s['new']:8} {s['margin']:6.1f}%   {f['old']:8} {f['new']:9} {f['margin']:6.1f}%")
     print("\nper sprite (vis32 - vis1 and hid32 - hid1, / 31), fixed a call (vis1 - placed):")
     derived = {}
@@ -143,6 +147,24 @@ def main():
                 derived[f"{shape}/{speed}/{v}"] = d
                 print(f"  {shape:6} {speed:4} {v:3} placed {d['placed']:5}  hidden {d['hidden']:5}"
                       f"  fixed {d['fixed']:5}  one placed {d['one_placed']:5}  one hidden {d['one_hidden']:5}")
+    print("\nthe mixed path (`big`: size 16, size_big 32), the library alone:")
+    print(f"{'row':16} {'slow':>8} {'fast':>8}   checksum")
+    for row in slow:
+        if "mix" in slow[row]:
+            print(f"{row:16} {slow[row]['mix']:8} {fast[row]['mix']:8}   {slow[row]['mix_sum']:#06x}")
+    for shape in ("plain", "order", "vis", "ordvis"):
+        for speed in SPEEDS:
+            r = results[speed]
+            def g(k):
+                return r[f"{k}_{shape}"]["mix"]
+            d = {"placed_small": round((g("mvis32s") - g("mvis1s")) / 31),
+                 "placed_large": round((g("mvis32b") - g("mvis1b")) / 31),
+                 "hidden": round((g("mhid32") - g("mhid1")) / 31),
+                 "one_small": g("mvis1s"), "one_large": g("mvis1b"), "one_hidden": g("mhid1")}
+            derived[f"mixed/{shape}/{speed}"] = d
+            print(f"  mixed {shape:6} {speed:4} placed small {d['placed_small']:5}  large {d['placed_large']:5}"
+                  f"  hidden {d['hidden']:5}  one small {d['one_small']:5}  one large {d['one_large']:5}"
+                  f"  one hidden {d['one_hidden']:5}")
     print("\nthe consumer's pass: old, new, saved, %, % of a frame")
     passes = {}
     for speed in SPEEDS:
