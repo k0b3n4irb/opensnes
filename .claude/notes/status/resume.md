@@ -365,3 +365,7 @@ Asked by a consuming game that sorts sprites of two sizes (16 and 32) into ONE d
 ## 2026-11-21 — per-sprite size in OamWorldBatch DONE (develop 4be20332, CI 44900420366 green)
 `big` (28) + `size_big` (32), optional, null = old paths; mono path +108 cycles a call, nothing a sprite; mixed 1 086-1 447 a sprite SlowROM; one-sprite mixed call 6 838 (outside prediction, doc says use a mono batch). Line bounds not done (direct page full). Opus agent, gates replayed by the session (make tests, bench-place). Also: compiler hunt red (timeout, G1 batch doubled difftest_stmt) fixed by `b34e4f0e`, run 44900291770 green; cron reads main's workflow: owner must update main. Lesson written in the kit.
 Next: the consuming game tests "OAM equal every frame" on its ROM (thread oamplaceworld-…); then hot-loop guide (a), CC_INLINE_LEAF_MAX (b).
+
+## 2026-11-21 — hot-loop guide (a) DONE
+`docs/craft/hot-loops.md` (+ README entry): index vs pointer (26 vs ~87 cycles an iteration, static count of the cc65816 output), count up, unroll gain ~10 % only, keep the loop a leaf / `noinline`, no variable multiply (`jsl __mul16`). Static estimate, not luna: said in the guide. A "hoist the invariant" claim was tested and dropped (n*2 is cheaper in the loop than in a local).
+Next: (b) CC_INLINE_LEAF_MAX — measure with/without on the consuming game's ray loop (needs its reduced case; thread of 2026-11-09), then document the verdict.
