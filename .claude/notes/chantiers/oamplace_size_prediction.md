@@ -57,6 +57,43 @@ direct page instead of Y (about 8), the end test before each sprite (7); for a
 large placed sprite the size bit (`lda #` / `tsb`, 10). Against the consumer's
 own C, about 2 500 to 2 700 a placed entry (its measure, not ours).
 
-## Measured (filled in after the code)
+## Measured (filled in after the code, same day)
 
-(pending)
+`make bench-place` on the worktree, before the change (the references came
+back exactly: 939 / 588 / 3 181) and after. SlowROM, master cycles.
+
+| Figure | Predicted | Measured | Verdict |
+|---|---|---|---|
+| single size, per sprite, four shapes (placed / hidden) | unchanged ± 5 | 939/588, 1 169/844, 1 004/776, 1 235/991: identical (order placed 1 169 both times; FastROM order placed 1 018 -> 1 019) | in |
+| single size, per call | + 90 ± 25 | + 108 (one sprite 3 181 -> 3 289; the 32-sprite rows + 108 to + 110; the consumer's two large calls 47 197 -> 47 415) | in (upper half) |
+| mixed, no order: placed small | 1 150 ± 100 | 1 086 | in |
+| mixed, no order: placed large | 1 270 ± 100 | 1 195 | in |
+| mixed, no order: hidden | 850 ± 100 | 768 | in (low edge) |
+| mixed with order, delta to single size with order (small / large / hidden) | + 170 / + 290 / + 170 ± 100 | + 103 / + 212 / + 109 (1 272 / 1 381 / 953) | in (low half) |
+| mixed: a one-sprite call | 4 600 ± 600 | 6 838 | OUT: + 2 238 |
+| ROM added | + 5.0 KB ± 0.8 | + 5 219 bytes (section 7 751 -> 12 970) | in |
+
+The one-sprite call: the prediction counted the mixed setup against the
+single-size one-sprite path, but a batch with `big` runs the group setup
+(GSETUP, about 230 CPU cycles with its two table reads) on top of the entry,
+plus the large constants, the two masks and the shape dispatch (about 50
+instructions): roughly 5 700 fixed. Not worth a straight path of its own for
+the consumer (its batches are large); the docs tell a lone sprite to use a
+one-size batch. The per-sprite figures sit in the low half of their bands:
+the CHK test and the slot counter cost less than counted (the slot load also
+serves the end test).
+
+Against the consumer's own C (about 2 500 to 2 700 a placed entry, its
+measure): 1 086 to 1 447 a placed entry depending on the shape, i.e. 45 to
+60 % less on that post, before its own test (hypothesis until it measures).
+
+Faults put in the new path, each caught by both fixtures (world_place bad
+bytes; libtests r_worldm red): the size bit never set 9 715; a large
+sprite's x tested at the small size 27 598; a hidden slot keeping its size
+bit 24 657.
+
+Line bounds (ask 2): not done, as planned. tcc__lf is now full (40 bytes)
+and r10 holds the big pointer; two bounds need two more y constants per
+size (the stored y and the test no longer share NSZ), i.e. four more words,
+or a slower path. The consumer said it can live without; the docs give the
+workaround (oamHide() after the call).
