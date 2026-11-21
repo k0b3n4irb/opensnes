@@ -23,3 +23,21 @@ the loop); I1-I4 carry the index in 32 bits, masks on both words, `lsr/ror` to r
 attributed post by post: the passes are only worth what the allocator keeps in registers; without R3-2 they pay their cost and not
 their gain. So the switch stays off and nothing of this reaches the corpus; the idioms "stand on their own" claim of step 1
 (`G1_r3_1_start.md`) is NOT confirmed by this twin. The decision on R3-2 (and on keeping the idioms) is the conductor's / owner's.
+
+## Replay and attribution by post (2026-11-21, decision of the conductor, condition 2)
+The session replayed the bench: 124 223 off / 137 308 I1-I4 / 144 294 I1-I5 SlowROM, 106 084 / 118 113 / 124 241 FastROM, equal to the cycle.
+An Opus agent then edited the "on" listing of `path` by hand, one post at a time, checksum 0x4af9 each time, every figure run twice
+(not replayed by the session; the hand-edited listings are in `$CLAUDE_JOB_DIR/tmp/scratch6`, disposable). Regression = on - off = 20 071 Slow / 18 157 Fast.
+
+| post (alone) | SlowROM gain | share of the regression |
+|---|--:|--:|
+| V1 the high word of the scaled index dropped (the final `and #126` keeps only the low word) | 17 288 | **86 % / 82 %** |
+| V5 the end-of-loop phi copies (lf+4 -> lf+26) | 8 306 | 41 % (4 155 once V1 is in) |
+| V2 stack frame of 6 bytes to direct-page slots | 939 | 5 % |
+| V3 branch-free sign mask | 116 | 0 % (no 2-instruction exact form exists; proof exhaustive on u16) |
+| V4 copies lf+32/34, lf+36/38 | 12 660 | not a regression post: the "off" listing has the same copies |
+V1+V5: 122 851 / 105 632, under the C without idioms (1.503 of the hand). All five: 109 539 / 94 056 = 1.340 / 1.350: gap to paper 2 still 0.220 / 0.228.
+
+Reading: ONE post explains the regression and does not need the allocator: a demanded-bits narrowing pass after I2 (the scaled index is read
+only through `& 126` and a u16-truncated `>> 1`, so its high word, the high word of the doubled step, the `and #0` and the exit `ror` are dead; phi, add and shift go 16-bit).
+V5 is a local phi-copy coalescing (hypothesis: no allocator needed, not written). Per the conductor's rule: correct V1 first, then re-read the threshold.
