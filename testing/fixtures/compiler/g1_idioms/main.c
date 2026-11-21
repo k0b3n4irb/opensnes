@@ -33,6 +33,22 @@
  * $FFFF, `<=`, a second exit, a loop that never runs);
  * OPENSNES_G1_FAULT=4 reads the signed compare as unsigned: i4_neg's
  * count becomes 0.
+ *
+ * G1 idiom I5 (same file): the two-entry loop. A table read by symbol at
+ * 2*idx, idx scaled by I2 and stepped under a mask below $8000, its
+ * entry unbounded (17 bits once scaled): the first load is peeled onto
+ * the entry edge in two forms, $S + lo and $S+$10000 + lo, chosen by the
+ * carry of the scaling (bit 15 of idx), and the loop is entered after
+ * it. r_i5[c] folds each case read in range (entry index below $8000,
+ * the same with the switch off or on); r_i5hi[c] starts at $8000 or
+ * more, through the FAR array big, so its first read is in bank $7F
+ * (the index is outside the C object: the IR's sum, not C's, is what is
+ * checked). The switch off, the backend's short form `lda.l big,x` drops
+ * bit 16 of that first index (known, out of the C object), so r_i5hi is
+ * checked with the switch on only; OPENSNES_G1_FAULT=5 drops the carry
+ * in the second form and turns it red. Not taken: a mask that keeps bit
+ * 15 (i5_wide), a constant entry (i5_const), a plain object (i5_plain,
+ * read `lda.w vals,x`: S+$10000 has no 16-bit operand).
  */
 #include <snes.h>
 
@@ -41,6 +57,8 @@ u32 r_k[16];
 u32 r_i2[13];
 u32 r_i3[10];
 u32 r_i4[7];
+u32 r_i5[8];
+u32 r_i5hi[3];
 u16 done;
 FAR s16 big[64];
 s16 vals[264];
@@ -306,6 +324,76 @@ __attribute__((noinline)) u32 i4_zero(void) {
     return acc;
 }
 
+/* I5: the table read by symbol (FAR array big, or ROM tab5 = F(i)) */
+const s16 tab5[64] = {81, -24952, 15551, -9482, 31021, 5988, -19045, 21458, -3575, -28608, 11895, -13138, 27365, 2332, -22701, 17802, -7231, -32264, 8239, -16794, 23709, -1324, -26357, 14146, -10887, 29616, 4583, -20450, 20053, -4980, -30013, 10490, -14543, 25960, 927, -24106, 16397, -8636, 31867, 6834, -18199, 22304, -2729, -27762, 12741, -12292, 28211, 3178, -21855, 18648, -6385, -31418, 9085, -15948, 24555, -478, -25511, 14992, -10041, 30462, 5429, -19604, 20899, -4134};
+
+/* the path shape: 40 trips (I4 reverses the counter, the test at the top) */
+__attribute__((noinline)) u32 i5_path(u16 idx, u16 step) {
+    u32 acc = 0x00300000;
+    u16 n;
+    for (n = 0; n < 40; n++) {
+        acc = mix(acc, (u32)(s32)big[idx]);
+        idx = (idx + step) & 63;
+    }
+    return mix(acc, idx);
+}
+
+/* the same on a ROM table, 64 trips */
+__attribute__((noinline)) u32 i5_rom(u16 idx, u16 step) {
+    u32 acc = 0x00310000;
+    u16 n;
+    for (n = 0; n < 64; n++) {
+        acc = mix(acc, (u32)(s32)tab5[idx]);
+        idx = (idx + step) & 63;
+    }
+    return mix(acc, idx);
+}
+
+/* do-while: the load at the top of the loop's header itself, n >= 1 (idx
+ * not read after the loop: I2 scales it) */
+__attribute__((noinline)) u32 i5_do(u16 idx, u16 n) {
+    u32 acc = 0x00320000;
+    do {
+        acc = mix(acc, (u32)(s32)big[idx]);
+        idx = (idx + 5) & 63;
+    } while (--n);
+    return acc;
+}
+
+/* not taken: the mask keeps bit 15, every load is 17 bits once scaled */
+__attribute__((noinline)) u32 i5_wide(u16 idx, u16 step) {
+    u32 acc = 0x00330000;
+    u16 n;
+    for (n = 0; n < 20; n++) {
+        acc = mix(acc, (u32)(s32)big[idx]);
+        idx = (idx + step) & 0x803F;
+    }
+    return mix(acc, idx);
+}
+
+/* not taken: a constant entry */
+__attribute__((noinline)) u32 i5_const(u16 step) {
+    u32 acc = 0x00340000;
+    u16 n, idx = 9;
+    for (n = 0; n < 20; n++) {
+        acc = mix(acc, (u32)(s32)tab5[idx]);
+        idx = (idx + step) & 63;
+    }
+    return mix(acc, idx);
+}
+
+/* not taken: a plain object, read `lda.w vals,x` under the data bank (a
+ * 16-bit operand: no second form) */
+__attribute__((noinline)) u32 i5_plain(u16 idx, u16 step) {
+    u32 acc = 0x00350000;
+    u16 n;
+    for (n = 0; n < 20; n++) {
+        acc = mix(acc, (u32)(s32)vals[idx]);
+        idx = (idx + step) & 127;
+    }
+    return mix(acc, idx);
+}
+
 typedef u32 (*kfn)(s16);
 static const kfn kfs[16] = {0, kf1, kf2, kf3, kf4, kf5, kf6, kf7, kf8,
                             kf9, kf10, kf11, kf12, kf13, kf14, kf15};
@@ -361,6 +449,17 @@ int main(void) {
     r_i2[10] = i2_exit(big, 4, 0x1234, 30);    /* n run out */
     r_i2[11] = i2_const(big, 40);
     r_i2[12] = i2_exit(big, 0x8001, F(0x8001), 10); /* found at entry */
+    r_i5[0] = i5_path(3, 5);
+    r_i5[1] = i5_path(0x7FFF, 1);              /* 2*idx = $FFFE: no carry */
+    r_i5[2] = i5_rom(3, 5);                    /* the path twin */
+    r_i5[3] = i5_rom(60, 0xFFFF);
+    r_i5[4] = i5_do(7, 30);
+    r_i5[5] = i5_do(2, 1);                     /* one pass */
+    r_i5[6] = i5_wide(0x10, 7) ^ i5_const(11);
+    r_i5[7] = i5_plain(100, 9);
+    r_i5hi[0] = i5_path(0x8003, 5);            /* first read in bank $7F */
+    r_i5hi[1] = i5_do(0x8010, 9);
+    r_i5hi[2] = i5_do(0x803F, 1);
     r_i3[0] = i3_count();
     r_i3[1] = i3_idx();
     r_i3[2] = i3_neg();

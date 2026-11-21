@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """G1 idioms I1 (narrow sign-extension chain), I2 (scaled induction
-variable), I3 (loop rotation) and I4 (induction reversal),
-compiler/qbe/idiom.c.
+variable), I3 (loop rotation), I4 (induction reversal) and I5 (the
+two-entry loop), compiler/qbe/idiom.c.
 
 Checks, in order:
   1. the ROM `make` produced (the switch off, the default): every value
-     against a model of the C (main.c says what each result is);
+     against a model of the C (main.c says what each result is), but
+     r_i5hi: its first read is at an index whose double is 17 bits, out
+     of the C object, and the backend's short form `lda.l big,x` drops
+     bit 16 of it (known); it is checked with the switch on;
   2. rebuilt with OPENSNES_G1_IDIOMS=1: the pass says it rewrote every
      function of main.c it should, with the idiom it should
      (OPENSNES_G1_TRACE), and every value is the same;
@@ -19,6 +22,8 @@ Checks, in order:
      runs, is rotated and its body runs once;
      =4 (I4) the trip count computed with the signed compares read as
      unsigned: i4_neg's counter from -5 to 5 counts 0 trips;
+     =5 (I5) the second form of the peeled first load reads $S, not
+     $S+$10000: the carry out of the scaling dropped, r_i5hi red;
   the ROM is rebuilt as `make` builds it at the end (`--no-faults` skips
   parts 2 and 3).
 """
@@ -49,10 +54,17 @@ WANT_RW = {("path", "I1"): 1, ("chain", "I1"): 2, ("dom", "I1"): 1,
            **{(f"i4_{n}", "I4"): 1
               for n in ("neg", "step", "down", "wrap", "le", "brk", "zero")},
            **{(f"i4_{n}", "I3"): 1
-              for n in ("neg", "step", "down", "wrap", "le")}}
+              for n in ("neg", "step", "down", "wrap", "le")},
+           **{(f"i5_{n}", "I2"): 1
+              for n in ("path", "rom", "do", "wide", "const", "plain")},
+           **{(f"i5_{n}", "I4"): 1
+              for n in ("path", "rom", "wide", "const", "plain")},
+           **{(f"i5_{n}", "I5"): 1 for n in ("path", "rom", "do")}}
 # fault -> the values it must turn red (one at least)
 FAULT_HITS = {"1": {"r_path3", "r_k", "r_chain", "r_dom"}, "2": {"r_i2"},
-              "3": {"r_i3"}, "4": {"r_i4"}}
+              "3": {"r_i3"}, "4": {"r_i4"}, "5": {"r_i5hi"}}
+# values the switch-off build is not checked on (see the docstring)
+OFF_SKIP = {"r_i5hi"}
 
 
 def s16(x: int) -> int:
@@ -169,6 +181,32 @@ def i4_model() -> list[int]:
             runs(0x00240000, 8, 0x99), acc, runs(0x00260000, 0, 0xAA)]
 
 
+def i5_model() -> tuple[list[int], list[int]]:
+    """main.c's r_i5[] and r_i5hi[]: each loop reads F(idx) at the full
+    index (big filled by put(), tab5[i] = F(i)); i5_do returns acc."""
+    def walk(acc, idx, step, n, mask=63, last=True):
+        for _ in range(n):
+            acc = mix(acc, F(idx) & M32)
+            idx = (idx + step) & mask
+        return mix(acc, idx) if last else acc
+
+    lo = [walk(0x300000, 3, 5, 40), walk(0x300000, 0x7FFF, 1, 40),
+          walk(0x310000, 3, 5, 64), walk(0x310000, 60, 0xFFFF, 64),
+          walk(0x320000, 7, 5, 30, last=False),
+          walk(0x320000, 2, 5, 1, last=False),
+          walk(0x330000, 0x10, 7, 20, 0x803F) ^ walk(0x340000, 9, 11, 20)]
+    vs = vals()
+    acc, idx = 0x350000, 100
+    for _ in range(20):
+        acc = mix(acc, vs[idx] & M32)
+        idx = (idx + 9) & 127
+    lo.append(mix(acc, idx))
+    hi = [walk(0x300000, 0x8003, 5, 40),
+          walk(0x320000, 0x8010, 5, 9, last=False),
+          walk(0x320000, 0x803F, 5, 1, last=False)]
+    return lo, hi
+
+
 def model() -> list[tuple[str, str]]:
     vs = vals()
     p0, p3 = 0x10000, 0x20000
@@ -204,13 +242,15 @@ def model() -> list[tuple[str, str]]:
         ("r_i2", "".join(le(x, 4) for x in i2_model())),
         ("r_i3", "".join(le(x, 4) for x in i3_model())),
         ("r_i4", "".join(le(x, 4) for x in i4_model())),
+        ("r_i5", "".join(le(x, 4) for x in i5_model()[0])),
+        ("r_i5hi", "".join(le(x, 4) for x in i5_model()[1])),
         ("done", "EFBE"),
     ]
 
 
-def values(luna: str) -> dict[str, bool]:
+def values(luna: str, skip=frozenset()) -> dict[str, bool]:
     return {name: assert_mem(luna, ROM, STEPS, [(name, want)])[0]
-            for name, want in model()}
+            for name, want in model() if name not in skip}
 
 
 def build(env_extra: dict[str, str]) -> str:
@@ -246,7 +286,9 @@ def run() -> int:
     if not ROM.is_file():
         sys.exit(f"ROM missing: {ROM} (run `make` first)")
     luna = find_luna()
-    fails = report(values(luna), "switch off: ")
+    fails = report(values(luna, OFF_SKIP), "switch off: ")
+    for name in sorted(OFF_SKIP):
+        print(f"SKIP switch off: {name} (checked with the switch on)")
     if "--no-faults" in sys.argv or fails:
         return 1 if fails else 0
     try:
@@ -256,9 +298,10 @@ def run() -> int:
         n2 = sum(v for (_, i), v in got.items() if i == "I2")
         n3 = sum(v for (_, i), v in got.items() if i == "I3")
         n4 = sum(v for (_, i), v in got.items() if i == "I4")
+        n5 = sum(v for (_, i), v in got.items() if i == "I5")
         print(("PASS " if ok else "FAIL ")
-              + f"I1, I2, I3, I4 rewrite every function they should"
-              f" ({n1} + {n2} + {n3} + {n4} sites)")
+              + f"I1, I2, I3, I4, I5 rewrite every function they should"
+              f" ({n1} + {n2} + {n3} + {n4} + {n5} sites)")
         if not ok:
             print(f"  got {sorted(got.items())}")
         fails += not ok
