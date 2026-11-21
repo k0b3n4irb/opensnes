@@ -351,3 +351,10 @@ QUEUE, in order: (1) DONE 2026-11-18: byte swap of a u16 as one `xba` (qbe `8591
 ## 2026-11-21 — G1 closed (owner), I1-I5 removed
 qbe reverts (d38a30a, pushed to origin p16), fixture g1_idioms, `--census` and the switch gone; PINS.md 170 patches. `make tests` green. Notes R0-R2 kept; branch g1-narrow stays local, unmerged.
 Next (routine by routine): oamPlaceWorld is ALREADY rewritten and on develop (LIB_place_prod, 2026-11-15, -28 % a sprite on the bench); one consuming game does not call it (its placement is its own loop), another does. Thread to the first = adoption try, not a new version. Then the "hot loop" guide (a) and CC_INLINE_LEAF_MAX (b).
+
+## Next lot (decided 2026-11-21, thread oamplaceworld-…): per-sprite size in OamWorldBatch
+Asked by a consuming game that sorts sprites of two sizes (16 and 32) into ONE depth order: one size per batch breaks its draw order.
+- Add an optional `size` array (or one big/small bit per sprite) read by BOTH the screen test and the high-table size bit. Optional second ask (comfort): two optional line bounds (top, bottom) for the on-screen test.
+- Constraint: the single-size path keeps its cost, measured with devtools/placebench (939 / 588 master cycles a sprite, 3 181 a one-sprite call, SlowROM); no regression for the other consumer.
+- Class B (lib/source/sprite_world.asm, sprite.h): an Opus agent writes it in its own worktree, prediction (cycles of the mixed-size path, ROM bytes) committed BEFORE the code; session replays every gate. The game then tests "OAM equal every frame" on its ROM; its own prediction: -55 % of its placement post (hypothesis).
+- Do not start before the CI of the removal commit is green.
