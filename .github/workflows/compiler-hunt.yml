@@ -21,6 +21,13 @@ on:
 
 jobs:
   hunt:
+    # Two jobs in parallel: the G1 batch of difftest_stmt (2026-11-20) doubled
+    # the programs of a window (30,000 -> 60,000) and the one job ran past its
+    # 90 minutes (run 44892069446, 2026-11-21). Each batch has its own budget.
+    strategy:
+      fail-fast: false
+      matrix:
+        batch: [stmt, idiom]
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -65,8 +72,9 @@ jobs:
           echo "seeds $start-$((start + 2999))"
 
       - name: Expressions (difftest.py)
+        if: matrix.batch == 'stmt'
         run: python3 testing/difftest.py --seeds ${{ steps.window.outputs.seeds }}
 
-      - name: Programs (difftest_stmt.py)
+      - name: Programs (difftest_stmt.py, ${{ matrix.batch }} batch)
         if: always()
-        run: python3 testing/difftest_stmt.py --seeds ${{ steps.window.outputs.seeds }}
+        run: python3 testing/difftest_stmt.py --batch ${{ matrix.batch }} --seeds ${{ steps.window.outputs.seeds }}
