@@ -21,13 +21,20 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
+# --coherent judges only the commits written after the check existed: b42286eb created it
+# (2026-11-14) while three commits of the X/Y lot (a00aa1ff, 71e02510, 362db7fc) were already on
+# `develop`. Played on the range of the first release (origin/main..main) it met them and refused
+# the push, though nobody could have obeyed a rule that did not exist. The bound is a commit, not
+# a date: the commit and all its ancestors are exempt, every later commit is judged as before.
+COHERENT_SINCE = "b42286eb75e461ccd9f9424603c4e89c8df81254"
+
 
 def git(*args, cwd=REPO):
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
 
 
-def pins(commit):
-    out = git("ls-tree", "-r", commit).stdout
+def pins(commit, cwd=REPO):
+    out = git("ls-tree", "-r", commit, cwd=cwd).stdout
     return [(line.split()[2], line.split("\t", 1)[1]) for line in out.splitlines()
             if line.startswith("160000 ")]
 
@@ -45,14 +52,16 @@ def on_remote(path, sha):
     return bool(git("branch", "-r", "--contains", sha, cwd=sub).stdout.strip())
 
 
-def coherent(rng):
+def coherent(rng, since=COHERENT_SINCE, repo=None):
     import re
+    cwd = repo or REPO
     bad = []
-    for c in git("rev-list", "--reverse", rng).stdout.split():
-        table = git("show", f"{c}:compiler/PINS.md").stdout
+    exempt = [f"^{since}"] if git("cat-file", "-e", f"{since}^{{commit}}", cwd=cwd).returncode == 0 else []
+    for c in git("rev-list", "--reverse", rng, *exempt, cwd=cwd).stdout.split():
+        table = git("show", f"{c}:compiler/PINS.md", cwd=cwd).stdout
         if not table:
             continue
-        for sha, path in pins(c):
+        for sha, path in pins(c, cwd):
             m = re.search(r"^\|\s*" + re.escape(path) + r"\s*\|\s*([0-9a-f]{12,40})\s*\|", table, re.M)
             if m and not sha.startswith(m.group(1)[:12]):
                 bad.append((c, path, sha, m.group(1)))
