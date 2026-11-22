@@ -1,0 +1,24 @@
+# consoleInit() tells console_force_blanked the screen is off (2026-11-22).
+# The fixture turns the screen on, sets up a second screen with
+# textModeInit() (which calls consoleInit(): forced blank), then sends a DMA
+# to VRAM in active display. The PPU is in forced blank, so the library's
+# DMA screen check must count nothing and fire no WDM $02; luna's own count
+# of unsafe writes says the screen really was off.
+# Negative control (2026-11-22, luna v1.44.0): the library before the fix
+# fails 4 asserts: WDM $02 fired, dma_unsafe_count = 1, r_delta = 1,
+# r_shadow = 0.
+rom = "../fixtures/libtests_console_blank/libtest_console_blank.sfc"
+frames = 30
+
+[asserts]
+wdm_empty = true                 # no WDM $02 from the DMA screen check
+
+[asserts.values]                 # u16, little-endian
+r_done = 0xC0DE
+r_outside = 1                    # the DMA under test started outside VBlank
+r_shadow = 1                     # the shadow after textModeInit(): screen off
+r_delta = 0                      # that DMA was not counted
+dma_unsafe_count = 0             # nor any of textModeInit()'s own transfers
+
+[asserts.dma]
+unsafe_writes = 0

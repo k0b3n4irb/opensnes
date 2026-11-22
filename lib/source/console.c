@@ -59,7 +59,11 @@ static u16 rand_seed;
  *============================================================================*/
 
 void consoleInit(void) {
-    /* Force blank - MUST be first to allow safe PPU register writes */
+    /* Force blank - MUST be first to allow safe PPU register writes. The
+     * shadow follows: after a setScreenOn(), a second consoleInit() (through
+     * textModeInit()) would leave the DMA screen check believing the screen
+     * on, and count every transfer outside VBlank as unsafe. */
+    console_force_blanked = 1;
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
     /* Detect PAL/NTSC */
