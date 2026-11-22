@@ -7,6 +7,7 @@ and the CHANGELOG.
 ## State
 
 - **v0.56.0 is released** (2026-11-22): `main` at `079994ea` (merge of `develop` `a6848fcb`), tag `v0.56.0` pushed, `release.yml` run 45005526201 green with 5 assets; `main` runs 45005503905 (build) and 45005503898 (lint) green. The first push was refused by the pre-push `--coherent` pin check, which judged three commits written before it existed (`a00aa1ff`, `71e02510`, `362db7fc`, on `develop` already): the check now exempts `b42286eb` and its ancestors (`a6848fcb`, with a test that sees a later fault). Cause: a history check laid down without a bound was never played on the release range `origin/main..main`; prevented by the bound and its test.
+- `consoleInit()` now sets `console_force_blanked` (`9fda92d8`, CI green: Lint 45012380157, Build 45012380168); test `libtest_console_blank`; cause: the shadow was incomplete, prevented by the test. The 4 MB ROM (`ROM_BANKS=128`) builds and boots; reads past bank $3F by named arrays are not yet measured.
 - The previous release, v0.55.0 (2026-11-08): `main` at `f21b3fc7`, tag `v0.55.0`.
 - The 0.53.0 worktree `../opensnes-requests` / `wip/requests` is merged and
   can go.
@@ -20,6 +21,7 @@ and the CHANGELOG.
 
 ## Waiting
 
+- The first game: its sample list for one song (sizes, first-use instants), then on 2026-12-08 we owe the audio route (ARAM sample relay, reduction or other) and say whether 12-15 holds.
 - luna's profile fold (`a38ff57`): replay at the pin bump that carries it
   (`partners/luna/2026-10-30_to_luna_profile-mirror-fold_reply.md`).
 - The first game: remove its fade workaround, replay its sound test.
