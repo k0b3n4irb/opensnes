@@ -256,6 +256,64 @@ See `examples/scrolling/continuous_scroll/` for the full implementation includin
 - **Stream +32 columns, not +31**: the 33rd partial tile at the right edge is visible, so always stream one column ahead.
 - **Use SC_64x32 or SC_64x64**: wider tilemaps give you a 64-column circular buffer, reducing the streaming frequency.
 
+## Maps With More Characters Than VRAM {#tutorial_scrolling_tilering}
+
+A tilemap entry names one of 1,024 characters, and once sprites and a
+status bar have their share a 4 bpp background gets 512 to 768 of them. A
+hand-drawn map easily has 1,200 to 1,600 distinct 8x8 characters, so no
+single character set fits. What the screen shows at once is far less (300
+to 450 in the maps measured), and that is what the `tilering` module keeps
+in VRAM: a ring of character slots, refilled as the camera moves.
+
+1. `opensnes-tilering convert` (@ref tools_opensnes_tilering) reads an
+   indexed PNG and keeps each character once, a mirrored copy merged with
+   it (the map entry carries the flip), numbered in order of first
+   appearance from the bottom of the map; it also measures the worst
+   screen, row and column.
+2. `tileRingInit()` takes the converted map, where the slots live in VRAM,
+   how many there are, and the work areas (FAR RAM is fine);
+   `tileRingFill()` loads the first screen in force blank.
+3. Each frame, `tileRingUpdate(&ring, camx, camy)` moves the window one
+   column and one row at most: the cells that leave release their slots (a
+   count per slot; a slot at 0 keeps its character, which comes back
+   without a transfer if the camera returns), the cells that come in take
+   theirs, new characters take free slots in sequence. It notes the
+   characters and the tilemap row and column in the VRAM queue;
+   `vramQueueFlush()` sends them right after `WaitForVBlank()`.
+
+```c
+static const TileRingMap world = archipelago_TILERING_MAP;
+TileRing ring;
+FAR u16 slot_of[archipelago_CHARS];
+FAR u16 char_of[640];
+FAR u8  refs[640];
+FAR u8  staging[TILERING_STAGING_BYTES(33, 29)];
+
+tileRingInit(&ring, &world, 0x0000, 0, 640, 0x3000, slot_of, char_of, refs, staging);
+tileRingFill(&ring, camx, camy);
+setScreenOn();
+while (1) {
+    /* move camx, camy */
+    tileRingUpdate(&ring, camx, camy);
+    bgSetScroll(0, camx, camy);
+    WaitForVBlank();
+    vramQueueFlush();
+}
+```
+
+**What a frame costs is yours to decide.** `tileRingCost(&ring, dx, dy)`
+gives the most characters a frame can bring at a speed, from the
+converter's figures for that map; `vramQueueCost()` gives what is queued
+before the flush. Measured on `scrolling/tile_ring` (1,433 characters, a
+ring of 640, legs at 3 to 7 px a frame and diagonals at 5 + 5): at most 21
+new characters in a frame, flushed in 7,994 master cycles (staging: the
+characters are first copied to WRAM, one transfer per run of slots) or
+19,270 (direct: one transfer per run of characters, from ROM), against a
+vertical blank of 50,468 on NTSC and 118,668 on PAL, the NMI handler's
+6,216 included in neither. The module's own work outside the blank is
+about 100,000 master cycles for a frame that crosses a column, up to
+280,000 for a diagonal into new characters (an NTSC frame is 357,366).
+
 ## VBlank Timing
 
 The PPU reads the scroll registers (`BG1HOFS`, `BG1VOFS`, etc.) as it renders, so a value written during HBlank is in force for the next line — that is what the HDMA parallax pattern above relies on (the references we hold do not pin the exact point inside a scanline where a write starts to count). An *unsynchronised* CPU write lands partway down the picture: the top of the frame shows the old scroll, the bottom the new one, visible as a one-frame tear.

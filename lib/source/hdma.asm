@@ -135,7 +135,7 @@ hdmaSetup:
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
     ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
-    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
+    ; against the SNES corpus (2026-09-07): anomie-regs marks
     ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
     ; be started mid-frame" — "you must basically do the init process
     ; manually by setting $43x8-A"; the snesdev VBlank-routine page states
@@ -229,7 +229,7 @@ hdmaSetupIndirect:
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
     ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
-    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
+    ; against the SNES corpus (2026-09-07): anomie-regs marks
     ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
     ; be started mid-frame" — "you must basically do the init process
     ; manually by setting $43x8-A"; the snesdev VBlank-routine page states

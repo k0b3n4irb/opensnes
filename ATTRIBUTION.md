@@ -224,10 +224,11 @@ Incompatible (do not use without isolation):
 - `res/water.bmp` — original work: procedurally generated water caustics
   (sum-of-sines field, 256-color indexed), created for this example.
   The HDMA technique it demonstrates is a C port of "SNES Wave HDMA Demo"
-  by krom (Peter Lemon), github.com/PeterLemon/SNES — code technique
-  credited, no krom assets used. `res/wavetable.bin` is krom's HDMA
-  table, extracted verbatim from the demo (data of the technique,
-  credited).
+  by krom (Peter Lemon), github.com/PeterLemon/SNES — technique credited,
+  no krom assets used. `res/wavetable.bin` is generated for OpenSNES by
+  `devtools/art_assets/hdma_wave.py` (a sum of three sines, original work,
+  CC0). It replaced krom's HDMA table, whose repository carries no
+  explicit licence; not one byte of it remains.
 
 ## examples/audio/soundboard
 
@@ -265,3 +266,27 @@ Incompatible (do not use without isolation):
 - krom's PlayTwoSong demo, whose *protocol* this example ports, ships
   songs built from samples ripped from commercial games — none of
   those assets are used here.
+
+## examples/memory/lzss_ram
+
+- `res/tiles.png`, `res/tiles_lz.png` — a synthetic blue pattern (256x512),
+  two byte-identical copies, created for this example by the project and
+  added with it by commit f67b6abb (2026-11-06) as test data. No third-party
+  content is known; no script that generated them was kept.
+
+## Tiled maps (`.tmj`) of the examples
+
+- `examples/demos/rpg/res/town.tmj`, `house.tmj` — written by
+  `devtools/art_assets/rpg.py` (through `make art-assets`; rewritten, they
+  are byte-identical to the committed files). No Tiled editor involved.
+- `examples/maps/map_scroll/res/rooftops.tmj` — written by
+  `build_map_scroll()` in `devtools/art_assets/build.py` (same check). It
+  declares a Tiled version string (`1.10.2`) as the format requires; no
+  Tiled session is known.
+- `.m16 .b16 .t16 .o16` of both examples (and `map_scroll`'s tracked ones) —
+  not written by a script of `devtools/art_assets`: they are the output of
+  `opensnes-level convert` on the `.tmj` above; `make clean && make` on both
+  examples reproduces the tracked files byte for byte.
+- Other `.tmj` of the repository (`testing/fixtures/retired_examples/tiled`,
+  the tool fixtures under `tools/`) are outside this entry: editor not
+  recorded.

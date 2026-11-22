@@ -195,15 +195,15 @@ chantier B2 had.
 
 ## 4. Queries (reproduce)
 
-- Mapping and titles: `snes_search("Super FX (GSU) cartridge memory mapping:
+- Mapping and titles: `corpus search("Super FX (GSU) cartridge memory mapping:
   is it LoROM (mode 20) … which commercial games use it")`.
-- Bus ownership: `snes_search("Super FX: while the GSU is running with
+- Bus ownership: `corpus search("Super FX: while the GSU is running with
   RON/RAN set, what happens when the SNES CPU reads ROM or RAM …")` →
-  `4a1e3a154e8eb7c7` expanded with `snes_get(context=2)`.
-- Framebuffer: `snes_search("Super FX framebuffer: screen height and bpp
+  `4a1e3a154e8eb7c7` expanded with `corpus get(context=2)`.
+- Framebuffer: `corpus search("Super FX framebuffer: screen height and bpp
   modes (SCMR HT, MD bits) …")`.
-- IRQ on STOP: `snes_search("Super FX GSU interrupt to the SNES CPU on
+- IRQ on STOP: `corpus search("Super FX GSU interrupt to the SNES CPU on
   STOP …")`.
-- Toolchains: `snes_search("GSU development kit and toolchain …")`.
-- FXPak Pro: `snes_search("Does the sd2snes / FXPak Pro flash cartridge
+- Toolchains: `corpus search("GSU development kit and toolchain …")`.
+- FXPak Pro: `corpus search("Does the sd2snes / FXPak Pro flash cartridge
   support Super FX …")`.

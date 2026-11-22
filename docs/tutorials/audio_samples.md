@@ -193,6 +193,23 @@ audioStopVoice(VOICE_ENGINE);                          /* key-off */
 `audioStopAll()` keys off all eight voices. Passing `AUDIO_VOICE_AUTO`
 as the voice gives the round-robin choice.
 
+To stop several voices at once, give `audioStopVoices()` a mask, one bit
+per voice number: it is one command to the sound CPU, where a loop of
+`audioStopVoice()` sends one per voice and waits for each to be taken
+before the next. The driver holds each key-off about 2 scanlines (the
+S-DSP reads KOFF only every other sample, 64 of the sound CPU's cycles, and
+a KOFF cleared before that read can leave the voice playing: fullsnes,
+KON/KOFF notes; anomie's S-DSP doc; the driver holds it 132), so on a frame
+that stops four voices:
+
+```c
+audioStopVoices((1 << 0) | (1 << 1) | (1 << 2) | (1 << 3));   /* voices 0-3 */
+```
+
+Measured on luna up to the end of a state read that follows: the read alone
+7 scanlines, four voices by one `audioStopVoices()` then the read 11, by
+four `audioStopVoice()` then the read 25. A mask of 0 sends nothing.
+
 ### Volume and pitch
 
 ```c
@@ -236,8 +253,8 @@ pitch you send is the note you hear. One update costs 3 scanlines at most
 **Stop, then play, on the same voice in one frame.** `audioStopVoice(v)`
 followed at once by `audioPlaySampleOn(v, …)` is accepted: the voice takes the
 new sample, pitch and volume, and sounds from the next sample period (the
-example checks the DSP registers one frame later). The pair costs 18
-scanlines at most (about 24 000 master cycles), most of it the play command.
+example checks the DSP registers one frame later). The pair costs 12
+scanlines at most (about 16 400 master cycles), most of it the play command.
 This is the rule "the last sound to arrive cuts the one in progress".
 
 **A sample sent in pieces.** `audioLoadSampleBegin()` then
@@ -315,8 +332,18 @@ goes: unload them first.
 | Call | Returns |
 |---|---|
 | `audioIsReady()` | 1 once `audioInit()` has started the driver; 0 if the driver did not answer |
+| `audioCommandDone()` | 1 when the driver has taken the last command (or none is pending), 0 while it has not; never waits, so a game that spreads its commands over frames, from its loop or an `nmiSetLag()` callback, sends on a 1 and never blocks |
 | `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
 | `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
+
+**From an `nmiSetLag()` callback.** When the main loop is too slow to send
+the music on time, the callback of lag frames can be the one place that sends
+(the main thread then calls no `audio*()`: two senders corrupt the
+handshake). The note start, volume, pitch, envelope, pan, stop and echo on/off
+calls are safe there, and so is `audioCommandDone()`; the calls that wait for
+a reply or stream bytes (`audioInit()`, the sample loaders,
+`audioGetVoiceState()`, `audioSetEcho()`) are not. The full list is in
+`audio.h`.
 
 There is no per-frame audio call: the
 engine sends each command as you call it, nothing is deferred.

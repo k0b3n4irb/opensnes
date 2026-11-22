@@ -56,11 +56,11 @@ the Linux legs before publishing.
 - **DSP-1 firmware** (`dsp1b.rom`) is copyrighted and never committed.
   With it in `~/.config/luna/firmware/`, the DSP-1 examples and fixture
   run; without it (CI) they are skipped, not failed.
-- **The SNES reference corpus** (the `cartouche` MCP server, "rag-partner")
+- **The SNES reference corpus** (the reference-corpus MCP server, "rag-partner")
   arbitrates hardware claims (`.claude/rules/hardware_claims.md`). It is
   run outside this repository; building and testing do not need it, but
   writing a new hardware claim in the docs does. What it holds and the
-  queries that check it: `.claude/notes/tech/cartouche_corpus.md`.
+  queries that check it: `.claude/notes/tech/reference_corpus.md`.
 - **Exchanges with luna and rag-partner** are in the repository
   (`.claude/notes/partners/`): read the open lists before a luna bump.
 

@@ -8,7 +8,7 @@ Expert : conception de SDK rétro et expérience développeur (05) · date : 202
 - Exercice réel : `make release RELEASE_DIR=<scratch>` (zip 30,6 Mo, 13 s), extraction dans un dossier neuf, puis **uniquement** GETTING_STARTED chemin A : `doctor`, `init --template game`, `build`, `test`, `run`, `budget`, `upgrade` ; ajout d'un second sprite 16×16 (PNG + `.toml`) ; puis le chemin « Manual setup ». Luna copié depuis le worktree (pas de réseau) au lieu de `scripts/install-luna.sh`.
 - Captures luna (`luna state --screenshot`) au repos et pad maintenu (`--input "30:0x900,200:0"`) : le sprite bouge ; second sprite affiché.
 - Diagnostics : erreurs volontaires (faute de frappe, module oublié, struct par valeur, variadique, en-têtes standard) avec et sans la passe clang.
-- Corpus cartouche : une vérification (taille OBJ / table de caractères 16×16), chunk ids cités en 05-9.
+- Reference corpus : une vérification (taille OBJ / table de caractères 16×16), chunk ids cités en 05-9.
 
 ## Points forts
 

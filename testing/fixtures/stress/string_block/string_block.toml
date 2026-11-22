@@ -1,0 +1,17 @@
+# memcpy, memmove and memset against a byte loop written in the test, across
+# plain RAM, FAR RAM, bank $7F and a ROM table, every length 0..40 and the
+# long ones, both parities, guards around each destination, the return value
+# and the data bank register on return (main.c). r_bad must be 0; the case
+# counts prove the runs went through.
+rom = "string_block.sfc"
+steps = 60000000
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_bad" = 0
+"r_cpy" = 1680
+"r_set" = 396
+"r_mov" = 1566

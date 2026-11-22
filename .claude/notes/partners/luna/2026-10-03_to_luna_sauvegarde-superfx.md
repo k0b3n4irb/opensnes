@@ -15,7 +15,7 @@ devrait-elle pouvoir sauvegarder ? Oui, et c'est fait.
 - `USE_SRAM=1` avec `USE_SUPERFX=1` n'est plus refusé : l'en-tête déclare
   `$15` à `$FFD6` (`xxd -s 0x7FD6 -l 1 devtools/libtests_gsu/libtest_gsu.sfc`
   rend `15`), `$FFBD` reste la taille de la RAM.
-- Le module `sram` lit et écrit la RAM de la cartouche (`$70:0000-$FFFF`).
+- Le module `sram` lit et écrit la RAM du Game Pak (`$70:0000-$FFFF`).
   Pendant un travail GSU (RAN = 1), il met RAN à 0 le temps du transfert,
   puis remet SCMR.
 

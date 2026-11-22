@@ -467,7 +467,7 @@ graphique ne couvre pas tous les besoins). Ce qui suit remplace les §9.3 et
 | Graphiste | Aseprite, Photoshop/Krita, Tiled ou LDtk | importer **son** fichier sans apprendre les drapeaux, voir tout de suite si une palette ou une taille ne passe pas, itérer en secondes |
 | Musicien / sound designer | OpenMPT, Schism, Furnace ; un DAW pour les samples | importer `.it` et `.wav`, connaître la place qu'il reste dans les 64 Ko de l'APU, entendre le résultat sur l'émulateur de référence |
 | Producteur / QA | un tableau, une console, un flash cart | une ROM finalisée avec un en-tête propre, une liste de ce qui a changé, une campagne de tests rejouable, une preuve console |
-| L'éditeur (Limited Run, Retro-bit, un fabricant de cartouches) | ses contraintes de fabrication | un mapper qu'il sait produire, une taille de ROM standard, la pile de sauvegarde dimensionnée, les crédits de licence des composants embarqués |
+| L'éditeur (Limited Run, Retro-bit, un fabricant de Game Paks) | ses contraintes de fabrication | un mapper qu'il sait produire, une taille de ROM standard, la pile de sauvegarde dimensionnée, les crédits de licence des composants embarqués |
 
 ### 10.2 Les besoins, du premier jour à la mise en boîte
 

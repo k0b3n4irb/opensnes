@@ -10,8 +10,8 @@ added up. The second, @ref measured "measured on luna", runs the same C
 program built by both SDKs and counts the master cycles the machine
 really spent.
 
-On these 34 functions OpenSNES is **about 38 %** faster; measured on 23
-whole workloads, 62 % (below). What made the difference on code that
+On these 34 functions OpenSNES is **about 39 %** faster; measured on 23
+whole workloads, 66 % (below). What made the difference on code that
 indexes an array or follows a pointer was not the pointer width: it was the
 stack frame and stack slots for values PVSnesLib keeps in the direct page,
 and code the optimiser left dead. Both are gone (see "Reading it" at the
@@ -21,7 +21,7 @@ end of this page).
 
 | Metric | Value |
 |--------|-------|
-| **Total cycle reduction** | **−37.5 %** vs PVSnesLib + 816-opt (1238 vs 1981 cycles) |
+| **Total cycle reduction** | **−38.9 %** vs PVSnesLib + 816-opt (1211 vs 1981 cycles) |
 | Functions compared | 34 (`helper` has no standalone body: it is inlined into `call_chain`) |
 | OpenSNES wins | 32 |
 | PVSnesLib+opt wins | 2 (`pea_constant_args`, `mod_const_10`) |
@@ -62,17 +62,17 @@ no page-crossing penalties).
   bitwise_and                 39        32        19    -40.6%
   bitwise_or                  39        32        19    -40.6%
   conditional                 81        65        37    -43.1%
-  loop_sum                   208       185        71    -61.6%
+  loop_sum                   208       185        67    -63.8%
   array_write                 74        65        52    -20.0%
   array_read                  68        60        47    -21.7%
   struct_sum                 111        86        49    -43.0%
-  swap                       158       142        83    -41.5%
+  swap                       158       142        75    -47.2%
   call_add                    56        41         4    -90.2%
   mul_variable                55        48        45     -6.2%
   clamp                      142       124        60    -51.6%
   signed_shift_right_8        38        31        28     -9.7%
   signed_shift_right_1        28        25        19    -24.0%
-  byte_store_loop            212       192        93    -51.6%
+  byte_store_loop            212       192        89    -53.6%
   global_increment            49        43        21    -51.2%
   zero_store_global           23        19        14    -26.3%
   compare_and_branch         136       129        49    -62.0%
@@ -83,9 +83,9 @@ no page-crossing penalties).
   mul_const_20                45        42        32    -23.8%
   mul_const_40                45        42        34    -19.0%
   mul_const_96                45        42        36    -14.3%
-  array2d_read               131       112        86    -23.2%
+  array2d_read               131       112        75    -33.0%
   ────────────────────  ────────  ────────  ────────  ────────
-  TOTAL                     2284      1981      1238    -37.5%
+  TOTAL                     2284      1981      1211    -38.9%
 ```
 
 ## Analysis
@@ -126,9 +126,23 @@ takes what that one declines: a `static` function with exactly one call
 site in its file, whose address is not used, is inlined with its control
 flow and not emitted (no keyword needed: the code exists once either way);
 a `static inline` function called from several places is copied at each, up
-to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function, unless it
-is tiny, stays a function when its caller still calls something else:
-apart, it keeps the direct-page frame that makes it fast.
+to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function is inlined
+even when its caller still calls something else (the rule that kept it apart
+is off by default; `CC_INLINE_LEAF_MAX=N` turns it back on for leaves larger
+than N IR instructions, to measure). In such a caller the leaf's temporaries
+that cross a call live on the stack, so a long hot loop can run faster as a
+function of its own: mark it `__attribute__((noinline))` and measure.
+Measured (2026-11-21, luna, a `static` ray-walking loop of about 25 IR
+instructions with one caller that also calls two other functions, 1,024 rays;
+`CC_INLINE_LEAF_MAX=16` against the default): keeping the leaf apart costs a
+fixed ~410 master cycles a call (the call, its four arguments, the direct-page
+frame) and saves ~18 a loop iteration, so it pays from about 23 iterations a
+call: rays of 2, 5 and 12 cases run 14 %, 9 % and 4.5 % slower apart, rays of
+40 run 0.5 % faster. That is why the default stays off: the loops of a game's
+inner code are short more often than long. For a loop known to run long, the
+explicit `noinline` is the tool. A function
+marked `__attribute__((noinline))` (or `[[gnu::noinline]]`) is never
+inlined, by either inliner.
 `QBE_NO_AUTO_INLINE=1` turns the second inliner off, to measure.
 
 (†) `helper` appears as 0 cycles because its standalone is suppressed
@@ -194,31 +208,31 @@ while it runs (bytes below the initial stack pointer).
 <!-- sdkbench:begin -->
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `sieve` | sieve of 1024 in a byte array | 4,198,808 | 1,137,496 | -72.9 % | 296 | 107 | -63.9 % | 31 | 23 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 792,608 | -69.8 % | 507 | 231 | -54.4 % | 43 | 36 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,454 | 2,244,260 | -77.6 % | 1174 | 400 | -65.9 % | 60 | 41 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,762 | 4,987,442 | -63.9 % | 983 | 401 | -59.2 % | 74 | 41 |
-| `mul` | 2304 multiplies of two variables | 6,389,950 | 3,343,258 | -47.7 % | 188 | 91 | -51.6 % | 34 | 29 |
-| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,787,672 | 2,243,748 | -74.5 % | 154 | 73 | -52.6 % | 34 | 28 |
-| `long` | 300 steps of a 32-bit generator and hash | 5,944,006 | 2,385,376 | -59.9 % | 594 | 289 | -51.3 % | 76 | 33 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,558 | 3,158,196 | -59.8 % | 605 | 307 | -49.3 % | 41 | 23 |
-| `calls` | recursive `fib(17)` | 5,041,974 | 2,562,518 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,292 | 911,922 | -66.2 % | 523 | 284 | -45.7 % | 34 | 23 |
-| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,124 | 1,343,372 | -51.2 % | 233 | 108 | -53.6 % | 34 | 23 |
-| `list` | a 64-node linked list walked 40 times | 2,858,638 | 1,296,160 | -54.7 % | 402 | 267 | -33.6 % | 37 | 23 |
-| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,926 | 813,578 | -72.1 % | 397 | 181 | -54.4 % | 33 | 23 |
-| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,636 | 2,001,106 | -62.0 % | 694 | 440 | -36.6 % | 39 | 44 |
-| `entities` | the 32 entities again, through a pointer | 8,851,278 | 2,996,408 | -66.1 % | 1098 | 489 | -55.5 % | 62 | 41 |
-| `copy` | word and byte copies as index loops | 4,485,180 | 981,098 | -78.1 % | 709 | 302 | -57.4 % | 34 | 29 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,148 | 1,518,776 | -50.7 % | 1156 | 743 | -35.7 % | 48 | 44 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,138 | 945,308 | -48.4 % | 392 | 270 | -31.1 % | 42 | 29 |
-| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,371,286 | 4,828,896 | -66.4 % | 831 | 337 | -59.4 % | 52 | 28 |
-| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,805,026 | 7,132,054 | -74.3 % | 1018 | 448 | -56.0 % | 61 | 28 |
-| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,799,876 | 11,839,932 | -68.7 % | 7722 | 3154 | -59.2 % | 93 | 52 |
-| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,922 | 4,497,130 | -60.4 % | 888 | 401 | -54.8 % | 94 | 35 |
-| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,396,874 | 55,167,950 | -59.0 % | 5132 | 2915 | -43.2 % | 84 | 63 |
-| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 57,584,566 | ours only | — | 3150 | | — | 62 |
-| **Total** | | **325,169,900** | **119,128,592** | **-63.4 %** | **25801** | **12295** | **-52.3 %** | | |
+| `sieve` | sieve of 1024 in a byte array | 4,198,808 | 1,018,282 | -75.7 % | 296 | 99 | -66.6 % | 31 | 23 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 773,362 | -70.5 % | 507 | 209 | -58.8 % | 43 | 36 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,454 | 2,101,480 | -79.1 % | 1174 | 386 | -67.1 % | 60 | 41 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,762 | 4,651,170 | -66.3 % | 983 | 398 | -59.5 % | 74 | 41 |
+| `mul` | 2304 multiplies of two variables | 6,389,950 | 3,343,814 | -47.7 % | 188 | 91 | -51.6 % | 34 | 29 |
+| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,787,672 | 2,243,750 | -74.5 % | 154 | 73 | -52.6 % | 34 | 28 |
+| `long` | 300 steps of a 32-bit generator and hash | 5,944,006 | 2,400,672 | -59.6 % | 594 | 285 | -52.0 % | 76 | 33 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,558 | 2,055,930 | -73.9 % | 605 | 222 | -63.3 % | 41 | 23 |
+| `calls` | recursive `fib(17)` | 5,041,974 | 2,563,038 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,292 | 660,538 | -75.5 % | 523 | 230 | -56.0 % | 34 | 23 |
+| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,124 | 1,254,716 | -54.4 % | 233 | 105 | -54.9 % | 34 | 23 |
+| `list` | a 64-node linked list walked 40 times | 2,858,638 | 1,296,642 | -54.6 % | 402 | 267 | -33.6 % | 37 | 23 |
+| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,926 | 715,970 | -75.5 % | 397 | 170 | -57.2 % | 33 | 23 |
+| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,636 | 1,935,404 | -63.2 % | 694 | 421 | -39.3 % | 39 | 44 |
+| `entities` | the 32 entities again, through a pointer | 8,851,278 | 2,992,378 | -66.2 % | 1098 | 484 | -55.9 % | 62 | 41 |
+| `copy` | word and byte copies as index loops | 4,485,180 | 923,184 | -79.4 % | 709 | 280 | -60.5 % | 34 | 29 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,148 | 1,314,002 | -57.4 % | 1156 | 652 | -43.6 % | 48 | 41 |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,138 | 926,040 | -49.4 % | 392 | 268 | -31.6 % | 42 | 29 |
+| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,371,286 | 4,386,948 | -69.5 % | 831 | 324 | -61.0 % | 52 | 23 |
+| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,805,026 | 6,668,708 | -76.0 % | 1018 | 434 | -57.4 % | 61 | 23 |
+| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,799,876 | 11,307,716 | -70.1 % | 7722 | 3047 | -60.5 % | 93 | 59 |
+| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,922 | 4,531,506 | -60.1 % | 888 | 397 | -55.3 % | 94 | 35 |
+| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,396,874 | 49,161,026 | -63.4 % | 5132 | 2681 | -47.8 % | 84 | 63 |
+| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 55,541,164 | ours only | — | 2929 | | — | 62 |
+| **Total** | | **325,169,900** | **109,226,276** | **-66.4 %** | **25801** | **11580** | **-55.1 %** | | |
 
 Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
 
@@ -250,7 +264,7 @@ either SDK's boot or per-frame handler in it.
   them.
 - **The stack is level or shallower on 22 workloads of 23.** `grid` is the
   exception (44 bytes against 39): a single large function whose
-  temporaries do not fit the 16 words of the direct-page block.
+  temporaries do not fit the 20 words of the direct-page block.
 
 What is left has named causes — a stack frame in every function that
 calls another, X reloaded after every instruction that is not an access,

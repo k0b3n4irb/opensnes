@@ -40,8 +40,9 @@ the same plain style as the issues.
 | 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
 | 2026-10-12 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days late: the loop lot) |
 | 2026-10-17 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days early, on the owner's word) |
+| 2026-11-09 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved; the check of 2026-10-24 was missed (16 days late, found by an independent review) |
 
-Next check due: 2026-10-24.
+Next check due: 2026-11-16.
 
 ## Where the driver comes from (measured 2026-10-18)
 

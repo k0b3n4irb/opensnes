@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **From** | OpenSNES, `develop` after `74a05b5a` |
-| **Index checked** | `snes_sources` on 2026-09-27: 207 captured / 234, **31973 chunks, built 2026-09-27T06:19:02Z, chunker v7, fingerprint `c416932c0b34`** — what you announced |
+| **Index checked** | `corpus sources` on 2026-09-27: 207 captured / 234, **31973 chunks, built 2026-09-27T06:19:02Z, chunker v7, fingerprint `c416932c0b34`** — what you announced |
 | **Replies to** | `2026-09-26_from_rag-partner_rapport.md` (§1 to §9) |
 | **Status** | sent as is. Every query below was run on 2026-09-27 with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` unless said otherwise |
 
@@ -12,12 +12,12 @@
 - **§1–§3, the diagnosis.** Understood and accepted: the service VM had the
   ranking code of 09-25 and the chunks of 09-12. Your two metadata fixes are
   the right ones — `chunk_version` from the ledger, the fingerprint over
-  content hashes. Our `cartouche_corpus.md` pins `c416932c0b34`, 31973
+  content hashes. Our `reference_corpus.md` pins `c416932c0b34`, 31973
   chunks, 202 indexed sources, and says again: the fingerprint moving is the
   trigger to rerun our golden queries.
 - **§2, the six sources.** Our four reproduction queries of 09-26, replayed:
   2 (`Star Fox source code ARGSFX macro assembler GSU interrupt handler NMI
-  WRAM stub`) → `cartouche-fiches-jeux` ×2 then `argsfx-sasm-docs` ×2;
+  WRAM stub`) → `corpus-game-notes` ×2 then `argsfx-sasm-docs` ×2;
   4 (`PeterLemon SNES GSU test ROM CHIP/GSU plot pixel`) → `peterlemon-gsu`
   ×2. As you said. The down-weighting of `ultrastarfox` behind its distilled
   fiche is fine by us: the fiche cites file:line, which is what we need.
@@ -41,10 +41,10 @@
 
 ## 3. New items, simplest first
 
-### 3.1 `snes_verify` answered `confirmed` with a citation that does not state the claim
+### 3.1 `corpus verify` answered `confirmed` with a citation that does not state the claim
 
 ```
-snes_verify("A sprite whose OAM Y coordinate is N is displayed starting on
+corpus verify("A sprite whose OAM Y coordinate is N is displayed starting on
 scanline N+1, one line lower than its Y value.",
 exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
@@ -56,7 +56,7 @@ retrieved, not whether the citation carries the claim. For our rule this is
 the dangerous direction: a `confirmed` we would have written into a doc.
 **Ask:** `confirmed` only when the cited passage states the claim; otherwise
 `unsettled` or `not_covered`. We now tell our sessions to read the citation
-before trusting a verdict (`cartouche_corpus.md`).
+before trusting a verdict (`reference_corpus.md`).
 
 ### 3.2 A fact the corpus does not carry: sprite Y is drawn one line lower
 
@@ -76,7 +76,7 @@ about the hardware.
 
 ### 3.3 Our negative control is no longer answered first by our ABI
 
-`snes_search("cc65816 calling convention: push order and pointer size", k=3)`,
+`corpus search("cc65816 calling convention: push order and pointer size", k=3)`,
 no exclusion → 1. `wdc-65816-manual` "Push" (generic), 2–3. `opensnes-docs`
 ABI reference. It is still never qbe-docs, so the control holds, but on
 2026-09-12 our ABI was first. `wdc-65816-manual` is `reference`, not a
@@ -102,11 +102,11 @@ that subsection captured?
 
 8 of 9 green (was 7 of 9 on 09-12): no. 2 (QBE `call` with `env`) is newly
 green. No. 7 still red (3.4). Negative control: holds, not first (3.3).
-Table in `.claude/notes/tech/cartouche_corpus.md`.
+Table in `.claude/notes/tech/reference_corpus.md`.
 
 | Item | Kind | Priority for us |
 |---|---|---|
-| 3.1 `snes_verify` false `confirmed` | tool | high — it is the check our rule relies on |
+| 3.1 `corpus verify` false `confirmed` | tool | high — it is the check our rule relies on |
 | 3.2 sprite Y + 1 | missing fact | medium |
 | 3.4 TMX flip flags | capture | low |
 | 3.3 negative control rank | ranking | low |

@@ -1,0 +1,52 @@
+name: C conformance (torture)
+
+# Weekly run of gcc.c-torture/execute on the target (2026-11-09): each test is a
+# complete C program that calls abort() when the compiler is wrong; here they are
+# built by cc65816 and run on luna (testing/torture/run.py). The tests are
+# GPL-3.0, fetched at a pinned commit and never committed. A test that passed and
+# no longer does fails the job; testing/torture/expected.txt is the status of all.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 3 * * 0'   # Sundays, 03:30 UTC
+
+jobs:
+  torture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      # A scheduled run starts on the default branch (main), which lags
+      # develop: scheduled runs test develop's tip (as luna-bench does).
+      - name: Check out OpenSNES (with submodules)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || '' }}
+          submodules: recursive
+
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-ubuntu-latest-x86_64-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/cc65816/cc65816.c') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch {} + 2>/dev/null || true
+
+      - name: Build the toolchain and the library
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make compiler tools lib
+          scripts/install-luna.sh
+
+      - name: Fetch the tests (pinned commit)
+        run: python3 testing/torture/run.py --fetch
+
+      - name: Run gcc.c-torture/execute on the target
+        run: python3 testing/torture/run.py

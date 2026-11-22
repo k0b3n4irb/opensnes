@@ -1,0 +1,63 @@
+function $k_path_c() {
+@start.650
+@body.651
+	%.5 =w loadsw $pa_hi
+	%.6 =w shl %.5, 16
+	%.10 =w loadsw $pa_lo
+	%.11 =w or %.6, %.10
+	%.16 =w loadsw $pa_hi+2
+	%.17 =w shl %.16, 16
+	%.21 =w loadsw $pa_lo+2
+	%.22 =w or %.17, %.21
+	%.27 =w loadsw $pa_hi+4
+	%.28 =w shl %.27, 16
+	%.32 =w loadsw $pa_lo+4
+	%.33 =w or %.28, %.32
+	%.38 =w loadsw $pa_hi+6
+	%.39 =w shl %.38, 16
+	%.43 =w loadsw $pa_lo+6
+	%.44 =w or %.39, %.43
+	%.46 =w loadsw $pa_idx
+	%.48 =w loadsw $pa_step
+@for_cond.652
+	%.49.595 =w phi @body.651 0, @for_cont.654 %.77
+	%.45.596 =w phi @body.651 %.46, @for_cont.654 %.61
+	%.34.597 =w phi @body.651 %.44, @for_cont.654 %.75
+	%.23.598 =w phi @body.651 %.33, @for_cont.654 %.71
+	%.12.599 =w phi @body.651 %.22, @for_cont.654 %.67
+	%.1.600 =w phi @body.651 %.11, @for_cont.654 %.64
+	%.51 =w cultw %.49.595, 64
+	jnz %.51, @for_body.653, @for_join.655
+@for_body.653
+	%.54 =l extuh %.45.596
+	%.55 =l mul %.54, 2
+	%.56 =l add %.55, $path_sin
+	%.57 =w volat loadsw %.56
+@for_cont.654
+	%.77 =w add %.49.595, 1
+	%.60 =w add %.48, %.45.596
+	%.61 =w and %.60, 63
+	%.64 =w add %.57, %.1.600
+	%.67 =w sub %.12.599, %.57
+	%.70 =w mul %.57, 2
+	%.71 =w add %.70, %.23.598
+	%.74 =w sar %.57, 1
+	%.75 =w add %.74, %.34.597
+	jmp @for_cond.652
+@for_join.655
+	%.79 =w shr %.1.600, 16
+	storew %.79, $pa_hi
+	storew %.1.600, $pa_lo
+	%.88 =w shr %.12.599, 16
+	storew %.88, $pa_hi+2
+	storew %.12.599, $pa_lo+2
+	%.97 =w shr %.23.598, 16
+	storew %.97, $pa_hi+4
+	storew %.23.598, $pa_lo+4
+	%.106 =w shr %.34.597, 16
+	storew %.106, $pa_hi+6
+	storew %.34.597, $pa_lo+6
+	storew %.45.596, $pa_idx
+	ret0
+}
+

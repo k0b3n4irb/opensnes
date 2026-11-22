@@ -30,6 +30,11 @@ out of range) is thrown away and another is drawn.
     python3 testing/difftest_stmt.py --seeds 7 --keep   # keep build/difftest/stmt_7
     python3 testing/difftest_stmt.py --cc /tmp/old/cc65816
 
+Each seed builds two ROMs: its first batch (`stmt_<seed>`, the programs it
+always gave) and its G1 batch (`stmti_<seed>`, another random stream whose
+programs also carry loops and widenings shaped like the G1 campaign's sites,
+see "the G1 idioms' shapes" below); `--batch` runs one of them.
+
 A failing program is reduced: statements are removed one at a time for as
 long as the result still differs, and what is left is printed.
 
@@ -44,8 +49,10 @@ import copy
 import json
 import os
 import random
+import re
 import shutil
 import subprocess
+import threading
 import sys
 from pathlib import Path
 
@@ -168,6 +175,18 @@ PINNED = [
      "pin_far[i + 8] = (pin_far[i + 8] & m) | q[2]; } "
      "for (n = 0; n < 16; n++) h = h * 31 + pin_far[n]; return h; }",
      "p15()", 0x0A8E68AE),
+    # two statics copied into a loop (the size rule), the second's return a
+    # 16-bit compare that the optimizer leaves as the operand of the 32-bit
+    # xor: the dead-store rule for a commutative operand took its slot, the
+    # pair path read it, and the build stopped (seed 9922, I1 S4, 2026-11-14)
+    ("a 16-bit compare xored into a 32-bit accumulator, from copies",
+     "static inline s32 p16c(u16 x0, u32 x1) { return !x0 ? (s32)1L : (x1 >= 1024L); } "
+     "static inline s8 p16s(u8 x) { switch (x & 7) { case 0: return x <= x; case 1: return ~x; "
+     "case 2: return ~x; case 3: return x && (s8)127; case 4: return x; case 5: return x && (s8)85; "
+     "case 6: return 1877980014UL; default: return x ^ 0L; } } "
+     "u32 p16(void) { s8 v2 = 85; u32 u = 3; u16 i; "
+     "for (i = 2; i > 0; i--) u ^= p16c(p16s((s8)-128), 32768U >= v2); return u; }",
+     "p16()", 3),
 ]
 
 PROGS_PER_ROM = 10
@@ -218,6 +237,8 @@ class Prog:
         self.fptab = None     # (rtype, [(name, type)], [expr, expr]): two functions behind a table
         self.far = set()      # arrays declared FAR (bank $7E, far codegen)
         self.ctabs = {}       # name -> (type, stride, rows, [values]): const tables walked by a pointer
+        self.hidden = set()   # G1 shapes: variables no random statement reads or writes
+        self.scoped = set()   # G1 shapes: counters declared in a block, outside the checksum
         self.nlabel = 0
         self.ctx = []         # generator only: 'loop' / 'switch' nesting
         self.body = []
@@ -463,7 +484,7 @@ def gen_lvalue(rng, P, addressable=False):
     """addressable: something `&` may be applied to (not a bit-field)."""
     pick = rng.random()
     if pick < 0.36:
-        return ("v", rng.choice([n for n in P.vars if n not in P.counters]))
+        return ("v", rng.choice([n for n in P.vars if n not in P.counters and n not in P.hidden]))
     if pick < 0.44 and P.mats:
         return ("m", rng.choice(list(P.mats)), masked(gen_expr(rng, P, 1), 2), masked(gen_expr(rng, P, 1), 4))
     if pick < 0.52 and P.bits and not addressable:
@@ -497,7 +518,7 @@ def gen_expr(rng, P, depth):
             return konst(t, D.interesting(rng, t))
         if pick < 0.45 and P.counters:
             return ("v", rng.choice(P.counters))
-        return gen_lvalue(rng, P) if depth else ("v", rng.choice(list(P.vars)))
+        return gen_lvalue(rng, P) if depth else ("v", rng.choice([n for n in P.vars if n not in P.hidden]))
     k = rng.random()
     if k < 0.03 and P.fptab:
         return ("fcall", masked(gen_expr(rng, P, depth - 1), 2),
@@ -627,13 +648,52 @@ def gen_stmt(rng, P, depth):
         return ("gskip", gen_expr(rng, P, 2), body, P.nlabel)
     if depth > 0 and pick < 0.39:
         labels = rng.sample(range(8), rng.randint(2, 4))
+        sel = masked(gen_expr(rng, P, 2), 8)
+        if rng.random() < 0.6:
+            # L2 (2026-11-12): switches the back end may turn into a jump
+            # table — 4 to 12 cases, dense or with holes or sparse, from 0, a
+            # positive or a negative first case, on a value of 16 or 32 bits,
+            # signed or unsigned, or on a byte — and some it must not
+            n = rng.randint(2, 12)
+            shape = rng.random()
+            if shape < 0.15:
+                # a byte variable as it is: unsigned char promoted to int
+                cands = [v for v, t in P.vars.items() if t in ("u8", "s8") and v not in P.hidden]
+                if cands:
+                    var = rng.choice(cands)
+                    lo = 0 if P.vars[var] == "u8" else -6
+                    labels = rng.sample(range(lo, lo + n + 4), n)
+                    sel = ("v", var)
+                else:
+                    labels = rng.sample(range(n + 2), n)
+                    sel = masked(gen_expr(rng, P, 2), 16)
+            else:
+                first = rng.choice([0, 0, rng.randint(1, 40), -rng.randint(1, 12), 1000])
+                stride = rng.choice([1, 1, 1, 2, 3]) if shape < 0.85 else 0
+                if stride:
+                    span = stride * (n + 2)
+                    pool = list(range(first - stride, first + span, stride))
+                else:
+                    span = 300                          # sparse: the tree stays
+                    pool = list(range(first, first + span))
+                labels = rng.sample(pool, min(n, len(pool)))
+                width = 16 if span <= 16 else 64 if span <= 64 else 512
+                # (e & (width - 1)) + base reaches the labels and around them
+                base = first - rng.randint(0, 2) * max(stride, 1)
+                sel = ("b", "+", masked(gen_expr(rng, P, 2), width), konst("s16", base))
+                if base >= 0 and rng.random() < 0.5:
+                    sel = masked(gen_expr(rng, P, 2), width)
+                    labels = [lab - base for lab in labels]
         P.ctx.append("switch")
-        arms = [[lab, gen_block(rng, P, depth - 1, rng.randint(1, 2)), rng.random() < 0.3]
+        # an arm of a large switch is one statement: ten programs inlined
+        # into main must stay under the backend's 2048 temporaries
+        arms = [[lab, gen_block(rng, P, depth - 1 if len(labels) <= 4 else 0,
+                                rng.randint(1, 2 if len(labels) <= 4 else 1)), rng.random() < 0.3]
                 for lab in labels]
         if rng.random() < 0.7:               # a default arm, anywhere
             arms.insert(rng.randint(0, len(arms)), [None, gen_block(rng, P, depth - 1, 1), rng.random() < 0.3])
         P.ctx.pop()
-        return ("sw", masked(gen_expr(rng, P, 2), 8), arms)
+        return ("sw", sel, arms)
     if pick < 0.42 and P.ctx and P.ctx[-1] == "loop":
         return (rng.choice(["brk", "cont"]), gen_expr(rng, P, 2))
     if pick < 0.46:
@@ -647,7 +707,8 @@ def gen_stmt(rng, P, depth):
         else:
             return ("pp", ty(cands[0], P), cands[0], gen_expr(rng, P, 2))
     if pick < 0.50:
-        acc = rng.choice([n for n, t in P.vars.items() if t in UNSIGNED and n not in P.counters])
+        acc = rng.choice([n for n, t in P.vars.items() if t in UNSIGNED and n not in P.counters
+                          and n not in P.hidden])
         if P.ctabs and rng.random() < 0.5:
             # a pointer walking a const table by `stride` elements, several
             # fields read a row, one array element masked and merged
@@ -671,7 +732,9 @@ def gen_stmt(rng, P, depth):
     return ("set", lv, gen_expr(rng, P, rng.choice([1, 2, 2, 3])))
 
 
-def gen_prog(rng) -> Prog:
+def gen_prog(rng, idioms: bool = False) -> Prog:
+    """idioms: a program of the G1 batch (gen_idiom); without it the random
+    stream, and so every program of a seed, is the one it always was."""
     P = Prog()
     for n in range(rng.randint(3, 5)):
         P.vars[f"v{n}"] = rng.choice(TYPES)
@@ -718,9 +781,200 @@ def gen_prog(rng) -> Prog:
         P.fpscope = Prog()
         P.fpscope.vars = dict(params)
         P.fptab = (rng.choice(TYPES), params, [gen_expr(rng, P.fpscope, 2) for _ in range(2)])
+    if idioms:
+        t = rng.choice(["s16", "u16"])             # 2*v is the index of a 16-bit table
+        P.arrays["ai"] = (t, [D.interesting(rng, t) for _ in range(rng.choice([4, 8]))])
+        if rng.random() < 0.5:
+            P.far.add("ai")
     gen_helpers(rng, P)
-    P.body = gen_block(rng, P, 2, rng.randint(3, 6))
+    if not idioms:
+        P.body = gen_block(rng, P, 2, rng.randint(3, 6))
+        return P
+    P.body = gen_block(rng, P, 2, rng.randint(1, 3))
+    for k in range(rng.randint(2, 4)):
+        stmts = gen_idiom(rng, P, str(k))
+        pos = rng.randint(0, len(P.body))
+        P.body[pos:pos] = stmts
     return P
+
+
+# ------------------------------------------------- the G1 idioms' shapes --
+# The second batch of a seed (`stmti_<seed>`) draws its programs from another
+# random stream and adds to each two to four statements shaped for the IR
+# idioms of the G1 campaign (retired 2026-11-21, the shapes are kept), every one written
+# with the statement kinds above, so the interpreter computes them as it
+# computes the rest:
+#   I1  s16 w = E; acc ^= (u32)(s32)w; acc += (u32)(s32)(w >> K), and the
+#       chain w2 = w >> a; (s32)w2; (s32)(w2 >> b); the shifted extension in
+#       a loop or an `if` the plain one dominates
+#   I2  ix = entry; loop { acc op= ai[ix]; ...; ix = (ix +- step) & (n - 1); }
+#       with ai a table of 16-bit elements, ix read nowhere else in the loop,
+#       the step a constant or a variable set before the loop, the entry a
+#       constant, a masked value, or any 16-bit value when the loop never runs
+#   I3  for (c = I; c OP B; c += S) with I, B, S constants: 0 to 48 trips,
+#       counted up or down, signed or not, across $FFFF or 0, nested
+#   I4  the same with a counter declared in a block of its own, read by
+#       nothing but its test and its step (so it stays out of the checksum)
+# A variable of these shapes is `hidden`: no random statement reads or
+# writes it, so the shape holds after any statement is drawn around it.
+
+def hvar(P, name, t, init=0, scoped=False):
+    P.vars[name] = t
+    P.init[name] = init
+    P.hidden.add(name)
+    if scoped:
+        P.scoped.add(name)
+
+
+def h_trips(ct, init, op, bound, sop, step, limit=48):
+    """How many times `for (c = init; c op bound; c sop= step)` runs its
+    body, or None when it would pass `limit` or meet undefined behaviour."""
+    v = D.wrap(init, ct)
+    for t in range(limit + 1):
+        if not D.binary(op, leaf(ct, v), leaf(ct, D.wrap(bound, ct))).value:
+            return t
+        a, b = leaf(ct, v), leaf("s16", step)
+        try:
+            n = checked(D.binary(sop, a, b), a, b)
+        except UB:
+            return None
+        v = D.wrap(n.value, ct)
+    return None
+
+
+def h_loop(rng, ct, scoped):
+    """The head of a loop of constant trip count: ((init, op, bound, sop,
+    step, short, scoped), trips)."""
+    signed = ct == "s16"
+    while True:
+        init = rng.choice([0, 0, rng.randint(1, 20), D.interesting(rng, ct),
+                           -rng.randint(1, 12) if signed else 0x10000 - rng.randint(1, 16)])
+        init = D.wrap(init, ct)
+        step = rng.choice([1, 1, 1, 2, 3, 5, 7])
+        sop = rng.choice("+-")
+        want = rng.choice([0, 1, 1, 2, 3, rng.randint(4, 20), rng.randint(20, 48)])
+        end = init + (want * step if sop == "+" else -want * step)
+        if rng.random() < 0.15:
+            op = rng.choice(["<", "<=", ">", ">=", "!="])
+        elif rng.random() < 0.25:
+            op = "!="
+        else:
+            op = rng.choice(["<", "<="] if sop == "+" else [">", ">="])
+        jit = rng.randrange(step) if rng.random() < 0.3 else 0
+        bound = D.wrap({"!=": end, "<": end - jit, "<=": end - 1 - jit,
+                        ">": end + jit, ">=": end + 1 + jit}[op], ct)
+        trips = h_trips(ct, init, op, bound, sop, step)
+        if trips is not None:
+            return (init, op, bound, sop, step, rng.random() < 0.5, scoped), trips
+
+
+def mix_stmt(rng, xa):
+    """xa = xa * 3 + K: what a loop leaves depends on how many times it ran."""
+    return ("set", ("v", xa), ("b", "+", ("b", "*", ("v", xa), konst("u32", 3)),
+                               konst("u32", rng.getrandbits(16) | 1)))
+
+
+def ext32(e):
+    return ("c", "u32", ("c", "s32", e))
+
+
+def idiom_loop(rng, P, k, extra=(), nest=True, counter_read=None):
+    """I3 / I4: a loop of constant trip count. Returns (statement, trips)."""
+    ct = rng.choice(["u16", "s16"])
+    c = f"ic{k}"
+    scoped = rng.random() < 0.6
+    hvar(P, c, ct, 0, scoped)
+    xa = f"ia{k}"
+    hvar(P, xa, "u32", D.interesting(rng, "u32"))
+    head, trips = h_loop(rng, ct, scoped)
+    readable = rng.random() < 0.35 if counter_read is None else counter_read
+    if readable:
+        P.counters.append(c)
+    P.ctx.append("loop")
+    body = [mix_stmt(rng, xa)] + list(extra)
+    if readable:
+        body.append(("op", "^", ("v", xa), ext32(("v", c))))
+    body += gen_block(rng, P, 1, rng.randint(0, 2))
+    rng.shuffle(body)
+    P.ctx.pop()
+    if readable:
+        P.counters.remove(c)
+    if nest and rng.random() < 0.25:
+        body.insert(rng.randint(0, len(body)), idiom_loop(rng, P, k + "n", nest=False)[0])
+    return ("for", "H", c, head, body), trips
+
+
+def idiom_i1(rng, P, k):
+    w = f"iw{k}"
+    hvar(P, w, "s16", D.interesting(rng, "s16"))
+    xa = f"ia{k}"
+    hvar(P, xa, "u32", D.interesting(rng, "u32"))
+    out = [("set", ("v", w), gen_expr(rng, P, 2)),
+           ("op", rng.choice("^+"), ("v", xa), ext32(("v", w)))]
+    shifted = [("op", rng.choice("^+-"), ("v", xa), ext32(("b", ">>", ("v", w), konst("s16", K))))
+               for K in rng.sample(range(1, 16), rng.randint(1, 2))]
+    shape = rng.random()
+    if shape < 0.3:                                 # a chain: (w >> a) >> b
+        w2 = f"iv{k}"
+        hvar(P, w2, "s16", 0)
+        out += [("set", ("v", w2), ("b", ">>", ("v", w), konst("s16", rng.randint(1, 15)))),
+                ("op", rng.choice("^+-"), ("v", xa), ext32(("v", w2))),
+                ("op", rng.choice("^+-"), ("v", xa),
+                 ext32(("b", ">>", ("v", w2), konst("s16", rng.randint(1, 15)))))]
+        out += shifted[:1]
+    elif shape < 0.55:                              # the plain extension dominates a loop
+        out.append(idiom_loop(rng, P, k + "d", extra=shifted)[0])
+    elif shape < 0.7:                               # ... or an if
+        out.append(("if", gen_expr(rng, P, 2), shifted, []))
+    else:
+        out += shifted
+    return out
+
+
+def idiom_i2(rng, P, k):
+    n = len(P.arrays["ai"][1])
+    ix = f"ix{k}"
+    hvar(P, ix, "u16", 0)
+    xa = f"ia{k}"
+    hvar(P, xa, "u32", D.interesting(rng, "u32"))
+    out = []
+    if rng.random() < 0.3:                          # a step set before the loop
+        sv = f"is{k}"
+        hvar(P, sv, rng.choice(["u16", "s16"]), 0)
+        out.append(("set", ("v", sv), gen_expr(rng, P, 2)))
+        step = ("v", sv)
+    else:
+        step = rng.choice([konst("s16", rng.choice([1, 1, 2, 3, 5, 7, -1, -3, n - 1])),
+                           konst("u16", D.interesting(rng, "u16"))])
+    read = ("op", rng.choice("+^-|"), ("v", xa), (rng.choice("iid"), "ai", ("v", ix)))
+    stepst = ("set", ("v", ix), ("b", "&", ("b", rng.choice("++-"), ("v", ix), step),
+                                 konst("u16", n - 1)))
+    P.ctx.append("loop")
+    body = [read] + gen_block(rng, P, 1, rng.randint(0, 2))
+    if rng.random() < 0.25:
+        body.append(("op", rng.choice("+^"), ("v", xa), ("i", "ai", ("v", ix))))
+    P.ctx.pop()
+    body.append(stepst)
+    loop, trips = idiom_loop(rng, P, k + "c", extra=body, nest=False, counter_read=rng.random() < 0.2)
+    # idiom_loop shuffled the body: put the step back at the end half the time
+    lb = loop[4]
+    if rng.random() < 0.5:
+        lb.remove(stepst)
+        lb.append(stepst)
+    if trips == 0 and rng.random() < 0.7:           # never read: any 16-bit entry (bit 15 too)
+        entry = rng.choice([konst("u16", D.interesting(rng, "u16")), ("c", "u16", gen_expr(rng, P, 2))])
+    else:
+        entry = rng.choice([konst("u16", rng.randrange(n)), masked(gen_expr(rng, P, 2), n)])
+    return [("set", ("v", ix), entry)] + out + [loop]
+
+
+def gen_idiom(rng, P, k):
+    pick = rng.random()
+    if pick < 0.3:
+        return idiom_i1(rng, P, k)
+    if pick < 0.6:
+        return idiom_i2(rng, P, k)
+    return [idiom_loop(rng, P, k)[0]]
 
 
 def bit_wrap(v: int, signed: bool, width: int) -> int:
@@ -796,7 +1050,11 @@ def run_block(block, P, env):
         elif k == "sw":
             sel = ev(st[1], P, env).value
             arms = st[2]
-            at = next((n for n, a in enumerate(arms) if a[0] == sel), None)
+            # a case label is converted to the promoted type of the value
+            # (C11 6.8.4.2): `case -1` matches 65535 on an unsigned int
+            pt = D.promote(ty(st[1], P))
+            at = next((n for n, a in enumerate(arms)
+                       if a[0] is not None and D.wrap(a[0], pt) == sel), None)
             if at is None:
                 at = next((n for n, a in enumerate(arms) if a[0] is None), None)
             while at is not None and at < len(arms):
@@ -843,7 +1101,12 @@ def run_block(block, P, env):
                     return False
                 return True
 
-            if form == "A":                       # for (c = 0; c < K; c++)
+            if form == "H":                       # for (c = I; c OP B; c += S)
+                init, op, bound, sop, step = count[:5]
+                env[c] = D.wrap(init, ct)
+                while ev(("b", op, ("v", c), konst(ct, bound)), P, env).value and once():
+                    env[c] = D.wrap(ev(("b", sop, ("v", c), konst("s16", step)), P, env).value, ct)
+            elif form == "A":                     # for (c = 0; c < K; c++)
                 env[c] = 0
                 while env[c] < count and once():
                     env[c] = D.wrap(env[c] + 1, ct)
@@ -886,7 +1149,8 @@ def expected(P) -> int:
 
 def state_values(P, env):
     for name in P.vars:
-        yield env[name]
+        if name not in P.scoped:
+            yield env[name]
     for name in P.arrays:
         yield from env[name]
     for f, _ in P.fields:
@@ -945,7 +1209,7 @@ def c_block(block, ind):
             out.append(f"{pad}}}")
         elif k == "swalk":
             _, tab, acc, op1, op2, f2, arr, j1, j2 = st
-            t, stride, rows, _ = P_CUR.ctabs[tab]
+            t, stride, rows, _ = _CUR.p.ctabs[tab]
             mask = "(ARRLEN_" + arr + " - 1)"
             out.append(f"{pad}{{ const {t} *pq = {tab}; u8 rn;")
             out.append(f"{pad}    for (rn = {rows}; rn; rn--, pq += {stride}) {{")
@@ -961,6 +1225,15 @@ def c_block(block, ind):
             if write:
                 out.append(f"{pad}    *pw_{arr} = {acc};")
             out.append(f"{pad}}}")
+        elif k == "for" and st[1] == "H":
+            _, _, c, (init, op, bound, sop, step, short, scoped), body = st
+            ct = _CUR.p.vars[c]
+            inc = f"{c}{sop}{sop}" if step == 1 and short else f"{c} {sop}= {step}"
+            if scoped:                            # a counter of this block only
+                out.append(f"{pad}{{ {ct} {c};")
+            out.append(f"{pad}for ({c} = {D.literal(ct, init)}; {c} {op} {D.literal(ct, bound)}; {inc}) {{")
+            out += c_block(body, ind + 1)
+            out.append(f"{pad}}}" + (" }" if scoped else ""))
         elif k == "for" and st[1] == "G":
             _, _, c, count, body, lab = st
             out.append(f"{pad}{c} = {count};")
@@ -997,7 +1270,10 @@ def c_helper(h, k: int, n: int) -> str:
     return f"{rt} h{k}(struct S{n} *q) {{ return {rd(h.expr)}; }}"
 
 
-P_CUR = None   # the program whose block c_block is writing (its tables)
+# the program whose block c_block is writing (its tables): one per thread —
+# the seeds run on a thread pool, and a module global was overwritten by
+# another seed between c_prog and c_block (KeyError on a table name)
+_CUR = threading.local()
 
 
 def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
@@ -1055,20 +1331,19 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     params = ", ".join(f"{P.vars[p]} {p}" for p in P.params) or "void"
     out.append(f"{STATIC(P)}u32 t{n}({params}) {{")
     for name, t in P.vars.items():
-        if name not in P.params and name not in P.gvars:
+        if name not in P.params and name not in P.gvars and name not in P.scoped:
             out.append(f"    {'static ' if name in P.statics else ''}{t} {name} = {P.init[name]};")
     out.append(f"    struct S{n} *ps = &s;")
     out.append("    u32 h = 0x811C9DC5UL;")
     for name, (t, vals) in P.arrays.items():
         out.append(f"    {t} {'FAR ' if name in P.far else ''}*pw_{name};")
-    global P_CUR
-    P_CUR = P
+    _CUR.p = P
     text = "\n".join(c_block(P.body, 1))
     for name, (t, vals) in P.arrays.items():
         text = text.replace("ARRLEN_" + name, str(len(vals)))
     if text:
         out.append(text)
-    mix = [f"(u32){name}" for name in P.vars]
+    mix = [f"(u32){name}" for name in P.vars if name not in P.scoped]
     for name, (t, vals) in P.arrays.items():
         mix += [f"(u32){name}[{k}]" for k in range(len(vals))]
     mix += [f"(u32)s.{f}" for f, _ in P.fields]
@@ -1111,20 +1386,23 @@ def STATIC(P) -> str:
     return getattr(P, "static_fns", "")
 
 
-def make_cases(seed: int) -> list:
-    rng = random.Random(f"stmt-{seed}")
+def make_cases(seed: int, idioms: bool = False) -> list:
+    """The programs of a seed; idioms: those of its G1 batch, from a random
+    stream of their own (the first batch stays what it was)."""
+    rng = random.Random(f"stmt-idiom-{seed}" if idioms else f"stmt-{seed}")
     cases = []
     while len(cases) < PROGS_PER_ROM:
-        P = gen_prog(rng)
+        P = gen_prog(rng, idioms)
         # seeds 4k+1: `static`; seeds 4k+3: `static inline`, which also copies
         # a helper called from several places
         P.static_fns = ("" if not isinstance(seed, int) or seed % 2 == 0
                         else "static " if seed % 4 == 1 else "static inline ")
         try:
-            cases.append(Case(P, f"seed {seed} program {len(cases)}"))
+            cases.append(Case(P, f"seed {seed} {'idiom ' if idioms else ''}program {len(cases)}"))
         except UB:
             continue
     return cases
+
 
 
 def run_batch(cases: list, name: str, luna: str):
@@ -1303,17 +1581,26 @@ def reduce_case(case: Case, luna: str, name: str) -> Case:
         best, rnd = hit, rnd + 1
 
 
-def run_seed(seed, luna: str, keep: bool):
+def run_seed(seed, luna: str, keep: bool, batches=("stmt", "idiom")):
+    """Both batches of a seed: (seed, worst code, messages)."""
     if seed == "pinned":
         res = run_pinned(luna)
         if res[1] == 0 and not keep:
             shutil.rmtree(D.WORK / "stmt_pinned", ignore_errors=True)
         return res
-    cases = make_cases(seed)
-    name = f"stmt_{seed}"
+    worst, msgs = 0, []
+    for batch in batches:
+        code, m = run_cases(make_cases(seed, batch == "idiom"),
+                            f"stmt_{seed}" if batch == "stmt" else f"stmti_{seed}",
+                            seed, luna, keep)
+        worst, msgs = max(worst, code), msgs + m
+    return seed, worst, msgs
+
+
+def run_cases(cases: list, name: str, seed, luna: str, keep: bool):
     res = verdicts(cases, name, luna)
     if isinstance(res, str):
-        return seed, 2, [f"seed {seed}: {res}"]
+        return 2, [f"seed {seed}: {res}"]
     msgs = []
     for c, bad in zip(cases, res):
         if bad:
@@ -1329,7 +1616,7 @@ def run_seed(seed, luna: str, keep: bool):
             shutil.rmtree(scratch, ignore_errors=True)
         if not msgs:
             shutil.rmtree(D.WORK / name, ignore_errors=True)
-    return seed, (1 if msgs else 0), msgs
+    return (1 if msgs else 0), msgs
 
 
 def main() -> int:
@@ -1338,20 +1625,23 @@ def main() -> int:
     ap.add_argument("--keep", action="store_true", help="keep the generated projects of passing seeds, and the reduction's and probe's projects of failing ones")
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
     ap.add_argument("--cc", help="path of another cc65816 to test (e.g. one built before a change)")
+    ap.add_argument("--batch", choices=["all", "stmt", "idiom"], default="all",
+                    help="the seed's first batch, its G1 batch (loops and widenings), or both (default)")
     args = ap.parse_args()
+    batches = ("stmt", "idiom") if args.batch == "all" else (args.batch,)
     if args.cc:
         D.MAKE_ARGS.append(f"CC={Path(args.cc).resolve()}")
     seeds = D.parse_seeds(args.seeds) if args.seeds else GATE_SEEDS
     luna = find_luna()
     worst = failed = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
-        for seed, code, msgs in pool.map(lambda s: run_seed(s, luna, args.keep), seeds):
+        for seed, code, msgs in pool.map(lambda s: run_seed(s, luna, args.keep, batches), seeds):
             worst = max(worst, code)
             failed += code != 0
             for m in msgs:
                 print(m)
-    print(f"difftest-stmt: {len(seeds) - failed}/{len(seeds)} seeds clean, "
-          f"{sum(len(PINNED) if x == 'pinned' else PROGS_PER_ROM for x in seeds)} programs")
+    nprog = sum(len(PINNED) if x == "pinned" else PROGS_PER_ROM * len(batches) for x in seeds)
+    print(f"difftest-stmt: {len(seeds) - failed}/{len(seeds)} seeds clean, {nprog} programs")
     return worst
 
 

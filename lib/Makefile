@@ -185,9 +185,20 @@ all: lorom hirom sa1 superfx
 DRIVER_BIN = $(SRCDIR)/audio_driver.spc700.bin
 DRIVER_BUDGET = 2048
 
-$(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc
+# Test knob, not a setting: the turns cmd_koff holds the KOFF mask
+# (KOFF_HOLD_TURNS in the driver, 21 when empty). The stress fixture
+# testing/fixtures/stress/koff_hold is built against a library made with a
+# hold too short (AUDIO_KOFF_HOLD_TURNS=8) to show that it counts the voices
+# a short hold leaves playing. The stamp rebuilds the driver when it changes.
+AUDIO_KOFF_HOLD_TURNS ?=
+KOFF_STAMP := build/.audio_koff_hold
+$(KOFF_STAMP): FORCE_COMPILER_ID
+	@mkdir -p build
+	@if [ "$$(cat $@ 2>/dev/null)" != "turns=$(AUDIO_KOFF_HOLD_TURNS)" ]; then echo "turns=$(AUDIO_KOFF_HOLD_TURNS)" > $@; fi
+
+$(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc $(KOFF_STAMP)
 	@echo "[SPC] $< -> $@"
-	@$(SPC_AS) -I ../templates -o $(SRCDIR)/audio_driver.spc700.o $<
+	@$(SPC_AS) -I ../templates $(if $(AUDIO_KOFF_HOLD_TURNS),-D KOFF_HOLD_TURNS=$(AUDIO_KOFF_HOLD_TURNS)) -o $(SRCDIR)/audio_driver.spc700.o $<
 	@echo "[objects]" > $(SRCDIR)/audio_driver.link
 	@echo "$(SRCDIR)/audio_driver.spc700.o" >> $(SRCDIR)/audio_driver.link
 	@$(LD) -b $(SRCDIR)/audio_driver.link $@
@@ -258,12 +269,17 @@ $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_LOROM)/$*.asm
 
 # ASM compilation for LoROM (core source/ + non-core contrib/)
+# Each object keeps the text it was assembled from beside it (X-asm.text.asm,
+# as each C object keeps X.c.asm): opensnes-rom place and check read the
+# call graph of the linked objects from their texts (L4 static frames).
 $(BUILDDIR_LOROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_LOROM)
 	@echo "[AS-LOROM] $<"
 	@$(AS) $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_LOROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_LOROM)
 	@echo "[AS-LOROM-CONTRIB] $<"
 	@$(AS) $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_LOROM):
 	@mkdir -p $(BUILDDIR_LOROM)
@@ -293,9 +309,11 @@ $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
 $(BUILDDIR_HIROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_HIROM)
 	@echo "[AS-HIROM] $<"
 	@$(AS) -D HIROM $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_HIROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_HIROM)
 	@echo "[AS-HIROM-CONTRIB] $<"
 	@$(AS) -D HIROM $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_HIROM):
 	@mkdir -p $(BUILDDIR_HIROM)
@@ -325,9 +343,11 @@ $(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
 $(BUILDDIR_SA1)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SA1)
 	@echo "[AS-SA1] $<"
 	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_SA1)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SA1)
 	@echo "[AS-SA1-CONTRIB] $<"
 	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_SA1):
 	@mkdir -p $(BUILDDIR_SA1)
@@ -357,9 +377,11 @@ $(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SUPERFX)
 	@echo "[AS-SUPERFX] $<"
 	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SUPERFX)
 	@echo "[AS-SUPERFX-CONTRIB] $<"
 	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+	@cp $< $(@:.o=.text.asm)
 
 $(BUILDDIR_SUPERFX):
 	@mkdir -p $(BUILDDIR_SUPERFX)

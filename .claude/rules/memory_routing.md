@@ -1,4 +1,9 @@
-# Memory routing (always loaded)
+---
+paths:
+  - ".claude/**"
+---
+
+# Memory routing
 
 Project knowledge goes to `.claude/notes/` in the repository (versioned, survives clones), not to the per-user `~/.claude/projects/.../memory/` (lost on a machine move). The user memory keeps only personal cross-project preferences. When in doubt, the repo.
 

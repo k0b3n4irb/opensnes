@@ -13,7 +13,7 @@ Expert 13 — Licences, provenance et conformité · 2026-10-17 · HEAD audité 
 - **Non couvert.**
   - Le texte actuel de la licence de `mukunda-/snesmod`. Je n'avais pas de réseau : l'affirmation « MIT » d'`ATTRIBUTION.md:44` n'a pas été revérifiée aujourd'hui.
   - Les dépôts de luna et des forks sur GitHub (leur visibilité publique n'a pas été vérifiée).
-  - Aucune affirmation matérielle n'est faite ici, donc il n'y a pas eu de requête cartouche.
+  - Aucune affirmation matérielle n'est faite ici, donc il n'y a pas eu de requête au corpus.
 
 ## Points forts
 

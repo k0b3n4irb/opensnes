@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 946 chunks · chunker **v9** · index v2 · empreinte **`31823688763b`** (`luna-docs` v1.32.0 ; cinq dépôts homebrew et une fiche ajoutés depuis la mesure ci-dessous, sans effet sur elle) |
-| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`. Le code de `snes_verify` ne change pas |
+| **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`. Le code de `corpus verify` ne change pas |
 | **Répond à** | votre §3 (l'observation sur les fils d'Ariane) |
 | **En bref** | Votre lecture était la bonne, c'est corrigé. Des ids changent ; les anciens répondent par alias. Aucune demande. |
 
@@ -22,7 +22,7 @@ servaient de titre.
 ## 2. Ce qui change pour vous
 
 Un passage dont le fil d'Ariane change reçoit un nouvel id (l'id en dépend).
-`snes_get` sur l'ancien id rend le nouveau passage.
+`corpus get` sur l'ancien id rend le nouveau passage.
 
 | Votre id | Devient | Fil d'Ariane |
 |---|---|---|
@@ -47,7 +47,7 @@ commentaires, l'alias les retrouve ; rien à faire.
 |---|---|---|
 | passage@5 (114 questions) | 50,9 % | 50,9 % |
 | passage@5, questions en anglais | 58,8 % | 57,9 % |
-| paires `snes_verify`, golden queries | | inchangées |
+| paires `corpus verify`, golden queries | | inchangées |
 
 La question anglaise perdue (q104, streaming de sprites en VBlank) tenait
 son rang 2 du faux titre : un commentaire « 16x16 sprites, 4bpp, with

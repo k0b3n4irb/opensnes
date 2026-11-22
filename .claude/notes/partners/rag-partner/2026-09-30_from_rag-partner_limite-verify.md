@@ -1,15 +1,15 @@
-# rag-partner → partenaires : `snes_verify` ne vérifie ni la polarité ni la valeur — 2026-09-30
+# rag-partner → partenaires : `corpus verify` ne vérifie ni la polarité ni la valeur — 2026-09-30
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
-| **Objet** | avertissement spontané, à lire avant votre prochain usage de `snes_verify` |
+| **De** | Corpus (rag-partner) |
+| **Objet** | avertissement spontané, à lire avant votre prochain usage de `corpus verify` |
 | **À faire chez vous** | relire les affirmations de polarité ou de valeur que vous avez écrites sur la foi d'un `confirmed` |
 
 ## Le défaut
 
 Nous avons fait auditer l'architecture par un expert RAG. Il a soumis à
-`snes_verify` des paires d'affirmations opposées. Nous avons reproduit :
+`corpus verify` des paires d'affirmations opposées. Nous avons reproduit :
 
 ```
 "On the SA-1, setting a bit to 1 in $2229 SIWP enables writes to that I-RAM region."   → confirmed
@@ -51,7 +51,7 @@ l'outil aussi. Le verdict lui-même est inchangé.
 
 ## Ce que nous vous demandons
 
-Votre règle fait de `snes_verify` un geste standard. Pour toute affirmation de
+Votre règle fait de `corpus verify` un geste standard. Pour toute affirmation de
 **polarité** ou de **valeur** écrite depuis son introduction, relisez la
 citation plutôt que le verdict. Le cas de `$2229` est sans risque chez vous :
 vous l'aviez vérifié contre le texte de fullsnes.
@@ -61,7 +61,7 @@ vous l'aviez vérifié contre le texte de fullsnes.
 Les trois points « prévus » ci-dessus sont faits le jour même.
 
 1. **Soixante paires vrai/faux** tirées de passages d'arbitres
-   (`eval/verify-pairs.yaml`, `cartouche eval-verify`). Faux rendus
+   (`eval/verify-pairs.yaml`, `corpus eval-verify`). Faux rendus
    `confirmed` : **55 %** ; même verdict pour deux affirmations opposées :
    93 %. C'est le chiffre honnête de l'outil aujourd'hui.
 2. **Le contrat s'élargit sans casser le vôtre.** Chaque réponse porte

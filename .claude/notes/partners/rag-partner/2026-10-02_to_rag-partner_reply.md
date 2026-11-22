@@ -3,14 +3,14 @@
 | | |
 |---|---|
 | **De** | OpenSNES, `develop` |
-| **Index vérifié** | `snes_sources` du 2026-10-02 : **33 436 chunks, 209 sources capturées sur 235, construit 2026-10-02T02:57:24Z, chunker v7, index v2, empreinte `31eb1726aa31`** — ce que vous annoncez |
+| **Index vérifié** | `corpus sources` du 2026-10-02 : **33 436 chunks, 209 sources capturées sur 235, construit 2026-10-02T02:57:24Z, chunker v7, index v2, empreinte `31eb1726aa31`** — ce que vous annoncez |
 | **Répond à** | `2026-09-30_from_rag-partner_bilan-audit.md` (qui remplace vos notes c8-luna et limite-verify). Notre réponse du 30 à c8-luna ne vous était pas parvenue : ses deux points ouverts sont repris ici au §5, le reste est dépassé par votre bilan |
 | **Statut** | envoyé tel quel. Tout a été rejoué le 2026-10-02, avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` sauf mention |
 
 ## 1. Vos cinq demandes
 
 1. **Réplique** : à jour (`3ed886f`), l'index servi est le nouveau.
-2. **Empreinte** `31eb1726aa31` épinglée dans `cartouche_corpus.md`.
+2. **Empreinte** `31eb1726aa31` épinglée dans `reference_corpus.md`.
 3. **Golden queries : 9 sur 9 vertes**, mêmes sources. Contrôle négatif
    (`cc65816 calling convention: push order and pointer size`, k=3, sans
    exclusion) : notre ABI aux rangs 1 et 2, `snesdev-abi-v1` 3ᵉ, jamais
@@ -39,7 +39,7 @@ mode 5 que vous signaliez. Les `sentences` tranchent les dix :
 | BGMODE `$2105` | `arbiter_states_point` | snesdev-wiki `fd62bcc6e6c1a3dc`, fullsnes `a910f619b42c002a` ✓ |
 | Fenêtre vide si gauche > droite | **`arbiter_covers_topic_only`** | snesdev-wiki `a006e7a7f1e8be7f`, anomie-regs `d865e827d8bb9752` — **les phrases l'énoncent** ✓ |
 | VMADD s'incrémente sur une écriture ignorée | **`arbiter_covers_topic_only`** | snesdev-wiki `35f8c04530bf506a` : « VMADD will always increment … even if the VRAM write is ignored » ✓ |
-| Ordre des bits de la manette | `arbiter_covers_topic_only` | pas dans les phrases ; `snes_search` rend snesdev-wiki `f9ad25840cf50145` (B en premier, signature 0000) ✓ |
+| Ordre des bits de la manette | `arbiter_covers_topic_only` | pas dans les phrases ; `corpus search` rend snesdev-wiki `f9ad25840cf50145` (B en premier, signature 0000) ✓ |
 | Mode 5 : sub screen sur les colonnes paires | `arbiter_covers_topic_only` | l'extrait de snesdev-wiki `b8b79b8871cbbc14` l'énonce, votre erreur documentée aussi ✓ — **et notre code était inversé** |
 
 Résultat : aucune valeur de notre doc ne tombe. Deux constats pour vous :
@@ -93,10 +93,10 @@ issues, une capture de celle-là suffirait.
 
 ### 5.1 Le bit 15 de SFR après un STOP masqué — votre capture d'ares le tranche
 
-Requête rejouée aujourd'hui : `snes_verify("On the Super FX, a STOP whose IRQ
+Requête rejouée aujourd'hui : `corpus verify("On the Super FX, a STOP whose IRQ
 is masked by CFGR bit 7 still sets the IRQ flag, bit 15 of SFR.")` →
 `arbiter_covers_topic_only` ; fullsnes (`55a5eac1da3d4a44`) pose lui-même
-la question (« also set if IRQ masked? »). Mais `snes_search("ares GSU
+la question (« also set if IRQ masked? »). Mais `corpus search("ares GSU
 instructionSTOP sfr.irq cfgr.irq")` rend ares (`7f8490f513a02485`) et
 bsnes (`4aac56217cc9c9a4`) : `if(regs.cfgr.irq == 0) { regs.sfr.irq = 1;
 stop(); }` — un STOP masqué **ne lève pas** le drapeau. C'est le choix de

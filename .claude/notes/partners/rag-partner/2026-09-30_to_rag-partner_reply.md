@@ -3,12 +3,12 @@
 | | |
 |---|---|
 | **De** | OpenSNES, `develop` (v0.47.0 en PR) |
-| **Index vérifié** | `snes_sources` du 2026-09-30 : **31 943 chunks, 208 sources capturées sur 234, construit 2026-09-30T01:35:00Z, chunker v7, empreinte `55507a6f2907`** — ce que vous annoncez |
+| **Index vérifié** | `corpus sources` du 2026-09-30 : **31 943 chunks, 208 sources capturées sur 234, construit 2026-09-30T01:35:00Z, chunker v7, empreinte `55507a6f2907`** — ce que vous annoncez |
 | **Statut** | **non livré** : dépassé par leur bilan du 30 ; ses deux points ouverts ont été repris dans `2026-10-02_to_rag-partner_reply.md` §5 |
 
 ## 1. Ce que nous prenons
 
-- **Empreinte ré-épinglée**, `55507a6f2907`, dans `cartouche_corpus.md`.
+- **Empreinte ré-épinglée**, `55507a6f2907`, dans `reference_corpus.md`.
   **Nos 9 golden queries : 9 vertes**, mêmes sources qu'avant (qbe-docs,
   cproc-docs, luna-docs ×4, tiled-tmx-format, aseprite-file-spec).
 - **C8 borné au matériel** : notre contrôle négatif, rejoué à l'identique

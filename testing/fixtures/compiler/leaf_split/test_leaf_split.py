@@ -48,12 +48,21 @@ def run() -> int:
     if not ROM.is_file():
         sys.exit(f"ROM missing: {ROM} (run `make` first)")
     fails = 0
-    # the premise: the leaves are split, part in tcc__lf, part on the stack
+    # the premise: leaf21 and leaf25 are split, part in tcc__lf, part on the
+    # stack; leaf17 fits the 20 words of tcc__lf whole since 2026-11-13; leaf21
+    # and leaf21n (run by the NMI on its own page) use the words added
+    # (+32..+39), so the NMI page's 168 bytes are exercised
     text = ASM.read_text() if ASM.is_file() else ""
-    for fn in ("leaf17", "leaf21", "leaf25"):
+    for fn, split in (("leaf17", False), ("leaf21", True), ("leaf25", True), ("leaf21n", True)):
         body = text.split(f"\n{fn}:\n", 1)[-1].split(".ENDS", 1)[0] if f"\n{fn}:\n" in text else ""
-        ok = "tcc__lf" in body and "\ttas" in body
-        print(("PASS " if ok else "FAIL ") + f"{fn}() splits its frame (tcc__lf and a stack frame)")
+        ok = "tcc__lf" in body and ("\ttas" in body) == split
+        what = "splits its frame (tcc__lf and a stack frame)" if split else "keeps its whole frame in tcc__lf"
+        print(("PASS " if ok else "FAIL ") + f"{fn}() {what}")
+        fails += not ok
+    for fn in ("leaf21", "leaf21n"):
+        body = text.split(f"\n{fn}:\n", 1)[-1].split(".ENDS", 1)[0] if f"\n{fn}:\n" in text else ""
+        ok = any(f"tcc__lf+{n}" in body for n in (32, 34, 36, 38))
+        print(("PASS " if ok else "FAIL ") + f"{fn}() uses the words added to tcc__lf (+32..+39)")
         fails += not ok
     luna = find_luna()
     for name, want in CASES:

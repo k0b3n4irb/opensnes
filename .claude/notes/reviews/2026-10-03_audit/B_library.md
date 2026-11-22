@@ -66,7 +66,7 @@ Chaque fonction publique des 36 en-têtes a été relue contre son corps, en qua
 - `crt0.asm` lu de `NmiHandler` à `WaitForVBlank` (lignes 1004-1510). `PHILOSOPHY.md` (principes, l. 50-158), `KNOWN_LIMITATIONS.md`, `silent_defects_log.md`, `docs/BENCHMARK.md` et `MIGRATING_FROM_PVSNESLIB.md` (étape 4).
 - Lancés : `check_asm_abi.py` (sur `lib/source` puis `--source lib/contrib`), `make lint-docs` (0 dérive, v0.47.0, 89 exemples), `symmap.py --check-ram-budget` (rpg, tetris, breakout).
 - luna v1.31.0 : `luna profile --budget` sur breakout, rpg, dynamic_sprite et map_scroll, plus les mesures des passes (hdma_helpers, random, map_scroll, mapandobjects).
-- Corpus cartouche cité par chunk id (exclusions opensnes appliquées). Recherche par motif des banques codées en dur dans tout l'asm de la lib.
+- Reference corpus cité par chunk id (exclusions opensnes appliquées). Recherche par motif des banques codées en dur dans tout l'asm de la lib.
 
 ## Points forts
 

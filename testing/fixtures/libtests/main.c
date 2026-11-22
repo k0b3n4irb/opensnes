@@ -463,6 +463,20 @@ u8 r_tile8[64];
 u8 r_tile4_dot[32];
 u16 r_glyph_ok;            /* tileBlitGlyph2bpp: cases equal to the C reference */
 u8 r_glyph_pin[32];        /* one case's tile and right tile, pinned outside the ROM */
+/* The map engine's column and row streaming (2026-11-11): a camera walk over
+ * the formula map of data.asm, each step at most one tile on each axis, with
+ * mapUpdate() and mapVblank() in force blank. test_libtest.py checks every
+ * tilemap word of the final visible window (33 x 29) in VRAM against the
+ * formula; the walk crosses both rings' wraps. r_mapwalk: steps run. */
+extern u8 mapgen[];
+extern u8 mapgen_tiles[];
+extern u8 mapgen_props[];
+extern u16 map_cam_x;
+extern u16 map_cam_y;
+u16 r_mapwalk;
+static const s8 mw_dx[] = { 1, 0, 1, -1, 0, 1 };
+static const s8 mw_dy[] = { 0, 1, 0, 0, -1, 1 };
+static const u8 mw_n[]  = { 34, 6, 2, 3, 2, 2 };
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -1327,9 +1341,23 @@ static u8 s_near[16];
 u16 r_str[24];
 /* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
 u16 r_oamget[8];
-u16 r_hrange[10];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 9, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
+u16 r_hrange[12];   /* oamHideRange against a loop of oamHide on a patterned shadow: bytes that differ per case -> 0 x 11, then the highest id written (oam_max_id, from 0) for (120, 20) -> 127 */
 static FAR u8 hr_save[544];
+/* oamSetAttr against oamSet with the same sprite, on a patterned shadow: bytes
+ * that differ per case -> 0 x 6, then an id of 128 changes nothing -> 0, then
+ * oam_max_id after a write to sprite 77 from 0 -> 77 */
+u16 r_setattr[8];
 static FAR u8 hr_want[544];
+/* The patterned shadow of the two vectors above: byte j = (start + j * step) | orv,
+ * by addition (a multiply per byte made these loops cost 8 frames each). */
+static void hr_fill(u8 start, u8 step, u8 orv) {
+    u16 j;
+    u8 v = start;
+    for (j = 0; j < 544; j++) {
+        oamMemory[j] = v | orv;
+        v += step;
+    }
+}
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
@@ -1369,6 +1397,146 @@ static const s16 w_sy[8] = { 0,  10,  10, 223, 100, 224, -31, -32 };
  * -Werror, and `order` must be 0 (2026-10-10: it did not compile). */
 static u8 w_old_seen[2];
 static const OamWorldBatch w_old = { w_sx, w_sy, w_rev, w_rev, w_old_seen, 108, 2, 32 };
+
+/* oamPlaceWorld with `big`: ten sprites of two sizes (16 small, 32 large) in
+ * ONE order, on sprites 90-99 (part of byte 22 of the high table, all of 23
+ * and 24: a first and a last group the batch covers in part). Camera at
+ * (100, 50). On screen: 0 (small, 0, 0), 1 (large, x = -31), 3 (large,
+ * x = -17: a small one there would be hidden), 4 (large, 255, 223), 5 (small),
+ * 7 (large, y = -31). Hidden: 2 (small, x = -16), 6 (large, y = 224), 8
+ * (small, y = -16), 9 (small, x = 256). Each call is compared byte for byte
+ * with a C model of the contract (the ten entries, the three bytes of the
+ * high table, visible[]), and a few bytes are pinned by hand as well. */
+u16 r_worldm[8];
+static const s16 m_sx[10] = { 0, -31, -16, -17, 255, 240, 100, 100, 100, 256 };
+static const s16 m_sy[10] = { 0,  10,  10,  20, 223, 100, 224, -31, -16,   0 };
+static const u8 m_big[10] = { 0, 1, 0, 2, 255, 0, 1, 1, 0, 0 };   /* any value but 0 is large */
+static const u8 m_rev[10] = { 9, 8, 7, 6, 5, 4, 3, 200, 1, 0 };  /* slot 7: not a sprite */
+static s16 m_x[10];
+static s16 m_y[10];
+static u8 m_tile[10];
+static u8 m_attr[10];
+static u8 m_seen[10];
+static FAR u8 m_eseen[10];
+static FAR u8 m_exp[43];      /* the ten entries, then bytes 22-24 of the high table */
+static FAR u8 m_save[43];
+static FAR u8 m_hid[10];
+
+static void m_hide(u16 slot)
+{
+    u16 id = 90 + slot, sh = (id & 3) << 1, hb = 40 + (id >> 2) - 22;
+    m_exp[slot * 4] = 0x01;
+    m_exp[slot * 4 + 1] = 0xF0;
+    m_exp[hb] = (u8)((m_exp[hb] & ~(3 << sh)) | (1 << sh));   /* x bit set, small */
+    m_hid[slot] = 1;
+}
+
+static void m_model(const u8 *order, u16 cx, u16 cy)
+{
+    u16 i, spr, id, o, sz, tx, ty, xs, sh, hb;
+    for (i = 0; i < 40; i++) m_exp[i] = oamMemory[90 * 4 + i];
+    for (i = 0; i < 3; i++) m_exp[40 + i] = oamMemory[512 + 22 + i];
+    for (i = 0; i < 10; i++) {
+        m_eseen[i] = m_seen[i];
+        m_hid[i] = 0;
+    }
+    for (i = 0; i < 10; i++) {
+        spr = order ? order[i] : i;
+        if (spr >= 10) {
+            m_hide(i);
+            continue;
+        }
+        sz = m_big[spr] ? 32 : 16;
+        tx = (u16)m_x[spr] - (u16)(cx - sz);
+        ty = (u16)m_y[spr] - (u16)(cy - sz);
+        if (tx == 0 || tx >= 256 + sz || ty == 0 || ty >= 224 + sz) {
+            m_hide(i);
+            m_eseen[spr] = 0;
+            continue;
+        }
+        id = 90 + i;
+        o = i * 4;
+        sh = (id & 3) << 1;
+        hb = 40 + (id >> 2) - 22;
+        xs = tx - sz;
+        m_exp[o] = (u8)xs;
+        m_exp[o + 1] = (u8)(ty - sz);
+        m_exp[o + 2] = m_tile[spr];
+        m_exp[o + 3] = m_attr[spr];
+        m_exp[hb] = (u8)((m_exp[hb] & ~(3 << sh))
+                         | ((xs & 0x8000) ? (1 << sh) : 0)
+                         | (m_big[spr] ? (2 << sh) : 0));
+        m_eseen[spr] = 1;
+    }
+}
+
+/* the bytes that differ from the model (a hidden entry's tile and attr are
+ * not part of the contract) */
+static u16 m_compare(void)
+{
+    u16 i, bad = 0;
+    for (i = 0; i < 40; i++) {
+        if (m_hid[i >> 2] && (i & 3) >= 2) continue;
+        if (oamMemory[90 * 4 + i] != m_exp[i]) bad++;
+    }
+    for (i = 0; i < 3; i++)
+        if (oamMemory[512 + 22 + i] != m_exp[40 + i]) bad++;
+    for (i = 0; i < 10; i++)
+        if (m_seen[i] != m_eseen[i]) bad++;
+    return bad;
+}
+
+static u16 m_seen_mask(void)
+{
+    u16 i, m = 0;
+    for (i = 0; i < 10; i++) m |= (u16)(m_seen[i] == 1) << i;
+    return m;
+}
+
+static void test_world_mixed(void)
+{
+    static OamWorldBatch mb;
+    u8 flag = oam_update_flag;
+    u16 i;
+    for (i = 0; i < 40; i++) m_save[i] = oamMemory[90 * 4 + i];
+    for (i = 0; i < 3; i++) m_save[40 + i] = oamMemory[512 + 22 + i];
+    for (i = 0; i < 10; i++) {
+        m_x[i] = m_sx[i] + 100;
+        m_y[i] = m_sy[i] + 50;
+        m_tile[i] = (u8)(0x40 + i);
+        m_attr[i] = (u8)(0x20 | i);
+        m_seen[i] = 0xEE;
+    }
+    /* every size bit of the three bytes set first: the call must clear the
+     * small ones and the hidden ones */
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] |= 0xAA;
+    mb.x = m_x; mb.y = m_y; mb.tile = m_tile; mb.attr = m_attr; mb.visible = m_seen;
+    mb.first_id = 90; mb.count = 10; mb.size = 16;
+    mb.order = 0; mb.big = m_big; mb.size_big = 32;
+    m_model(0, 100, 50);
+    oamPlaceWorld(&mb, 100, 50);
+    r_worldm[0] = m_compare();                                           /* 0 */
+    r_worldm[1] = oamMemory[91 * 4] | (oamMemory[91 * 4 + 1] << 8);      /* $E1, 10 */
+    r_worldm[2] = (oamMemory[512 + 22] & 0xF0) | (oamMemory[512 + 23] << 8);  /* $C0, $2D */
+    r_worldm[3] = oamMemory[512 + 24] | ((m_seen_mask() & 0xFF) << 8);  /* $59; 0,1,3,4,5,7 seen: $BB */
+    /* the same sprites by `order`: a reversal, slot 7 not a sprite (hidden,
+     * small), sprite 2 named by no slot (its visible byte untouched) */
+    for (i = 0; i < 10; i++) m_seen[i] = 0xEE;
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] |= 0xAA;
+    mb.order = m_rev;
+    m_model(m_rev, 100, 50);
+    oamPlaceWorld(&mb, 100, 50);
+    r_worldm[4] = m_compare();                                           /* 0 */
+    r_worldm[5] = (oamMemory[512 + 22] & 0xF0) | (oamMemory[512 + 23] << 8);  /* $50, $86 */
+    r_worldm[6] = oamMemory[512 + 24] | ((m_seen_mask() & 0xFF) << 8);  /* $37; $BB (8 and 9 hidden) */
+    /* sprite 2, named by no slot, keeps its visible byte; a batch written
+     * before `big` existed (w_old, eight initialisers) has it 0 */
+    r_worldm[7] = 0x0168 ^ ((m_seen[2] == 0xEE && (m_seen_mask() >> 8) == 0
+                             && w_old.big == 0 && w_old.size_big == 0) ? 0 : 0xFFFF);
+    for (i = 0; i < 40; i++) oamMemory[90 * 4 + i] = m_save[i];
+    for (i = 0; i < 3; i++) oamMemory[512 + 22 + i] = m_save[40 + i];
+    oam_update_flag = flag;
+}
 
 static void test_string(void) {
     u16 i;
@@ -1728,6 +1896,8 @@ int main(void) {
 
     test_string();
 
+    test_world_mixed();
+
     /* Sprites 100-102, which nothing else in this ROM uses, and the upload
      * flag put back: the OAM the probe reads at the end was placed there by
      * earlier blocks (some through dmaCopyOam), and an upload of the shadow
@@ -1749,15 +1919,16 @@ int main(void) {
          * with a pattern in every byte (sizes and ninth bits included): the
          * same bytes everywhere, edges inside a byte of the high table
          * (3+9, 5+3), whole bytes (4+8), the clamp at 128, one sprite, an id
-         * past the end, a count of 0. */
+         * past the end, a count of 0, all 128, and 91 from 30 (past 64: the
+         * two passes of the low table). */
         {
-            static const u8 hr_first[9] = {0, 3, 4, 5, 125, 127, 128, 10, 40};
-            static const u8 hr_count[9] = {1, 9, 8, 3, 10, 1, 5, 0, 32};
+            static const u8 hr_first[11] = {0, 3, 4, 5, 125, 127, 128, 10, 40, 0, 30};
+            static const u8 hr_count[11] = {1, 9, 8, 3, 10, 1, 5, 0, 32, 128, 91};
             u8 c;
             u16 j, k, last;
             for (j = 0; j < 544; j++) hr_save[j] = oamMemory[j];
-            for (c = 0; c < 9; c++) {
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+            for (c = 0; c < 11; c++) {
+                hr_fill((u8)(c * 11), 37, 0x02);
                 last = hr_first[c] + hr_count[c];
                 if (last > 128) last = 128;
                 for (k = hr_first[c]; k < last; k++) {      /* the definition, written out */
@@ -1766,12 +1937,12 @@ int main(void) {
                     oamMemory[512 + (k >> 2)] |= (u8)(1 << ((k & 3) << 1));
                 }
                 for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                hr_fill((u8)(c * 11), 37, 0x02);
                 for (k = hr_first[c]; k < last; k++) oamHide(k);   /* and oamHide() itself */
                 k = 0;
                 for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
                 r_hrange[c] = k;
-                for (j = 0; j < 544; j++) oamMemory[j] = (u8)((j * 37 + c * 11) | 0x02);
+                hr_fill((u8)(c * 11), 37, 0x02);
                 oamHideRange(hr_first[c], hr_count[c]);
                 k = 0;
                 for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
@@ -1779,7 +1950,35 @@ int main(void) {
             }
             oam_max_id = 0;
             oamHideRange(120, 20);
-            r_hrange[9] = oam_max_id;
+            r_hrange[11] = oam_max_id;
+            {
+                static const u16 sa_id[6]   = {0, 5, 63, 64, 126, 127};
+                static const u16 sa_x[6]    = {0, 255, 256, 300, 511, 17};
+                static const u16 sa_y[6]    = {0, 240, 100, 7, 255, 223};
+                static const u16 sa_tile[6] = {0, 0x1FF, 0x100, 0x0AB, 0x0FF, 0x155};
+                static const u16 sa_pal[6]  = {0, 7, 3, 5, 1, 6};
+                static const u16 sa_pri[6]  = {0, 3, 1, 2, 3, 0};
+                static const u16 sa_fl[6]   = {0, 0xC0, 0x40, 0x80, 0xC0, 0x00};
+                for (c = 0; c < 6; c++) {
+                    hr_fill((u8)(c * 7), 29, 0x01);
+                    oamSet(sa_id[c], sa_x[c], sa_y[c], sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]);
+                    for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                    hr_fill((u8)(c * 7), 29, 0x01);
+                    oamSetAttr(sa_id[c], sa_x[c], sa_y[c], sa_tile[c],
+                               OAM_ATTR(sa_tile[c], sa_pal[c], sa_pri[c], sa_fl[c]));
+                    k = 0;
+                    for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                    r_setattr[c] = k;
+                }
+                for (j = 0; j < 544; j++) hr_want[j] = oamMemory[j];
+                oamSetAttr(128, 1, 2, 3, 4);
+                k = 0;
+                for (j = 0; j < 544; j++) if (oamMemory[j] != hr_want[j]) k++;
+                r_setattr[6] = k;
+                oam_max_id = 0;
+                oamSetAttr(77, 10, 10, 10, 0x30);
+                r_setattr[7] = oam_max_id;
+            }
             for (j = 0; j < 544; j++) oamMemory[j] = hr_save[j];
         }
         /* the ninth x bit and the size bit of neighbours in one byte of the
@@ -2062,6 +2261,22 @@ int main(void) {
     r_fast[10] = padHeld(0) | padPressed(1) | padReleased(0);          /* 0 */
     r_fast[11] = (padHeld)(1) | (padPressed)(0) | (padHeld)(9) | (padPressed)(200) | padReleased(5);  /* 0 */
     r_fast[12] = 0xFA57;
+
+    {
+        u16 leg, k;
+        setScreenOff();
+        mapLoad(mapgen, mapgen_tiles, mapgen_props);
+        r_mapwalk = 0;
+        for (leg = 0; leg < 6; leg++) {
+            for (k = 0; k < mw_n[leg]; k++) {
+                map_cam_x += (s16)mw_dx[leg] * 8;
+                map_cam_y += (s16)mw_dy[leg] * 8;
+                mapUpdate();
+                mapVblank();
+                r_mapwalk++;
+            }
+        }
+    }
 
     r_done      = 0xBEEF;
 

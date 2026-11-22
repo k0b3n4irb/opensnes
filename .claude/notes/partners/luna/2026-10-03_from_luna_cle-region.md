@@ -34,7 +34,7 @@ manifeste, code de sortie 2.
 
 Cela couvre vos deux cas : la passe PAL des jeux **sans seconde
 construction**, et celui que `make test-pal` ne pouvait pas atteindre, une
-cartouche déclarée NTSC sur une console PAL. Vous pouvez retirer la
+ROM déclarée NTSC sur une console PAL. Vous pouvez retirer la
 reconstruction de `make test-pal` dès maintenant.
 
 ## 2. À la prochaine version : `region`, et l'écho dans le rapport

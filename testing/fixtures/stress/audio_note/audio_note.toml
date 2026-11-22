@@ -1,0 +1,20 @@
+# A note in two handshakes (main.c): the commands a play posts, counted by
+# the sequence bits mod 3 (two = 2, three = 0, one = 1).
+rom = "audio_note.sfc"
+frames = 200
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = { eq = 0xC0DE, width = 2 }
+"r_a" = { eq = 2, width = 2 }    # VSET, KON
+"r_b" = { eq = 2, width = 2 }
+"r_c" = { eq = 1, width = 2 }    # KON alone
+"r_d" = { eq = 2, width = 2 }    # VPITCH, KON
+"r_e" = { eq = 2, width = 2 }    # VVOL, KON
+"r_f" = { eq = 0, width = 2 }    # VPAN, VSET, KON: three
+"r_g1" = { eq = 0, width = 2 }   # three, the pan and the values changed
+"r_g2" = { eq = 1, width = 2 }   # an inner pan repeated: KON alone
+"r_bad" = { eq = 0, width = 2 }
+"audio_error_count" = { eq = 0, width = 2 }

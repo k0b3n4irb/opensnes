@@ -1,0 +1,18 @@
+# scrolling/tile_ring on a PAL console, staging mode: the same lap as
+# scrolling_tile_ring.toml (the course is counted in frames, not seconds).
+# The PAL vertical blank is lines 225-311: a flush may end on line 86 at
+# most, counted from 225. Measured 2026-11-20 (luna v1.44.0): line 10, the
+# same 21 characters, 5 entries and 922 bytes as on NTSC.
+rom = "../../examples/scrolling/tile_ring/tile_ring.sfc"
+frames = 1150
+region = "pal"
+
+[[checkpoint]]
+at_frame = 1150
+[checkpoint.values]
+tr_laps         = { eq = 1, width = 2 }
+tr_starved      = { eq = 0, width = 2 }
+tr_refused      = { eq = 0, width = 2 }
+tr_max_entries  = { ge = 4, le = 8, width = 2 }
+tr_max_cost     = { ge = 600, le = 1300, width = 2 }
+tr_max_lines    = { le = 86, width = 2 }

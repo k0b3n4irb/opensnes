@@ -86,12 +86,12 @@
       }
     },
     "world": {
-      "cycles": 31747,
+      "cycles": 23767,
       "detail": {
-        "oamPlaceWorld@sprite": 229544,
-        "oamPlaceWorld@next8": 133840,
-        "opensnes_font_2bpp_end": 116280,
-        "oamPlaceWorld@x_done": 85600
+        "oamPlaceWorld": 78440,
+        "ph_plain_n": 37160,
+        "ph_y19": 25982,
+        "ph_y16": 25920
       }
     },
     "vramc": {
@@ -113,12 +113,12 @@
       }
     },
     "worldo": {
-      "cycles": 36309,
+      "cycles": 27803,
       "detail": {
-        "oamPlaceWorld@oslot": 297542,
-        "opensnes_font_2bpp_end": 116032,
-        "oamPlaceWorld@onext8": 113800,
-        "oamPlaceWorld@ox_done": 87542
+        "oamPlaceWorld": 75782,
+        "ph_ord_n": 36822,
+        "pl_t3": 25834,
+        "ph_y48": 23280
       }
     },
     "hideeach": {
@@ -131,12 +131,75 @@
       }
     },
     "hiderange": {
-      "cycles": 9820,
+      "cycles": 4614,
       "detail": {
-        "oamHideRange@low": 102760,
-        "oamHideRange@mid": 67600,
-        "oamHideRange": 9240,
-        "oamHideRange@done": 5200
+        "_ohr_run": 25920,
+        "_ohr_lo2": 24880,
+        "opensnes_font_2bpp_end": 8138,
+        "_ohr_lo1": 6880
+      }
+    },
+    "mapcol": {
+      "cycles": 13158,
+      "detail": {
+        "_ProcessVerticalBuffer": 220400,
+        "_maupd4": 14160,
+        "_mapupd9": 7080,
+        "_mapupd3": 6480
+      }
+    },
+    "maprow": {
+      "cycles": 14981,
+      "detail": {
+        "_hrun": 237320,
+        "_mapupd8": 20400,
+        "_ProcessHorizontalBuffer": 17120,
+        "_mapupd3": 7280
+      }
+    },
+    "hide1": {
+      "cycles": 1710,
+      "detail": {
+        "_ohr_one": 10200,
+        "opensnes_font_2bpp_end": 9058,
+        "_ohr_done": 5240,
+        "NmiHandler@oam_done": 4496
+      }
+    },
+    "hide128": {
+      "cycles": 10158,
+      "detail": {
+        "_ohr_run": 101920,
+        "_ohr_mid": 34120,
+        "_ohr_lo2": 24880,
+        "_ohr_big": 9320
+      }
+    },
+    "oamfast": {
+      "cycles": 82825,
+      "detail": {
+        "row_oamfast@do_body": 988230,
+        "row_oamfast@if_false": 291800,
+        "row_oamfast@cond_join": 208184,
+        "row_oamfast@if_join": 60902
+      }
+    },
+    "oamattr": {
+      "cycles": 50629,
+      "detail": {
+        "oamSetAttr": 445964,
+        "row_oamattr@for_body": 436262,
+        "oamSetAttr@x_done": 96166,
+        "oamSetAttr@none": 28960
+      }
+    },
+    "oambatch": {
+      "cycles": 36686,
+      "detail": {
+        "oamSetBatch@gen_done": 407524,
+        "oamSetBatch@gen": 267640,
+        "opensnes_font_2bpp_end": 43000,
+        "oamSetBatch@done": 5760
       }
     }
   }

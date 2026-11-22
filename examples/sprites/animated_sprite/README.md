@@ -69,7 +69,7 @@ and the cadence:
 DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 4, 8, 12, 64);
 
 animPlay(&kit_anim, &walk_down);       /* continues if already playing */
-kit.gfx_frame = animTick(&kit_anim);   /* the tile number for oamSet() */
+kit.gfx_frame = animTick(&kit_anim);   /* the tile number for oamSetAttr() */
 ```
 
 Animation only advances when a direction button is held. `ANIM_DELAY` (6 frames)
@@ -86,7 +86,7 @@ Many SNES games use this to halve the sprite art needed for left/right movement.
 ### Sprite Sheets in VRAM
 
 All animation frames are loaded into VRAM at once via `oamInitGfxSet()`. The
-active frame is selected by changing the tile number in `oamSet()`. This means
+active frame is selected by changing the tile number given to `oamSetAttr()`. This means
 switching frames is instant -- just change a number, no DMA needed.
 
 ### 32x32 Tiles in OAM

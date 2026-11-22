@@ -55,7 +55,7 @@ Nous les signalons parce que quelqu'un vous posera la question.
 ## 4. Une question sans réponse arbitrée, constatée par un autre projet
 
 Un jeu construit sur notre SDK a constaté que
-« cartouche ne trouve pas de source arbitre » sur la vitesse réelle du
+« corpus ne trouve pas de source arbitre » sur la vitesse réelle du
 SA-1 selon la mémoire utilisée (environ 5,4 MHz quand les deux
 processeurs travaillent depuis la ROM, d'après la table du test de
 vitesse SA-1 que notre `sa1.h` cite). Nous ne l'avons pas re-vérifié

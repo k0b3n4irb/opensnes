@@ -1,5 +1,9 @@
 # the second access needs no reload at all: X is known across the label
 # (peephole_xflow, 2026-10-13), and the addition reads tab,x as its operand
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in index_x: absent \tldx
 in index_x: absent \tlda\.b tcc__lf\+\d+\n\ttax\n\tlda
 in index_x: present \tadc\.w tab,x\n

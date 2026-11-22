@@ -23,6 +23,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
+| draw a sprite whose attribute byte (flip, priority, palette) the game keeps composed | `oamSetAttr`, `OAM_ATTR` | `sprite` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | hide a sprite that left the screen, or a run of them | `oamHide`, `oamHideRange` | `sprite` | [demos/rpg](../examples/demos/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/aseprite_pipeline](../examples/sprites/aseprite_pipeline/) |
@@ -90,7 +91,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | structure a game in several files (a screen layer, a checksummed save, a test per screen) | `fadeStart`, `fadeStep`, `vramQueuePush`, `sramLoad`, `sramSave` | `vramqueue`, `sram` | [games/shard_dash](../examples/games/shard_dash/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
 | send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushWithin` (the push that checks a budget you give), `vramQueuePushSprite`, `vramQueuePushSpriteWithin` (a whole sprite frame within your budget), `vramQueueFlush`, `vramQueueFlushUntil` (what ends before a scanline; the rest kept in order), `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
-| place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
+| place the sprites of a scrolling game (world coordinates, camera, culling; sorted by depth, two sizes in one order) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | write the OAM entries of N alike objects (bullets, particles) from arrays, in one call | `oamSetBatch`, `OamBatch` | `sprite_batch` (opt-in) | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress LZ77 tiles (into VRAM under forced blank, or into RAM of any bank with the screen on) | `lzssDecodeVram`, `lzssDecodeRam` | `lzss` | [memory/lzss_ram](../examples/memory/lzss_ram/) — about 100 master cycles per byte, 160 for tiles |
@@ -122,11 +123,11 @@ its header.
 | Header | Functions | Where it is explained |
 |---|---|---|
 | `anim.h` | `animRestart` | [animation](tutorials/animation.md) |
-| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio_samples.md) |
+| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopVoices`, `audioStopAll` | [audio: choosing the voice](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch`, `audioSetVoiceVolumePitch`, `audioSetVoicePan` | [audio: volume and pitch](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio_samples.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio_samples.md) |
-| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio_samples.md) |
+| `audio.h` | `audioIsReady`, `audioCommandDone`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio_samples.md) |
 | `audio.h` | `audioLoadSampleAt`, `audioLoadSampleBeginAt` | [audio: a swap area](tutorials/audio_samples.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
@@ -198,6 +199,7 @@ topic without naming most of the API.
 | `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
 | `object.h` | [The Object Engine](tutorials/object.md), [how it works](tutorials/object_engine.md) | ✅ |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
+| `tilering.h` | [Scrolling](tutorials/scrolling.md) — maps with more characters than VRAM | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
 Every public header is covered: 16.16 maths in the [Math](tutorials/math.md)

@@ -9,7 +9,7 @@
 
 ## 1. Vitesse du SA-1 : pris, et corrigé chez nous
 
-Relu avec `snes_get(2a9489fee54a5b11, context=1)` : la fiche et sa table
+Relu avec `corpus get(2a9489fee54a5b11, context=1)` : la fiche et sa table
 de valeurs (`1cf244fb710b7a3a`). Deux endroits du SDK recopiaient la table
 du README :
 

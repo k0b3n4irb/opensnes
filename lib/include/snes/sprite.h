@@ -304,9 +304,14 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
- * @note **Performance**: `oamSet()` is written in assembly and is cheap; use it
- * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
- * (see "Fast Macro Sprite API" below) save the call itself.
+ * @note **Performance**: `oamSet()` is written in assembly; about 2,030 master
+ * cycles a sprite, the call and its seven arguments included (SlowROM,
+ * devtools/libbench, row `oamset`). A game that keeps the attribute byte
+ * composed pays about 1,580 with oamSetAttr(); one with arrays of x, y, tile
+ * and attribute about 1,150 a sprite with oamSetBatch(). The `oamSetFast()`
+ * macro costs more than the call (about 2,590: the compiled C writes each byte
+ * through a computed index), and so does `oamSetXYFast()` against oamSetXY()
+ * (about 1,920 against 1,330).
  *
  * @note Any integer type works for the coordinates you keep on your side
  * (`u16`, `s16`, struct members or plain variables). Until 2026-09-21 this
@@ -318,6 +323,30 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
+
+/**
+ * @brief Set a sprite whose attribute byte the game keeps composed
+ *
+ * oamSet() with the attribute byte given whole: @p attr is stored as the
+ * fourth OAM byte (vhoopppc, as OAM_ATTR() builds it; its bit 0 is bit 8
+ * of the tile), the low byte of @p tile as the third. Nothing is shifted
+ * or masked, so a game that keeps the byte in its data (one per object or
+ * per animation frame) pays neither the composition nor the two extra
+ * arguments of oamSet(). Same x, y, ninth x bit, size bit untouched, same
+ * invalid-id rule.
+ *
+ * @param id Sprite ID (0-127)
+ * @param x X position (0-511, negative wraps)
+ * @param y Y position (0-255), as oamSet() takes it
+ * @param tile Tile number: its low byte is stored, bit 8 comes from @p attr
+ * @param attr Attribute byte (vhoopppc)
+ *
+ * @code
+ * u8 attr = OAM_ATTR(tile, pal, prio, OBJ_FLIPX);   // once, when it changes
+ * oamSetAttr(id, x, y, tile, attr);                 // every frame
+ * @endcode
+ */
+void oamSetAttr(u16 id, u16 x, u16 y, u16 tile, u16 attr);
 
 /**
  * @brief Set sprite X position
@@ -386,6 +415,8 @@ typedef struct {
     u8   count;          /**< 21: number of sprites */
     u8   size;           /**< 22: width and height in pixels: 8, 16, 32 or 64 */
     const u8 *order;     /**< 24: optional, one byte per slot: slot i shows sprite order[i]. 0: slot i shows sprite i */
+    const u8 *big;       /**< 28: optional, one byte per sprite: not 0 = large (`size_big`), 0 = small (`size`). 0: one size, size bits untouched */
+    u8   size_big;       /**< 32: width and height in pixels of a large sprite; read only with `big` */
 } OamWorldBatch;
 
 /* Not under the host's syntax check (clang, 8-byte pointers): the layout
@@ -399,6 +430,8 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, first_id) == 20, "OamWorldBatch
 _Static_assert(__builtin_offsetof(OamWorldBatch, count) == 21, "OamWorldBatch.count offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.size offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.order offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, big) == 28, "OamWorldBatch.big offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, size_big) == 32, "OamWorldBatch.size_big offset (sprite_world.asm)");
 #endif
 
 /**
@@ -414,8 +447,23 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  * - **`visible[]`** tells the game which sprites were placed, so that it
  *   can skip its own work (animation, streaming) for the others without
  *   testing again. Pass 0 if it is not wanted.
- * - **The size bit is not touched**: set it once with oamSetSize(). A batch
- *   has one size; a game with two sizes makes two calls.
+ * - **Without `big`, the size bit is not touched**: set it once with
+ *   oamSetSize(). The batch has one size, `size`.
+ * - **`big`, for sprites of two sizes in one drawing order.** One byte per
+ *   sprite (indexed by the sprite, as `tile`): 0 is small, `size` pixels,
+ *   any other value large, `size_big` pixels (the two sizes the game chose
+ *   with oamInit(), e.g. OBJ_SIZE16_L32: 16 and 32). The screen test
+ *   uses each sprite's own size, and the call writes the size bit of every
+ *   slot of the batch: set for a placed large sprite, clear for a placed
+ *   small one AND for every hidden slot (a hidden entry is small). Two calls of one size each would put the sprites
+ *   in OAM order by size, which is not the game's drawing order. Only the
+ *   byte is read, but as a word: the byte after the last sprite's is read
+ *   too, as for any array (harmless in RAM and ROM).
+ *   Cost, measured (devtools/placebench, rows `mix`, SlowROM): about
+ *   1 090 master cycles a placed small sprite, 1 200 a large one and 770
+ *   a hidden one in a large batch (with `order`, about 100 more each);
+ *   a call of one sprite about 6 800, since a batch with `big` always
+ *   takes the path of the large batches.
  * - **`cam_y` is the y you give bgSetScroll()**: a sprite and the
  *   background it stands on take the same camera value.
  * - A batch that runs past sprite 127 stops there.
@@ -428,10 +476,22 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  *   `order[i]`: the arrays stay indexed by the sprite and the sort permutes
  *   `count` bytes. `visible[]` stays indexed by the sprite. An `order`
  *   byte that is not under `count` hides its slot. A batch declared without
- *   the field (the eight initialisers of the example below) has `order` 0.
- *   Cost, measured (devtools/libbench, rows `world` and `worldo`): with
- *   `order`, about 240 master cycles more a sprite (+14 %); without it,
- *   one test a call, about 180 master cycles whatever the count.
+ *   the field (the eight initialisers of the example below) has `order` 0,
+ *   and `big` 0 likewise.
+ *   Cost, measured (devtools/placebench, SlowROM): with `order`, about
+ *   230 master cycles more a placed sprite, 260 a hidden one.
+ * - **Cost** (devtools/placebench, master cycles, SlowROM): a call of one
+ *   sprite about 3 300; in a large batch, about 940 a placed sprite and
+ *   590 a hidden one (FastROM: 2 800, 810, 510). The code is about 13 KB,
+ *   placed by the linker in any bank.
+ * - **What the call touches besides the OAM shadow and `visible[]`**: the
+ *   two camera arguments it was given are left as they were; the tile and
+ *   attribute bytes of a sprite it hides are left as they were (only x, y
+ *   and the ninth x bit say hidden, as oamHide() does); it uses up to 30
+ *   bytes of the `tcc__lf` block as scratch (all 40 with `big`), which the
+ *   ABI gives any callee (compiler/ABI.md). Within the call, the ninth x
+ *   bits of a group of eight OAM entries are written together after the
+ *   group's entries.
  *
  * @param batch The sprites (see OamWorldBatch)
  * @param cam_x World x of the screen's left edge
@@ -450,6 +510,12 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.or
  * static u8 by_depth[12];                 // by_depth[0]: the actor in front
  * static const OamWorldBatch sorted = {
  *     ax, ay, atile, aattr, aseen, 0, 12, 32, by_depth
+ * };
+ *
+ * // two sizes in one order, oamInit(OBJ_SIZE16_L32, ...): abig[i] != 0 is 32x32
+ * static u8 abig[12];
+ * static const OamWorldBatch mixed = {
+ *     ax, ay, atile, aattr, aseen, 0, 12, 16, by_depth, abig, 32
  * };
  * @endcode
  */
@@ -506,8 +572,11 @@ void oamHide(u16 id);
  * Does to sprites @p first to @p first + @p count - 1 what oamHide() does
  * to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A
  * scene that clears or parks many sprites a frame (a pool of effects, the
- * sprites a screen no longer shows) pays about a quarter of what the same
- * loop of oamHide() calls costs.
+ * sprites a screen no longer shows) pays, the call included: 1,710 master
+ * cycles for one sprite, 2,750 for 4, 4,610 for 32, 10,160 for all 128,
+ * about 58 a sprite past the first few; a loop of oamHide() costs about 800
+ * a sprite (SlowROM, devtools/libbench, rows hide1, hiderange, hide128,
+ * hideeach).
  *
  * @param first First sprite ID (0-127); at 128 or more nothing is done
  * @param count How many; the run is cut at sprite 127, 0 does nothing
@@ -822,30 +891,29 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 /*============================================================================
  * Fast Macro Sprite API
  *
- * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
- * These write directly to oamMemory[] without function call overhead.
+ * Inline alternatives to oamSet/oamSetXY: they write directly to oamMemory[]
+ * without a function call.
  *
- * oamSet() is a call with seven arguments pushed and a stack frame; for a
- * handful of sprites updated every frame the macros below write the four
- * OAM bytes in place. (A byte count of an earlier oamSet's frame and a
- * "visible jitter" claim stood here until 2026-10-04; the cost is in
- * docs/PERF.md, measured, not here.)
+ * The macros below write the OAM bytes in place, from C. They are NOT
+ * cheaper than the assembly setters: measured per sprite (devtools/libbench,
+ * SlowROM), oamSetFast() 2,590 master cycles against oamSet() 2,030 and
+ * oamSetAttr() 1,580, oamSetXYFast() 1,920 against oamSetXY() 1,330. They
+ * stay for code that wants the writes inline; for speed, call the setters.
  *
  * Note: cc65816 does not truly inline 'static inline' functions — they
  * become separate SUPERFREE sections with global labels that conflict
- * across translation units. Macros are the only zero-overhead option.
+ * across translation units; hence macros.
  *
  * oamMemory[] and oam_update_flag are declared in <snes/system.h>
  * (included automatically via <snes.h>).
  *
  * Usage:
- *   // Pre-compute attribute byte once at init
+ *   // Pre-compute attribute byte once at init, then per frame:
  *   u8 attr = OAM_ATTR(tile, palette, priority, flags);
+ *   oamSetAttr(id, x, y, tile, attr);      // the cheapest full update
  *
- *   // Per-frame: fast full update
+ *   // the inline forms
  *   oamSetFast(id, x, y, tile, palette, priority, flags);
- *
- *   // Per-frame: position-only update (most common)
  *   oamSetXYFast(id, x, y);
  *============================================================================*/
 
@@ -875,11 +943,10 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
           (_slot) == 2 ? 0x10 : 0x40))
 
 /**
- * @brief Set sprite properties with zero function-call overhead
+ * @brief Set sprite properties with inline writes
  *
- * Drop-in replacement for oamSet() that writes directly to oamMemory[].
- * Same parameters, same behavior, but compiles to direct memory writes
- * instead of a call to oamSet().
+ * Same parameters and behavior as oamSet(), written directly to
+ * oamMemory[] instead of a call. Measured slower than the call (see above).
  *
  * @param _id Sprite ID (0-127)
  * @param _x X position (0-511)
@@ -908,8 +975,8 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 /**
  * @brief Update sprite position only (most common per-frame operation)
  *
- * Fastest possible sprite update — only writes X, Y, and X high bit.
- * Use when tile/palette/priority/flags don't change between frames.
+ * Writes only X, Y and the X high bit, inline. Measured slower than
+ * oamSetXY() (see above).
  *
  * @param _id Sprite ID (0-127)
  * @param _x X position (0-511)

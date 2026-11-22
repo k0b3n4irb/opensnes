@@ -1,7 +1,7 @@
-# OpenSNES → Cartouche (rag-partner) — rapport du 2026-09-11
+# OpenSNES → Corpus (rag-partner) — rapport du 2026-09-11
 
 **De :** OpenSNES SDK (`k0b3n4irb/opensnes`, HEAD `0ffd06bf`, develop)
-**Corpus sondé :** état `snes_sources` du 2026-09-10 — 195 sources capturées
+**Corpus sondé :** état `corpus sources` du 2026-09-10 — 195 sources capturées
 sur 218 recensées, 7 arbitres généraux, 9 arbitres de domaine.
 **Contexte :** la revue des manques du SDK du 2026-09-11
 (`.claude/notes/reviews/2026-09-11_gaps_review.md`, branche `wip/gaps-review`)
@@ -9,7 +9,7 @@ a sondé le corpus pour savoir ce qu'un agent de développement y trouve, et
 ce qu'il n'y trouve pas. Ce rapport ne porte que sur le corpus : sources à
 ingérer, requêtes de validation, et deux remarques d'usage.
 
-**Méthode :** huit requêtes `snes_search` avec
+**Méthode :** huit requêtes `corpus search` avec
 `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]` (obligatoire chez
 nous pour toute vérification : nos propres docs sont indexées et
 transformeraient la question en boucle de confirmation), `k=3` ou `4`. Une
@@ -101,10 +101,10 @@ du corpus ne couvre ce sujet » serait plus utile qu'un classement de
 passages hors sujet.
 
 **b. La liste des sources n'est pas dans notre dépôt.** Notre règle
-`hardware_claims.md` impose `snes_search` pour tout claim matériel, mais
+`hardware_claims.md` impose `corpus search` pour tout claim matériel, mais
 rien chez nous ne dit quelles sources existent ni quelles « golden queries »
 l'audit de 2026-09 avait retenues (elles vivent dans un artefact externe).
-Le SDK va se doter d'une note `.claude/notes/tech/cartouche_corpus.md`
-(item D6 de la revue) reprenant la sortie de `snes_sources` et les requêtes
+Le SDK va se doter d'une note `.claude/notes/tech/reference_corpus.md`
+(item D6 de la revue) reprenant la sortie de `corpus sources` et les requêtes
 ci-dessus. Si le corpus expose un identifiant de version ou une date
 d'index, on aimerait l'y épingler pour détecter la dérive.

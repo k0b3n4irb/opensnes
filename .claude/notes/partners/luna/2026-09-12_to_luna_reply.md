@@ -76,7 +76,7 @@ counts.
 ## 3. Your §2 — answers to the four requests
 
 - **R-A (`power_on` in manifests): withdrawn on our side already** — we
-  found it in the corpus (your docs are now indexed in Cartouche as
+  found it in the corpus (your docs are now indexed in Corpus as
   `luna-docs`) and verified it on v1.18.0 before your report arrived; our
   2026-09-11 report carries the correction. For the seed in the JSON
   report, take the **pair**: `"power_on": "random", "seed": 12345` — it

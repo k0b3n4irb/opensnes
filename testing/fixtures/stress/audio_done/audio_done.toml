@@ -1,0 +1,35 @@
+# audioCommandDone(), the acknowledgement read without waiting (main.c).
+# Nothing pending: 1. Right after audioStopVoices() (the driver holds the
+# key-off 132 of its cycles): 0, then 1 after a few calls. After a 1 the
+# command is forgotten and the next send does not wait; an nmiSetLag()
+# callback, the only sender, sends on each lag frame it reads 1.
+# Measured (2026-11-19): 6 to 7 calls up to the 1; a send after the 1, 3
+# scanlines with the measure (1 alone); the same send right after the stop, 5.
+# Built with `make clean && make FAULT=1` (the function always reads 1),
+# r_first_zero reads 0 and r_calls_max 1: the run fails.
+rom = "audio_done.sfc"
+frames = 400                     # the run ends before frame 300
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = { eq = 0xC0DE, width = 2 }
+"r_idle" = { eq = 2, width = 2 }               # 1 + 1 with nothing pending
+"r_idle_errs" = { eq = 0, width = 2 }
+"r_rounds" = { eq = 64, width = 2 }
+"r_first_zero" = { eq = 64, width = 2 }        # 0 at once after every send
+"r_never" = { eq = 0, width = 2 }              # and 1 before the bound, every time
+"r_calls_min" = { ge = 2, width = 2 }          # measured 6
+"r_calls_max" = { le = 40, width = 2 }         # measured 7; the bound is 4000
+"r_pending_left" = { eq = 0, width = 2 }       # a 1 forgets the command
+"r_next_bad" = { eq = 0, width = 2 }
+"r_round_errs" = { eq = 0, width = 2 }
+"r_lines_empty" = { le = 1, width = 2 }        # the measure alone
+"r_lines_after_done" = { le = 3, width = 2 }   # the send after a 1: no wait
+"r_lines_no_done" = { ge = 4, width = 2 }      # the same send waiting for the stop
+"r_lag_runs" = { eq = 120, width = 2 }
+"r_lag_sends" = { ge = 100, width = 2 }        # measured 120: one per lag frame
+"r_lag_bad" = { eq = 0, width = 2 }
+"r_lag_errs" = { eq = 0, width = 2 }
+"audio_error_count" = { eq = 0, width = 2 }

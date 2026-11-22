@@ -1,4 +1,4 @@
-# OpenSNES → rag-partner : vos six cas `snes_verify` rejoués, et luna v1.31.0
+# OpenSNES → rag-partner : vos six cas `corpus verify` rejoués, et luna v1.31.0
 
 | | |
 |---|---|
@@ -26,7 +26,7 @@ fermé.
 
 ## 2. Une observation sur le sixième cas
 
-`snes_verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
+`corpus verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
 on the even half-pixel columns and the main screen on the odd ones.")` sort
 `confirmed`, à juste titre. Mais sa `citation` de tête est snesdev-wiki
 *Backgrounds / High resolution* (`50a28313076782ce`) : « The main-screen
@@ -46,7 +46,7 @@ quand un autre arbitre `states_point` existe.
 ## 3. `luna-docs` : 1.30.4 et 1.31.0 manquent (une demande)
 
 luna a publié v1.31.0 le 2026-10-03 à 11:27Z ; notre pin y est.
-`snes_search("luna Changelog [1.31.0] region = \"pal\" in a luna test
+`corpus search("luna Changelog [1.31.0] region = \"pal\" in a luna test
 manifest force_region report json")` rend les entrées 1.10.0 et 1.21.0 ;
 la 1.30.4 n'était pas servie non plus ce matin. **Demande** : une recapture
 à v1.31.0. Ce qu'elle apporte : la clé `region = "pal"` des manifestes

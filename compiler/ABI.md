@@ -215,8 +215,8 @@ $00:0018-001B   tcc__r9, tcc__r9h
 $00:001C-001F   tcc__r10, tcc__r10h
 $00:0020        tcc__retval_hi           (high half of a 32-bit return)
 $00:0022-0033   the handlers' pointers and flags (nmi_callback, …), tcc__fp
-$00:0080-009F   tcc__lf                  (32 bytes: values that do not live across a call)
-a page placed by the linker   tcc__nmi_registers   (the NMI handler's own direct page, 160 bytes, page-aligned)
+$00:0080-00A7   tcc__lf                  (40 bytes: values that do not live across a call)
+a page placed by the linker   tcc__nmi_registers   (the NMI handler's own direct page, 168 bytes, page-aligned)
 ```
 
 `tcc__r9` and `tcc__r10` are the **scratch registers** used for inline
@@ -225,16 +225,19 @@ as **caller-saved**: any function call may clobber them.
 
 **`tcc__lf` is caller-saved too, and a callee may use it.** The compiler
 keeps there the temporaries of a function that calls nothing (all of them
-when they fit in its 16 words; otherwise the costliest ones — use count
+when they fit in its 20 words; otherwise the costliest ones — use count
 weighted by loop depth — and the rest in a stack frame), and, in a
 function that calls, only the temporaries no call crosses (a value that
 must survive a call is on the stack). A function with an object on the
 stack (a local whose address is taken, a dynamic allocation) and no call
 keeps all its temporaries on the stack. So nothing in `tcc__lf` is expected
-to survive a `jsl`, and hand-written assembly called from C may use its 32
+to survive a `jsl`, and hand-written assembly called from C may use its 40
 bytes as scratch for the length of the call, like the `tcc__r*` slots.
-First user in the library: `oamPlaceWorld()` with an `order` array
-(`lib/source/sprite_world.asm`, 2026-10-10). Assembly that is NOT called
+First user in the library: `oamPlaceWorld()` (`lib/source/sprite_world.asm`,
+2026-10-10), which uses up to 30 of the 40 bytes (its camera constants,
+group limits and, with an `order` array, the order pointer and the slot;
+14 bytes with `order` only before 2026-11-15), and all 40 with a `big`
+array (the large size's camera constants, since 2026-11-21). Assembly that is NOT called
 from C — a handler — must not touch it: it would be writing the
 interrupted function's temporaries.
 
@@ -321,6 +324,13 @@ Constraints to respect:
   Plain globals remain the SDK convention for NMI flag handshakes
   (`vblank_flag`, `oam_update_flag`) only for cycle-cost equivalence —
   not because `volatile` is broken.
+- **A hardware register must be read through a volatile lvalue**: a
+  non-volatile byte is read as a word (`lda` with a 16-bit accumulator,
+  then `and.w #$00FF`), so the byte above it is read as well. Only a
+  `volatile` access, or an address whose compile-time constant part lies
+  outside `$0000-$1FFF` and banks `$7E-$7F`, keeps the 8-bit read
+  (`byte_load_as_word` in `w65816/emit.c`; `QBE_NO_BYTE_WORD=1` turns the
+  word read off). Hand-written assembly that C calls is not concerned.
 
 ---
 

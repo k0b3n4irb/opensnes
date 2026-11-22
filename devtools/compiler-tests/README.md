@@ -63,6 +63,7 @@ one-TU ROM whose globals the sibling `test_*.py` asserts through
 | `a7_32bit` | 32-bit (`Kl`) arithmetic: add/sub carry, mul, div, mod, shifts by constant, signed folds |
 | `a6_farptr` | the 4-byte pointer ABI: bank byte through every lib boundary |
 | `b2_far_ram` | `FAR` objects in bank $7E with bank-honouring codegen |
+| `far_bank7f` | `FAR` objects in bank $7F placed by assembly: every access form, `memcpy`/`memset`, no overlap |
 | `debug_channel` | the debug channel to luna |
 | `c_features` | switch (dense / sparse / fall-through / negative / 32-bit), function pointers (const and RAM tables, callback, struct member), bit-fields, enum, goto, recursion, 32-bit `* / %` and variable shifts on runtime operands, promotions and truncations, signed division rounding, short-circuit side effects, `sizeof` of the target's types, const far reads (gaps review C2) |
 

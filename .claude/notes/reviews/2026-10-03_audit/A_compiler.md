@@ -50,7 +50,7 @@ Négatif (rien de faux), mesuré sur luna : **133 vecteurs** de sonde corrects. 
 ## Risques
 
 - **Le gel du critère 7 est menacé tout de suite** : les n° 1 à 4 sont quatre défauts silencieux du compilateur trouvés le 2026-10-03, et chacun relance la quinzaine dès qu'il est consigné dans `silent_defects_log.md`.
-- **Les écritures `FAR` égarées tombent dans `$00:2000-$7FFF`.** Selon où l'éditeur de liens place l'objet dans `$7E:2000+`, un `++` peut écrire dans `INIDISP`, `NMITIMEN` ou un registre DMA, et sur une cartouche Super FX ou SA-1 dans les registres du coprocesseur (`$3000-$3FFF`). Le symptôme ne ressemblera alors à rien qui mène au compilateur.
+- **Les écritures `FAR` égarées tombent dans `$00:2000-$7FFF`.** Selon où l'éditeur de liens place l'objet dans `$7E:2000+`, un `++` peut écrire dans `INIDISP`, `NMITIMEN` ou un registre DMA, et sur un Game Pak Super FX ou SA-1 dans les registres du coprocesseur (`$3000-$3FFF`). Le symptôme ne ressemblera alors à rien qui mène au compilateur.
 - **Le refus des structs dépend de l'optimiseur** : `struct S c = b;` (alignement 2) compile quand gvn replie la copie (`p5` `sc1`, correct) et se fait refuser sinon. Le jour où une passe change, la frontière bouge sans prévenir.
 - **Les n° 6 et 7 sont latents** : ils deviennent réels dès qu'une passe d'élimination des stores morts entre dans QBE, ou dès qu'un utilisateur écrit une routine asm d'après `ABI.md`.
 - **Les fixtures prouvent les formes qu'on a pensé à écrire.** Les 4 défauts tombent tous à l'intersection de deux axes testés séparément (`FAR` × `++`, `FAR`/`const` × champ de bits, `u32` × agrégat × initialiseur). Aucun générateur combinatoire ni oracle différentiel n'existe.

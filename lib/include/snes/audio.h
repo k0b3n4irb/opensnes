@@ -8,8 +8,33 @@
  *       volume, per-voice control, dynamic BRR loading, playback with
  *       pan/pitch, echo with FIR filter, and live voice-state readback.
  *
- * @warning Main-thread only — do not call audio functions from an NMI
- *          callback. One engine per ROM: do not link `audio` and
+ * @par Callbacks
+ * One sender at a time: the main thread OR one callback, never both (two
+ * senders interleave on the four ports and corrupt the handshake).
+ * Whoever sends may be an nmiSetLag() callback (one sender, the main thread
+ * no longer calls audio*()): the ports are written by long address and the
+ * state is in WRAM below $2000, so the callback's data bank ($7E) changes
+ * nothing. Safe there (each one a posted command or a read of the WRAM
+ * mirror): audioSetVolume(), audioStopVoice(), audioStopVoices(),
+ * audioStopAll(), audioSetVoiceVolume(), audioSetVoicePitch(),
+ * audioSetADSR(), audioSetVoicePan(), audioSetVoiceVolumePitch(),
+ * audioPlaySample(), audioPlaySampleEx(), audioPlaySampleOn(),
+ * audioEnableEcho(), audioDisableEcho(), audioCommandDone(),
+ * audioGetVolume(), audioIsReady(), audioGetSampleInfo(),
+ * audioGetFreeMemory(). Run from a callback by
+ * `testing/fixtures/stress/audio_nmi`: audioSetVolume(), audioStopVoices(),
+ * audioSetVoiceVolume(), audioSetVoicePitch(), audioSetADSR(),
+ * audioSetVoicePan(), audioSetVoiceVolumePitch(), audioPlaySampleOn(),
+ * audioEnableEcho(), audioDisableEcho(); audioCommandDone() by
+ * `audio_done`; the others (thin wrappers, mirror reads, audioSetGain())
+ * take the same path and are not run there. Not for a callback: the ones
+ * that wait for a reply or stream bytes (audioInit(), audioLoadSample*(),
+ * audioLoadSampleStep(), audioGetVoiceState(), audioSetEcho(),
+ * audioSetEchoFilter(), audioReleaseEcho()): they spend
+ * frames in the handler. A command waits, bounded, for the acknowledgement
+ * of the previous one; in a callback gate the send with audioCommandDone().
+ *
+ * @warning One engine per ROM: do not link `audio` and
  *          `snesmod` together (both own the APU). `apuReset()` hot-swap
  *          works over this driver ($FE stays reserved).
  *
@@ -231,6 +256,46 @@ typedef struct {
 u8 audioInit(void);
 
 /**
+ * @brief Queue a key-off of the voices of @p mask (bit n = voice n)
+ *
+ * The command queue lets a game loop slower than the music say what to do
+ * and have it sent at the driver's pace, without waiting: the queue holds
+ * 16 orders (AUDIO_ERR_NO_MEMORY when full, nothing queued), and
+ * audioQueueDrain() sends them. Only the three below are queued; every
+ * other function sends at once.
+ *
+ * **One sender, one lock.** The queue is filled from the main thread and
+ * drained from one place (an nmiSetLag() callback, or the loop). While the
+ * main thread writes the ports ($2140-$2143: any command, a VSET, the block
+ * of a sample load) an interrupt-time drain sends nothing and tries again at
+ * its next call, so a load in steps (audioLoadSampleStep()) and a drain from
+ * a callback can share the ports. The queued orders keep their order; they
+ * are not dated.
+ */
+u8 audioQueueStopVoices(u8 mask);
+
+/** @brief Queue a master volume (0..AUDIO_VOL_MAX); see audioQueueStopVoices() */
+u8 audioQueueSetVolume(u8 volume);
+
+/** @brief Queue a voice pitch (14-bit); see audioQueueStopVoices(). The
+ *         mirrors (audioGetVolume(), audioGetVoiceState()) are not touched
+ *         by the queued functions. */
+u8 audioQueueSetVoicePitch(u8 voice, u16 pitch);
+
+/** @brief Orders queued and not yet sent */
+u8 audioQueueCount(void);
+
+/**
+ * @brief Send queued orders, at most @p maxCmds, without waiting
+ *
+ * Stops at the first order the driver cannot take yet (the previous command
+ * is not acknowledged) or when the ports are in use by the interrupted code.
+ * Call it once a frame from the nmiSetLag() callback.
+ * @return orders still queued
+ */
+u8 audioQueueDrain(u8 maxCmds);
+
+/**
  * @brief Check if audio system is ready
  *
  * audioInit() blocks until the driver answers, so there is no
@@ -240,6 +305,43 @@ u8 audioInit(void);
  * @return Non-zero if the driver answered audioInit()'s ping, 0 otherwise
  */
 u8 audioIsReady(void);
+
+/**
+ * @brief Has the sound CPU taken the last command? (never waits)
+ *
+ * A function that sends a command returns once the ports are written; the
+ * next command waits, bounded, for the sound CPU to acknowledge it before it
+ * writes its own (see audioInit()). This function is that wait without the
+ * wait: one read of the acknowledgement port. A caller that spreads its
+ * commands over several frames, from the main loop or from an nmiSetLag()
+ * callback, asks it first and sends only on a 1, so that no send ever
+ * spends the frame waiting for the previous one.
+ *
+ * On a 1 for an acknowledged command it forgets the command, as the next
+ * send would have, so the send that follows does not look at the port
+ * again. It never loops, sends nothing, writes no port and counts no error
+ * (`audio_error_count` does not move on a 0).
+ *
+ * Cost: a handful of instructions. Measured on luna
+ * (`testing/fixtures/stress/audio_done`): after audioStopVoices(), whose
+ * key-off the sound CPU holds about 2 scanlines, the function reads 0 for
+ * a few calls in a row before it reads 1.
+ *
+ * @note One sender only: the main loop or the callback, not both. Called
+ *       in an interrupt that lands inside a send of the main loop, it could
+ *       read the port before that send records its command.
+ *
+ * @return 1 when no command is pending or the sound CPU acknowledged it
+ *         (the command is then forgotten), 0 while it has not yet
+ *
+ * @code
+ * if (audioCommandDone()) {             // never blocks
+ *     audioSetVoiceVolume(v, vol[v]);   // posted at once, no wait inside
+ *     v = (u8)((v + 1) & 7);
+ * }
+ * @endcode
+ */
+u8 audioCommandDone(void);
 
 /** @} */
 
@@ -539,6 +641,11 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
  *
  * An explicit voice does not advance the round-robin counter.
  *
+ * A note is two commands, VSET then KON, when its volume and its pitch both
+ * differ from what the voice holds (three when its pan changed too); only the
+ * one that changed, or none, is sent otherwise
+ * (`testing/fixtures/stress/audio_note`).
+ *
  * @param voice Voice 0-7, or AUDIO_VOICE_AUTO for the round-robin choice
  * @param sampleId Sample slot (0-63)
  * @param volume Volume level (0-127)
@@ -555,13 +662,55 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
 u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch);
 
 /**
+ * @brief Stop several voices with one command
+ *
+ * Keys off every voice whose bit is set in @p mask: bit 0 is voice 0, bit 7
+ * voice 7 (`0x05` stops voices 0 and 2). One command to the sound CPU,
+ * whatever the number of voices, where a loop of audioStopVoice() sends one
+ * per voice and waits for each to be taken before sending the next: stopping
+ * four voices this way is one handshake instead of four.
+ *
+ * Like every key-off it starts the voices' release, it does not cut them: the
+ * S-DSP takes 8 off the envelope every sample, so a voice at full envelope is
+ * silent about 8 ms later (see audioLoadSampleBeginAt()).
+ *
+ * Cost: the call itself is the port writes (the acknowledgement is awaited by
+ * the next command). The sound CPU holds the key-off 132 of its cycles,
+ * about 2 scanlines, the same for one voice or eight, so a command sent
+ * right after waits for it. Measured on luna
+ * (`testing/fixtures/stress/koff_hold`), up to the end of a state read that
+ * follows: the read alone 7 scanlines; four voices stopped by one
+ * audioStopVoices() then the read, 11; by four audioStopVoice() then the
+ * read, 25.
+ *
+ * @param mask Voices to stop, one bit per voice number (0-7)
+ * @return AUDIO_OK (also for a @p mask of 0, which sends nothing), or
+ *         AUDIO_ERR_TIMEOUT when the previous command was never
+ *         acknowledged (nothing is sent then), as for audioStopVoice()
+ *
+ * @code
+ * audioStopVoices((1 << 0) | (1 << 2) | (1 << 5));   // voices 0, 2 and 5
+ * @endcode
+ */
+u8 audioStopVoices(u8 mask);
+
+/**
  * @brief Stop a specific voice
+ *
+ * audioStopVoices() with the one bit of @p voice.
+ *
  * @param voice Voice number (0-7)
+ * @return AUDIO_OK, AUDIO_ERR_INVALID_ID for a voice of 8 or more (nothing
+ *         is sent), or AUDIO_ERR_TIMEOUT as for audioStopVoices()
  */
 u8 audioStopVoice(u8 voice);
 
 /**
  * @brief Stop all audio playback
+ *
+ * audioStopVoices(0xFF): every voice in one command.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT as for audioStopVoices()
  */
 u8 audioStopAll(void);
 

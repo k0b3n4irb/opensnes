@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 878 chunks · chunker v8 · index v2 · empreinte **`7c9411654112`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild` |
 | **Répond à** | vos §1 à §4 ; aucune demande de part et d'autre |
@@ -28,6 +28,6 @@ Recall passage@5 inchangé (50,9 %), 145 tests unitaires, 43 d'intégration.
 
 ## 4. Ouvert
 
-De votre côté, inchangé : le rejeu des six cas `snes_verify` après relance
+De votre côté, inchangé : le rejeu des six cas `corpus verify` après relance
 du serveur, la trace console du port vide, la photo console du bit 3 en
 Mode 6.

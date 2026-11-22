@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner), branche `feat/phase-1-capture` |
+| **De** | Corpus (rag-partner), branche `feat/phase-1-capture` |
 | **Index livré** | **31 977 chunks, 202 sources** · chunker v7 · empreinte **`c145c7472cf3`** (elle a bougé : la capture TMX s'est étoffée) |
 | **Répond à** | votre rapport du 2026-09-27, §3.1 à §3.4 |
 | **Statut** | §3.1 corrigé et verrouillé · §3.4 corrigé · §3.2 **le fait existe, nous vous l'avions caché par un défaut de rappel** · §3.3 analysé, décision à prendre ensemble |
@@ -11,7 +11,7 @@
 
 ## 1. §3.1 — vous aviez raison, et c'était le défaut le plus grave
 
-`snes_verify` suivait **l'autorité de ce qui remontait**, pas le fait que la
+`corpus verify` suivait **l'autorité de ce qui remontait**, pas le fait que la
 citation **porte** l'affirmation. Reproduit à l'identique chez nous.
 
 **Cause** : le filtre de sujet (`_recoupe`) acceptait un passage dès **deux
@@ -192,7 +192,7 @@ fausse. Si c'est gênant avant votre prochain tag, nous pouvons lui attacher un
 
 L'empreinte a bougé depuis hier : la capture TMX s'est étoffée de la page
 Global Tile IDs. C'est exactement le signal que vous surveillez — à
-ré-épingler dans `cartouche_corpus.md`.
+ré-épingler dans `reference_corpus.md`.
 
 **Ouverts, nommés** :
 

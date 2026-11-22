@@ -71,7 +71,7 @@ def main() -> int:
             if name not in syms:
                 continue                       # registers/defines, not linked symbols
             bank, addr = syms[name]
-            if bank >= 0x01 and addr >= 0x8000:
+            if bank >= 0x01 and bank not in (0x7E, 0x7F) and addr >= 0x8000:
                 bad.append(f"  ${bank:02X}:{addr:04X}  {name}  (read bank-blind in {casm.name})")
     if bad:
         print("FAIL: C code reads bank $01+ data with bank-$00 addressing:")

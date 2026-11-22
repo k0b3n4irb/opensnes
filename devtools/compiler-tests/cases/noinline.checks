@@ -1,0 +1,22 @@
+# noinline: the function stays, its one caller calls it
+# (a call in tail position is a jml; QBE_INLINE_FAULT=noinline, which forgets
+# the keyword, turns these red)
+raw present \nkeep\.noinline:
+in one: present j[sm]l keep\b
+raw present \nkeep23\.noinline:
+in one23: present j[sm]l keep23\b
+raw present \nkeep_proto\.noinline:
+in one_proto: present j[sm]l keep_proto\b
+# the small inliner and the copy of `static inline` refuse it too
+raw present \ntiny\.noinline:
+in small: present j[sm]l tiny\b
+raw present \npick\.noinline:
+in both: present jsl pick[\s\S]*jsl pick
+# the same function unmarked, and one whose PARAMETER carries the attribute: absorbed
+raw absent \ngone\.
+in one_gone: absent j[sm]l
+raw absent \nparm\.
+in one_parm: absent j[sm]l
+# on an object: ignored, an ordinary initialised global
+raw present \nobj:
+in read_obj: present lda\.w obj

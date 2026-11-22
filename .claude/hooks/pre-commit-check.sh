@@ -21,15 +21,16 @@ case "$INPUT" in
         ;;
 esac
 
-TODAY=$(date +%Y-%m-%d)
-MARKER="/tmp/opensnes_tests_passed_${TODAY}"
+# One marker per working tree and per day (tree-key.sh says why).
+MARKER=""
+. "$(dirname "$0")/tree-key.sh" 2>/dev/null && tests_marker
 
-if [[ -f "$MARKER" ]]; then
+if [[ -n "$MARKER" && -f "$MARKER" ]]; then
     exit 0
 fi
 
-# Tests not run today — block
-cat <<'EOF'
-{"decision": "block", "reason": "BLOCKED: OpenSNES test suite has not been run today.\n\nRun the test suite first (single tool: luna):\n\n  make tests\n\nWhen it prints 'ALL CHECKS PASSED' the marker /tmp/opensnes_tests_passed_$(date +%Y-%m-%d) is created automatically.\n\nTo bypass for trivial changes (docs, comments), touch the marker manually:\n\n  touch /tmp/opensnes_tests_passed_$(date +%Y-%m-%d)\n\nSee CONTRIBUTING.md for the full testing workflow."}
+# Tests not run today in this working tree — block
+cat <<EOF
+{"decision": "block", "reason": "BLOCKED: the OpenSNES test suite has not been run today in THIS working tree.\n\nRun the test suite first (single tool: luna):\n\n  make tests\n\nWhen it prints 'ALL CHECKS PASSED' the marker of this tree is created automatically. A green run in another worktree does not count.\n\nTo bypass for trivial changes (docs, comments), touch this tree's marker:\n\n  touch ${MARKER:-/tmp/opensnes_tests_passed_DATE_TREE}\n\nSee CONTRIBUTING.md for the full testing workflow."}
 EOF
 exit 0

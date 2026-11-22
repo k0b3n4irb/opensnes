@@ -2,5 +2,5 @@
 in first: present lda\.l deref_string_literal_string
 in nth: present lda\.l deref_string_literal_string
 in idx: present lda\.l deref_string_literal_string
-in swapped: present lda \[tcc__r9\]
+in swapped: present lda \[tcc__(?:r9|lf\+\d+)\]
 absent lda\.w deref_string_literal_string

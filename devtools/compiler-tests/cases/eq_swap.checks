@@ -1,0 +1,6 @@
+# eq_swap: `a == b` with b left in A by the line before is `cmp a`, not
+# `sta T0 / lda a / cmp T0`; T0's store then goes (peephole_slotdead).
+# The twin eq_swap_off pins the old shape; an ordered compare is not swapped.
+in k: present lda\.w g\n\tand\.w #\$00FF\n\tcmp\.b tcc__lf\+\d+\n\tbeq
+in k: absent lda\.w g\n\tand\.w #\$00FF\n\tsta
+in lt: present lda\.w g\n\tand\.w #\$00FF\n\tsta\.b (tcc__lf\+\d+)\n\tlda\.b tcc__lf\+\d+\n\tcmp\.b \1\n\tbcc

@@ -29,9 +29,9 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | d337fd5767abf4f15e8bd0274eec25469755860b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 79ee5d9022fdb4c6a35f548e940f685e8032569a | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
+| compiler/cproc | 18eecca664b0f348f7f06c467bd11ea9328aeb31 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | d38a30a3e237895c71c684964bae6ec4bbdcc510 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -44,9 +44,11 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 49 patches since upstream merge-base 7051114
+### compiler/cproc — 51 patches since upstream merge-base 7051114
 
 ```
+18eecca attr: noinline reaches QBE as a linkage keyword — `__attribute__((noinline))` / `[[gnu::noinline]]` was skipped like any unknown hint and a one-site static marked noinline was absorbed all the same; kept per declarator (a parameter's or a member's is not the function's), merged across declarations, emitted before `function`; ignored on an object, as GCC does (I1 S3, 2026-11-14)
+82e1c1d attr: GNU attributes whose omission changes the program are refused — `mode`, `vector_size`, `ext_vector_type`, `alias`, `cleanup`, `section`, `noinit`, `persistent`, `ms_struct`, `scalar_storage_order` were skipped like any unknown attribute: `sizeof` of a `mode(QI)` type was 2, of a `vector_size(8)` type 2; the message names the attribute and why, in every spelling (`__mode__`, `[[gnu::mode]]`); weak, ifunc, may_alias, noreturn, naked, transparent_union stay skipped (harmless or a loud link error) (gcc.c-torture 20020108-1, scal-to-vec2, 2026-11-09)
 d337fd5 expr: an address above `$FFFF` cast to a plain pointer is refused — `(u8 *)0x708040` kept its bank only at a constant index, `p[i]` went to bank $00; a `__far` or `const` pointee, a function pointer and a negative sentinel pass; the value of `(u8 *)(BASE + 0x40 * n)` is computed without folding the tree (STRUCTURAL_DEFECTS A10, 2026-10-25)
 075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
 b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
@@ -101,7 +103,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 141 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 170 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -113,6 +115,25 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+8591689 perf(w65816): the byte swap of a 16-bit word is one `xba` — `mark_bswap` rewrites `or (shl x, 8), (shr x, 8)` (either order, all `w`) into the emitter's own `bswap` op before every analysis; `sar`, `l` and a count other than 8 refused; `QBE_NO_BSWAP=1` byte-identical, `QBE_BSWAP_FAULT=1` the provoked fault (fixture `bswap`)
+71b528d perf(w65816): an equality is compared from the operand A already holds — `eq_swap` for `ceqw`/`cnew` only, when A holds the second operand and not the first, `cmp` the first (Z is the same either way); refused if an operand lives in X/Y or the second is a 16-bit load; `QBE_NO_EQ_SWAP=1` byte-identical, `QBE_EQ_SWAP_FAULT=1` the provoked fault (fixture `eq_swap`)
+5a4c275 fix(w65816): the dead-store rule for a commutative operand is for a 16-bit operation only — `mark_dead_stores` case 3 dropped the store of arg[1] of a commutative operation trusting an A-cache swap the 32-bit pair path never makes; a 16-bit compare xored into a 32-bit accumulator lost its slot and the build stopped on `temp_noslot` (difftest_stmt seed 9922, pinned as `p16`, reachable with `static inline` helpers); the corpus and the library byte-identical (2026-11-14)
+0f52456 feat(inline): `noinline` is a linkage keyword every inliner refuses — `Lnk.noinline`; the small inliner's eligibility, `auto_inline_ok` (reason `noinline`) and the leaf rule's guess refuse it; `QBE_INLINE_FAULT=noinline` forgets it (check `noinline`); output byte-identical for code that does not write it (I1 S3, 2026-11-14)
+7bd8684 feat(inline): `CC_TRACE_INLINE` names why each call stays a call — one `decline` line per call auto_inline_ok or splice_fn refuses (the reason, the test before or after the callee's own inlining, the temporaries counted and those still used, the reason with the site count left out) and one `final` line per function (its IR size after its own copies); stderr only, the output byte-identical (I1 S2, 2026-11-14)
+f2e1f03 fix(w65816): no label ends in `.b`, `.w` or `.l`, which WLA-DX reads as an operand size — `inl_label` adds `_` after a copied block's cut label that would (three levels of copies failed the link), `wla_label_guard` refuses any function, block or datum label of that shape (a `static` of a source `b.c` / `w.c` / `l.c` linked to the wrong function); `QBE_INLINE_FAULT=label`, `QBE_LABEL_FAULT=noguard` (I1 S1, 2026-11-14)
+3f469bf perf(w65816): a far pointer read in its direct-page slot, stepped on 16 bits when one object of the unit is all it can point into — `peephole_dp_ptr` (the staging into tcc__r9 goes, `[tcc__lf+N]`, last of the text rules) and `farptr_web` / `farptr_step` (an object never crosses a bank; a pointer from one object of the unit, only dereferenced, adds on its low word); `QBE_NO_FARPTR_DP=1` byte-identical, `QBE_FARPTR_TRACE`, `QBE_FARPTR_FAULT=1..4`, `QBE_FARPTR_ASSERT=1` (lot E1, 2026-11-14)
+1888e97 fix(w65816): the X/Y colour reads a decomposed address's base and index only for the kinds that set them — a near dereference's entries were a former function's (an assertion on two programs of the 20 000-seed statement hunt) (lot XY, 2026-11-14)
+ca35268 perf(w65816): the X/Y colour as a lot, the loop rule kept where no coloured value lives — byte ranges of the coloured values passed to `peephole_loop_x`, the loop rule's counters learned from a plain emission stopped after it, webs joined only when no two members live together; `QBE_XY_ASSERT=1` (shadow slots, `stp` on a difference), `QBE_XY_FAULT=3`; compile time +2.5 % (lot XY, 2026-11-14)
+b7883df perf(w65816): G1 probe, a value that lives in X or Y, proved by its own emission — a third colour in `color_slots` (a web of 16-bit temps with an index use or a loop phi, never across a call, in X or Y), the function emitted again until its own text proves every coloured value; `QBE_NO_XY_COLOUR=1`, `QBE_XY_TRACE=1`, `QBE_XY_FAULT=1|2` (G1 probe, 2026-11-13)
+1aeda99 feat(w65816): the static-frame side table is written for every function, frames on or off — the S0 comment lines always, `sf=` (0 until a frame is given) and `; sframe table 1`; read by opensnes-rom place / check --objects; `QBE_SFRAME_FAULT=noedge` drops a call from the table (the check must refuse); the ROMs do not change (L4 S1, 2026-11-14)
+42c86ad feat(w65816): QBE_SFRAME_DUMP writes what a static frame would take, as comments — after each function's `.ENDS` (no text pass sees them): candidate or why not, stack and parameter bytes, every IR call with its argument bytes, the unit's address-taken names; read by devtools/sframe/sframe_count.py; the ROMs do not change (L4 S0, 2026-11-13)
+650a80e perf(w65816): tcc__lf has 20 words, and a plain source is the operand in place — peephole_fuse_indexed folds `lda SRC / sta T / ldx|ldy / lda Y / op T` into `lda Y / op SRC` (switches QBE_LF_WORDS, QBE_NO_PEEP_FUSE_SRC)
+a0c9619 perf(w65816): a dense switch is a jump table — the compare tree stays in the IR; jt_find evaluates a region of compares on one 16-bit value on all 65536 values and emits `asl a / tax / jmp (@jtt.N,x)` and a `.dw` table before `.ENDS` from 4 cases and 4 compares, 3 slots a compare (a range test is not a dispatch); the text passes see a group of `bvs` to the targets in place of the jump, rewritten by jt_rewrite; gapbench state 1.41 -> 1.35; `QBE_NO_JUMP_TABLE=1`, `QBE_JT_TRACE=1` (L2, 2026-11-12)
+70fa55c perf(w65816): two masks in a row are one — `and.w #K1 / and.w #K2` is `and.w #(K1 & K2)`: a byte read and its zero extension each masked the value; gapbench 2.22 -> 2.20; `QBE_NO_PEEP_AND2=1` (A6a R5, 2026-11-11)
+a475b76 perf(reassoc): a constant added to a loop counter goes into the symbol — `sym[i + k]` folded into `sym+k*s` only when i's own definition bounded it; testbound now takes the bound from a dominating `cultw i, N` (a loop's counter in its body), and the old add goes when the extension was its only use (ivar then scales the counter); the fill unrolled by hand 44157 -> 17718 cycles; `QBE_NO_REASSOC_LOOP=1` (A6a R4, 2026-11-11)
+ab06b6b perf(w65816): a load of what A already holds goes, across blocks — peephole_xflow carried A's slot across blocks for the tax rule only; it now drops `lda S` when A equals S on every way in and N/Z are dead (pp_nz_dead_after), and the base pass's `sta S / ldx P / lda S` takes ldy / tyx / txy and a block label; the fill's loop body is one store; gapbench 2.31 -> 2.22; `QBE_NO_PEEP_AFLOW=1` (A6a R3, 2026-11-11)
+780f5e9 perf(w65816): the counter of a rotated loop in Y when X is taken — the loop rule refused a body that wrote X (a table lookup, a second index) and left the counter in memory; a second pass uses Y when nothing but the counter's own reads writes it, and both passes now read `lda S / tax|tay`, `ldx|ldy S` and `lda P / clc / adc S` (commuted); gapbench 2.44 -> 2.31; `QBE_NO_PEEP_LOOPY=1` (A6a R2, 2026-11-11)
+b6e3071 perf(w65816): a byte read is a word read and a mask — `lda / and.w #$00FF` with a 16-bit accumulator in place of `sep #$20 / lda / rep #$20 / and`; never for a volatile access nor an address whose constant part is outside low RAM and banks $7E-$7F (a register may have a read side effect); gapbench geometric mean 2.55 -> 2.44; `QBE_NO_BYTE_WORD=1` (A6a R1, 2026-11-11)
 79ee5d9 gvn: a divide or remainder of two constants is folded — an integer div / rem is pinned (it may trap) and dedupins skipped every pinned instruction before foldref, so `19391 / 3584` called __sdiv16; it now goes through foldref, which refuses a zero divisor and INT_MIN / -1 at the class width; shard_dash and world_sprites lose 1 and 6 helper calls, the library byte-identical (2026-11-07)
 1dee06b perf(w65816): a leaf above 16 words keeps its costliest temps in tcc__lf — one word too many sent every temp of a leaf to the stack; it is coloured again as a function that calls with no temp crossing a call (costliest first in tcc__lf, the overflow on the stack); a 16.16 path walk 53 -> 42 instructions a turn, frame 40 -> 10 bytes, the corpus byte-identical; `QBE_NO_LEAF_SPLIT=1` (2026-11-04)
 42abcce perf(w65816): the per-object loop, 64 to 55 instructions: one-word copies share their source's slot, sinkload, peephole_slotdead
@@ -211,15 +232,22 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 5 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
+### compiler/wla-dx — 6 patches since the v10.7 release (stable section sort, 2026-11-10; chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
 
 ```
+96e7860 wlalink: sort_sections is a stable sort, so the ROM bytes do not depend on the system's qsort
 7382e4c wlalink: a section with no room names its first label, and says when it is larger than a bank
 8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+`96e7860` (2026-11-10): `_sections_sort` returned -1 for two sections of the same priority and size in both
+directions, which is not an order, and `qsort()` placed them as its implementation pleased (glibc keeps the original
+order; macOS and MinGW do not). The same sources linked to ROMs that differed by the addresses of RAM variables on each
+system (8 variables of the console module in `print_string`; 41 to 51 bytes of 262 144). Ties now keep the position
+the section had before the sort. On Linux, which already gave that order, the 65 example ROMs are byte-identical.
 
 `7382e4c` (2026-10-14) changes a message only: a section that finds no
 room in ROM is refused naming its first label (for a C const object, its C

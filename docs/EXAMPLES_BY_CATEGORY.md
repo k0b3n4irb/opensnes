@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 65 examples organized by topic. For a progressive learning path, see
+All 66 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -65,6 +65,7 @@ Move a world past the camera.
 | @subpage examples_scrolling_mixed_scroll | Multiple BG layers at different scroll rates |
 | @subpage examples_scrolling_continuous_scroll | A threshold camera over two layers in parallax |
 | @subpage examples_scrolling_parallax_scroll | Per-scanline HDMA parallax scrolling |
+| @subpage examples_scrolling_tile_ring | Eight-direction scrolling over 1,433 distinct characters: a ring of VRAM slots (`tilering`) |
 
 ---
 

@@ -47,12 +47,27 @@ except Exception:
     print("")
 ' 2>/dev/null) || OUTPUT=""
 
+# The raw scan leaves the COMMAND out: a command that merely names the banner
+# (a grep for it, a test of this hook) is not a green run. Seen 2026-11-12:
+# a command quoting the banner marked its own tree. If the input is not JSON
+# the whole of it is scanned, as before.
+RAW=$(printf '%s' "$INPUT" | python3 -c '
+import sys, json
+s = sys.stdin.read()
+try:
+    d = json.loads(s)
+    d.pop("tool_input", None)
+    print(json.dumps(d))
+except Exception:
+    print(s)
+' 2>/dev/null) || RAW="$INPUT"
+
 # Check for the success banner emitted by `make tests`
 if printf '%s' "$OUTPUT" | grep -qE 'ALL CHECKS PASSED' 2>/dev/null \
-   || printf '%s' "$INPUT" | grep -qE 'ALL CHECKS PASSED' 2>/dev/null; then
-    TODAY=$(date +%Y-%m-%d)
-    MARKER="/tmp/opensnes_tests_passed_${TODAY}"
-    echo "$(date '+%H:%M:%S') tests passed" >> "$MARKER" 2>/dev/null
+   || printf '%s' "$RAW" | grep -qE 'ALL CHECKS PASSED' 2>/dev/null; then
+    # One marker per working tree and per day (tree-key.sh says why).
+    . "$(dirname "$0")/tree-key.sh" 2>/dev/null && tests_marker \
+        && echo "$(date '+%H:%M:%S') tests passed" >> "$MARKER" 2>/dev/null
 fi
 
 exit 0

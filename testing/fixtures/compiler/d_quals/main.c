@@ -66,7 +66,10 @@ u16 r_bits_near;    /* near_bits = {5, 17, 200} -> 222 (control) */
 
 u16 r_done;
 
-static void dirty(void) {
+/* dirty() and rdp() must stay functions: dirty() fills the stack that zarr()
+ * and zstruct() then use, rdp() reads through a pointer the compiler cannot
+ * see the target of. noinline says so (I1 S3); two call sites did before. */
+static void __attribute__((noinline)) dirty(void) {
     volatile u8 junk[64];
     u16 i;
     for (i = 0; i < 64; i++)
@@ -84,7 +87,7 @@ static u16 zstruct(void) {
     return (u16)z.x | (u16)(z.x >> 16) | (u16)z.y | (u16)(z.y >> 16) | z.hp;
 }
 
-static u16 rdp(const struct bits *p) {
+static u16 __attribute__((noinline)) rdp(const struct bits *p) {
     return p->a + p->b + p->c;
 }
 

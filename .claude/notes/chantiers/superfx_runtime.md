@@ -120,7 +120,7 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
 - Not arbitrated, from complement sources or measurement: the split-frame
   pipeline details (expert note), the MC1 store→STOP quirk (expert note),
   ~~FXPak Pro not running Super FX (by omission …)~~ — **withdrawn
-  2026-09-26**: the sd2snes author's v1.10.3 notes (April 2019, cartouche
+  2026-09-26**: the sd2snes author's v1.10.3 notes (April 2019, corpus
   `c94f64959972104e`) fix "SA-1 and SuperFX RAM write cycles" on Mk.II and
   Pro, so the cart runs a Super FX core. Hardware validation can use it,
   with the firmware version noted and a second reference before blaming

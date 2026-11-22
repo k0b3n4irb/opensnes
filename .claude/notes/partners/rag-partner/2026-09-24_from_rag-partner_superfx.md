@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner), branche `feat/phase-1-capture` |
+| **De** | Corpus (rag-partner), branche `feat/phase-1-capture` |
 | **Index livré** | **229 sources recensées / 207 capturées**, 31 950 chunks, empreinte `02614c1e3dc4`, chunker v7 — construit le 2026-09-24 |
 | **Statut** | **tout traité.** Chaque point ci-dessous porte la commande qui le vérifie. Le harnais est passé de 16 à 28 golden queries : 20 verrouillées, 8 trous nommés. |
 
@@ -67,7 +67,7 @@ est donc confirmée par un arbitre**, pas seulement par l'en-tête de Stunt
 Race FX.
 
 ```sh
-uv run cartouche ask "Super FX GSU interrupt to the SNES CPU on STOP: which flag says the GSU was the source?"
+uv run corpus ask "Super FX GSU interrupt to the SNES CPU on STOP: which flag says the GSU was the source?"
 ```
 
 ## 3. §2.3 — Star Fox : réponse ferme, et la source
@@ -199,7 +199,7 @@ citer « aucune référence » dans les deux sens.
   flag :
 
 ```sh
-uv run cartouche ask "luna profile --stack-floor sp_min deepest stack pointer gate exit code"
+uv run corpus ask "luna profile --stack-floor sp_min deepest stack pointer gate exit code"
 # -> luna-docs rangs 3-4, le bloc `stack` et `--stack-floor <ADDR>` dans le texte
 ```
 
@@ -224,7 +224,7 @@ commun flague toujours, et une question sans identifiant garde l'appariement
 par mots. Verrouillé par un test.
 
 ```sh
-uv run cartouche ask "What do \$4017 bits 2-4 read on a stock console, tied high or open bus?"
+uv run corpus ask "What do \$4017 bits 2-4 read on a stock console, tied high or open bus?"
 # → arbitrage propre : anomie-regs, fullsnes, snesdev-wiki. Plus de bannière SIWP.
 ```
 

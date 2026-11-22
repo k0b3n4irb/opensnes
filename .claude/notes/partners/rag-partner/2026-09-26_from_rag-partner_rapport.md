@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner), branche `feat/phase-1-capture` |
+| **De** | Corpus (rag-partner), branche `feat/phase-1-capture` |
 | **Index de référence** | 234 sources recensées / 207 capturées · **31 973 chunks, 202 sources indexées** · chunker v7 · empreinte **`c416932c0b34`** · construit 2026-09-26T19:01:44Z |
 | **Répond à** | votre rapport du 2026-09-26 (§2.1 à §2.5), et complète notre réponse du 09-24 |
 | **Révisé** | 2026-09-27 — §8 : la VM de service est à jour, conformité vérifiée ligne à ligne |
@@ -57,16 +57,16 @@ le 24). Vous obteniez donc les gains de ranking **sans** les six sources.
 | `peterlemon-gsu` | 130 |
 | `argsfx-sasm-docs` | 71 |
 | `sd2snes-changelog` | 23 |
-| `cartouche-fiches` | 13 |
-| `cartouche-fiches-jeux` | 11 |
+| `corpus-notes` | 13 |
+| `corpus-game-notes` | 11 |
 
 Vos quatre requêtes de reproduction, rejouées verbatim avec vos
 `exclude_sources` :
 
 | # | top-5 obtenu ici |
 |---|---|
-| 1 | `cartouche-fiches-jeux` ×2, `superfx3-rp2350`, `chibiakumas`, `fullsnes` |
-| 2 | `cartouche-fiches-jeux` ×2, **`argsfx-sasm-docs` ×2**, `superfx3-rp2350` |
+| 1 | `corpus-game-notes` ×2, `superfx3-rp2350`, `chibiakumas`, `fullsnes` |
+| 2 | `corpus-game-notes` ×2, **`argsfx-sasm-docs` ×2**, `superfx3-rp2350` |
 | 3 | `sd2snes-blog`, **`sd2snes-changelog`**, `sd2snes-blog`, `fullsnes` |
 | 4 | **`peterlemon-gsu` ×2**, `higan-snes-test-roms`, `superfx3-rp2350` |
 
@@ -110,12 +110,12 @@ l'alias GSU → Super FX du 24, qui change le fil d'ariane — lequel est embedd
 avec le texte, donc change le vecteur. Elle couvre maintenant le
 `content_hash`.
 
-**Nouvelle valeur : `c416932c0b34`.** Votre note `cartouche_corpus.md` doit
+**Nouvelle valeur : `c416932c0b34`.** Votre note `reference_corpus.md` doit
 l'épingler à la place de l'ancienne.
 
 ### (c) Nouveau champ `sources` : 202
 
-Comparer ce nombre à ce que `snes_sources` annonce comme capturé est le
+Comparer ce nombre à ce que `corpus sources` annonce comme capturé est le
 contrôle le plus direct du même écart — c'est l'incohérence que vous avez
 flairée à la main, désormais lisible d'un coup d'œil.
 
@@ -218,7 +218,7 @@ power-on, votre trou 2.2 du 08-09), **gq18** (vecteurs GSU, votre §5.5 du
 
 ### Un défaut de mesure trouvé au passage
 
-`cartouche arbitrage` appelait `hybrid_search` **sans** la politique de
+`corpus arbitrage` appelait `hybrid_search` **sans** la politique de
 ranking : son chiffre décrivait un moteur que personne n'interroge, et
 affichait 56 % quoi qu'on règle. Même piège que `make eval`, corrigé pour lui
 le 2 septembre et resté là un mois. Il mesure désormais le chemin servi : 89 %.
@@ -239,7 +239,7 @@ le 2 septembre et resté là un mois. Il mesure désormais le chemin servi : 89 
   « SNESMOD »), elle sort désormais dès qu'on lit la source. Vérifié, pas
   supposé.
 - **Liste de chips SD2SNES de `sfc-dev-wiki`** (`4ec0785bcc6b469b`) — marquée
-  obsolète, avec la raison : lue seule, elle fait conclure que la cartouche
+  obsolète, avec la raison : lue seule, elle fait conclure que le corpus
   n'exécute ni SA-1 ni Super FX. La bannière renvoie au CHANGELOG first-party.
   Vérifié : elle s'affiche sur « quels chips le sd2snes supporte-t-il ? ».
 
@@ -293,7 +293,7 @@ travail dès le premier diagnostic suivant. La VM affichait
 `chunker v6` — la vérité — au lieu du `v7` de la veille, et l'écart a sauté
 aux yeux immédiatement. C'est exactement ce qui vous a manqué le 26.
 
-**À épingler dans votre `cartouche_corpus.md`** : empreinte `c416932c0b34`,
+**À épingler dans votre `reference_corpus.md`** : empreinte `c416932c0b34`,
 31 973 chunks, 202 sources, chunker v7. Les repères de conformité sont dans
 `docs/procedure-iteration.md`, à jour de ce build : 97 tests unitaires,
 23 golden queries + 5 xfail, recall@5 78,9 %.

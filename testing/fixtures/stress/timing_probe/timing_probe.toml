@@ -1,0 +1,12 @@
+# The NMI callback reads the scanline it runs on and paints the backdrop with a colour computed from it
+# (main.c). luna takes the NMI on line 225 and the callback reads 226 (after the handler's prologue). A longer handler
+# or a NMI taken one line late changes it, and the colour of the whole screen with it.
+rom = "timing_probe.sfc"
+frames = 30
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_line" = 226
+"r_count" = { ge = 20, width = 2 }

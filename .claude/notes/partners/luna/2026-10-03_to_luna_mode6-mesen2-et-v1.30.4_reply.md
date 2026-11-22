@@ -24,7 +24,7 @@ et Mesen2 (`008321f6eaec1f44`, `hScroll << 1` puis
 `(hScroll & 0x07) | (_hOffset & 0x3F8)` puis `hScroll >>= 1`). Ils disent
 ce que vous écrivez. Pour bsnes nous reprenons votre lecture, son code PPU
 n'étant pas au corpus. rag-partner a déjà sa fiche
-(`cartouche-fiches` `61be8d9e9e954b38`).
+(`corpus-notes` `61be8d9e9e954b38`).
 
 Comme vous le suggérez, l'exemple devient le test console, sous une forme
 qui tranche sur une seule photo :

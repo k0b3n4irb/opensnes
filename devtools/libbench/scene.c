@@ -16,6 +16,7 @@
 #include "which.h"
 #if !PVS
 #include <snes/vramqueue.h>
+#include <snes/map.h>
 #endif
 
 u16 res;
@@ -99,6 +100,74 @@ void row_oamxy(void) {
 #endif
 #endif
         }
+    }
+}
+
+/* The same 32 sprites through the three other ways to write a whole entry:
+ *   oamfast:  the oamSetFast() macro, the arguments of oamset;
+ *   oamattr:  oamSetAttr(), the attribute byte composed once by the game;
+ *   oambatch: one oamSetBatch() call over arrays of x, y, tile and attr.
+ * PVSnesLib has none of them and runs its oamSet(), as in oamset. */
+static s16 bat_x[32];
+static s16 bat_y[32];
+static u8 bat_tile[32];
+static u8 bat_attr[32];
+
+void row_oamfast(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);
+#else
+            oamSetFast(i, i << 3, r + i, i, 0, 3, 0);
+#endif
+#endif
+        }
+    }
+}
+
+void row_oamattr(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        for (i = 0; i < 32; i++) {
+            bench_nop();
+#if CALLS
+#if PVS
+            oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);
+#else
+            oamSetAttr(i, i << 3, r + i, i, 0x30);
+#endif
+#endif
+        }
+    }
+}
+
+void row_oambatch(void) {
+    u16 r, i;
+#if !PVS
+    static OamBatch bat;
+    bat.x = bat_x; bat.y = bat_y; bat.tile = bat_tile; bat.attr = bat_attr;
+    bat.first_id = 0; bat.count = 32;
+#endif
+    for (i = 0; i < 32; i++) {
+        bat_x[i] = i << 3; bat_tile[i] = i; bat_attr[i] = 0x30;
+    }
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the game moves its sprites, in both ROMs */
+        for (i = 0; i < 32; i++) bat_y[i] = r + i;
+#if CALLS
+#if PVS
+        for (i = 0; i < 32; i++) oamSet(i << 2, bat_x[i], bat_y[i], 3, 0, 0, bat_tile[i], 0);
+#else
+        oamSetBatch(&bat);
+#endif
+#endif
     }
 }
 
@@ -374,6 +443,90 @@ void row_vramq(void) {
     }
 }
 
+/* The map engine streaming a new column, then a new row (the row builder had
+ * never been timed). A map of 128 x 64 entries; the camera moves one tile (8
+ * pixels) a repetition, right for mapcol, down for maprow, so that every
+ * mapUpdate() builds exactly one column of 29 entries or one row of 33.
+ * mapUpdateCamera() runs in both ROMs and cancels; mapUpdate() is the row. The
+ * entries are varied (tile ids, both flip bits) though no SDK's cost depends
+ * on them. Both SDKs have the four calls under these names. */
+#define BMW 128
+#define BMH 64
+static const u16 bench_map[3 + BMW * BMH] = {
+    BMW * 8, BMH * 8, BMW * BMH * 2,
+    0x0001, 0x4002, 0x8003, 0xC004, 0x0105, 0x0206, 0x03FF, 0x0000
+};
+static const u16 bench_tiles[2048] = { 0x0000, 0x0001, 0x2002, 0x0403, 0x0004, 0x1C05 };
+static const u16 bench_props[1024] = { 0x0000, 0xFF00 };
+
+static void map_setup(void) {
+    setScreenOff();
+#if PVS
+    mapLoad((u8 *)bench_map, (u8 *)bench_tiles, (u8 *)bench_props);
+#else
+    mapLoad((const u8 *)bench_map, (const u8 *)bench_tiles, (const u8 *)bench_props);
+#endif
+    mapUpdateCamera(0, 0);
+    mapUpdate();
+    setScreenOn();
+}
+
+void row_mapcol(void) {
+    u16 r;
+    map_setup();
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the camera follows x - 128 once x is 128 ahead of it: 8 (r + 1) */
+        mapUpdateCamera(128 + ((r + 1) << 3), 0);
+#if CALLS
+        mapUpdate();
+#endif
+    }
+}
+
+void row_maprow(void) {
+    u16 r;
+    map_setup();
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+        /* the camera follows y - 144 once y is 144 below it: 8 (r + 1) */
+        mapUpdateCamera(0, 144 + ((r + 1) << 3));
+#if CALLS
+        mapUpdate();
+#endif
+    }
+}
+
+/* oamHideRange at the two ends of its range: one sprite, all 128. PVSnesLib
+ * runs oamClear(first, count), as in hiderange. */
+void row_hide1(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(40, 1);
+#else
+        oamHideRange(10, 1);
+#endif
+#endif
+    }
+}
+
+void row_hide128(void) {
+    u16 r;
+    for (r = 0; r < REPS; r++) {
+        bench_nop();
+#if CALLS
+#if PVS
+        oamClear(0, 128);
+#else
+        oamHideRange(0, 128);
+#endif
+#endif
+    }
+}
+
 /* All of it in one frame, REPS frames in a row: the pad, three scrolls, 32
  * sprites placed, 20 characters, then the frame boundary — where each SDK's
  * handler sends what the calls left for it (PVSnesLib uploads the sprite
@@ -451,6 +604,20 @@ int main(void) {
     row_hideeach();
 #elif ROW == 15
     row_hiderange();
+#elif ROW == 16
+    row_mapcol();
+#elif ROW == 17
+    row_maprow();
+#elif ROW == 18
+    row_hide1();
+#elif ROW == 19
+    row_hide128();
+#elif ROW == 20
+    row_oamfast();
+#elif ROW == 21
+    row_oamattr();
+#elif ROW == 22
+    row_oambatch();
 #endif
     done = 0x600D;
     while (1) {

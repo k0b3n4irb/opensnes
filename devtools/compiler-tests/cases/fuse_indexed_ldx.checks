@@ -4,4 +4,4 @@ in orIndexed: present \tldx\.b tcc__lf\+2\n\tlda\.l src\+2,x\n\tldx\.b tcc__lf\+
 in orIndexed: absent \tora\.b tcc__lf
 # Through a pointer: staged in tcc__r9 once (the or between two words keeps
 # it), an ldy between the two loads.
-in orPointer: present \tsta\.l dst,x\n\tldy\.w #2\n\tlda \[tcc__r9\],y\n\tora\.l dst\+2,x\n
+in orPointer: present \tsta\.l dst,x\n\tldy\.w #2\n\tlda \[tcc__(?:r9|lf\+\d+)\],y\n\tora\.l dst\+2,x\n

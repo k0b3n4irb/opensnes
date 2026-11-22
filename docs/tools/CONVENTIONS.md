@@ -23,6 +23,7 @@ The earlier tools (gfx4snes, smconv, font2snes…) are no longer shipped;
 | `opensnes-sample` | WAV → BRR |
 | `opensnes-music` | Impulse Tracker → soundbank, with the samples it shares |
 | `opensnes-rom` | check a ROM: the post-link checks, the header and checksum, what the game uses of the console |
+| `opensnes-tilering` | maps with more 8x8 characters than VRAM holds: characters with mirrors merged, a 16-bit map, the worst window, row and column, for the `tilering` module |
 | `opensnes-save` | battery save files (`.srm`): create, read, patch, compare (verifying a save format: with the one planned for 1.1) |
 
 luna is not in the family: it is the emulator, debugger and test runner

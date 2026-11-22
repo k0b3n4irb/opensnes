@@ -155,6 +155,37 @@ def stream_hash(luna: str, rom: Path) -> str:
     return hashlib.sha256(("\n".join(kept) + "\n").encode()).hexdigest()
 
 
+JOURNAL = HERE / "baselines" / "WRAM_JOURNAL.md"
+JOURNAL_HEAD = (
+    "# Journal of wram.json\n\n"
+    "Every rewrite of `baselines/wram.json` leaves a line here (`wram_regress.py --update --why \"...\"`): the date, the\n"
+    "commit it was made on, how many examples drifted, the reason with its evidence, and the hash of the file written.\n"
+    "A drift that was a real defect is marked **CATCH**. The point is to count: an oracle that is rewritten often and\n"
+    "catches nothing measures the change, not the correctness (independent review of 2026-11-09). `devtools/check_wram_journal.py`\n"
+    "(in `make lint`) refuses a `wram.json` whose hash is not the last line's, and `--stats` counts the month.\n\n"
+    "| Date | Commit | Drifted | Kind | Why (and the evidence) | wram.json |\n|---|---|---|---|---|---|\n"
+)
+
+
+def journal(why, caught, drifted, total):
+    import datetime
+    import hashlib
+    import subprocess
+    sha = hashlib.sha256(BASELINE.read_bytes()).hexdigest()[:12]
+    try:
+        head = subprocess.run(["git", "-C", str(HERE.parent), "rev-parse", "--short=8", "HEAD"], capture_output=True, text=True).stdout.strip() or "?"
+    except OSError:
+        head = "?"
+    if not JOURNAL.is_file():
+        JOURNAL.write_text(JOURNAL_HEAD, encoding="utf-8")
+    line = "| %s | %s | %d of %d | %s | %s | `%s` |\n" % (
+        datetime.date.today().isoformat(), head, drifted, total, "**CATCH**" if caught else "benign",
+        why.replace("|", "/").replace("\n", " "), sha)
+    with JOURNAL.open("a", encoding="utf-8") as f:
+        f.write(line)
+    print(f"journal: {JOURNAL.relative_to(HERE.parent)} (+1 line, {drifted} of {total} drifted)")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="WRAM-state regression (H7)")
     ap.add_argument("--update", action="store_true", help="(re)write the baseline")
@@ -164,9 +195,20 @@ def main() -> int:
     ap.add_argument("--force-stale", action="store_true",
                     help="capture from a stale tree anyway (debugging only — "
                          "NEVER commit a baseline captured with this)")
+    ap.add_argument("--why", metavar="TEXT",
+                    help="REQUIRED with --update: why the baseline moves, with the evidence that the drift is "
+                         "benign (the diff_corpus result for a change of timing or memory map). One line of "
+                         "baselines/WRAM_JOURNAL.md.")
+    ap.add_argument("--caught", action="store_true",
+                    help="with --update: the drift was a real defect the oracle caught (the journal marks it CATCH)")
     args = ap.parse_args()
+    if args.update and not args.why:
+        print("REFUSED: --update needs --why TEXT (one line: the reason and the evidence the drift is benign; "
+              "baselines/WRAM_JOURNAL.md keeps it)", file=sys.stderr)
+        return 2
     luna = find_luna()
     db = json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.is_file() else {}
+    old_streams = {k: (v["stream"] if isinstance(v, dict) else v) for k, v in db.items()}
 
     if args.update and not args.force_stale and not corpus_is_fresh():
         print("REFUSED: --update from a stale tree writes wrong baselines "
@@ -251,6 +293,8 @@ def main() -> int:
         BASELINE.parent.mkdir(parents=True, exist_ok=True)
         BASELINE.write_text(json.dumps(dict(sorted(db.items())), indent=2) + "\n", encoding="utf-8")
         print(f"\nwrote {BASELINE.relative_to(HERE.parent)} ({updated} entries)")
+        drifted = sum(1 for k, v in db.items() if old_streams.get(k) != v["stream"])
+        journal(args.why, args.caught, drifted, len(db))
     print(f"\nWRAM regression: {count - fails}/{count} ok"
           + (f", {fails} drift/err" if fails else "")
           + (f", {skipped_fw} skipped (no coprocessor firmware)" if skipped_fw else "")

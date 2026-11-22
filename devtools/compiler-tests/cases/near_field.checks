@@ -10,7 +10,7 @@ in set: absent pha
 # two consecutive stores through the same pointer: X is loaded once
 in set: present sta\.l \$000004,x\n\tsta\.l \$000006,x|sta\.l \$000004,x\n\tlda \d+,s\n\tsta\.l \$000006,x
 # the 32-bit load reads through the 24-bit pointer
-in next: present lda \[tcc__r9\]
+in next: present lda \[tcc__(?:r9|lf\+\d+)\]
 in next: absent ,x
 # the sign bit keeps its mask; the high byte of an unsigned value needs none
 in sign_bit: present and\.w #1\n

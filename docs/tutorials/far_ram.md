@@ -140,6 +140,18 @@ helpers taking `FAR` pointers, and `(const u8 *)` on the DMA calls. The
 ROM renders pixel for pixel the same, and bank 0 went from 1436 to 6880
 free bytes.
 
+## Bank $7F
+
+A bulk buffer may also live in bank $7F: declare it in your assembly with
+`.RAMSECTION "x" BANK $7F SLOT 3` and in C as `extern FAR u16 x[];`. The
+library places nothing in $7F. The compiler follows the 24-bit address for
+the direct symbol, `x[i]`, a run-time `FAR` pointer and a pointer passed to a
+function, up to an offset above $8000 in the bank, and `memcpy` / `memset`
+(`<snes/string.h>`) write into it; a `$7E` and a `$7F` object read in one
+function keep their own bank. `opensnes-rom check` rules are unchanged: it
+reports the `$7E` band only. `testing/fixtures/compiler/far_bank7f` pins
+these forms.
+
 ## Copying: `<snes/string.h>`
 
 A loop in C over a plain pointer reads and writes bank $00, so it cannot
@@ -159,8 +171,10 @@ memcpy(level, level1, sizeof(level));   /* ROM -> FAR */
 memset(level, 0, sizeof(level));        /* clear it */
 ```
 
-`memcpy` and `memset` move a word at a time: 23 CPU cycles a word in the
-copy loop, so about 12 a byte. For VRAM, CGRAM and OAM the data goes
+`memcpy` copies with the CPU's block move (`mvn`) from 12 bytes up, 7 CPU
+cycles a byte; `memset` fills with unrolled word stores from 20 bytes up,
+about 3.6 CPU cycles a byte (`<snes/string.h>` has the figures). For VRAM,
+CGRAM and OAM the data goes
 through PPU ports: that is DMA's job (`dmaCopyVram()` and friends), not
 `memcpy`'s.
 

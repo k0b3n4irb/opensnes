@@ -19,7 +19,7 @@ Nous avions dit : décoder en `$60-$6F` toute LoROM DSP-1 au-delà de 1 Mo. En
 lisant le choix de carte d'ares (`mia/medium/super-famicom.cpp`), le critère
 est la RAM de sauvegarde, puis la taille :
 
-| Cartouche | Carte (ares) | Fenêtre du DSP |
+| Corpus | Carte (ares) | Fenêtre du DSP |
 |---|---|---|
 | LoROM sans RAM | `NEC-LOROM` (SHVC-1B0N) | `$30-$3F:8000-FFFF` |
 | LoROM avec RAM, ≤ 1 Mo | `NEC-LOROM-RAM#A` (SHVC-1B5B) | `$20-$3F:8000-FFFF` |
@@ -46,7 +46,7 @@ ne trouverait plus son DSP en `$30:8000`.
 
 Vérifié ici : votre `lib/source/dsp1.asm` lit `$30:8000` et `$30:C000`, donc
 `dsp1_cube` trouve sa puce comme avant (DSP en marche à l'image 120). Une
-lecture en `$20-$2F` sur une cartouche sans RAM ne répondrait plus.
+lecture en `$20-$2F` sur un Game Pak sans RAM ne répondrait plus.
 
 ## 3. Aussi dans ce commit
 

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **De** | OpenSNES, `develop` (post-v0.47.0), luna v1.30.3 |
-| **Index vérifié** | `snes_sources` : **34 819 chunks, construit 2026-10-02T11:54:22Z, chunker v8, empreinte `b363c473e7ec`**, servi par notre réplique après `git pull` (`4b40699`) + `make import` + `make rebuild` |
+| **Index vérifié** | `corpus sources` : **34 819 chunks, construit 2026-10-02T11:54:22Z, chunker v8, empreinte `b363c473e7ec`**, servi par notre réplique après `git pull` (`4b40699`) + `make import` + `make rebuild` |
 | **Statut** | envoyé tel quel ; vos six points vérifiés, deux observations sur la règle assouplie (§2) |
 
 ## 1. Vos six points, rejoués sur `b363c473e7ec`
@@ -16,7 +16,7 @@ Toutes les requêtes avec `exclude_sources=["opensnes-docs","opensnes-notes-tech
 | §1 forme fausse | la même, inversée | `contradicted`, note « l'affirmation reprend la FORME FAUSSE » ✓ |
 | §1 marquage | notre 4.2 | `confirmed`, et la phrase fautive de la page *Backgrounds* (`50a28313076782ce`) sort marquée `documented_error` ✓ |
 | §2 | l'en-tête « Pour servir cet index » | présent ; c'est ce qui nous a fait reconstruire ✓ |
-| §3 index atomique | `make rebuild` sur notre réplique, 13:53 → 13:56:31 | `cartouche.db.part` construit à côté, `cartouche.db` gardé à 268 554 240 octets ; un `snes_search` lancé à 13:55 a répondu (SIWP, `58c21d90e4a81edc`) ; bascule à la fin ✓ |
+| §3 index atomique | `make rebuild` sur notre réplique, 13:53 → 13:56:31 | `corpus-index.db.part` construit à côté, `corpus-index.db` gardé à 268 554 240 octets ; un `corpus search` lancé à 13:55 a répondu (SIWP, `58c21d90e4a81edc`) ; bascule à la fin ✓ |
 | §4 mode 4 | notre 4.1 | `confirmed / arbiter_states_point`, `d594aeedde1b87c2` `states_point: true` ✓ |
 | §5 phrases | notre reformulation 4.2 (« even half-pixel columns ») | anomie-regs (« taking pixels from the subscreen for the even-numbered pixels ») et `a9676395a44c743b` dans `evidence` ✓ |
 | §6 `luna-docs` | « luna Super FX battery save srm_out GSU work RAM has_battery » | l'entrée `[1.30.3]` aux rangs 1 et 2 (`b0c25f779e82f2bd`, `7b959d3e57fa5ab1`) ✓ |
@@ -37,7 +37,7 @@ concrets ; aucun ne nous a trompés (nous lisons les phrases), mais ce sont des
 ### 2.1 Le multiplieur revient par une autre porte
 
 ```
-snes_verify("Reading the hardware multiplier result at $4216 while
+corpus verify("Reading the hardware multiplier result at $4216 while
 auto-joypad read is in progress returns a corrupted product.",
 exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
@@ -73,6 +73,6 @@ registre cité (2.1 : `product` dans « Multiplication Product »).
 
 ## 3. Une petite chose sans demande
 
-`snes_sources` liste `luna-docs — arbitre-domaine — 2026-09-30` alors que le
+`corpus sources` liste `luna-docs — arbitre-domaine — 2026-09-30` alors que le
 contenu servi porte l'entrée `[1.30.3]` du 2026-10-02 : la date de capture
 affichée n'a pas suivi la recapture.

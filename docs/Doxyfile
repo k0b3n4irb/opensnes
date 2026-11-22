@@ -113,6 +113,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/backgrounds/mode5_hires \
                          ../examples/mode7/perspective_rotate \
                          ../examples/scrolling/parallax_scroll \
+                         ../examples/scrolling/tile_ring \
                          ../examples/chips/superfx_3d \
                          ../examples/chips/superfx_game_skeleton \
                          ../examples/mode7/extbg \

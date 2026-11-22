@@ -53,8 +53,8 @@ STRIP ?= strip
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels libtests_region libtests_region_pal libtests_bigrom
-FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features const_div debug_channel d_quals leaf_frame leaf_split static_dup
-FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram bswap c_features const_div debug_channel d_quals eq_swap far_bank7f farptr_dp inline_label_cut jump_table leaf_frame leaf_split static_dup
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow rt32_nmi wait_race koff_hold audio_done audio_nmi audio_note audio_queue race_sweep timing_probe string_block string_nmi world_place
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
 FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
@@ -86,7 +86,7 @@ OPENSNES_TMP ?= /tmp/opensnes-tests
 export OPENSNES_TMP
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers test-sanitizers-pass coverage-host coverage-host-pass luna-bench test-toolchain-suites test-link-modules test-bank-spill test-torture fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins bench-slots bench-gap bench-place count-sframe count-a1 count-i1 count-i1-calib test-sframe budget asset-budget submodules verify-toolchain hooks check-clean-export clean-tmp lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release clean-all hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -149,9 +149,15 @@ lint-cproc-widths:
 # push leaves (scripts/githooks/). Opt-in: a clone has no hooks until this
 # runs once. Two non-conforming subjects reached develop in two days
 # (756da353, 0d30ec65) with the lint only in CI, after the push.
+# An existing core.hooksPath is left alone (FORCE=1 replaces it).
 hooks:
-	@git config core.hooksPath scripts/githooks
-	@echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"
+	@cur=$$(git config --get core.hooksPath || true); \
+	if [ -n "$$cur" ] && [ "$$cur" != "scripts/githooks" ] && [ "$(FORCE)" != "1" ]; then \
+		echo "hooks: core.hooksPath is already set to $$cur, left unchanged (make hooks FORCE=1 to override)"; \
+	else \
+		git config core.hooksPath scripts/githooks; \
+		echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"; \
+	fi
 
 # Every example built from a clean export of HEAD (git archive, make clean,
 # make), the way CI builds it: a file the commit leaves out fails here
@@ -215,6 +221,7 @@ test-devtools:
 	@python3 devtools/symmap/test_symmap.py
 	@python3 devtools/test_asset_budget.py
 	@python3 devtools/test_header_arg_checks.py
+	@python3 devtools/test_check_submodule_pins.py
 	@cd testing && python3 -m unittest -q test_harness
 
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
@@ -222,6 +229,9 @@ lint: lint-docs
 	@python3 devtools/lint_asm.py
 	@$(MAKE) -s test-devtools
 	@python3 devtools/check_bank_reads.py --selftest
+	@python3 devtools/check_ci_downloads.py
+	@python3 devtools/check_wram_journal.py
+	@python3 devtools/test_check_wram_journal.py >/dev/null
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
@@ -250,6 +260,9 @@ examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
 tests: test-compiler
+	@# A compiler binary left instrumented by test-sanitizers / coverage-host
+	@# would build every ROM below with ASan (2026-11-07: a partner build failed on it).
+	@$(MAKE) -s test-bin-clean
 	@# Corpus freshness guard (issue #105): incremental trees have produced
 	@# ROMs that differ from clean builds; baselines captured from them get
 	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
@@ -279,14 +292,24 @@ tests: test-compiler
 	@# asserts below).
 	@$(MAKE) -s fixtures
 	@python3 testing/rom_coverage.py
-	@# APU output hashed for the ten audio examples (luna
+	@# APU output hashed for every audio example (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 testing/audio_regress.py
+	@# The interrupt gate: a NMI forced before EVERY instruction of the 32-bit helpers must not change a result
+	@# (luna race-sweep; skipped, loudly, while the pinned luna lacks it). Seen failing 2026-11-10 on the tree before 76adcdb0:
+	@# 135 of 141 addresses of the multiply, 193 of 206 of the divide; 0 of 353 now.
+	@python3 testing/race_gate.py
+	@# The list the second-emulator comparison reads (luna's job, kit's mesen2_screens --corpus) is generated; a stale one fails here.
+	@python3 devtools/gen_mesen2_corpus.py --check
 	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
 	@python3 testing/nmi_budget.py
+	@# The tilering module's worst frames (characters and tilemap flushed
+	@# after the NMI handler) against the vertical blank, NTSC and PAL, and
+	@# no lag frame over a lap of scrolling/tile_ring (2026-11-20).
+	@python3 testing/tile_ring_budget.py
 	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
 	@# PPU drops such a write silently), and gsuPresent's frames whole,
 	@# double-buffered and swapped in blank (2026-09-29).
@@ -309,21 +332,37 @@ tests: test-compiler
 		$(MAKE) -s -C $$d clean && $(MAKE) -s -C $$d && python3 $$d/test_*.py || exit 1; done
 	@python3 devtools/link_modules.py
 	@python3 testing/bank_spill.py
+	@# L4 static frames (S1, dormant): opensnes-rom place and check --objects on every built example, the
+	@# compiler's provoked fault (QBE_SFRAME_FAULT=noedge refused), the tool against the S0 count (seconds).
+	@python3 devtools/sframe/test_sframe_link.py --oracle
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
+	@# C conformance on the target, the frozen subset (about a minute; the whole suite is
+	@# `make test-torture`). It fetches the gcc tests the first time (network; skipped offline
+	@# outside CI). Shown to fail with fdcda7c8 and ee5b8636 undone (testing/torture/README.md).
+	@python3 testing/torture/run.py --quick
+	@# The three measured benches the CI runs after `make tests` (opensnes_build.yml):
+	@# they were not here, so a green `make tests` could be red there (2026-11-08: a new
+	@# label in WaitForVBlank read as 357 226 cycles of "idle" in libbench). About 20 s.
+	@python3 devtools/cyclecount/bench.py
+	@python3 devtools/sdkbench/run.py --check
+	@python3 devtools/libbench/run.py --check
+	@# C against hand-written assembly: no routine may get slower than its baseline.
+	@python3 devtools/gapbench/run.py --check
 	@$(MAKE) -s clean-tmp
 	@echo "ALL CHECKS PASSED (luna)"
 
 # What the tests leave in the temporary directory: $(OPENSNES_TMP), the files
 # of QBE's suite that it never removes, and the pass markers of earlier days
-# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh; today's
-# stays, the pre-commit hook reads it).
+# (written by the Claude Code hook .claude/hooks/mark-tests-passed.sh, one per
+# working tree; today's stay, the pre-commit hook reads this tree's).
 clean-tmp:
 	@rm -rf $(OPENSNES_TMP)
 	@rm -f /tmp/qbe.zzzz.*
 	@for f in /tmp/opensnes_tests_passed_*; do \
-		[ -e "$$f" ] && [ "$$f" != /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d) ] && rm -f "$$f"; done; true
+		case "$$f" in /tmp/opensnes_tests_passed_$$(date +%Y-%m-%d)_*) continue;; esac; \
+		[ -e "$$f" ] && rm -f "$$f"; done; true
 
 # The VBlank time budget on its own (gaps review R4): the same gate `make
 # tests` runs, handy while tuning the NMI handler. `--report` prints the
@@ -467,6 +506,7 @@ test-difftest:
 # against committed goldens — needs `make tools` first. Also the CI job
 # `tools-golden` (lint.yml) runs exactly this target (review P4).
 test-tools:
+	@python3 devtools/check_tool_versions.py
 	@python3 tools/opensnes-sample/tests/run_golden.py
 	@python3 tools/opensnes-music/tests/run_golden.py
 	@python3 tools/opensnes-rom/tests/run_golden.py
@@ -477,6 +517,7 @@ test-tools:
 	@python3 tools/opensnes-palette/tests/run_golden.py
 	@python3 tools/opensnes-image/tests/run_golden.py
 	@python3 tools/opensnes-save/tests/run_golden.py
+	@python3 tools/opensnes-tilering/tests/run_golden.py
 	@python3 tools/opensnes/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
@@ -495,6 +536,22 @@ test-tools:
 # sanitized cproc-qbe left behind made a partner build fail on LeakSanitizer,
 # 2026-11-07), so the tree is usable again when it returns.
 SAN_ENV := ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1
+# No compiler binary of bin/ carries the ASan runtime. BIN_CLEAN_FILES is
+# overridable so that the check can be seen failing on a file that does.
+BIN_CLEAN_FILES ?= bin/qbe bin/cproc-qbe bin/cc65816 bin/wla-65816
+test-bin-clean:
+	@bad=0; for f in $(BIN_CLEAN_FILES); do \
+		[ -f "$$f" ] || continue; \
+		if grep -q -a __asan_init "$$f"; then echo "FAIL: $$f carries the ASan runtime (run make clean && make)"; bad=1; fi; \
+	done; \
+	[ $$bad -eq 0 ] && echo "OK: no instrumented compiler binary in bin/" || exit 1
+
+# C conformance on the target: the programs of gcc.c-torture/execute, built by cc65816
+# and run on luna (about 25 minutes, so weekly in torture.yml and not in `make tests`).
+# The first time: python3 testing/torture/run.py --fetch  (clones the tests, GPL, never committed).
+test-torture:
+	@python3 testing/torture/run.py
+
 test-sanitizers:
 	@$(MAKE) test-sanitizers-pass; rc=$$?; \
 	  echo "test-sanitizers: restoring the normal binaries (make clean && make)"; \
@@ -682,6 +739,43 @@ bench-slots:
 	@scripts/install-luna.sh
 	@python3 devtools/slotbench/run.py
 
+# What C costs against assembly written by hand, routine by routine, on luna
+# (devtools/gapbench/README.md). `make tests` runs it with --check.
+bench-gap:
+	@scripts/install-luna.sh
+	@python3 devtools/gapbench/run.py
+
+# oamPlaceWorld() against its previous body (place_old.asm) on the same batches,
+# SlowROM and FastROM, on luna (devtools/placebench/run.py). A report, no gate.
+bench-place:
+	@scripts/install-luna.sh
+	@python3 devtools/placebench/run.py
+
+# L4 S0, a count before any code: what static frames would take, under three edge
+# models (.claude/notes/chantiers/gap_lots/L4_s0_count.md). Reads the comments
+# QBE_SFRAME_DUMP=1 adds to the .c.asm (the ROMs do not change): build with it first.
+count-sframe:
+	@python3 devtools/sframe/test_sframe_count.py
+	@python3 devtools/sframe/sframe_count.py --corpus examples --lib-casm lib/build/lorom
+
+# A1 S0: the IR is kept only on request (CC65816_KEEP_IR); a report for a lot's decision, no gate
+A1_IR ?= build/a1_ir
+count-a1:
+	@test -d $(A1_IR) || { echo "count-a1: no IR in $(A1_IR); build it first: make clean && CC65816_KEEP_IR=$(abspath $(A1_IR)) make"; exit 1; }
+	@python3 devtools/sframe/a1_count.py --corpus examples --lib-casm lib/build/lorom --ir-dir $(A1_IR)
+
+count-i1:
+	@test -d $(A1_IR) || { echo "count-i1: no IR in $(A1_IR); build it first: make clean && CC65816_KEEP_IR=$(abspath $(A1_IR)) make"; exit 1; }
+	@python3 devtools/sframe/i1_count.py --corpus examples --lib-casm lib/build/lorom --ir-dir $(A1_IR)
+
+count-i1-calib:
+	@test -d $(A1_IR) || { echo "count-i1-calib: no IR in $(A1_IR); build it first: make clean && CC65816_KEEP_IR=$(abspath $(A1_IR)) make"; exit 1; }
+	@python3 devtools/sframe/i1_calib.py compile --qbe bin/qbe --ir-dir $(A1_IR) --out build/i1_calib
+	@python3 devtools/sframe/i1_calib.py report --dir build/i1_calib
+
+test-sframe:
+	@python3 devtools/sframe/test_sframe_link.py --oracle
+
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: Doxygen resolves some directory links
 # differently on Windows, so a doc warning must not be able to block a build
@@ -738,10 +832,12 @@ release: all
 	@for f in $(RELEASE_DIR)/opensnes/bin/*; do \
 		[ -f "$$f" ] && { $(STRIP) -S "$$f" || exit 1; }; done; true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@# The objects and the label index only: the build links
-	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and never
-	@# reads the .asm the compiler wrote on the way (about 200 files).
-	@cd lib && find build \( -name '*.o' -o -name symbols.txt \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
+	@# The objects, the label index and the objects' texts: the build links
+	@# lib/build/<flavour>/*.o, reads symbols.txt when a link fails, and
+	@# opensnes-rom place / check read the call graph of the linked objects
+	@# from X.c.asm (C, with its side table) and X-asm.text.asm (assembly)
+	@# (L4 static frames, 2026-11-14). The wrappers X.asm stay out.
+	@cd lib && find build \( -name '*.o' -o -name symbols.txt -o -name '*.c.asm' -o -name '*.text.asm' \) | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
@@ -857,6 +953,13 @@ help:
 	@echo "  bench-lib - The same library calls through both SDKs, timed on luna (needs PVSNESLIB_HOME)"
 	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
 	@echo "  bench-slots - Sprites at fixed VRAM slots against the dynamic engine, on luna"
+	@echo "  bench-gap - What C costs against hand-written assembly, twelve routines, on luna"
+	@echo "  bench-place - oamPlaceWorld() against its previous body, same batches, on luna"
+	@echo "  count-sframe - L4 S0: the static-frame count (every .c.asm carries the side table since S1)"
+	@echo "  count-a1 - A1 S0: what the first integer argument in A would take (census from the side table, the text and the kept IR)"
+	@echo "  count-i1 - I1 S0: what inlining the same-file calls would take (eligible callees, sites, ROM; same inputs as count-a1)"
+	@echo "  count-i1-calib - I1 S2: the inliner's decline reasons and the size rule's calibration (kept IR recompiled with CC_TRACE_INLINE)"
+	@echo "  test-sframe - L4 S1: opensnes-rom place / check --objects on the corpus, the noedge fault, the S0 count as oracle"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"

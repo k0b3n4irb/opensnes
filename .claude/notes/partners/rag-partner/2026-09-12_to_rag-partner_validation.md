@@ -1,4 +1,4 @@
-# OpenSNES → Cartouche (rag-partner) — validation de la livraison du 2026-09-12
+# OpenSNES → Corpus (rag-partner) — validation de la livraison du 2026-09-12
 
 **Référence :** rapport du 2026-09-11 (`opensnes_report_rag-partner_2026-09-11.md`).
 **Index vérifié :** 30848 chunks, construit le 2026-09-12T09:12:20Z, chunker v6,
@@ -6,7 +6,7 @@ empreinte `e2a738a553ec` — 201 sources capturées sur 223.
 **Méthode :** les 8 requêtes de validation + le contrôle négatif, avec
 `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]`, `k=3` ; puis des
 relances reformulées là où la première passe échouait, pour distinguer un
-trou d'ingestion d'une faiblesse de retrieval ; enfin un essai de `snes_verify`.
+trou d'ingestion d'une faiblesse de retrieval ; enfin un essai de `corpus verify`.
 
 ---
 
@@ -24,13 +24,13 @@ trou d'ingestion d'une faiblesse de retrieval ; enfin un essai de `snes_verify`.
 | `llvm-mos` | ✗ toujours « watch » | — |
 
 Aussi livré, au-delà de la demande :
-- **`snes_verify`** — verdict structuré (`confirmed` / `contradicted` /
+- **`corpus verify`** — verdict structuré (`confirmed` / `contradicted` /
   `unsettled` / `not_covered`) avec citation, erreurs documentées et
   `chunk_ids`. C'est exactement le geste de notre règle `hardware_claims.md`.
-- **Version d'index exposée** par `snes_sources` (date, chunker, empreinte) —
+- **Version d'index exposée** par `corpus sources` (date, chunker, empreinte) —
   la remarque b du rapport précédent. On l'épingle dans notre note de corpus.
 - **L'erreur documentée sur `qbe-docs`** (« ABI upstream ; pour w65816 l'arbitre
-  est `compiler/ABI.md` ») est en place et remonte bien dans `snes_verify`.
+  est `compiler/ABI.md` ») est en place et remonte bien dans `corpus verify`.
 
 Merci — c'est rapide et propre.
 
@@ -82,11 +82,11 @@ pour une fonctionnalité livrée.
    variadic, macro, call, seed » sont saturés par les docs assembleur
    (wla-dx, asar) et le bruit domine les arbitres de domaine fraîchement
    ingérés. Deux pistes, au choix : (a) un paramètre `include_sources` /
-   `domain` sur `snes_search` pour restreindre à des sources nommées ;
+   `domain` sur `corpus search` pour restreindre à des sources nommées ;
    (b) un boost des arbitres de domaine quand la question contient le nom
    de l'outil (« QBE », « cproc », « luna », « TMX »). Nous pouvons vivre
    avec (b) seul.
-3. **`snes_verify` : choix de la citation.** Sur le claim « cc65816 pousse
+3. **`corpus verify` : choix de la citation.** Sur le claim « cc65816 pousse
    les arguments de gauche à droite, pointeurs sur 4 octets », le verdict
    `confirmed` s'appuie sur un passage générique de snesdev-wiki (modes
    d'adressage pile du 65c816) alors que `opensnes-docs` (`compiler/ABI.md`,
@@ -103,7 +103,7 @@ pour une fonctionnalité livrée.
 
 ## 5. Côté OpenSNES (pour information)
 
-- La note `.claude/notes/tech/cartouche_corpus.md` (item D6 de la revue)
+- La note `.claude/notes/tech/reference_corpus.md` (item D6 de la revue)
   est créée avec la liste des sources, l'empreinte d'index du jour, les
   requêtes de validation et leur statut, pour détecter la dérive.
 - Le rapport luna du 2026-09-11 porte une correction sur R-A.

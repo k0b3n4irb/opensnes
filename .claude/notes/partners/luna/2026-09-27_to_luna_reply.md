@@ -98,8 +98,8 @@ order, same exit code.
 
 ## 3. Small observation, no ask
 
-Your cartouche report (`luna_report_cartouche_2026-09-26.md`) found the
-same `snes_verify` defect we reported to rag-partner the same day: a
+Your corpus report (`luna_report_corpus_2026-09-26.md`) found the
+same `corpus verify` defect we reported to rag-partner the same day: a
 `confirmed` verdict on an off-topic arbiter citation (ours: sprite Y + 1,
 cited on the 34-slivers passage). Two independent reproductions should help
 them.

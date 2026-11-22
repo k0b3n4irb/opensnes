@@ -15,7 +15,7 @@ Expert 01 — matériel SNES (65816, PPU, DMA/HDMA, NMI, timing) · 2026-10-17 �
   - Sonde personnelle du moment où le handler interroge `$4212` pour la première fois.
   - Sonde personnelle des DMA générales concurrentes d'un HDMA sur les lignes affichées.
   - Une ROM variante (Super FX + HUD texte) pour reproduire le constat 01-1, avec son contrôle négatif.
-- Arbitrage au corpus Cartouche (`exclude_sources=["opensnes-docs","opensnes-notes-tech"]`) de 12 affirmations de `KNOWN_LIMITATIONS.md`, `docs/hardware/` et `crt0.asm`, plus 5 errata que le SDK ne cite pas encore (tableau en fin de section « Points forts »).
+- Arbitrage au reference corpus (`exclude_sources=["opensnes-docs","opensnes-notes-tech"]`) de 12 affirmations de `KNOWN_LIMITATIONS.md`, `docs/hardware/` et `crt0.asm`, plus 5 errata que le SDK ne cite pas encore (tableau en fin de section « Points forts »).
 - Hors périmètre, à peine effleuré : SA-1 et DSP-1 (→ expert 02), audio (→ expert audio), la qualité du compilateur.
 
 ## Points forts
@@ -38,8 +38,8 @@ Expert 01 — matériel SNES (65816, PPU, DMA/HDMA, NMI, timing) · 2026-10-17 �
 | 4 | BG3 en OPT : VOFS choisit les rangées de la table, la verticale est la suivante (`KL:142-147`) | snesdev-wiki `d594aeedde1b87c2` (« as if 8 was added to VOFS ») | ✔ |
 | 5 | CGRAM écrite pendant l'image → mauvaise entrée (`KL:149-153`) | snesdev-wiki `60df1d0a294af255` | ✔ |
 | 6 | IRQ H à HTIME + 3,5 points (`KL:155`) | fullsnes `ae801928f9327bcc` | ✔ |
-| 7 | Drapeau H-blank à H = 274 (`KL:156`) | anomie-timing `08a81c8c93552908`, fullsnes `ae801928f9327bcc` | ✔ (`snes_verify` a rendu `arbiter_covers_topic_only` ; voir « Risques ») |
-| 8 | Verrou d'écriture double partagé entre BG1 scroll et Mode 7, MPY corrompu (`KL:166-176`) | fullsnes `6b054a12234f8aa4`, snesdev-wiki `78c0e95f65b95a86` | ✔ (`snes_verify` : `unsettled`, alors que les phrases l'énoncent) |
+| 7 | Drapeau H-blank à H = 274 (`KL:156`) | anomie-timing `08a81c8c93552908`, fullsnes `ae801928f9327bcc` | ✔ (`corpus verify` a rendu `arbiter_covers_topic_only` ; voir « Risques ») |
+| 8 | Verrou d'écriture double partagé entre BG1 scroll et Mode 7, MPY corrompu (`KL:166-176`) | fullsnes `6b054a12234f8aa4`, snesdev-wiki `78c0e95f65b95a86` | ✔ (`corpus verify` : `unsettled`, alors que les phrases l'énoncent) |
 | 9 | Pad : 16 bits puis des 1 ; `$4017` bits 2-4 lus à 1 (`crt0.asm:1411-1419`) | anomie-regs `56a1f95cb6d41c36`, `786c3baa4eacf2bd` | ✔ |
 | 10 | Démarrage HDMA en milieu d'image : A2A et NTRL à poser à la main (`hdma.asm:118-131`) | anomie-regs `d30459cd9066579f`, `e94b100cf8bb1d70` | ✔ |
 | 11 | Auto-joypad lancé tôt dans la VBlank, environ 4 K mclk (`crt0.asm:1354`) | fullsnes `ae801928f9327bcc` (H 32,5-95,5, 4224 clks) | ✔ |
@@ -116,7 +116,7 @@ Aucune des affirmations 🔴/🟠 de `KNOWN_LIMITATIONS.md` échantillonnées n'
 2. **Port 2 vide.** La valeur du 17e bit sur un port vide n'est donnée par aucune référence (`crt0.asm:1416-1418`, assumé honnêtement). La ligne 2 du protocole ne demande pas de démarrer **sans** pad en port 2 pour lire `padIsConnected(1)`. C'est à ajouter : une observation de cinq secondes, qui tranchera aussi le point pour le corpus.
 3. **Bus ouvert et état PPU au démarrage.** luna randomise les RAM, pas les registres PPU. `InitHardware` écrit presque tout. Restent non écrits la CGRAM au-delà de l'entrée 0 (vidée par `consoleInit`) et COLDATA (`stz $2132` n'écrit aucun canal, `crt0.asm:446` ; c'est sans effet tant que les maths de couleur sont coupées). Risque faible.
 4. **Les conflits de canal entre modules** (01-1) sont une classe, pas un cas. La lib a 4 usagers internes de canaux DMA (0, 1, 7, et 1 pour le GSU). Aucune table ne les recense et aucun test ne combine les modules qui les partagent.
-5. **Arbitrage outillé imparfait.** Deux fois aujourd'hui, `snes_verify` a rendu `arbiter_covers_topic_only`/`unsettled` alors qu'un arbitre énonce le point mot pour mot. Le cas H = 274 est dans anomie-timing `08a81c8c93552908`, dont la phrase n'est pas dans `evidence`. Le cas du verrou BG1/Mode 7 est dans fullsnes `6b054a12234f8aa4` et snesdev-wiki `78c0e95f65b95a86`. À reporter à rag-partner (`OPEN_rag-partner.md`) : je n'ai pas le droit d'écrire hors de ce rapport. Même chose pour luna : la colonne `hclock` des écritures HDMA vaut 0 dans `--mem-trace`, alors que le HDMA a lieu vers H = 278 (fullsnes `ae801928f9327bcc`). Une demande « révision S-CPU / PPU / 1-CHIP » est aussi à faire.
+5. **Arbitrage outillé imparfait.** Deux fois aujourd'hui, `corpus verify` a rendu `arbiter_covers_topic_only`/`unsettled` alors qu'un arbitre énonce le point mot pour mot. Le cas H = 274 est dans anomie-timing `08a81c8c93552908`, dont la phrase n'est pas dans `evidence`. Le cas du verrou BG1/Mode 7 est dans fullsnes `6b054a12234f8aa4` et snesdev-wiki `78c0e95f65b95a86`. À reporter à rag-partner (`OPEN_rag-partner.md`) : je n'ai pas le droit d'écrire hors de ce rapport. Même chose pour luna : la colonne `hclock` des écritures HDMA vaut 0 dans `--mem-trace`, alors que le HDMA a lieu vers H = 278 (fullsnes `ae801928f9327bcc`). Une demande « révision S-CPU / PPU / 1-CHIP » est aussi à faire.
 
 ## Améliorations recommandées
 

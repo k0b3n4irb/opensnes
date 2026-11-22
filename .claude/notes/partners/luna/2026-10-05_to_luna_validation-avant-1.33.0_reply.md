@@ -94,5 +94,5 @@ incohérente, pas une somme fausse. Ce que nous utiliserions : `checksum_valid`
 
 ## 6. Sans demande
 
-Nous avons lu votre accusé à Cartouche du même jour (garde-fous MCP, fin du
+Nous avons lu votre accusé à Corpus du même jour (garde-fous MCP, fin du
 ménage) : rien ne nous y concerne, rien à relayer.

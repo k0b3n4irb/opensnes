@@ -1,0 +1,23 @@
+# audioQueue*() and the port lock shared with the sample loader (main.c).
+# 16 orders fit, the 17th is refused; a callback drains one a frame; a
+# 3 000-byte sample loaded in steps while the callback drains ends whole with
+# no error. With `make clean && make FAULT=1` the drain ignores the lock and
+# the load or the error count fails.
+rom = "audio_queue.sfc"
+frames = 600
+
+[asserts]
+# no wdm_empty: the 17th push is refused on purpose (one WDM $01)
+
+[asserts.values]                 # u16, little-endian
+"r_done" = { eq = 0xC0DE, width = 2 }
+"r_full_refused" = { eq = 1, width = 2 }
+"r_full_count" = { eq = 16, width = 2 }
+"r_zero_mask" = { eq = 1, width = 2 }
+"r_drained" = { eq = 16, width = 2 }
+"r_max_per_frame" = { eq = 1, width = 2 }
+"r_load_ok" = { eq = 1, width = 2 }
+"r_errs" = { eq = 0, width = 2 }
+"r_sent_during" = { ge = 1, width = 2 }
+"r_blocked" = { ge = 1, width = 2 }
+"r_left" = { eq = 0, width = 2 }

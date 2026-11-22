@@ -6,6 +6,8 @@
 *.c.asm
 *.c.o
 *.wrap.asm
+*.text.asm
+sframe.asm
 combined.asm
 combined.obj
 linkfile

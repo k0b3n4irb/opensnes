@@ -1,3 +1,6 @@
+# The compare tree as cproc builds it: with the jump table off (L2), which
+# takes this switch of four cases.
+env QBE_NO_JUMP_TABLE=1
 # Case 0 is reached without being tested: v is unsigned and below 1.
 in dense: absent cmp\.w #0
 count 6 cmp\.w #

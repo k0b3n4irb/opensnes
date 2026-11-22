@@ -1,0 +1,15 @@
+# A6a R4: `buf[i + k]` with i a loop counter bounded by its loop's test
+# (`cultw i, N` whose true edge dominates the access) folds k into the
+# symbol (reassoc, testbound): one index, constant offsets. The twin
+# reassoc_loop_off pins the index computed for each access.
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
+in fill4: present sta\.l fbuf,x\n\tsta\.l fbuf\+2,x\n\tsta\.l fbuf\+4,x\n\tsta\.l fbuf\+6,x
+in fill4: absent asl a
+in pairs: present sta\.w nbuf,x\n[^\n]*\n\tsta\.w nbuf\+2,x
+in pairs: absent asl a
+# a bound the loop's test does not give as a constant: i + 1 may wrap
+in open_bound: absent nbuf\+2
+in open_bound: present inc a\n\tasl a\n\ttax

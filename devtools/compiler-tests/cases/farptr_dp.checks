@@ -1,0 +1,17 @@
+# Lot E1: a far pointer read where it lives (`[tcc__lf+N]`, peephole_dp_ptr)
+# and stepped on its low word when it comes from one object of this unit
+# alone and is only dereferenced (farptr_web). The twin farptr_dp_off pins
+# the staging and the 32-bit steps.
+in copy2: present lda \[tcc__lf\+\d+\]\n\tand\.w #\$00FF\n
+in copy2: present sep #\$20\n\tsta \[tcc__lf\+\d+\]\n\trep #\$20
+in copy2: absent tcc__r9
+in copy2: absent adc\.w #0
+in copy2: present inc\.b tcc__lf\+\d+\n\tinc\.b tcc__lf\+\d+
+# the value read is not stored and read back around a staging that is gone
+in copy2: absent sta\.b (tcc__lf\+\d+)\n\tlda\.b \1\n
+# compared with its end: read in place, but stepped on 32 bits
+in cmp_walk: present lda \[tcc__lf\+\d+\]
+in cmp_walk: present adc\.w #1\n\tsta\.b tcc__lf\+\d+\n\tlda\.b tcc__lf\+\d+\n\tadc\.w #0
+# an extern object, a parameter: 32 bits
+in ext_walk: present adc\.w #0
+in par_walk: present adc\.w #0

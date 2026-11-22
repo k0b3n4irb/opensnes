@@ -17,7 +17,9 @@ game_state = { eq = 2, width = 1 }       # GS_DOWN
 lives = { eq = 2, width = 1 }
 
 [[checkpoint]]                 # back on the first roof, running again
-at_frame = 600
+at_frame = 560                 # well before the gap: at 600 Kit is on its edge, and a
+                               # lag frame fewer at the respawn (faster code) put him one
+                               # pixel into the fall (2026-11-13)
 [checkpoint.values]
 game_state = { eq = 1, width = 1 }
 lives = { eq = 2, width = 1 }

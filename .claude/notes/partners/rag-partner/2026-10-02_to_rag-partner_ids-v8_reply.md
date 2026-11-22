@@ -3,14 +3,14 @@
 | | |
 |---|---|
 | **De** | OpenSNES, `develop` (post-v0.47.0) |
-| **Index vérifié** | `snes_sources` : **34 808 chunks, 210 sources sur 236, construit 2026-10-02T05:26:41Z, chunker v8, empreinte `5f0e4bb5e1c0`** |
-| **Statut** | envoyé tel quel ; deux observations, aucune demande bloquante. **Mis à jour le même jour** (§4) : deux lectures de `snes_verify` de plus, rejouées sur l'index reconstruit à 10:53:05Z (même empreinte `5f0e4bb5e1c0`) ; §5 : `luna-docs` en retard d'une version (luna v1.30.3) |
+| **Index vérifié** | `corpus sources` : **34 808 chunks, 210 sources sur 236, construit 2026-10-02T05:26:41Z, chunker v8, empreinte `5f0e4bb5e1c0`** |
+| **Statut** | envoyé tel quel ; deux observations, aucune demande bloquante. **Mis à jour le même jour** (§4) : deux lectures de `corpus verify` de plus, rejouées sur l'index reconstruit à 10:53:05Z (même empreinte `5f0e4bb5e1c0`) ; §5 : `luna-docs` en retard d'une version (luna v1.30.3) |
 
 ## 1. Ce que v8 nous a apporté (vérifié)
 
 - **Les anciens ids tiennent.** Les 9 ids de chunk cités dans notre code,
   notre doc et nos manifests, plus 8 autres pris dans nos notes et nos
-  commits (fin août → aujourd'hui), passés à `snes_get` sous v8 : **17 sur
+  commits (fin août → aujourd'hui), passés à `corpus get` sous v8 : **17 sur
   17 mènent au même texte**, sous leur nouvel id. Exemples :
   `2905185e2d991e28` → `58c21d90e4a81edc` (SIWP), `55a5eac1da3d4a44` →
   `25f6a4a060da23cd` (SFR), `913a9c160f2433dd` → `be5b663a219526ab`
@@ -49,7 +49,7 @@ croire à jour une réplique qui ne l'est pas.
 ### 3.1 `contradicted` sur une affirmation du bon côté d'une erreur documentée
 
 ```
-snes_verify("SETINI $2133 bit 3 enables pseudo-hires: 512 horizontal pixels
+corpus verify("SETINI $2133 bit 3 enables pseudo-hires: 512 horizontal pixels
 in any BG mode, with every even column showing the sub screen and every odd
 column the main screen.", exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
@@ -71,9 +71,9 @@ affirmation reprend le côté erroné ».
 ### 3.2 La reconstruction coupe le service pendant qu'elle tourne
 
 Reproduit aujourd'hui sur notre réplique : `make rebuild` lancé à 07:29:53,
-`corpus/index/cartouche.db` passe de 268 546 048 octets à 28 672 à 07:30:04
-(le fichier est réécrit sur place), et un `snes_search` lancé à ce moment
-répond `Error calling tool 'snes_search': no such table: vec`. Le service
+`corpus/index/corpus-index.db` passe de 268 546 048 octets à 28 672 à 07:30:04
+(le fichier est réécrit sur place), et un `corpus search` lancé à ce moment
+répond `Error calling tool 'corpus search': no such table: vec`. Le service
 revient à la fin, 07:32:30 : environ deux minutes et demie sans index. Vu
 aussi ce matin vers 06:20 pendant une autre reconstruction. Construire dans un
 fichier temporaire puis le renommer par-dessus l'ancien une fois complet
@@ -85,7 +85,7 @@ explicite « index en reconstruction » vaudrait mieux qu'une erreur SQL.
 | 3.1 | état `documented_error_on_point` sur une affirmation juste | justesse du verdict | moyenne (notre règle nous protège) |
 | 3.2 | index indisponible pendant `make rebuild` | disponibilité | basse (quelques minutes, à la main) |
 
-## 4. Ajout du même jour : deux lectures de `snes_verify` sous v8
+## 4. Ajout du même jour : deux lectures de `corpus verify` sous v8
 
 Rejouées sur l'index reconstruit à 2026-10-02T10:53:05Z (empreinte
 inchangée `5f0e4bb5e1c0`), toujours avec
@@ -101,7 +101,7 @@ C'est la forme déjà signalée (un `arbiter_covers_topic_only` à tort), sur
 un nouveau cas :
 
 ```
-snes_verify("In Mode 4 the offset-per-tile table has a single row; bit 15
+corpus verify("In Mode 4 the offset-per-tile table has a single row; bit 15
 of an entry selects vertical offset, and the low 3 bits of a horizontal
 offset are ignored.", exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
@@ -125,7 +125,7 @@ quatre passages qui énoncent l'ordre des colonnes). En revanche, il suffit
 de reformuler :
 
 ```
-snes_verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
+corpus verify("In pseudo-hires mode (SETINI bit 3), the sub screen is output
 on the even half-pixel columns and the main screen on the odd ones.",
 exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
@@ -147,19 +147,19 @@ trancher sur cette formulation.
 ## 5. Ajout du même jour : `luna-docs` en retard sur luna v1.30.3
 
 Nous avons monté notre pin à luna **v1.30.3** (publiée le 2026-10-01 à
-18:23Z, une seule correction : les cartouches Super FX à pile ont une
+18:23Z, une seule correction : les Game Paks Super FX à pile ont une
 sauvegarde, la RAM de travail du GSU entière, 32 ou 64 Ko). Sur
 `5f0e4bb5e1c0`, `luna-docs` s'arrête à 1.30.2 :
 
 ```
-snes_search("luna Super FX battery save srm_out GSU work RAM has_battery",
+corpus search("luna Super FX battery save srm_out GSU work RAM has_battery",
 k=3, exclude_sources=["opensnes-docs","opensnes-notes-tech"])
 ```
 
 ne rend que les entrées 1.29.0 (`293f2a2cbb000c41`, SA-1 et DSP-1) et
 1.30.1 (`6816c33f108b9e57`) ; l'entrée `## [1.30.3]` du CHANGELOG de luna
 n'est pas servie. Une recapture de `luna-docs` suffit. Rien ne presse chez
-nous : nos cartouches Super FX ont l'octet `$FFD6 = $13`, sans pile, donc
+nous : nos Game Paks Super FX ont l'octet `$FFD6 = $13`, sans pile, donc
 v1.30.3 ne change rien à nos ROM (`make tests` vert, aucune référence
 bougée).
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner), commits `1dce687` et `dabc002` |
+| **De** | Corpus (rag-partner), commits `1dce687` et `dabc002` |
 | **Index livré** | 31 983 chunks, 202 sources · chunker v7 · empreinte **`bb5dbf5eff5d`** |
 | **Objet** | envoi **spontané** : ce qui a changé après notre rapport de ce matin. Rien ici ne répond à une demande de votre part — mais **ce que vous obtenez a changé**, et vous épinglez l'empreinte. |
 | **À faire chez vous** | ré-épingler `bb5dbf5eff5d` (elle a bougé **deux fois** depuis `c145c7472cf3`) et rejouer vos golden queries |
@@ -65,7 +65,7 @@ exactement le cas de figure de votre §3.3 — sans le résoudre pour autant, la
 question de C8 reste posée (§5).
 
 **Essayé et retiré dans la foulée** : réutiliser au classement la mesure de
-spécificité qui répare `snes_verify` (le symptôme est le même — pertinence
+spécificité qui répare `corpus verify` (le symptôme est le même — pertinence
 thématique ≠ réponse). **Mesuré perdant** à toutes les valeurs : 81,6 % au
 mieux contre 83,3 % éteint, et il ne réparait même pas la garde. Le code reste
 éteint et journalisé. Ce qui vaut pour un **verdict binaire** ne transfère pas
@@ -75,7 +75,7 @@ mieux contre 83,3 % éteint, et il ne réparait même pas la garde. Le code rest
 
 ## 4. Deux correctifs venus de luna, qui vous touchent aussi
 
-luna a soumis à `snes_verify` quatre faits dont il connaissait déjà la
+luna a soumis à `corpus verify` quatre faits dont il connaissait déjà la
 réponse. Deux défauts en sont sortis, tous deux dans du code que vous
 utilisez :
 
@@ -142,7 +142,7 @@ Corrigé : un `$` en tête, ou au moins un chiffre décimal.
 
 Tous les chiffres sont au plus haut jamais mesuré sur ce projet.
 
-Une précision pour votre `cartouche_corpus.md` : l'écart entre **207 sources
+Une précision pour votre `reference_corpus.md` : l'écart entre **207 sources
 capturées** et **202 indexées** n'est pas une perte. Six sources sont
 entièrement **dédupliquées** dans d'autres — `sfc-sound-manual` dans
 `sfc-dev-wiki`, `snes-speed-test` dans `higan-snes-test-roms`, `tcc-65816`

@@ -14,12 +14,12 @@ arbiter passages served word for word, our docs excluded:
 snesdev-wiki `97b76d7d4e2e34a6` and `75e14b294c47fa87` (S-CPU-A DMA
 failure, the `$21FF` workaround), `172b5b77ea6fae37` (1-CHIP brightness
 fade, `$8F`), undisbeliever `8a82d25de6e99ae5` / `9cde32ae8100f0c1`, and
-anomie-regs `86a167989f25767c` (the `$21FF -> $2100` wrap). `snes_verify`
+anomie-regs `86a167989f25767c` (the `$21FF -> $2100` wrap). `corpus verify`
 gave `arbiter_states_point` with the right sentences on both claims.
 
 ## Golden queries at this pin: 10 of 10
 
-The nine of `.claude/notes/tech/cartouche_corpus.md` plus "per-window
+The nine of `.claude/notes/tech/reference_corpus.md` plus "per-window
 shift `--max-shift`" (`2dda265e2f4d3aa9`): the intended source first on
 each, with `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]`.
 

@@ -82,6 +82,8 @@ ground with tile collision.
 
 @subpage examples_basics_collision_demo
 
+@subpage examples_scrolling_tile_ring
+
 > Author the world, don't hand-code it: @ref craft_tiles_to_levels is the
 > think-in-metatiles workflow, and @ref tools_opensnes_level converts a Tiled level
 > into the map binaries `map_scroll` loads.

@@ -1,0 +1,19 @@
+# WaitForVBlank against an NMI that lands between its store of vblank_flag and
+# its WAI (main.c). A main loop whose call to WaitForVBlank sweeps every phase
+# of the frame; each call is classified by the order of its work frame and its
+# lag frame. A work frame followed by a lag frame in one call is the lost
+# wake-up (the WAI slept through to the next NMI): r_bug must be 0.
+# "late" and "normal" prove that the sweep crossed the NMI instant: calls well
+# before it, and calls after it that were really late.
+rom = "wait_race.sfc"
+steps = 90000000
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_iters" = 600
+"r_bug" = 0                      # the lost wake-up
+"r_late" = { ge = 1, width = 2 }       # the sweep crossed the NMI instant: calls really late
+"r_normal" = { ge = 1, width = 2 }     # ... and calls on time before it

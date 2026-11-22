@@ -89,9 +89,17 @@ FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 260),
             # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
             (FIXTURES_DIR / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60),
             # the sound CPU's memory: audioLoadSampleBegin / Step; done by frame 200
-            (FIXTURES_DIR / "libtests_aram" / "libtest_aram.sfc", "libtest_aram", 260)] + [
+            (FIXTURES_DIR / "libtests_aram" / "libtest_aram.sfc", "libtest_aram", 260),
+            # the only caller of audioCommandDone; r_done before frame 300
+            (FIXTURES_DIR / "stress" / "audio_done" / "audio_done.sfc", "audio_done", 300),
+            # audio from a lag callback, one sender; r_done before frame 200
+            (FIXTURES_DIR / "stress" / "audio_nmi" / "audio_nmi.sfc", "audio_nmi", 300),
+            # a note in two commands; r_done before frame 200
+            (FIXTURES_DIR / "stress" / "audio_note" / "audio_note.sfc", "audio_note", 200),
+            # the command queue drained from a lag callback against a stepped load
+            (FIXTURES_DIR / "stress" / "audio_queue" / "audio_queue.sfc", "audio_queue", 600)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
-    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
+    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals", "far_bank7f")
 ]
 
 

@@ -1,0 +1,4 @@
+tool = "opensnes-tilering"
+
+[convert]
+window = "33x29"

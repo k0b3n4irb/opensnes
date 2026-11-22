@@ -1,0 +1,13 @@
+# the third level's cut fell right after .b, .w and .l, and each such label
+# got its `_` (if a change of numbering moves the cut, these fail loudly
+# instead of the runtime fixture passing for nothing)
+raw present \n@inl\S+\.b_:
+raw present \n@inl\S+\.w_:
+raw present \n@inl\S+\.l_:
+# no label is left on a size suffix
+raw absent \n@\S+\.[bwlBWL]:
+# everything was copied: three levels, no call left
+in run: absent jsl
+raw absent \nbs\.
+raw absent \npair\.
+raw absent \nf\.

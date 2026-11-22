@@ -1,0 +1,25 @@
+# The audio functions from an nmiSetLag() callback, one sender (main.c).
+# The same 64-step script from the callback (the main thread busy, every
+# VBlank a lag frame) and from the main thread: every call AUDIO_OK, no
+# error counted, the sound CPU plays voices 3 to 7 only, the mirrors equal.
+# Built with `make clean && make FAULT=1` (the main thread stops every voice
+# beside the callback) the run fails.
+rom = "audio_nmi.sfc"
+frames = 300                     # the run ends before frame 200
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = { eq = 0xC0DE, width = 2 }
+"r_cb_steps" = { eq = 64, width = 2 }
+"r_cb_bad" = { eq = 0, width = 2 }
+"r_cb_errs" = { eq = 0, width = 2 }
+"r_cb_mask" = { eq = 0xF8, width = 2 }
+"r_work_bad" = { eq = 0, width = 2 }
+"r_main_steps" = { eq = 64, width = 2 }
+"r_main_bad" = { eq = 0, width = 2 }
+"r_main_errs" = { eq = 0, width = 2 }
+"r_main_mask" = { eq = 0xF8, width = 2 }
+"r_same" = { eq = 1, width = 2 }
+"audio_error_count" = { eq = 0, width = 2 }

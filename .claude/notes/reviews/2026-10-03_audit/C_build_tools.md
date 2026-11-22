@@ -34,7 +34,7 @@ Tous construits avec `rc=0`, sans message d'erreur, sauf mention contraire.
 - Construit dans le scratchpad : ~40 builds de `print_string`, `libtests_gsu`, `sa1_hello`, `dsp1_cube` sur `ROM_BANKS` ∈ {1, 2, 3, 12, 64, 65, 80, 127, 128, 200, 256} × LoROM/HiROM/SA-1/DSP-1, `GSU_BANK` ∈ {0, 2, 7, 9, x}, `GSU_RAM_KB` ∈ {0, 48, 1024, abc}, `ROM_NAME` spéciaux, bascule incrémentale LoROM→HiROM et `GSU_BANK` 1→2.
 - Vérifié : en-têtes par `xxd`, sommes de contrôle des **103** `.sfc` du dépôt (`cks.py`), rendu par `luna diff` et `luna state --screenshot`.
 - Outils : `make test-tools` (8 suites vertes), gfx4snes / font2snes / wav2brr / smconv sur entrées fabriquées (32 couleurs, 2048 et 512 tuiles, WAV stéréo/8/24 bits/44,1 kHz, IT à 12 canaux, fichiers non-IT).
-- Corpus : 3 requêtes `snes_search` (SA-1, LoROM, DSP-1) avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`. Hors périmètre : codegen (→ compilateur), contenu des tests luna (→ tests/CI).
+- Corpus : 3 requêtes `corpus search` (SA-1, LoROM, DSP-1) avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`. Hors périmètre : codegen (→ compilateur), contenu des tests luna (→ tests/CI).
 
 ## Points forts
 

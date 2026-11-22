@@ -53,7 +53,7 @@ main 65816 and SA-1. Our compiler output would work on SA-1 unmodified
 
 ## SA-1 SIWP/CIWP polarity — RESOLVED: bit=1 = write-enable, $FF correct (2026-09-02)
 
-> **Resolution (2026-09-02, Cartouche corpus audit).** The dispute below is
+> **Resolution (2026-09-02, Reference corpus audit).** The dispute below is
 > settled: the wiki page is wrong, `$FF` is hardware-correct.
 > - fullsnes, [SA-1 memory control](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol):
 >   "2229h SNES SIWP — 0-7 Write enable flags for eight 256-byte chunks

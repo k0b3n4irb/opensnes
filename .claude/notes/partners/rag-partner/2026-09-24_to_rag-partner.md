@@ -90,7 +90,7 @@ real-hardware protocol can cover the GSU at all.
 
 ### 2.6 Golden queries for the domain
 
-Once the sources land, we will add to `cartouche_corpus.md` (with the
+Once the sources land, we will add to `reference_corpus.md` (with the
 expected top source next to each): the six queries of §5 below. Today
 four of them have no arbiter in their top results.
 
@@ -106,7 +106,7 @@ four of them have no arbiter in their top results.
   model (auto-read `$0000` for both an empty port and an idle pad; past
   bit 16 a pad's data line idles high, an empty port returns 0s), and
   none of them documents a measurement. Reproduce:
-  `snes_search("What does an unplugged (empty) controller port read: auto-joypad $4218/$4219 value with no controller, and manual $4016/$4017 serial clocking past bit 16 — data line idle high or low?")`
+  `corpus search("What does an unplugged (empty) controller port read: auto-joypad $4218/$4219 value with no controller, and manual $4016/$4017 serial clocking past bit 16 — data line idle high or low?")`
   → `d867f1d7f4d8c40a`, `36528163bfc15466`, `60e7a00b7d843371`,
   `5dee6ebd90c1db9d` — bit layouts and timing, never the value.
 - **DSP-1 `Distance` (code 28H) reads one low on exact lengths** on the
@@ -135,7 +135,7 @@ now on.
 
 Captured 2026-09-12; the tool has released twice since and a third
 release is queued. Reproduce:
-`snes_search("luna profile --stack-floor sp_min deepest stack pointer gate exit code")`
+`corpus search("luna profile --stack-floor sp_min deepest stack pointer gate exit code")`
 → two WDC-manual fragments and one `luna-docs` chunk (`33ab516edca6fb25`)
 without the flag. Ask: re-capture at every luna tag. The luna team can
 notify you directly when they tag; we will re-run the golden queries at
@@ -163,12 +163,12 @@ each of our pin bumps and tell you if the capture lags.
 
 ## 5. Queries used (reproduce)
 
-1. `snes_search("Super FX (GSU) cartridge memory mapping: is it LoROM (mode 20) … which commercial games use it")` — no arbiter; `ghidra-superfx`, `sneslab`, `stuntrace-recomp`.
-2. `snes_search("Super FX: while the GSU is running with RON/RAN set, what happens when the SNES CPU reads ROM or RAM …")` — no arbiter; manual §6.1.1/6.1.2, `sneslab`; expanded with `snes_get("4a1e3a154e8eb7c7", context=2)`.
-3. `snes_search("Super FX framebuffer: screen height and bpp modes (SCMR HT, MD bits) …")` — anomie-regs cited as arbiter but its passage is about OAM; the useful ones are `sneslab` and the manual.
-4. `snes_search("GSU development kit and toolchain: what did Nintendo/Argonaut provide …")` — no arbiter; DiscoC, libsfx, sneslab.
-5. `snes_search("Super FX GSU interrupt to the SNES CPU on STOP …")` — no arbiter; manual, wikibooks, sneslab.
-6. `snes_search("Does the sd2snes / FXPak Pro flash cartridge support Super FX …")` — no arbiter; SuperFX3, sfc-dev-wiki, sd2snes-blog.
-7. `snes_search("SNES ROM header expansion RAM size byte at $FFBD …")` — **arbiters answered** (snesdev-wiki, fullsnes): the counter-example that shows what 1-6 should look like.
+1. `corpus search("Super FX (GSU) cartridge memory mapping: is it LoROM (mode 20) … which commercial games use it")` — no arbiter; `ghidra-superfx`, `sneslab`, `stuntrace-recomp`.
+2. `corpus search("Super FX: while the GSU is running with RON/RAN set, what happens when the SNES CPU reads ROM or RAM …")` — no arbiter; manual §6.1.1/6.1.2, `sneslab`; expanded with `corpus get("4a1e3a154e8eb7c7", context=2)`.
+3. `corpus search("Super FX framebuffer: screen height and bpp modes (SCMR HT, MD bits) …")` — anomie-regs cited as arbiter but its passage is about OAM; the useful ones are `sneslab` and the manual.
+4. `corpus search("GSU development kit and toolchain: what did Nintendo/Argonaut provide …")` — no arbiter; DiscoC, libsfx, sneslab.
+5. `corpus search("Super FX GSU interrupt to the SNES CPU on STOP …")` — no arbiter; manual, wikibooks, sneslab.
+6. `corpus search("Does the sd2snes / FXPak Pro flash cartridge support Super FX …")` — no arbiter; SuperFX3, sfc-dev-wiki, sd2snes-blog.
+7. `corpus search("SNES ROM header expansion RAM size byte at $FFBD …")` — **arbiters answered** (snesdev-wiki, fullsnes): the counter-example that shows what 1-6 should look like.
 
 All with `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]`.

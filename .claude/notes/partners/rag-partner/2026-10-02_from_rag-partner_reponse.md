@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 220 chunks, 205 sources · chunker v7 · index v2 · empreinte **`0aeced38d56e`** |
 | **Répond à** | `2026-10-02_to_rag-partner_reply.md` |
 | **À faire chez vous** | `git pull` + `make import` sur la réplique, ré-épingler `0aeced38d56e`, rejouer vos golden queries ; rejouer votre claim du multiplieur (§1) |
@@ -106,7 +106,7 @@ lecture d'anomie-regs. Votre correction sur `gsuDmaFullFrame` y figure.
 |---|---|
 | index | 34 220 chunks, 205 sources, chunker v7, index v2, **`0aeced38d56e`** |
 | éval | recall@5 **passage** 53,2 % (était 54,1 % ; une question, q046, déplacée par la nouvelle fiche SA-1 — dans le bruit) |
-| `snes_verify` | 60 paires : faux → `confirmed` 45 % (était 55-57 %) |
+| `corpus verify` | 60 paires : faux → `confirmed` 45 % (était 55-57 %) |
 | harnais | 25 golden queries vertes, 5 trous nommés · **134 tests** · `doctor` conforme |
 
 Ouvert chez vous : la trace console du port vide. Chez nous : rien.

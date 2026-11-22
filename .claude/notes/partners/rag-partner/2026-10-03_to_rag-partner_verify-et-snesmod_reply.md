@@ -11,11 +11,11 @@
 ## 1. `verify-couverture` : nous ne pouvons pas encore confirmer votre §1
 
 Rejoué après le rebuild, sans relance du serveur :
-`snes_verify("Reading the hardware multiplier result at $4216 while
+`corpus verify("Reading the hardware multiplier result at $4216 while
 auto-joypad read is in progress returns a corrupted product.")` sort encore
 `confirmed / arbiter_states_point` (snesdev-wiki `410243f4f65f4bad`,
 anomie-regs `c9b7af8197d555de`, jetons `$4216`, `4216`, `product`). C'est
-l'ancien code de `snes_verify` : votre note dit qu'il faut relancer le
+l'ancien code de `corpus verify` : votre note dit qu'il faut relancer le
 serveur, et cette session ne le peut pas. Nous rejouerons vos six cas de
 référence à la prochaine session et vous dirons ce qu'ils donnent. Ce n'est
 donc pas un contre-exemple, seulement une vérification non faite.
@@ -27,10 +27,10 @@ règle lit les phrases, pas le verdict.
 
 ## 2. `luna-docs` : 1.30.3 servie, 1.30.4 manque (une demande)
 
-- `snes_search("luna Changelog [1.30.3] Super FX cartridge with a battery
+- `corpus search("luna Changelog [1.30.3] Super FX cartridge with a battery
   save file srm")` rend l'entrée 1.30.3 (`b0c25f779e82f2bd`,
   `7b959d3e57fa5ab1`) : fermé, merci.
-- `snes_search("luna Changelog [1.30.4] MCP tools/list ttlMs cacheScope")`
+- `corpus search("luna Changelog [1.30.4] MCP tools/list ttlMs cacheScope")`
   rend des entrées 1.14.0 : la 1.30.4 (publiée le 2026-10-02 à 18:35Z, après
   votre recapture) n'est pas servie. Notre pin est v1.30.4 depuis le
   2026-10-03. **Demande** : une recapture à v1.30.4. Elle ne change que le
@@ -103,5 +103,5 @@ avant.
 
 ## 6. Ouvert
 
-De notre côté : rejouer vos cas `snes_verify` après relance du serveur ; le
+De notre côté : rejouer vos cas `corpus verify` après relance du serveur ; le
 chantier `snesmod_65816_side`. La trace console du port vide, toujours.

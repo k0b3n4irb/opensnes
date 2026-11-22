@@ -15,15 +15,16 @@
  * Press A and the same ripple comes from the `hdma` module instead:
  * hdmaWaveH() computes the sine table in RAM and hdmaWaveUpdate() animates
  * it, with the amplitude now a parameter (LEFT/RIGHT). The defaults
- * (amplitude 10, frequency 10: a 25.6-line period) sit close to krom's
- * table (round(10 * sin), a ~25.8-line quasi-period), so the switch shows
- * the helper reproducing what the hand-built table did. Press A again to go
- * back.
+ * (amplitude 10, frequency 10: a 25.6-line period) sit close to the
+ * hand-built table (a 25.85-line ripple of 7.5 px, plus a chop and a slow
+ * sway), so the switch shows the helper doing what the hand-built table did.
+ * Press A again to go back.
  *
  * C port of "SNES Wave HDMA Demo" by krom (Peter Lemon),
  * github.com/PeterLemon/SNES, PPU/HDMA/WaveHDMA — technique reproduced on
  * the snes/hdma.h API in the original demo configuration (BG Mode 3,
- * full-screen 256-color image). The picture is ours, no krom assets: the
+ * full-screen 256-color image). The picture and the table are ours, no krom
+ * assets (the table: devtools/art_assets/hdma_wave.py): the picture is the
  * city canal at night (res/canal.png), the one backgrounds/mode3 shows.
  *
  * @par SNES Concepts
@@ -43,8 +44,8 @@
  *
  * @par What to Observe
  * - At boot: the canal at night in tight sine ripples flowing UPWARD at one
- *   scanline per frame — krom's exact table (896 entries, verbatim) and
- *   cadence (wrap at 672); the white rulers every 64px stay straight
+ *   scanline per frame — our 896-entry table and krom's cadence
+ *   (wrap at 672); the white rulers every 64px stay straight
  * - Press A: the hdma module takes over (channel 6 instead of 0); the
  *   ripple looks nearly the same
  * - LEFT/RIGHT (module mode): amplitude from 2 to 24 pixels, in steps of 2
@@ -61,8 +62,8 @@
 #include <snes/input.h>
 
 /** @brief Wrap length of the start-pointer animation, in table entries.
- *  krom's exact value: his sine's quasi-period is ~25.8 lines (non-
- *  integer), so his seamless wrap needs 672 entries; the table holds
+ *  krom's value, kept: the ripple's period is 672/26 = 25.85 lines (non-
+ *  integer), so the seamless wrap needs 672 entries; the table holds
  *  224 more so any start phase has a full screen of valid lines. */
 #define WAVE_WRAP     672
 /** @brief Bytes per HDMA entry in 1REG_2X mode: count + 16-bit value */
@@ -93,11 +94,11 @@
 #include "res/canal.inc"   /* generated: canal_tiles[] + canal_tiles_1[] (two bank-sized parts), canal_map[], canal_pal[] */
 
 /**
- * @brief krom's exact HDMA table, in ROM (data.asm).
+ * @brief The HDMA table, in ROM (data.asm; generated, ours).
  *
- * 896 entries of [1][offset16] + terminator, extracted verbatim from
- * the original demo: entry values are round(10*sin) samples with a
- * quasi-period of ~25.8 lines. The table is never written: the
+ * 896 entries of [1][offset16] + terminator: a sum of three sines
+ * (25.85-line ripple, chop, slow sway), peak 11.5 px, written by
+ * devtools/art_assets/hdma_wave.py. The table is never written: the
  * animation only moves the start pointer (hdmaSetup reads the bank
  * from the far pointer, so the table can sit in any ROM bank).
  */

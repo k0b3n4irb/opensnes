@@ -173,7 +173,7 @@ HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filt
 # No superfx memmap branch: GSU cartridges are LoROM-mapped on the 65816
 # side (the GSU has its own ROM view), so plain memmap.inc is intentional.
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
-# $FFD6 (snesdev-wiki, ROM header, cartouche dc4d4f3adf2cd2f3): high nibble
+# $FFD6 (snesdev-wiki, ROM header, corpus dc4d4f3adf2cd2f3): high nibble
 # = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
 # it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
 # DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).
@@ -268,13 +268,9 @@ endif
 # The VRAM queue's capacity (snes/vramqueue.h): the library is built once,
 # so the queue's arrays are assembled per project (templates/vramqueue_ram.asm)
 # and C is told the same number. 10 bytes of the C RAM band per entry.
+# Whether the project has the queue is decided after the module dependencies
+# are resolved (below): a module that queues (tilering) brings it in.
 VRAM_QUEUE_MAX ?= 32
-ifneq ($(filter vramqueue,$(LIB_MODULES)),)
-ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
-$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
-endif
-VRAMQ_OBJ := vramqueue_ram.o
-endif
 
 # Assembler flags
 ASFLAGS := -D VRAM_QUEUE_MAX_VAL=$(VRAM_QUEUE_MAX) -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
@@ -346,6 +342,8 @@ _DEP_panel           := dma console
 _DEP_ppu_reset       := console background colormath mosaic window mode7 hdma sprite   # ppuReset: the shadows of each, oamClear
 _DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
+_DEP_tilering        := vramqueue dma tilering_cells                            # vramQueuePush, dmaCopyVram, the cell loops
+_DEP_tilering_cells  := tilering                                                # tr_hot_*: the context tilering.c sets
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
 _DEP_audio           := apu audio_blob audio_stream audio_vset
@@ -355,6 +353,15 @@ _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 # four rounds: sprite_dynamic_dispatch -> sprite_dynamic -> sprite -> dma -> console
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1))))))
 LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
+# The queue's arrays (see VRAM_QUEUE_MAX above), for a project that lists
+# vramqueue or a module that depends on it (until 2026-11-20 this was tested
+# before the resolution: `LIB_MODULES := tilering` alone failed to link).
+ifneq ($(filter vramqueue,$(LIB_MODULES)),)
+ifeq ($(shell [ "$(VRAM_QUEUE_MAX)" -ge 1 ] 2>/dev/null && [ "$(VRAM_QUEUE_MAX)" -le 255 ] && echo ok),)
+$(error VRAM_QUEUE_MAX = $(VRAM_QUEUE_MAX): the VRAM queue holds 1 to 255 entries)
+endif
+VRAMQ_OBJ := vramqueue_ram.o
+endif
 
 #------------------------------------------------------------------------------
 # Library Object Resolution
@@ -679,6 +686,9 @@ project_sa1_boot.asm: $(SA1_BOOT_SRC)
 crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boot.asm .opensnes_config
 	@echo "[AS] crt0"
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
+	@# its text beside it, as X.wrap.asm beside every other object: the
+	@# call graph opensnes-rom place / check read (L4 static frames)
+	@cp $< crt0.text.asm
 
 # Initialized data start marker
 data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP) .opensnes_config
@@ -816,7 +826,7 @@ test test-update: $(TARGET)
 
 clean:
 	@echo "Cleaning $(TARGET)..."
-	@rm -f crt0.o
+	@rm -f crt0.o crt0.text.asm
 	@rm -f data_init_start.o data_init_start.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)

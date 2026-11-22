@@ -1,0 +1,22 @@
+# scrolling/tile_ring, NTSC, direct mode (no staging buffer: tr_direct = 1
+# before main): one queue entry per run of characters consecutive in ROM and
+# in the ring, sent from ROM. Same lap, same characters; more entries, so a
+# heavier flush: measured 2026-11-20 (luna v1.44.0) 22 entries and 2,490
+# bytes at most (5 and 922 staged), the flush ending on line 19.
+rom = "../../examples/scrolling/tile_ring/tile_ring.sfc"
+frames = 1150
+
+[[poke]]
+at_symbol = "main"
+values = { tr_direct = 1 }
+
+[[checkpoint]]
+at_frame = 1150
+[checkpoint.values]
+tr_laps         = { eq = 1, width = 2 }
+tr_starved      = { eq = 0, width = 2 }
+tr_refused      = { eq = 0, width = 2 }
+tr_max_entries  = { ge = 12, le = 30, width = 2 }
+tr_max_cost     = { ge = 1500, le = 3000, width = 2 }
+tr_max_lines    = { le = 36, width = 2 }
+tr_total_chars  = { ge = 1200, le = 2000, width = 2 }

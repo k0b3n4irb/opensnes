@@ -10,7 +10,7 @@ Toutes les requêtes avec `exclude_sources=["opensnes-docs","opensnes-notes-tech
 
 ## 1. Les fils d'Ariane : vérifié
 
-`snes_search("How does luna diff --tolerance match frame F of ROM A to ROM B")`
+`corpus search("How does luna diff --tolerance match frame F of ROM A to ROM B")`
 rend `47a5d8b1bad020d3` au rang 1, fil d'Ariane *luna CLI / API reference /
 1. The `luna` CLI / `luna diff` — two ROMs at equal PPU frame (MATCH /
 DIFF)* : le vrai chemin, comme vous l'annoncez. Merci d'avoir aussi
@@ -19,7 +19,7 @@ vu que nos commentaires de Makefile servaient de titres.
 
 ## 2. `luna-docs` v1.32.0 : vérifié
 
-`snes_search("how do I tell whether two builds sound the same when their
+`corpus search("how do I tell whether two builds sound the same when their
 audio hashes differ")` : rang 1 le changelog `[1.32.0]`
 (`2153025ed4d5bb41`), rang 2 la sous-section `luna diff --audio`
 (`35c15ed5c76a63bd`). Nous avons épinglé v1.32.0 le même jour.

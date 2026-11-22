@@ -1,39 +1,49 @@
 {
-  "luna": "v1.40.0",
+  "luna": "v1.44.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "2f82602f5e9b191b7b188ba2bd049ad0df4ae733c95b7cc8e7437b9ecb3b5eb0",
+      "sha256": "9946cd4b890a301c7ea763f4b092e3856eab055b668d33eecadd60b529a0562b",
       "samples": 159936,
       "peak": 21264
     },
     "audio/speech_synth": {
-      "sha256": "13203c9490562da8b47b3b74d6e605b785062dcb8f485436e6c44ea4e6d833fd",
+      "sha256": "639b1dcb932eae3b7b922ffec94a48a01dea22ef412d1b7b871999aff8654d99",
       "samples": 159936,
       "peak": 23167
     },
+    "audio/sample_swap": {
+      "sha256": "fadedb2e821deae1d60598c64d6eedcb9c4fda29f135d0fe63311db5ff09d946",
+      "samples": 159936,
+      "peak": 6259
+    },
+    "audio/sfx_voices": {
+      "sha256": "13ff2897f930bb19790f4dc00476773021539f605a0742b578074ac432d96d6d",
+      "samples": 159936,
+      "peak": 27017
+    },
     "fixtures/snesmod_music_large": {
-      "sha256": "134280de654f6eb211deded357a12deb2917a93dce6dd84edd84ce7148480a5e",
+      "sha256": "eae5c859cfb02557dea5060f45b984cca20f11b9d5fe63467ecdc0872699bcb6",
       "samples": 159936,
       "peak": 8269
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "97f7a259fd5c646950e9bca2d85745a42adfbedcf751e5e41aeb92bb9673152e",
+      "sha256": "07d560207c273dadac59587e804b5eec257ea882d6738b019456e3d534916675",
       "samples": 160006,
       "peak": 8321
     },
     "audio/soundboard": {
-      "sha256": "4b6d3d786250a13d9950edd30b1195036ea16d10a81e05f5886d321ed85c4974",
+      "sha256": "2c13757b5164bb2bca4cda9cd0d43ccb8501e6de5b304298760677e93d9cc99c",
       "samples": 159936,
       "peak": 9939
     },
     "audio/snesmod_music": {
-      "sha256": "c5712df8f97c3c762901cbbc4fbc4256c1552ffda026a20150729f9d8649abc2",
+      "sha256": "31f8cc4138b10bba1fe2d340bf4367272e3d92d9d51fe0bf734ae763a5a9ff8f",
       "samples": 159936,
-      "peak": 13140
+      "peak": 13532
     },
     "audio/sfx_from_wav": {
-      "sha256": "e9bdac7f940fa9b996478d7477c36d91512c4acda8b3b8568c3b58ecd5d96c5f",
+      "sha256": "00fbddf85dd25c6ee66ad095e453134ec782569f44beb13f649786627a0fa12c",
       "samples": 159936,
       "peak": 12192
     }

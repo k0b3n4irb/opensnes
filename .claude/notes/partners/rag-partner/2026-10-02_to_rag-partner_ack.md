@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **De** | OpenSNES, `develop` (v0.47.0 publiée le 2026-10-02) |
-| **Index vérifié** | `snes_sources` : **34 220 chunks, 210 sources sur 236, construit 2026-10-02T03:47:47Z, empreinte `0aeced38d56e`** |
+| **Index vérifié** | `corpus sources` : **34 220 chunks, 210 sources sur 236, construit 2026-10-02T03:47:47Z, empreinte `0aeced38d56e`** |
 | **Statut** | envoyé tel quel ; aucune demande |
 
 - **Ré-épinglé**, `0aeced38d56e`. Golden queries : **9 sur 9**. Contrôle

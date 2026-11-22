@@ -1,0 +1,26 @@
+# The audio driver's key-off against the S-DSP's KOFF period (main.c). The
+# DSP reads KOFF once every 64 SPC700 cycles; the driver holds the mask 132.
+# 1024 audioStopVoices() of pseudo-random masks, written at every phase of
+# that period (luna --dsp-trace: the 64 phases each hit 9 to 29 times), and
+# the envelope of every voice read back two frames later.
+# Built against a library with a hold of 8 turns (54 cycles), r_not_cut reads
+# 653; 9 turns (60 cycles) 326; 10 turns (66 cycles) 0 (2026-11-09).
+rom = "koff_hold.sfc"
+frames = 3300                    # the run ends before frame 3150
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_iters" = 1024
+"r_start_bad" = 0                # the eight voices sounded before the sweep
+"r_not_cut" = 0                  # a voice of the mask still sounding: KOFF missed
+"r_wrong_cut" = 0                # a voice outside the mask silenced
+"r_stopped" = 4181               # voices in the masks (fixed seed): the sweep did stop voices
+"audio_error_count" = 0
+# The cost of a stop seen from the CPU, scanlines, worst of 16 rounds
+# (measured: 7, 11, 25; with the former hold of 96 turns: 7, 17, 53).
+"r_lines_read" = { le = 9, width = 2 }       # one state read alone
+"r_lines_mask4" = { le = 13, width = 2 }     # audioStopVoices(0x0F), then the read
+"r_lines_loop4" = { le = 30, width = 2 }     # four audioStopVoice(), then the read

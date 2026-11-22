@@ -16,8 +16,10 @@
  * so apuReset() hot-swap works over the driver. Every wait is bounded
  * — the audio API returns AUDIO_ERR_TIMEOUT instead of hanging.
  *
- * Main-thread only: do not call audio functions from an NMI callback
- * (same stance as the DMA queue).
+ * One sender at a time. An nmiSetLag() callback may be that sender (the
+ * ports are written by long address, the state is in WRAM below $2000:
+ * the callback's data bank $7E changes nothing); the list of what is safe
+ * there is in audio.h, and testing/fixtures/stress/audio_nmi runs it.
  */
 
 #include <snes/audio.h>
@@ -152,6 +154,13 @@ static u8 audio_refuse(u8 code) {
 /* The command the driver has not acknowledged yet (0: none). */
 u8 audio_pending;               /* shared with audio_vset.asm */
 
+/* The lock of the ports $2140-$2143: non-zero while a command is being
+ * written, or a sample block streamed, from this context. audioQueueDrain()
+ * runs from an interrupt (an nmiSetLag callback) and sends nothing while it
+ * is set: the interrupted code would find its ports rewritten. Shared with
+ * audio_vset.asm. */
+u8 audio_port_lock;
+
 /**
  * @brief Wait (bounded) for the driver to acknowledge the pending command.
  * @return AUDIO_OK (also when nothing is pending) or AUDIO_ERR_TIMEOUT
@@ -188,7 +197,9 @@ static u8 cmd_wait(void) {
 static u8 cmd_post(u8 op, u8 p0, u16 p1) {
     u8 cmd;
 
+    audio_port_lock++;
     if (cmd_wait() != AUDIO_OK) {
+        audio_port_lock--;
         return audio_refuse(AUDIO_ERR_TIMEOUT);
     }
     audio_seq = (u8)(audio_seq >= 3 ? 1 : audio_seq + 1);
@@ -199,6 +210,7 @@ static u8 cmd_post(u8 op, u8 p0, u16 p1) {
     APU_IO3 = (u8)(p1 >> 8);
     APU_IO0 = cmd;
     audio_pending = cmd;
+    audio_port_lock--;
     return AUDIO_OK;
 }
 
@@ -268,6 +280,97 @@ u8 audioIsReady(void) {
     return audio_ready;
 }
 
+/* cmd_wait() without the loop: one look at the ack port. No refusal is
+ * counted and nothing is written to the ports: a 0 is not an error, the
+ * caller asks again later. */
+u8 audioCommandDone(void) {
+    u8 cmd = audio_pending;
+
+    if (!cmd) {
+        return 1;
+    }
+    if (APU_IO0 != cmd) {
+        return 0;
+    }
+    audio_pending = 0;
+    return 1;
+}
+
+/*============================================================================
+ * Command queue (RAM ring drained without waiting)
+ *============================================================================*/
+
+/* A game loop slower than the music posts its orders late; a queue lets the
+ * loop say what to do and an nmiSetLag() callback (one sender) send it at the
+ * pace of the driver. One producer (main thread) and one consumer (the
+ * drain): the producer writes the entry, then moves the head; the consumer
+ * reads the entry, then moves the tail. */
+#define AQ_SIZE 16u             /* entries; a power of two */
+
+typedef struct { u8 op; u8 p0; u16 p1; } QueuedCmd;
+
+static QueuedCmd aq_ring[AQ_SIZE];
+static u8 aq_head;              /* next free entry (producer) */
+static u8 aq_tail;              /* next entry to send (consumer) */
+
+static u8 aq_push(u8 op, u8 p0, u16 p1) {
+    u8 h = aq_head;
+
+    if ((u8)(h - aq_tail) >= AQ_SIZE) {
+        return audio_refuse(AUDIO_ERR_NO_MEMORY);
+    }
+    aq_ring[h & (AQ_SIZE - 1)].op = op;
+    aq_ring[h & (AQ_SIZE - 1)].p0 = p0;
+    aq_ring[h & (AQ_SIZE - 1)].p1 = p1;
+    aq_head = (u8)(h + 1);
+    return AUDIO_OK;
+}
+
+u8 audioQueueStopVoices(u8 mask) {
+    if (!mask) {
+        return AUDIO_OK;
+    }
+    return aq_push(OP_KOFF, mask, 0);
+}
+
+u8 audioQueueSetVolume(u8 volume) {
+    if (volume > AUDIO_VOL_MAX) {
+        volume = AUDIO_VOL_MAX;
+    }
+    return aq_push(OP_MVOL, volume, 0);
+}
+
+u8 audioQueueSetVoicePitch(u8 voice, u16 pitch) {
+    if (voice >= AUDIO_MAX_VOICES) {
+        return audio_refuse(AUDIO_ERR_INVALID_ID);
+    }
+    if (pitch > 0x3FFF) {
+        pitch = 0x3FFF;
+    }
+    return aq_push(OP_VPITCH, voice, pitch);
+}
+
+u8 audioQueueCount(void) {
+    return (u8)(aq_head - aq_tail);
+}
+
+u8 audioQueueDrain(u8 maxCmds) {
+    QueuedCmd *e;
+
+    while (maxCmds && aq_tail != aq_head) {
+        if (audio_port_lock || !audioCommandDone()) {
+            break;              /* ports in use by the interrupted code, or driver busy */
+        }
+        e = &aq_ring[aq_tail & (AQ_SIZE - 1)];
+        if (cmd_post(e->op, e->p0, e->p1) != AUDIO_OK) {
+            break;              /* counted by cmd_post; the entry stays */
+        }
+        aq_tail = (u8)(aq_tail + 1);
+        maxCmds--;
+    }
+    return (u8)(aq_head - aq_tail);
+}
+
 /*============================================================================
  * Master volume
  *============================================================================*/
@@ -292,15 +395,23 @@ u8 audioGetVolume(void) {
  * Voice control
  *============================================================================*/
 
+u8 audioStopVoices(u8 mask) {
+    if (!mask) {
+        return AUDIO_OK;        /* nothing to stop: no command, no handshake */
+    }
+    /* The driver's KOFF takes a mask: one command for any set of voices. */
+    return cmd_post(OP_KOFF, mask, 0);
+}
+
 u8 audioStopVoice(u8 voice) {
     if (voice >= AUDIO_MAX_VOICES) {
         return audio_refuse(AUDIO_ERR_INVALID_ID);
     }
-    return cmd_post(OP_KOFF, (u8)(1 << voice), 0);
+    return audioStopVoices((u8)(1 << voice));
 }
 
 u8 audioStopAll(void) {
-    return cmd_post(OP_KOFF, 0xFF, 0);
+    return audioStopVoices(0xFF);
 }
 
 u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
@@ -376,7 +487,18 @@ u8 audioSetGain(u8 voice, u8 mode) {
  *        loop when this returns.
  * @return AUDIO_OK or AUDIO_ERR_TIMEOUT
  */
+static u8 load_block_locked(u16 dst, const u8 *brrData, u16 size);
+
 static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
+    u8 err;
+
+    audio_port_lock++;          /* the whole stream: no queued command in between */
+    err = load_block_locked(dst, brrData, size);
+    audio_port_lock--;
+    return err;
+}
+
+static u8 load_block_locked(u16 dst, const u8 *brrData, u16 size) {
     u16 spin, full;
     u8 idx, tail;
 
@@ -750,6 +872,21 @@ u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
     pan_to_lr(volume, pan, &l, &r);
     lr = (u16)((u16)r << 8 | l);
     vm = &audio_voice_mirror[voice];
+    vm->pan = pan;
+    if ((!(vm->sent & SENT_VOL) || vm->vol_lr != lr)
+            && (!(vm->sent & SENT_PITCH) || vm->pitch != pitch)) {
+        /* both change: one VSET (volume split by the driver's pan weight,
+         * and pitch) instead of VVOL then VPITCH. The note is two
+         * handshakes, VSET then KON, when the envelope is already set;
+         * a pan that changed costs one VPAN in front, as VVOL did before. */
+        if (audioSetVoiceVolumePitch(voice, volume, pitch) != AUDIO_OK) {
+            return AUDIO_VOICE_NONE;
+        }
+        /* the driver holds this volume and pitch: what the mirror cleared
+         * for an inner pan is nothing left to send */
+        vm->sent |= SENT_VOL;
+        vm->vol_lr = lr;
+    }
     if (!(vm->sent & SENT_VOL) || vm->vol_lr != lr) {
         if (cmd_post(OP_VVOL, voice, lr) != AUDIO_OK) {
             return AUDIO_VOICE_NONE;

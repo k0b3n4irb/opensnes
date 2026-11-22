@@ -284,6 +284,17 @@ span banks; split it.` (A `static` is named `name.file`.)
 table per level, per variant, per screen). The compiler itself has no limit
 on the number of elements.
 
+### 🟢 A source named `b.c`, `w.c` or `l.c` cannot hold a `static` (refused)
+A file-scope `static` is named `name.file` in the assembly, and the assembler
+reads a trailing `.b`, `.w` or `.l` (either case) as an operand size: in a
+source `b.c`, `jsl g.b` would call a function `g` and `lda.w v.b` read a
+variable `v`. The compiler stops instead, naming the symbol:
+`function g.b ends in .b, which the assembler reads as a size suffix …;
+rename the file`.
+
+**Mitigation:** give the source a longer name (`board.c`, `bank.c`); a file
+of that name with only global functions and variables compiles.
+
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**
 PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
 **left-to-right**. ASM functions ported from PVSnesLib without changing the stack
@@ -303,6 +314,22 @@ changes. The runtime itself uses plain globals for its NMI handshakes
 (`vblank_flag`, `oam_update_flag`), at the same cost. **Test:** the
 compiler suite's `test_volatiles.c` (three reads of `hw_status` give three
 loads).
+
+### 🟡 A hardware register must be read through a `volatile` lvalue
+A byte that is not `volatile` is read as a 16-bit word whose low byte is
+kept: the byte above it is read too. On RAM and ROM that costs nothing and
+saves the switch to an 8-bit accumulator; on a register whose read has an
+effect it is a second, unwanted read (reading `$2137` latches the H/V
+counters, reading `$2139` or `$213A` steps the VRAM address). The compiler
+keeps the 8-bit read for every `volatile` access and for an address whose
+constant part is not in low RAM (`$0000-$1FFF`) or banks `$7E-$7F`, so
+`*(u8 *)0x2138` and `((u8 *)0x4210)[i]` are read one byte. What it cannot
+see is a register address reaching a plain pointer at run time.
+
+**Mitigation:** read registers through `REG_*` (`snes/registers.h`, all
+`vu8` / `vu16`) or any `volatile` pointer. **Test:** the compiler check
+`byte_word` (the plain, indexed, `FAR`, `const`, pointer and field reads as
+words; the volatile and constant-address reads as bytes).
 
 ### 🟢 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges (lint-enforced)
 WLA-DX tracks the current accumulator/index register width across `rep`/`sep`
@@ -327,12 +354,33 @@ They use the hardware multiplier ($4202-$4217) plus shared WRAM
 temporaries, and the unit is not reentrant: an NMI that lands between a
 main-thread multiply's write to `$4203` and its read of `$4216` and
 multiplies in the callback destroys the main thread's result. NMI is not
-maskable, so no wait fixes that. Plain C `*` / `/` / `%` **are** callback-safe —
-the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
-to software paths. Symptom if ignored: silently wrong fixed-point values,
+maskable, so no wait fixes that. Plain C `*` / `/` / `%` **are** callback-safe,
+in an `nmiSet()` or an `nmiSetLag()` callback, at both widths:
+
+- **16 bits** (`int`, `u16`, `s16`): the runtime detects the NMI context
+  (`in_nmi_ctx`) and takes a software path that touches neither the
+  hardware unit nor any shared RAM.
+- **32 bits** (`long`, `u32`, `s32`): the multiply takes the same kind of
+  software path; the multiply and the divide return their high half in RAM
+  slots (`mul32_hi`, `div32_qh`, `div32_rl`, `div32_rh`) that the callback's
+  first 32-bit call saves and the NMI handler puts back after the callback,
+  and the divide saves and restores its working words around the call. The
+  main thread finds its own values whether the NMI landed inside its
+  helper or between the helper's return and the read of the high half.
+  The fixture `testing/fixtures/stress/rt32_nmi` checks 10 000 iterations of
+  each operation against an `nmiSetLag()` callback doing the same.
+
+Symptom if ignored: silently wrong fixed-point values,
 only when computed inside the callback. Mitigation: compute fixed-point
 math in the main loop, or use plain integer operators in the callback.
 (The headers carry the same `@warning`.)
+
+An `irqSet()` handler is assembly and gets none of this: the runtime does
+not know it is running there. A handler that calls the compiler's runtime,
+or that uses the hardware multiplier/divider itself, corrupts the
+multiply or divide it interrupted (a handler multiplying on every scanline
+made 9 369 of 10 000 main-thread 32-bit products wrong). Keep `$4202-$4217` and
+the runtime out of IRQ handlers.
 
 ### 🟢 The SA-1 starts only in bank $00 (checked after every link)
 The SA-1 reset vector (CRV, `$2203-$2204`) is 16 bits ("Size: 16 bits",
@@ -492,6 +540,25 @@ cproc has no `asm` statement: `__asm__("nop")` stops the build with
 `wla-65816`, listed in the example's `ASMSRC`) and call it through the C
 ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
 pattern. Pinned by `cases/negative/inline_asm.c`.
+
+### 🟡 GNU attributes that change the program are refused
+cproc skips the GNU attributes that are hints (`unused`, `format`,
+`noreturn`, `may_alias`, `deprecated`...), honours `packed` on a structure and
+`noinline` on a function (no inliner copies it into a caller), and
+refuses, with a message naming the attribute, those it does not implement and
+whose omission would compile a different program: `mode` and `vector_size` /
+`ext_vector_type` (they change a type's width), `alias`, `cleanup`, `section`,
+`noinit`, `persistent` (where and how an object lives), `ms_struct` and
+`scalar_storage_order` (a structure's layout and byte order), and `aligned`.
+For example `typedef unsigned int u8 __attribute__((mode(QI)));` stops with
+`GNU attribute 'mode' is not supported: it sets the width of the type`, in any
+spelling (`__mode__`, `[[gnu::mode(QI)]]`). `weak` and `ifunc` are skipped: the
+link then fails on the missing or duplicate symbol.
+
+**Mitigation:** write the type you mean (`unsigned char`, an array or a struct),
+and the placement the SDK offers (`FAR`, `RAM_CODE`). Code ported from a GNU C
+source needs those spelled out; grep for `__attribute__` first. Pinned by the
+`cases/negative/gnu_attr_*.c` fixtures.
 
 ## Where to add new entries
 

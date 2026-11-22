@@ -1,0 +1,5 @@
+env QBE_NO_BYTE_WORD=1
+in plain:       present sep #\$20\n\tlda\.w g\n\trep #\$20\n\tand\.w #\$00FF
+in indexed:     present sep #\$20\n\tlda\.w arr,x\n\trep #\$20
+in far_indexed: present sep #\$20\n\tlda\.l farr,x\n\trep #\$20
+in through_ptr: present sep #\$20\n\tlda\.l \$000000,x\n\trep #\$20

@@ -1,4 +1,12 @@
-# luna, rag-partner and the game: working jointly (always loaded)
+---
+paths:
+  - "testing/**"
+  - "devtools/**"
+  - "scripts/**"
+  - ".claude/notes/**"
+---
+
+# luna, rag-partner and the game: working jointly
 
 Roles, authorisations, pushes, "one lot = one conversation" and the scientific method are in the tree's `CLAUDE.md`, not here. This file is what is specific to OpenSNES.
 
@@ -6,7 +14,7 @@ Roles, authorisations, pushes, "one lot = one conversation" and the scientific m
 | Partner | What it is | We owe it |
 |---|---|---|
 | **luna** | cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | capability requests with a working prototype, bug reports with a ROM and a command line, an answer to every note it sends. Lifecycle in `luna_tooling.md`. |
-| **rag-partner** (corpus, MCP `cartouche`) | arbitrated SNES reference: hardware, chips, SPC700, formats, luna's docs | every query that came back empty, wrong or unsettled; every source it lacks; every fact we measured that no source states (with provenance). It has no standing session. |
+| **rag-partner** (corpus, served over MCP) | arbitrated SNES reference: hardware, chips, SPC700, formats, luna's docs | every query that came back empty, wrong or unsettled; every source it lacks; every fact we measured that no source states (with provenance). It has no standing session. |
 | **the game** | the first project built on the SDK, the proof that the whole assembles | what it shows us stays in `.claude/notes/private/` (ignored by git); in this repository it is "the game", nothing more. |
 
 **Silence is a failure**: a gap in a partner noticed and not reported the same day is the same gap next month. We are the bridge: what luna answers about the hardware goes into the rag-partner report; when the corpus contradicts luna, luna gets the citation.
@@ -25,9 +33,9 @@ A request lands only if it passes four checks, written in the reply:
 A justified no closes a request; the asker finds another way or brings a new fact.
 
 ## The game lives on this tree
-It builds against this working tree on `develop`, never a release. So: a compiler chantier, a change to a public header or to `make/common.mk` is made in a **separate worktree** (an uncommitted edit here is seen by the game's next build); what lands on `develop` is announced to it; a full rebuild (`make clean && make`, `bin/` incomplete for minutes) is announced before and after; during a Class A validation, give it the compiler binary in a separate directory. Nothing of the game enters a commit, test, note, document or commit message: name, rights holder, paths, source file or function names, measurements tied to its sources. What must enter is a stand-alone example written by us. A worktree opened by a sub-agent starts from the last release, not from `develop`: say `git checkout -B work develop` first.
+It builds against this working tree on `develop`, never a release. So: a compiler chantier, a change to a public header or to `make/common.mk` is made in a **separate worktree** (an uncommitted edit here is seen by the game's next build); what lands on `develop` is announced to it; a full rebuild (`make clean && make`, `bin/` incomplete for minutes) is announced before and after; an advance is announced to the game only once `bin/` is rebuilt on the checkout it reads (compare `bin/qbe` and `bin/cc65816` dates with the commit: new sources over old binaries assemble the new `crt0` with the old compiler); during a Class A validation, give it the compiler binary in a separate directory. Nothing of the game enters a commit, test, note, document or commit message: name, rights holder, paths, source file or function names, measurements tied to its sources. What must enter is a stand-alone example written by us. A worktree opened by a sub-agent starts from the last release, not from `develop`: say `git checkout -B work develop` first.
 
 ## Periodic duties
 - Before blaming the toolchain: query rag-partner (`hardware_claims.md`). Before writing an internal script: ask what luna exposes (`luna_tooling.md`).
-- At every luna pin bump: re-run the corpus golden queries (`.claude/notes/tech/cartouche_corpus.md`) and tell rag-partner if `luna-docs` lags the tag.
+- At every luna pin bump: re-run the corpus golden queries (`.claude/notes/tech/reference_corpus.md`) and tell rag-partner if `luna-docs` lags the tag.
 - Weekly: the five SNESMOD issues (`.claude/notes/partners/snesmod-upstream/README.md`, with the command and the next due date). Monthly: what QBE upstream committed, to take what serves us, nothing goes back (`.claude/notes/partners/qbe-upstream/README.md`).

@@ -5,7 +5,7 @@
 # ones — bit 13 (apply to BG1) plus the offset 8, the one bit that falls
 # inside a 16-half-pixel tile — and row 1 (vertical, $6040) = 0.
 # Emulators disagree on what offset 8 draws in hi-res (ares/bsnes/luna: half
-# a tile; Mesen2: nothing), and no reference covers it (cartouche-fiches
+# a tile; Mesen2: nothing), and no reference covers it (corpus-notes
 # 61be8d9e9e954b38): the card is for a console photo
 # (docs/HARDWARE_VERIFICATION.md). This manifest pins what the ROM writes,
 # not what the PPU draws.

@@ -1,9 +1,9 @@
-# Hardware claims under arbitration — `snes_verify` sweep of the docs (2026-09-12)
+# Hardware claims under arbitration — `corpus verify` sweep of the docs (2026-09-12)
 
 The second instrument of the post-v0.42.0 sweep (`.claude/notes/reviews/2026-09-11_gaps_review.md`):
 every verifiable hardware claim in `KNOWN_LIMITATIONS.md`, `docs/hardware/`, the
 tutorials, the two guides, `templates/crt0.asm` and `registers.h` (143 claims, extracted by
-an agent with `file:line` anchors) was put through Cartouche's `snes_verify` with
+an agent with `file:line` anchors) was put through Corpus's `corpus verify` with
 `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]`, and the **citation was read**
 for each verdict — the label alone is not the check (calibration showed `confirmed` on
 citations that do not state the claim, and one `contradicted` whose citation supported it).
@@ -108,7 +108,7 @@ C058 | confirmed(label) | C? | DMA 8 master cycles/byte (anomie-timing) confirme
 C059 | (pending) | ? | "VBlank gives ~2,200 cycles per frame after NMI" — check wording (dma.md:115)
 C060 | confirmed | B | wiki: VRAM only in vblank/force-blank (HBlank thus unsafe, implied); "VMADD still increments when ignored" not quoted
 C061 | confirmed | A~ | anomie: 8 master cycles overhead per channel; doc's "~12 setup + ~8 trigger" is an SDK-side estimate — say "about"
-C062 | (pending) | — | modes 5-7 — snes_get on anomie DMA chunk
+C062 | (pending) | — | modes 5-7 — corpus get on anomie DMA chunk
 C063 | confirmed | A | snesdev-wiki HDMA table format (repeat / non-repeat)
 C064 | confirmed | A | snesdev-wiki A1Tn etc.
 C065 | confirmed | A | scroll latch text + HDMA table doctrine

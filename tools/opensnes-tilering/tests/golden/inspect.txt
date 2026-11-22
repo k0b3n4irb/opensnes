@@ -1,0 +1,1 @@
+small.png: 8x6 characters, 41 distinct (44 without merging mirrors), 1312 bytes; window 4x3: worst 12 in view (at 0, 0), 4 new a row, 3 a column

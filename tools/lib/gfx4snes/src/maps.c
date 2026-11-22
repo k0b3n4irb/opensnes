@@ -594,7 +594,9 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
     // with the wrong palette (build-tools audit S7, until 2026-10-04).
     // Mode 7 is checked at save time (one byte per tile).
     if (graphicmode != 9 && newnbtiles + blanktileabsent > 1024)
-        fatal("%d distinct tiles (+%d blank): a BG map addresses 1024 at most - reduce the image or deduplicate with -F", newnbtiles, blanktileabsent);
+        fatal("%d distinct tiles (+%d blank): a BG map addresses 1024 at most - %s", newnbtiles, blanktileabsent,
+              isflip ? "reduce the image (mirrored tiles are already merged)"
+                     : "reduce the image or merge mirrored tiles with --flip");
     *nbtiles = ((graphicmode==5) || (graphicmode==6)) ? newnbtiles<<1 : newnbtiles;
 
     // free hash tables

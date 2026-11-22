@@ -6,7 +6,7 @@
 | **Status** | sent as is |
 
 luna v1.40.0 was released on 2026-10-21 (`a3efb61`). `luna-docs` in the
-corpus does not carry it yet: `snes_search("luna bench verdict firmware
+corpus does not carry it yet: `corpus search("luna bench verdict firmware
 missing coprocessor --jobs", exclude_sources=["opensnes-docs",
 "opensnes-notes-tech"])` serves the `luna bench` page (chunk
 `2a2df49556ad7867`) with `[DIR]`, `--out` and `-f` only.

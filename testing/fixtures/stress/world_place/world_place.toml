@@ -1,0 +1,19 @@
+# oamPlaceWorld against a C model of its contract: 10 000 random batches
+# (arrays in plain RAM, FAR RAM and ROM; order and visible[] or not; first id
+# and count on and past their limits; sizes 8 to 64; positions on the culling
+# limits; `big` or not, size_big 8 to 64), the whole sprite table compared
+# after each (main.c). r_bad must be 0; the counts prove the mix went through
+# (r_large: sprites placed large, by the mixed path).
+rom = "world_place.sfc"
+steps = 500000000
+
+[asserts]
+wdm_empty = true
+
+[asserts.values]                 # u16, little-endian
+"r_done" = 0xC0DE
+"r_bad" = 0
+"r_batches" = 10000
+"r_placed" = 0x6DBF               # counts wrap at 65536: they pin the mix, not a total
+"r_hidden" = 0xD389
+"r_large" = 0x2B89

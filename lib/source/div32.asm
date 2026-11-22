@@ -63,6 +63,63 @@
 ; asset banks (2026-09-23: four examples failed to link, "No room for
 ; section .div32 in ROM bank 7"). The literal list is deliberate: a .DEFINE
 ; is not expanded inside BANKS, and banks 1-7 exist in every memory map.
+;------------------------------------------------------------------------------
+; Inside a user NMI callback (in_nmi_ctx bit 7, crt0.asm)
+;------------------------------------------------------------------------------
+; An nmiSetLag callback may have interrupted a main-thread divide anywhere,
+; or between its return and the caller's `lda.l div32_qh`. Everything the
+; divide writes is shared RAM, so the callback's divide:
+;   - has rt32_nmi_save keep the main thread's result slots (div32_qh,
+;     div32_rl, div32_rh, and mul32_hi) once a callback; the NMI handler
+;     puts them back when the callback returns;
+;   - pushes the main thread's working words (div32_ql, the divisor, the
+;     two signs), runs the ordinary divide on its arguments pushed again
+;     (REENTRY: the entry past the test), and pulls them back.
+; No hardware unit is involved either way. Entered with P pushed, 16-bit.
+;------------------------------------------------------------------------------
+.MACRO DIV32_IN_CALLBACK ARGS REENTRY
+    jsl rt32_nmi_save
+    lda.w div32_ql
+    pha
+    lda.w div32_div_lo
+    pha
+    lda.w div32_div_hi
+    pha
+    lda.w div32_dvd_sign
+    pha
+    lda.w div32_quot_sign
+    pha
+    ; The arguments are now at 15..22,s: push them again in their order,
+    ; b_hi first — each push brings the next one to 21,s.
+    lda 21,s
+    pha
+    lda 21,s
+    pha
+    lda 21,s
+    pha
+    lda 21,s
+    pha
+    jsl REENTRY
+    tax                          ; the quotient's low half
+    tsa
+    clc
+    adc.w #8
+    tas
+    pla
+    sta.w div32_quot_sign
+    pla
+    sta.w div32_dvd_sign
+    pla
+    sta.w div32_div_hi
+    pla
+    sta.w div32_div_lo
+    pla
+    sta.w div32_ql
+    txa
+    plp
+    rtl
+.ENDM
+
 .SECTION ".div32" SEMISUPERFREE BANKS 7-1
 
 .ACCU 16
@@ -95,6 +152,9 @@ tcc_udivmod32:
     rep #$30
     .ACCU 16
     .INDEX 16
+    bit.w in_nmi_ctx-1           ; N = bit 7 of in_nmi_ctx: inside a user NMI callback
+    bmi udiv32_nmi               ; 7 cycles here on every call
+udiv32_body:
 
     ; Copy dividend → ql:qh (loop uses ql:qh as the shifting workspace;
     ; after 32 iterations they hold the quotient).
@@ -115,6 +175,15 @@ tcc_udivmod32:
     plp
     rtl
 
+udiv32_nmi:
+    DIV32_IN_CALLBACK udiv32_reentry
+udiv32_reentry:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    brl udiv32_body
+
 ;------------------------------------------------------------------------------
 ; tcc_sdivmod32 - Signed 32-bit divide+modulo
 ;------------------------------------------------------------------------------
@@ -131,6 +200,10 @@ tcc_sdivmod32:
     rep #$30
     .ACCU 16
     .INDEX 16
+    bit.w in_nmi_ctx-1           ; as tcc_udivmod32 (8 cycles: the test
+    bpl sdiv32_body              ; jumps over a long branch)
+    brl sdiv32_nmi
+sdiv32_body:
 
     ; --- Read dividend; record sign in div32_dvd_sign; store |dividend| → ql:qh
     lda 5,s
@@ -215,6 +288,15 @@ tcc_sdivmod32:
     lda.w div32_ql               ; return A = quotient low
     plp
     rtl
+
+sdiv32_nmi:
+    DIV32_IN_CALLBACK sdiv32_reentry
+sdiv32_reentry:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    brl sdiv32_body
 
 
 ;------------------------------------------------------------------------------
@@ -319,13 +401,12 @@ div32_ucore:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; Scratch RAM for the 32-bit divmod helpers (14 bytes, bank-0)
+; Scratch RAM for the 32-bit divmod helpers (10 bytes, bank 0). The result
+; slots div32_qh, div32_rl and div32_rh are in crt0.asm (.system), where
+; the NMI handler can put them back after a callback.
 ;------------------------------------------------------------------------------
 .RAMSECTION ".div32_ram" BANK 0 SLOT 1
     div32_ql:           dsb 2    ; quotient low (and dividend workspace)
-    div32_qh:           dsb 2    ; quotient high
-    div32_rl:           dsb 2    ; remainder low
-    div32_rh:           dsb 2    ; remainder high
     div32_div_lo:       dsb 2    ; |divisor| low
     div32_div_hi:       dsb 2    ; |divisor| high
     div32_dvd_sign:     dsb 2    ; $FFFF if dividend was negative, $0000 else

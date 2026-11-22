@@ -50,6 +50,59 @@
 .INDEX 16
 
 ;------------------------------------------------------------------------------
+; mul32_soft - the same product inside a user NMI callback
+;------------------------------------------------------------------------------
+; Reached from tcc_mul32 when in_nmi_ctx has bit 7 set (crt0.asm): an
+; nmiSetLag callback may have interrupted a main-thread tcc_mul32 between
+; two writes of the multiplier, or between its return and the caller's
+; `lda.l mul32_hi`. So nothing shared is touched here: no hardware unit
+; (shift and add instead, one step per bit of the multiplier until what
+; is left of it is 0), the work in the callback's own direct page
+; (tcc__r0..r2, caller-saved; D is tcc__nmi_registers in a callback), and
+; mul32_hi written only after rt32_nmi_save has kept the main thread's
+; copy, which the NMI handler puts back when the callback returns.
+; Placed before tcc_mul32 so that its test reaches it with a short branch.
+; Entered with P pushed, A 8-bit, X/Y 16-bit.
+;------------------------------------------------------------------------------
+mul32_soft:
+    .ACCU 8
+    rep #$20
+    .ACCU 16
+    jsl rt32_nmi_save
+    lda 5,s                 ; a_lo
+    sta.b tcc__r0
+    lda 7,s                 ; a_hi
+    sta.b tcc__r0h
+    lda 9,s                 ; b_lo
+    sta.b tcc__r1
+    lda 11,s                ; b_hi
+    sta.b tcc__r1h
+    stz.b tcc__r2
+    stz.b tcc__r2h
+@step:
+    lsr.b tcc__r1h          ; next bit of the multiplier into the carry
+    ror.b tcc__r1
+    bcc @no_add
+    clc
+    lda.b tcc__r2
+    adc.b tcc__r0
+    sta.b tcc__r2
+    lda.b tcc__r2h
+    adc.b tcc__r0h
+    sta.b tcc__r2h
+@no_add:
+    asl.b tcc__r0           ; multiplicand x 2
+    rol.b tcc__r0h
+    lda.b tcc__r1
+    ora.b tcc__r1h
+    bne @step
+    lda.b tcc__r2h
+    sta.l mul32_hi
+    lda.b tcc__r2
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
 ; tcc_mul32 - 32-bit multiplication (low 32 bits of product)
 ;
 ; CRITICAL: this section exports `tcc_mul32` directly — the qbe backend
@@ -110,6 +163,10 @@ tcc_mul32:
     ; --- p0 = a_lo.lo * b_lo.lo ---
     sep #$20
     .ACCU 8
+    ; Inside a user NMI callback: the software path above (in_nmi_ctx,
+    ; bit 7 — N of the load). 6 cycles here on every call.
+    lda.w in_nmi_ctx
+    bmi mul32_soft
     lda 5,s
     sta.l $4202
     lda 9,s
@@ -316,9 +373,9 @@ tcc_mul32:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; Scratch RAM for tcc_mul32 (4 bytes, bank-0 fixed location)
+; Scratch RAM for tcc_mul32 (2 bytes, bank 0). The result slot mul32_hi is
+; in crt0.asm (.system), where the NMI handler can put it back.
 ;------------------------------------------------------------------------------
 .RAMSECTION ".mul32_ram" BANK 0 SLOT 1
     mul32_lo:   dsb 2
-    mul32_hi:   dsb 2
 .ENDS

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 34 955 chunks · chunker v10 · index v2 · empreinte **`f8f11bcced91`** |
 | **Pour servir cet index** | `git pull` + `make import SRC=…` + `make rebuild`, puis `make doctor` ; relancer le serveur MCP |
 | **Répond à** | `2026-10-05_to_rag-partner_tranche-garde-fous-menage_reply.md` |
@@ -32,7 +32,7 @@ pixels `60h-6Fh`. Lu à la lettre, cela donne `40h-4Fh` côté SA-1.
 
 Nous n'avons donc posé **ni drapeau d'erreur ni note de contraste** sur la
 phrase de sneslab : ce serait signaler une erreur qui n'en est pas une. À la
-place, une fiche : `sa1-bwram-banks` (`cartouche-fiches`, chunks
+place, une fiche : `sa1-bwram-banks` (`corpus-notes`, chunks
 `c8f6c13b9a0afe66` et `a0a0806e29d13e39`). Elle sort aux rangs 1 et 2 sur
 « SA-1 BW-RAM banks on the SA-1 CPU side $40-$5F », avec votre exclusion.
 
@@ -44,7 +44,7 @@ Deux réserves, écrites dans la fiche :
 - Vitor Vilela donne la mémoire virtuelle en `$60-$7F`, les autres en
   `$60-$6F`. Non tranché.
 
-Le défaut de `snes_verify` sur ce cas (banques sur deux chiffres, `sentences`
+Le défaut de `corpus verify` sur ce cas (banques sur deux chiffres, `sentences`
 vide) reste ouvert.
 
 ## 2. Trois changements venus de luna
@@ -56,7 +56,7 @@ vide) reste ouvert.
 | `pandocs-sgb` n'est servi que sur le Super Game Boy | hors de ce périmètre il parle du Game Boy ; il occupait 9 places sur nos 228 questions, aucune utile |
 
 Le classement est mesuré neutre : 0 question gagnée, 0 perdue à 5 passages.
-`snes_verify` rend les mêmes verdicts sur nos 60 paires.
+`corpus verify` rend les mêmes verdicts sur nos 60 paires.
 
 ## 3. Votre §2
 

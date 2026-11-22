@@ -61,9 +61,11 @@ above 300 mclk per frame.
   17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
   8,900 mclk per frame (2.5 %) for its five characters, each a 32x32
-  sprite placed or hidden every frame (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
-  `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
-  counts.
+  sprite placed or hidden every frame (the setters are assembly). For large
+  counts: `oamSetAttr` when the game keeps the attribute byte composed,
+  `oamSetBatch` over arrays, or writing `oamMemory[]` directly
+  (sprite_swarm). The `oamSetFast` / `oamSetXYFast` macros cost more than
+  the calls (rows `oamfast`, `oamset`, `oamattr` below).
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
   rooftop_run (both are compiled C).
 - **`bgSetScroll`**: about 570 mclk per frame in each of the three games.
@@ -72,7 +74,7 @@ above 300 mclk per frame.
 
 The per-function figures are what luna counts at the function's own
 labels. Asm routines a function calls under their own names (the map
-engine's `map_prepare_column`, SNESMOD's SPC transfer routines) are not
+engine's `_ProcessVerticalBuffer`, SNESMOD's SPC transfer routines) are not
 added to it, and code the compiler inlined into the caller is counted in
 the caller.
 
@@ -114,14 +116,21 @@ compilers.
 | `text` | 20 characters printed and shown | 82,796 | 17,366 | -79.0 % |
 | `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 167,840 | 91,385 | -45.6 % |
 | `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,336 | 53,409 | -58.7 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 31,747 | -75.5 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,336 | 23,767 | -81.6 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 17,626 | +1.3 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,545 | -39.4 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 36,309 | -73.4 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,697 | 27,803 | -79.7 % |
 | `hideeach` | 32 sprites parked off screen, one call each | 46,183 | 25,588 | -44.6 % |
-| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 9,820 | -82.2 % |
+| `hiderange` | the same 32 sprites in one call: `oamHideRange` here, `oamClear` there | 55,187 | 4,614 | -91.6 % |
+| `mapcol` | the map engine streaming one new column (29 entries), one `mapUpdate` | — | 13,158 | |
+| `maprow` | the map engine streaming one new row (33 entries), one `mapUpdate` | — | 14,981 | |
+| `hide1` | one sprite parked off screen: `oamHideRange` here, `oamClear` there | — | 1,710 | |
+| `hide128` | all 128 sprites parked off screen in one call: `oamHideRange` here, `oamClear` there | — | 10,158 | |
+| `oamfast` | the 32 sprites of oamset through the `oamSetFast` macro | — | 82,825 | |
+| `oamattr` | the 32 sprites, attribute byte composed by the game: `oamSetAttr` | — | 50,629 | |
+| `oambatch` | the 32 sprites from arrays of x, y, tile and attr: one `oamSetBatch` here | — | 36,686 | |
 
-OpenSNES costs no more than PVSnesLib on **14 of the 16 rows**. PVSnesLib at `1fab4b2a 2026-07-28`.
+OpenSNES costs no more than PVSnesLib on **14 of the 16 rows** both were measured on. PVSnesLib at `1fab4b2a 2026-07-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library

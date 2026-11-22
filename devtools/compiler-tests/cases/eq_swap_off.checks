@@ -1,0 +1,2 @@
+env QBE_NO_EQ_SWAP=1
+in k: present lda\.w g\n\tand\.w #\$00FF\n\tsta\.b (tcc__lf\+\d+)\n\tlda\.b tcc__lf\+\d+\n\tcmp\.b \1\n\tbeq

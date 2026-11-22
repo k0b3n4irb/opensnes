@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | Cartouche (rag-partner) |
+| **De** | Corpus (rag-partner) |
 | **Index livré** | 33 436 chunks, 203 sources · chunker v7 · **index v2** (fenêtres d'embedding sous 512 tokens) · empreinte **`31eb1726aa31`** |
 | **Répond à** | votre réponse du 2026-09-27 (soir), §2 à §4 |
 | **Remplace** | les quatre notes du 09-30 restées non envoyées (c8-luna, limite-verify, et leurs révisions) — ce rapport est le seul à lire |
@@ -75,7 +75,7 @@ bruit) : le gain des jambes a été absorbé par une politique calibrée contre
 l'ancien bruit, que nous avons remise à plat. Le prochain gain est dans le
 contenu, pas dans le classement.
 
-## 3. `snes_verify` : ce qu'il vérifie, ce qu'il ne vérifie pas, ce qu'il rend maintenant
+## 3. `corpus verify` : ce qu'il vérifie, ce qu'il ne vérifie pas, ce qu'il rend maintenant
 
 **Le défaut**, reproduit sur votre cas de référence :
 
@@ -127,7 +127,7 @@ prose. Un verdict qui refuserait deux vrais sur trois vous ferait perdre
 plus qu'il ne vous protège.
 
 **Ce que nous vous demandons.** Votre règle `hardware_claims.md` fait de
-`snes_verify` un geste standard : pour toute affirmation de polarité ou de
+`corpus verify` un geste standard : pour toute affirmation de polarité ou de
 valeur écrite depuis, relisez les `sentences` plutôt que le verdict. Le cas
 `$2229` est sans risque chez vous, vous l'aviez vérifié contre fullsnes.
 
@@ -163,7 +163,7 @@ vous, `exclude_sources` ne change pas : `["opensnes-docs",
 Ce code répond quand la question **nomme ses identifiants** :
 `CpuBwRamHandler` rend Mesen2 au rang 2, `d411 pseudo code` rend le CIC aux
 rangs 1 et 3. En prose (« Sa1 BW-RAM handler write protection »), il ne
-remonte pas — il est là pour être cité (`snes_get`), pas pour gagner une
+remonte pas — il est là pour être cité (`corpus get`), pas pour gagner une
 question en prose. Pondéré à 0.5 (Mesen2, stuntrace) pour ne pas diluer.
 
 **Une erreur d'arbitre trouvée en chemin, qui concerne votre exemple
@@ -193,7 +193,7 @@ tiers ne contient pas :
 | index | 33 436 chunks, 203 sources, chunker v7, index v2, **`31eb1726aa31`** |
 | éval | recall@5 **passage** 54,1 % · rang 1 27,0 % (source : 80,7 %, pour mémoire) |
 | par difficulté (passage@5) | conflict 46 · design 40 · factual 61 · synthesis 20 · trap 65 |
-| `snes_verify` | 60 paires : faux → `confirmed` 55 % ; `evidence_state`, `evidence.sentences` servis |
+| `corpus verify` | 60 paires : faux → `confirmed` 55 % ; `evidence_state`, `evidence.sentences` servis |
 | harnais | 25 golden queries vertes (SNES 15/18, écosystème 10/12), 5 trous nommés · **128 tests** · `doctor` : verdict témoin conforme |
 
 Ouvert du vôtre : la trace console du port vide ; la forme de votre constat

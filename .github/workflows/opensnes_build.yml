@@ -72,6 +72,10 @@ jobs:
         if: matrix.name == 'windows'
         uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
         with:
+          # The runner image ships MSYS2: `release: false` uses it instead of
+          # downloading the installer, which answered 504/503 twice on
+          # 2026-11-08 (the packages below still come from the pacman mirrors).
+          release: false
           update: true
           msystem: UCRT64
           install: >-
@@ -247,6 +251,18 @@ jobs:
           echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
+      # The ROMs of every platform, hashed, to compare them (devtools/compare_rom_hashes.py): nothing
+      # had checked that clang on Linux and macOS and the MSYS2 toolchain produce the same bytes.
+      # Measurement only for now; the lists go out with the build logs (*.log).
+      - name: Hash the example ROMs (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
+
+      - name: Hash the example ROMs (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.name }}.log
+
       # Validate the starter project builds via the OPENSNES= consumption path
       # a downstream user follows (proves the release-consumption contract).
       - name: Build starter project (Linux/macOS)
@@ -365,7 +381,12 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    # The x86_64 runner is slower and noisier than the arm64 one: this job took 10 to 12 minutes on
+    # most pushes and 15, 16, 19, 19 and then more than 20 on others (2026-11-09: cancelled at the
+    # limit, red badges). 35 minutes leaves room for the suite as it grows (the frozen torture subset
+    # fetches and builds about a minute of tests). 2026-11-20: the suite took 18 to 25 minutes, then 32 on
+    # the push that added the tile ring tests (cancelled at 35 in the last step): 50 leaves room.
+    timeout-minutes: 50
     steps:
       - name: Check out OpenSNES (with submodules)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -411,6 +432,15 @@ jobs:
         run: |
           export OPENSNES_HOME=$(pwd)
           make TOOLCHAIN_WERROR=1
+
+      - name: Hash the example ROMs
+        run: python3 devtools/rom_hashes.py > rom_hashes_${{ matrix.arch }}.log
+
+      - name: Upload the ROM hashes
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ROM hashes (${{ matrix.arch }})
+          path: rom_hashes_${{ matrix.arch }}.log
 
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
@@ -465,3 +495,38 @@ jobs:
             testing/baselines/
             /tmp/opensnes-tests/luna-test-actual/
             /tmp/opensnes-tests/luna-test-corpus/
+
+  # ====================================================================== #
+  # The same sources must give the same ROMs on every system               #
+  #                                                                        #
+  # Each build leg writes the sha256 of its 66 example ROMs                #
+  # (devtools/rom_hashes.py); this job compares the lists. Until 2026-11-10 #
+  # macOS and Windows differed from Linux on all 65 (wlalink sorted equal  #
+  # sections with an order that was not one, and qsort() placed them as    #
+  # the platform pleased); the section sort is stable now.                 #
+  # ====================================================================== #
+  rom-hashes:
+    name: Same ROMs on every system
+    needs: [build, functional-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+
+      - name: Download the hash lists
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: hashes
+          pattern: "{ROM hashes*,OpenSNES Logs*}"
+
+      - name: Compare
+        run: |
+          find hashes -name 'rom_hashes_*.log' | sort
+          python3 devtools/compare_rom_hashes.py \
+            "linux-x86_64=hashes/ROM hashes (x86_64)/rom_hashes_x86_64.log" \
+            "linux-arm64=hashes/ROM hashes (arm64)/rom_hashes_arm64.log" \
+            "macos=hashes/OpenSNES Logs (darwin)/rom_hashes_darwin.log" \
+            "windows=hashes/OpenSNES Logs (windows)/rom_hashes_windows.log"

@@ -1,4 +1,8 @@
 # the index is stored because the other side of the branch reloads it into X
+# the shape pinned here is the text rules' and the slots' own: the X/Y colour
+# (lot XY, 2026-11-14) would hold this case's counter or index in a register
+# itself (its shapes: xy_colour.checks)
+env QBE_NO_XY_COLOUR=1
 in keep: present \tsta\.b tcc__lf\+(\d+)\n[\s\S]*\tldx\.b tcc__lf\+\1\n
 # after the branch, the slots are written again and never read: both stores go
 in keep: present \tadc\.w #2\n\tasl a\n\ttax\n\tlda\.w tab,x\n\trtl

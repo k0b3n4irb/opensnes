@@ -10,13 +10,14 @@ being unreliable, see .claude/rules/luna_tooling.md): a changed hash means
 changed, go look". The capture is deterministic run to run (same seed of
 nothing: the SPC700/DSP are integer machines).
 
-Examples covered: the eight that play without input (apu_switch, snesmod_music,
-pitch_mod, play_noise, echo, speech_synth, the snesmod_music_large fixture, and
-chips/superfx_game_skeleton — music while the GSU works) and the three
-that need a button (soundboard, snesmod_music, sfx_from_wav), each pressed with
-the script of its luna test manifest. The button-driven ones joined on luna
-v1.29.0: before it, `--audio-out` under `--input` kept only 16 384 samples
-from the boot and then jumped to the last checkpoint.
+Examples covered (the EXAMPLES table below is the list; no count is written in prose, it went stale in three documents): those that play without input (speech_synth, sample_swap,
+sfx_voices, the snesmod_music_large fixture, and chips/superfx_game_skeleton, which plays
+music while the GSU works) and those that need a button (apu_switch, soundboard,
+snesmod_music, sfx_from_wav), each pressed with the script of its luna test manifest. Every
+audio example under examples/audio is in the list. The button-driven ones joined on luna
+v1.29.0: before it, `--audio-out` under `--input` kept only 16 384 samples from the boot and
+then jumped to the last checkpoint. The capture stops at FRAMES (5 s): the first part of a
+longer example (sfx_voices plays for 700 frames) is what the hash covers.
 
 Run:  python3 testing/audio_regress.py            # compare
       python3 testing/audio_regress.py --update   # re-capture after an intended change
@@ -45,6 +46,9 @@ FRAMES = 300  # 5 s NTSC — past every driver's boot + sample upload
 EXAMPLES = {
     "audio/apu_switch":    ("audio/apu_switch/apu_switch.sfc", "150:0x8000,153:0"),
     "audio/speech_synth":  ("audio/speech_synth/speech_synth.sfc", None),
+    # the sample loaded at an address and swapped during play; the effects voice by voice
+    "audio/sample_swap":   ("audio/sample_swap/sample_swap.sfc", None),
+    "audio/sfx_voices":    ("audio/sfx_voices/sfx_voices.sfc", None),
     # left the examples in the 1.0 review; a soundbank across two banks
     "fixtures/snesmod_music_large": ("../testing/fixtures/retired_examples/snesmod_music_large/music_large.sfc", None),
     # the music fed from ROM while the GSU renders and the NMI moves frames

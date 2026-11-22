@@ -331,5 +331,28 @@ class ExampleReview20261015(unittest.TestCase):
             self.assertFalse(check_doc_drift.named_file_missing(ex, "crt0.asm"))   # a file of the SDK
 
 
+class TestSdkbenchHeadline(unittest.TestCase):
+    """Anchor 22: the prose headline of the measured workloads against the table's Total row."""
+    PAGE = ("| `farfill` | a screen | 134,396,874 | 55,167,950 | -59.0 % | 5132 | 2915 | -43.2 % | 84 | 63 |\n"
+            "| **Total** | | **325,169,900** | **119,128,592** | **-63.4 %** | **25801** | **12295** | **-52.3 %** | | |\n")
+
+    def test_matching_headline_passes(self):
+        prose = {"docs/BENCHMARK.md": "measured on 23\nwhole workloads, 63 % (below).",
+                 "ROADMAP.md": "and 63 % faster measured on luna on 23 workloads, each"}
+        self.assertEqual(check_doc_drift.sdkbench_headline_drifts(self.PAGE, prose), [])
+
+    def test_stale_headline_is_a_drift_in_both_spellings(self):
+        # the 2026-11-09 case: 62 % in the prose, -63.4 % in the table
+        prose = {"docs/BENCHMARK.md": "measured on 23\nwhole workloads, 62 % (below).",
+                 "ROADMAP.md": "and 62 % faster measured on luna on 23 workloads, each"}
+        out = check_doc_drift.sdkbench_headline_drifts(self.PAGE, prose)
+        self.assertEqual(len(out), 2)
+        self.assertIn("62 %", out[0])
+
+    def test_no_total_row_or_no_headline_is_an_error_not_a_pass(self):
+        self.assertTrue(check_doc_drift.sdkbench_headline_drifts("no table", {"a": "x"}))
+        self.assertTrue(check_doc_drift.sdkbench_headline_drifts(self.PAGE, {"a": "nothing to find"}))
+
+
 if __name__ == "__main__":
     unittest.main()

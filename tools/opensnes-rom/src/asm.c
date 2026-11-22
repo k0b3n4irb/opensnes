@@ -167,7 +167,9 @@ int check_bank_reads(cli_ctx *ctx, const sym_file *s, const char *dir)
         for (size_t i = 0; i < blind.n; i++) {
             const sym_label *l = sym_find(s, blind.v[i]);
             if (!l) continue;                       /* registers, defines: not linked symbols */
-            if (l->bank >= 0x01 && l->address >= 0x8000) {
+            /* WRAM ($7E-$7F) is RAM, not LoROM data: an address of $8000 or more
+             * in it is a plain offset, read through its own bank by `lda.l`. */
+            if (l->bank >= 0x01 && l->bank != 0x7E && l->bank != 0x7F && l->address >= 0x8000) {
                 if (!bad) cli_error(ctx, base, "C code reads bank $01+ data with bank-$00 addressing (the read returns garbage at runtime: cc65816 near deref). Keep C-read data in bank $00 or RAM, or pass it to a lib function as a far pointer:");
                 fprintf(stderr, "  $%02X:%04X  %s  (read bank-blind in %s)\n", l->bank, l->address, blind.v[i], base);
                 bad = 1;
@@ -239,7 +241,14 @@ static int is_port_write(const char *line)
     return !ident_char(p[4]);
 }
 
-/* "jsl|jsr|jml|jmp [.w|.l|.b] name" → name (a label, not a local @label) */
+/* "jsl|jsr|jml|jmp [.w|.l|.b] name" → name (a label, not a local @label).
+ * The name may hold dots: a static C function is `name.unit` (fill.main).
+ * Until 2026-11-14 call_target, pea_label and the function header below read
+ * an identifier without dots, so a static function was neither a function
+ * nor a callee here: its body was put in the function above it in the file,
+ * and a WRAM-port write in a static function called from an NMI callback
+ * was missed when that function was not itself reachable (found by L4 S1,
+ * golden case "nmirace_static"). */
 static int call_target(const char *line, char *out, size_t n)
 {
     const char *p = line;
@@ -253,7 +262,7 @@ static int call_target(const char *line, char *out, size_t n)
     if (*p == '.' && p[1] && strchr("wlbWLB", p[1])) p += 2;
     if (!isspace((unsigned char)*p)) return 0;
     while (isspace((unsigned char)*p)) p++;
-    size_t l = take_ident(p, out, n);
+    size_t l = take_sym(p, out, n);
     if (!l) return 0;
     p += l;
     while (isspace((unsigned char)*p)) p++;
@@ -270,7 +279,7 @@ static int pea_label(const char *line, char *out, size_t n)
     if (p[0] == '.' && (p[1] == 'w' || p[1] == 'W')) p += 2;
     if (!isspace((unsigned char)*p)) return 0;
     while (isspace((unsigned char)*p)) p++;
-    size_t l = take_ident(p, out, n);
+    size_t l = take_sym(p, out, n);
     if (!l) return 0;
     p += l;
     while (isspace((unsigned char)*p)) p++;
@@ -315,7 +324,7 @@ int check_nmi_race(cli_ctx *ctx, const char *dir)
             if (!*p || *p == ';') continue;
             /* a function: "name:" at column 0 and nothing else */
             if (ident_start(line[0])) {
-                size_t l = take_ident(line, name, sizeof name);
+                size_t l = take_sym(line, name, sizeof name);
                 const char *q = line + l;
                 if (*q == ':') {
                     q++;

@@ -8,8 +8,8 @@ paths:
 
 CRITICAL: every **new hardware claim** written into `docs/` or
 `KNOWN_LIMITATIONS.md` — a register's behaviour, a timing figure, a
-PPU/APU/chip property — must be checked against the Cartouche corpus
-(MCP `cartouche`, tool `snes_search`) before it lands. The project's
+PPU/APU/chip property — must be checked against the reference corpus
+(the reference-corpus MCP server of the session, its search tool) before it lands. The project's
 two costliest historical detours came from exactly one pattern: *a
 wrong or misread external source, with no arbiter consulted at the
 moment of doubt*.
@@ -32,33 +32,36 @@ moment of doubt*.
 
 1. **When writing a hardware claim** — query first:
    ```
-   snes_search(question, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
+   search(question, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
    ```
    The exclusion is mandatory for verification queries: our own docs
    are indexed in the corpus, and letting them answer turns the check
    into a confirmation loop (they are the thing being verified).
    Or confront the exact sentence you are about to write:
    ```
-   snes_verify(claim, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
+   verify(claim, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
    ```
    A mistyped id in `exclude_sources` is refused since 2026-10-04
-   (`snes_search` answers "exclude_sources inconnu(s)… Rien n'a été
-   cherché", `snes_verify` returns `verdict: invalid_request`); before, it
+   (`corpus search` answers "exclude_sources inconnu(s)… Rien n'a été
+   cherché", `corpus verify` returns `verdict: invalid_request`); before, it
    was ignored in silence and our own docs could answer. Read the first
    line of a result before reading the rest.
-   **Never trust its `verdict`.** `confirmed` means "an arbiter deals
+   **Never trust its `verdict`, nor its `evidence_state`.** `arbiter_covers_point`
+   (the verdict renamed from `confirmed` on 2026-11-08) means "an arbiter deals
    with this point", not "this sentence is true": it checks neither
    **polarity** (0/1, enable/protect, active high/low) nor **value**
-   (address, bit count, cycles) — two opposite claims both come out
-   `confirmed` (rag-partner measured 55 % of false claims `confirmed`,
-   2026-09-30). The claim may be written only if `evidence_state ==
-   "arbiter_states_point"` **and** one of the arbiter `evidence[].sentences`
-   states the polarity or value word for word. The two failure shapes seen
-   on 2026-10-02: a false `arbiter_states_point` whose sentences said
-   nothing about the claim (the multiplier during auto-joypad), and a false
+   (address, bit count, cycles). Measured by the corpus on a sealed set of 30
+   pairs drawn from the code of an emulator it never indexed: a false claim
+   comes out `arbiter_covers_point` 40 % of the time (95 % interval 25-58 %),
+   a true one 53 %. The other verdicts are `documented_false_form`,
+   `no_arbiter_on_point`, `not_covered` and `invalid_request`. A claim may be
+   written only if one of the arbiter `evidence[].sentences` states the
+   polarity or the value word for word: **the sentences decide, alone**; the
+   verdict and the state only say where to read. The two failure shapes seen
+   on 2026-10-02: a false `arbiter_states_point` whose sentences said nothing
+   about the claim (the multiplier during auto-joypad), and a false
    `arbiter_covers_topic_only` whose sentences stated it exactly (the empty
-   window, VMADD incrementing on an ignored write) — the sentences decide,
-   both ways.
+   window, VMADD incrementing on an ignored write).
 2. **When sources conflict** — `contrast=true` lays every source's
    position side by side, ordered by authority, with anchored
    citations. This is the tool for disputed polarities and timings.
@@ -76,7 +79,7 @@ moment of doubt*.
    corpus eliminates it in one query.
 5. **Traceability** — a non-trivial claim cites its arbiter source
    (anchored link) in the doc itself or in the commit message.
-   `snes_get(chunk_id)` retrieves the full passage when the search
+   `get(chunk_id)` retrieves the full passage when the search
    excerpt is truncated.
 
 ## When this rule does NOT apply
@@ -85,7 +88,7 @@ moment of doubt*.
   workflow docs, examples' gameplay text.
 - Claims already carrying an arbiter citation (re-verifying on every
   edit is noise; re-verify when the *claim itself* changes).
-- Sessions where the cartouche MCP is not connected: degrade
+- Sessions where the corpus MCP is not connected: degrade
   gracefully — mark the claim "to verify against the SNES corpus" in
   the commit body so a later session picks it up. Do not silently
   skip the check.
