@@ -4,6 +4,9 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- fix(compiler): a 32-bit mask of a 32-bit 0 / 1 chosen by a one-bit test, `((a & 1) ? 1UL : 0UL) & 63`, compiles (qbe `9c97bbc`); qbe stopped on an assertion of its value numbering (`assoccon`). The optimizer replaces the 32-bit choice by the 16-bit test that makes it, an operand this target reads zero-extended, and the step that merges the constants of two `&` in a row asserted that both were 32-bit. It now leaves such a pair as it is: merging across the widening would be wrong for `+`, `-` and `*`. The corpus and the library are byte-identical; the fixture `testing/fixtures/compiler/assoc_widen` checks the values (high half included) and `difftest_stmt` pins the shape as `p17` (found by `--batch idiom`, seed 62339485).
+
 ## [0.56.0] — 2026-11-21
 
 ### Fixed

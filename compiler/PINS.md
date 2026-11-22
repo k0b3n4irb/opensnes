@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 18eecca664b0f348f7f06c467bd11ea9328aeb31 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | d38a30a3e237895c71c684964bae6ec4bbdcc510 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 9c97bbc74daced9535e2488de0439e5b319b95e3 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 96e7860d2590d54469748b6dad01091c91430255 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 6) |
 <!-- END PINS -->
 
@@ -103,7 +103,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 170 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 171 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -115,6 +115,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+9c97bbc fix(gvn): assoccon leaves a pair whose inner operation is narrower alone — a `w` operand of an `l` instruction is legal IR on w65816 (usecheck, read zero-extended) and phicopyref makes one when it puts the `w` jnz argument for an `l` 0/1 phi; assoccon asserted upstream's typing (`KWIDE(i2->cls) >= KWIDE(i1->cls)`) and qbe stopped on `((a & 1) ? 1UL : 0UL) & 63`; merging the constants across the widening is wrong for add, sub and mul, so the pair is left alone (difftest_stmt --batch idiom seed 62339485, pinned as `p17`, fixture `assoc_widen`); the corpus byte-identical (2026-11-22)
 8591689 perf(w65816): the byte swap of a 16-bit word is one `xba` — `mark_bswap` rewrites `or (shl x, 8), (shr x, 8)` (either order, all `w`) into the emitter's own `bswap` op before every analysis; `sar`, `l` and a count other than 8 refused; `QBE_NO_BSWAP=1` byte-identical, `QBE_BSWAP_FAULT=1` the provoked fault (fixture `bswap`)
 71b528d perf(w65816): an equality is compared from the operand A already holds — `eq_swap` for `ceqw`/`cnew` only, when A holds the second operand and not the first, `cmp` the first (Z is the same either way); refused if an operand lives in X/Y or the second is a 16-bit load; `QBE_NO_EQ_SWAP=1` byte-identical, `QBE_EQ_SWAP_FAULT=1` the provoked fault (fixture `eq_swap`)
 5a4c275 fix(w65816): the dead-store rule for a commutative operand is for a 16-bit operation only — `mark_dead_stores` case 3 dropped the store of arg[1] of a commutative operation trusting an A-cache swap the 32-bit pair path never makes; a 16-bit compare xored into a 32-bit accumulator lost its slot and the build stopped on `temp_noslot` (difftest_stmt seed 9922, pinned as `p16`, reachable with `static inline` helpers); the corpus and the library byte-identical (2026-11-14)

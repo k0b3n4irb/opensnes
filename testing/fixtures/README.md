@@ -35,6 +35,7 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 |---|---|
 | `a6_farptr/` | the 4-byte pointer ABI: the bank byte through every lib boundary |
 | `a7_32bit/` | 32-bit arithmetic: add/sub carry, mul, div, mod, shifts, signed folds |
+| `assoc_widen/` | a 32-bit mask of a 32-bit 0 / 1 chosen by a one-bit test, `((a & 1) ? 1UL : 0UL) & 63`: gvn puts the 16-bit `a & 1` for the phi and its `assoccon` asserted upstream's typing on the `w` operand of the `l` and (difftest_stmt idiom seed 62339485); the ROM builds, and the values, high half included, are `a & 1` for six run-time values of a |
 | `b2_far_ram/` | `FAR` objects in bank $7E with bank-honouring codegen |
 | `bswap/` | the byte swap of a 16-bit word as one `xba`: `(w << 8) \| (w >> 8)` in both orders, from a FAR read and on a global in place, swept over the 65 536 values of w against the swap built without the shape and a host checksum; the shapes left alone (a signed `>>`, 32 bits, the masked idiom) still right; a branch on the swapped value; the provoked fault (`QBE_BSWAP_FAULT=1`, a `sar` taken) makes the s16 form wrong, `QBE_NO_BSWAP=1` keeps the values and loses the `xba` |
 | `far_bank7f/` | `FAR` objects in bank $7F placed by assembly: every access form, `memcpy`/`memset`, no overlap |

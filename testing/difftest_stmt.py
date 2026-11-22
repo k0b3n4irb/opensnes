@@ -187,6 +187,12 @@ PINNED = [
      "u32 p16(void) { s8 v2 = 85; u32 u = 3; u16 i; "
      "for (i = 2; i > 0; i--) u ^= p16c(p16s((s8)-128), 32768U >= v2); return u; }",
      "p16()", 3),
+    # a 32-bit 0 / 1 chosen by a one-bit test, then masked: gvn put the 16-bit
+    # test for the 32-bit phi and assoccon asserted the widths of the two ands
+    # (--batch idiom, seed 62339485, 2026-11-22)
+    ("a 32-bit mask of a 32-bit 0 / 1 chosen by a one-bit test",
+     "u32 p17(u16 a) { return ((a & 1) ? 1UL : 0UL) & 0x10001UL; }",
+     "p17(pin_g | 1)", 1),
 ]
 
 PROGS_PER_ROM = 10
