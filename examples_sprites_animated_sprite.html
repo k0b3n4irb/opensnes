@@ -132,7 +132,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-6"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">sprites/simple_sprite</span> first (OAM basics, tile loading).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-26"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-27"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -146,12 +146,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Right  </td><td class="markdownTableBodyNone">Walk right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-33"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/animated_sprite</div>
 </div><!-- fragment --><p>Then open <span class="tt">animated_sprite.sfc</span> in luna (<span class="tt">luna-gui animated_sprite.sfc</span>) or any emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-12"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-13"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-sprite-sheet-layout"></a>
 1. Sprite sheet layout</h3>
@@ -182,7 +182,7 @@ How It Works</h2>
 <div class="fragment"><div class="line"><a class="code hl_define" href="anim_8h.html#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a>(walk_down, <a class="code hl_define" href="anim_8h.html#ac2f8f711a52b203de5a6469e086c963f">ANIM_LOOP</a>, <a class="code hl_define" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a>, 0, 4, 8, 12, 64);</div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="anim_8h.html#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a>(&amp;<a class="code hl_variable" href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a>, &amp;walk_down);       <span class="comment">/* continues if already playing */</span></div>
-<div class="line"><a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a>.gfx_frame = <a class="code hl_function" href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a>(&amp;<a class="code hl_variable" href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a>);   <span class="comment">/* the tile number for oamSet() */</span></div>
+<div class="line"><a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a>.gfx_frame = <a class="code hl_function" href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a>(&amp;<a class="code hl_variable" href="games_2rooftop__run_2main_8c.html#abd0611a2b49c085f2b68f1656452c09c">kit_anim</a>);   <span class="comment">/* the tile number for oamSetAttr() */</span></div>
 <div class="ttc" id="aanim_8h_html_a35cf99090ec3c39a40eb25db6f87b05d"><div class="ttname"><a href="anim_8h.html#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a></div><div class="ttdeci">#define DECLARE_ANIM_CLIP(name, mode_, speed_,...)</div><div class="ttdoc">Declare a static const AnimClip with uniform frame duration.</div><div class="ttdef"><b>Definition</b> anim.h:202</div></div>
 <div class="ttc" id="aanim_8h_html_a7a416dc50a4020c4810d7b205bb0304b"><div class="ttname"><a href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a></div><div class="ttdeci">u16 animTick(AnimPlayer *p)</div><div class="ttdoc">Advance one tick; return the current frame value.</div></div>
 <div class="ttc" id="aanim_8h_html_a82791dbe279dc728e3946f838f8e2cf1"><div class="ttname"><a href="anim_8h.html#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a></div><div class="ttdeci">void animPlay(AnimPlayer *p, const AnimClip *clip)</div><div class="ttdoc">Start (or keep) a clip — continue-if-same semantics.</div></div>
@@ -191,14 +191,14 @@ How It Works</h2>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_a40d20879d5ecca950af2b5d40fa95874"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#a40d20879d5ecca950af2b5d40fa95874">kit</a></div><div class="ttdeci">Walker kit</div><div class="ttdoc">Kit, the player-controlled sprite, initialized facing down at (100, 100).</div><div class="ttdef"><b>Definition</b> main.c:109</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_aca96d6bd10d9a1eca2363540f9d3f5a8"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a></div><div class="ttdeci">#define ANIM_DELAY</div><div class="ttdoc">Number of frames to hold each animation frame before advancing.</div><div class="ttdef"><b>Definition</b> main.c:106</div></div>
 </div><!-- fragment --><p>Animation only advances when a direction button is held. <span class="tt"><a class="el" href="sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8" title="Number of frames to hold each animation frame before advancing.">ANIM_DELAY</a></span> (6 frames) controls walking speed &ndash; at 60 fps, this means about 10 animation steps per second.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-31"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-32"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="obj_flipx----hardware-horizontal-mirror"></a>
 OBJ_FLIPX &ndash; Hardware Horizontal Mirror</h3>
 <p>The PPU can flip any sprite horizontally by setting a single bit in the OAM attribute byte. This costs nothing &ndash; no extra tiles in VRAM, no CPU work. Many SNES games use this to halve the sprite art needed for left/right movement.</p>
 <h3 class="doxsection"><a class="anchor" id="sprite-sheets-in-vram"></a>
 Sprite Sheets in VRAM</h3>
-<p>All animation frames are loaded into VRAM at once via <span class="tt"><a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a></span>. The active frame is selected by changing the tile number in <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>. This means switching frames is instant &ndash; just change a number, no DMA needed.</p>
+<p>All animation frames are loaded into VRAM at once via <span class="tt"><a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a></span>. The active frame is selected by changing the tile number given to <span class="tt"><a class="el" href="sprite_8h.html#aee3781df317208e36203b753f1e83c92" title="Set a sprite whose attribute byte the game keeps composed.">oamSetAttr()</a></span>. This means switching frames is instant &ndash; just change a number, no DMA needed.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md32x32-tiles-in-oam"></a>
 32x32 Tiles in OAM</h3>
 <p>In OAM, a 32x32 sprite uses 16 hardware 8x8 tiles arranged in a 4x4 grid. The tile number refers to the top-left tile; the PPU fills in the rest automatically using the SNES tile numbering convention (right tile = tile+1, each row below is 16 tiles further, the 16-tile-per-row VRAM layout). <span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span> makes "large" mean 32x32, and <span class="tt">oamSetSize(0, OBJ_LARGE)</span> picks it for this sprite.</p>
@@ -227,7 +227,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#abae503d9cce4f555874775d414a68e31">anim</a></span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

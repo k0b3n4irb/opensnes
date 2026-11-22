@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['0_0',['0',['../tutorial_panel.html#autotoc_md-panelflush-uploads-under-forced-blank--do-not-do-it-yourself-with-setbrightness0',1,'🔴 &lt;span class=&quot;tt&quot;&gt;panelFlush&lt;/span&gt; uploads under forced blank — do not do it yourself with &lt;span class=&quot;tt&quot;&gt;setBrightness(0)&lt;/span&gt;'],['../tutorial_dma.html#autotoc_md-channel-0-vs-hdma-on-channel-0',1,'🟠 Channel 0 vs HDMA on channel 0'],['../known_limitations.html#autotoc_md-sprite-palettes-start-at-cgram-offset-128-not-0',1,'🟡 Sprite palettes start at CGRAM offset 128, not 0'],['../tools_luna.html',1,'luna — command reference (pinned v1.40.0)'],['../examples_mode7_perspective_rotate.html#measured-parity-luna-v190',1,'Measured parity (luna v1.9.0)']]],
+  ['0_0',['0',['../tutorial_panel.html#autotoc_md-panelflush-uploads-under-forced-blank--do-not-do-it-yourself-with-setbrightness0',1,'🔴 &lt;span class=&quot;tt&quot;&gt;panelFlush&lt;/span&gt; uploads under forced blank — do not do it yourself with &lt;span class=&quot;tt&quot;&gt;setBrightness(0)&lt;/span&gt;'],['../tutorial_dma.html#autotoc_md-channel-0-vs-hdma-on-channel-0',1,'🟠 Channel 0 vs HDMA on channel 0'],['../known_limitations.html#autotoc_md-sprite-palettes-start-at-cgram-offset-128-not-0',1,'🟡 Sprite palettes start at CGRAM offset 128, not 0'],['../tools_luna.html',1,'luna — command reference (pinned v1.44.0)'],['../examples_mode7_perspective_rotate.html#measured-parity-luna-v190',1,'Measured parity (luna v1.9.0)']]],
   ['0_20—_204_20layer_202bpp_20background_1',['Mode 0 — 4-Layer 2bpp Background',['../examples_backgrounds_mode0.html',1,'examples_backgrounds']]],
   ['0_20—_20does_20my_20setup_20even_20work_2',['Stage 0 — &quot;Does my setup even work?&quot;',['../learning_path.html#stage-0--does-my-setup-even-work',1,'']]],
   ['0_2047_3',['&lt;span class=&quot;tt&quot;&gt;mode7SetScale(0x0100)&lt;/span&gt; is 1:1 since 0.47',['../upgrading.html#mode7setscale0x0100-is-11-since-047',1,'']]],
@@ -17,5 +17,6 @@ var searchData=
   ['0_20palette_14',['Mode 0 Palette',['../examples_text.html#mode-0-palette',1,'']]],
   ['0_20vs_20hdma_20on_20channel_200_15',['🟠 Channel 0 vs HDMA on channel 0',['../tutorial_dma.html#autotoc_md-channel-0-vs-hdma-on-channel-0',1,'']]],
   ['0_20will_20freeze_16',['What 1.0 will freeze',['../stability.html',1,'documentation']]],
-  ['0x0100_20is_201_3a1_20since_200_2047_17',['&lt;span class=&quot;tt&quot;&gt;mode7SetScale(0x0100)&lt;/span&gt; is 1:1 since 0.47',['../upgrading.html#mode7setscale0x0100-is-11-since-047',1,'']]]
+  ['024_20characters_20of_20a_20tilemap_20entry_17',['The 1,024 characters of a tilemap entry',['../examples_scrolling_tile_ring.html#the-1024-characters-of-a-tilemap-entry',1,'']]],
+  ['0x0100_20is_201_3a1_20since_200_2047_18',['&lt;span class=&quot;tt&quot;&gt;mode7SetScale(0x0100)&lt;/span&gt; is 1:1 since 0.47',['../upgrading.html#mode7setscale0x0100-is-11-since-047',1,'']]]
 ];

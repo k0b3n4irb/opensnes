@@ -65,5 +65,6 @@ var searchData=
   ['_2443xf_62',['DMA ($43x0-$43xF)',['../registers.html#dma-43x0-43xf',1,'']]],
   ['_2444ff_63',['CPU ($4200-$44FF)',['../registers.html#cpu-4200-44ff',1,'']]],
   ['_247e_3a0000_20_247f_3affff_64',['Work RAM ($7E:0000 - $7F:FFFF)',['../memory_map.html#work-ram-7e0000---7fffff',1,'']]],
-  ['_247f_3affff_65',['Work RAM ($7E:0000 - $7F:FFFF)',['../memory_map.html#work-ram-7e0000---7fffff',1,'']]]
+  ['_247f_65',['Bank $7F',['../tutorial_far_ram.html#bank-7f',1,'']]],
+  ['_247f_3affff_66',['Work RAM ($7E:0000 - $7F:FFFF)',['../memory_map.html#work-ram-7e0000---7fffff',1,'']]]
 ];

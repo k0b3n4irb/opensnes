@@ -7,12 +7,12 @@ var examples_text =
         [ "2BPP Tile Format", "examples_text.html#autotoc_md2bpp-tile-format", null ],
         [ "VRAM Layout for Text", "examples_text.html#vram-layout-for-text", null ],
         [ "Mode 0 Palette", "examples_text.html#mode-0-palette", null ],
-        [ "SNES Concepts", "examples_text_pixel_text.html#snes-concepts-37", null ],
+        [ "SNES Concepts", "examples_text_pixel_text.html#snes-concepts-38", null ],
         [ "VRAM Layout", "examples_text_pixel_text.html#vram-layout-8", null ],
-        [ "Assets", "examples_text_pixel_text.html#assets-23", null ],
-        [ "Controls", "examples_text_pixel_text.html#controls-31", null ],
+        [ "Assets", "examples_text_pixel_text.html#assets-24", null ],
+        [ "Controls", "examples_text_pixel_text.html#controls-32", null ],
         [ "How to Build", "examples_text_pixel_text.html#how-to-build-17", null ],
-        [ "Modules Used", "examples_text_pixel_text.html#modules-used-56", null ]
+        [ "Modules Used", "examples_text_pixel_text.html#modules-used-57", null ]
       ] ]
     ] ],
     [ "Print a string", "examples_text_print_string.html", null ]

@@ -8,7 +8,7 @@ var searchData=
   ['map_5fopt_5f1way_5',['MAP_OPT_1WAY',['../map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30',1,'map.h']]],
   ['map_5fopt_5fbg2_6',['MAP_OPT_BG2',['../map_8h.html#a1697378c813c532a862943726625bd5b',1,'map.h']]],
   ['map_5frow_7',['MAP_ROW',['../text_2pixel__text_2main_8c.html#a10604f7360d0cbdedf200b32365215a7',1,'main.c']]],
-  ['map_5fvram_8',['MAP_VRAM',['../sprites_2world__sprites_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c',1,'MAP_VRAM:&#160;main.c'],['../text_2pixel__text_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c',1,'MAP_VRAM:&#160;main.c']]],
+  ['map_5fvram_8',['MAP_VRAM',['../scrolling_2tile__ring_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c',1,'MAP_VRAM:&#160;main.c'],['../sprites_2world__sprites_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c',1,'MAP_VRAM:&#160;main.c'],['../text_2pixel__text_2main_8c.html#af53226ffd949ef2f3857166c4f1c673c',1,'MAP_VRAM:&#160;main.c']]],
   ['map_5fwidth_9',['MAP_WIDTH',['../basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76',1,'main.c']]],
   ['max_5fbullets_10',['MAX_BULLETS',['../demos_2shmup_2main_8c.html#a4331843c2698da5ccb18562eb1485681',1,'main.c']]],
   ['max_5fenemies_11',['MAX_ENEMIES',['../demos_2shmup_2main_8c.html#a544651f3405cff79c40d898a8e54f507',1,'main.c']]],

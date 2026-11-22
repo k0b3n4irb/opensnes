@@ -63,6 +63,7 @@ var sprite_8h =
     [ "oamMetaDrawDyn", "sprite_8h.html#ae4d4517a682025275d57356f692e2548", null ],
     [ "oamPlaceWorld", "sprite_8h.html#abd8864858828dc6c2646b15d59420b5a", null ],
     [ "oamSet", "sprite_8h.html#a697c4b66632525f55f21fb6008582b3f", null ],
+    [ "oamSetAttr", "sprite_8h.html#aee3781df317208e36203b753f1e83c92", null ],
     [ "oamSetBatch", "sprite_8h.html#a7519143e6fefdcbe97f2c6fcbaa73bbd", null ],
     [ "oamSetSize", "sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5", null ],
     [ "oamSetTile", "sprite_8h.html#adb68723edfe9fcb5f46620c5753e293b", null ],

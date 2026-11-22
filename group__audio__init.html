@@ -125,13 +125,56 @@ $(function(){initNavTree('group__audio__init.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga634e804e5503aaaf10174761af1e023d" id="r_ga634e804e5503aaaf10174761af1e023d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga634e804e5503aaaf10174761af1e023d">audioCommandDone</a> (void)</td></tr>
+<tr class="memdesc:ga634e804e5503aaaf10174761af1e023d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has the sound CPU taken the last command? (never waits).  <br /></td></tr>
 <tr class="memitem:ga7d44cacb545a813f38250020bbfa5ecd" id="r_ga7d44cacb545a813f38250020bbfa5ecd"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd">audioInit</a> (void)</td></tr>
 <tr class="memdesc:ga7d44cacb545a813f38250020bbfa5ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the audio system.  <br /></td></tr>
 <tr class="memitem:ga4149a6d84a9f9c0368e3657f65c1dd52" id="r_ga4149a6d84a9f9c0368e3657f65c1dd52"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga4149a6d84a9f9c0368e3657f65c1dd52">audioIsReady</a> (void)</td></tr>
 <tr class="memdesc:ga4149a6d84a9f9c0368e3657f65c1dd52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if audio system is ready.  <br /></td></tr>
+<tr class="memitem:gab979d610055c8ae595d476444c6ba5f1" id="r_gab979d610055c8ae595d476444c6ba5f1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gab979d610055c8ae595d476444c6ba5f1">audioQueueCount</a> (void)</td></tr>
+<tr class="memdesc:gab979d610055c8ae595d476444c6ba5f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orders queued and not yet sent.  <br /></td></tr>
+<tr class="memitem:gac97dddc29b7b90fef4e6ebf9ca4db313" id="r_gac97dddc29b7b90fef4e6ebf9ca4db313"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gac97dddc29b7b90fef4e6ebf9ca4db313">audioQueueDrain</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> maxCmds)</td></tr>
+<tr class="memdesc:gac97dddc29b7b90fef4e6ebf9ca4db313"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send queued orders, at most <code class="param">maxCmds</code>, without waiting.  <br /></td></tr>
+<tr class="memitem:ga1f25da7764913295211f5dfdfe151e7f" id="r_ga1f25da7764913295211f5dfdfe151e7f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga1f25da7764913295211f5dfdfe151e7f">audioQueueSetVoicePitch</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pitch)</td></tr>
+<tr class="memdesc:ga1f25da7764913295211f5dfdfe151e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue a voice pitch (14-bit); see <a class="el" href="#ga9f53a120addc06612529ba94dfa6a3f3" title="Queue a key-off of the voices of mask (bit n = voice n).">audioQueueStopVoices()</a>. The mirrors (<a class="el" href="group__audio__volume.html#ga369cd526622e459d207ce9cf59a4b2cb" title="Get current master volume.">audioGetVolume()</a>, <a class="el" href="group__audio__volume.html#gab4c6d490fc3f1e7048c99b7fe357ec11" title="Get current state of a voice.">audioGetVoiceState()</a>) are not touched by the queued functions.  <br /></td></tr>
+<tr class="memitem:ga7834e5baca8109fb3094b001e435cf4a" id="r_ga7834e5baca8109fb3094b001e435cf4a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga7834e5baca8109fb3094b001e435cf4a">audioQueueSetVolume</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> volume)</td></tr>
+<tr class="memdesc:ga7834e5baca8109fb3094b001e435cf4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue a master volume (0..AUDIO_VOL_MAX); see <a class="el" href="#ga9f53a120addc06612529ba94dfa6a3f3" title="Queue a key-off of the voices of mask (bit n = voice n).">audioQueueStopVoices()</a>.  <br /></td></tr>
+<tr class="memitem:ga9f53a120addc06612529ba94dfa6a3f3" id="r_ga9f53a120addc06612529ba94dfa6a3f3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga9f53a120addc06612529ba94dfa6a3f3">audioQueueStopVoices</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mask)</td></tr>
+<tr class="memdesc:ga9f53a120addc06612529ba94dfa6a3f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue a key-off of the voices of <code class="param">mask</code> (bit n = voice n).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"></div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="ga634e804e5503aaaf10174761af1e023d" name="ga634e804e5503aaaf10174761af1e023d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga634e804e5503aaaf10174761af1e023d">&#9670;&#160;</a></span>audioCommandDone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioCommandDone </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Has the sound CPU taken the last command? (never waits). </p>
+<p>A function that sends a command returns once the ports are written; the next command waits, bounded, for the sound CPU to acknowledge it before it writes its own (see <a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a>). This function is that wait without the wait: one read of the acknowledgement port. A caller that spreads its commands over several frames, from the main loop or from an <a class="el" href="interrupt_8h.html#a97190a6ce1065e4d7077b9621c7f1221" title="Register a callback for lag frames.">nmiSetLag()</a> callback, asks it first and sends only on a 1, so that no send ever spends the frame waiting for the previous one.</p>
+<p>On a 1 for an acknowledged command it forgets the command, as the next send would have, so the send that follows does not look at the port again. It never loops, sends nothing, writes no port and counts no error (<span class="tt"><a class="el" href="group__audio__const.html#gae118be8d4fdddb69c0a256c13b860997" title="Refusals the audio module has answered since power-on.">audio_error_count</a></span> does not move on a 0).</p>
+<p>Cost: a handful of instructions. Measured on luna (<span class="tt">testing/fixtures/stress/audio_done</span>): after <a class="el" href="group__audio__playback.html#gaba04a78f510ff846dd0ece801fc58589" title="Stop several voices with one command.">audioStopVoices()</a>, whose key-off the sound CPU holds about 2 scanlines, the function reads 0 for a few calls in a row before it reads 1.</p>
+<dl class="section note"><dt>Note</dt><dd>One sender only: the main loop or the callback, not both. Called in an interrupt that lands inside a send of the main loop, it could read the port before that send records its command.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 when no command is pending or the sound CPU acknowledged it (the command is then forgotten), 0 while it has not yet</dd></dl>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#ga634e804e5503aaaf10174761af1e023d">audioCommandDone</a>()) {             <span class="comment">// never blocks</span></div>
+<div class="line">    <a class="code hl_function" href="group__audio__volume.html#gabdcfc3d4cbc315dc7fda9e9f63ec87d4">audioSetVoiceVolume</a>(v, vol[v]);   <span class="comment">// posted at once, no wait inside</span></div>
+<div class="line">    v = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((v + 1) &amp; 7);</div>
+<div class="line">}</div>
+<div class="ttc" id="agroup__audio__init_html_ga634e804e5503aaaf10174761af1e023d"><div class="ttname"><a href="#ga634e804e5503aaaf10174761af1e023d">audioCommandDone</a></div><div class="ttdeci">u8 audioCommandDone(void)</div><div class="ttdoc">Has the sound CPU taken the last command? (never waits).</div></div>
+<div class="ttc" id="agroup__audio__volume_html_gabdcfc3d4cbc315dc7fda9e9f63ec87d4"><div class="ttname"><a href="group__audio__volume.html#gabdcfc3d4cbc315dc7fda9e9f63ec87d4">audioSetVoiceVolume</a></div><div class="ttdeci">u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR)</div><div class="ttdoc">Set volume for a specific voice.</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a id="ga7d44cacb545a813f38250020bbfa5ecd" name="ga7d44cacb545a813f38250020bbfa5ecd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga7d44cacb545a813f38250020bbfa5ecd">&#9670;&#160;</a></span>audioInit()</h2>
 
@@ -173,6 +216,108 @@ Functions</h2></td></tr>
 <p>Check if audio system is ready. </p>
 <p><a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a> blocks until the driver answers, so there is no "still initialising" state to poll: 0 after <a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a> means the SPC700 driver never answered (and every audio call is then a no-op).</p>
 <dl class="section return"><dt>Returns</dt><dd>Non-zero if the driver answered <a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a>'s ping, 0 otherwise </dd></dl>
+
+</div>
+</div>
+<a id="gab979d610055c8ae595d476444c6ba5f1" name="gab979d610055c8ae595d476444c6ba5f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab979d610055c8ae595d476444c6ba5f1">&#9670;&#160;</a></span>audioQueueCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioQueueCount </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Orders queued and not yet sent. </p>
+
+</div>
+</div>
+<a id="gac97dddc29b7b90fef4e6ebf9ca4db313" name="gac97dddc29b7b90fef4e6ebf9ca4db313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac97dddc29b7b90fef4e6ebf9ca4db313">&#9670;&#160;</a></span>audioQueueDrain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioQueueDrain </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>maxCmds</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send queued orders, at most <code class="param">maxCmds</code>, without waiting. </p>
+<p>Stops at the first order the driver cannot take yet (the previous command is not acknowledged) or when the ports are in use by the interrupted code. Call it once a frame from the <a class="el" href="interrupt_8h.html#a97190a6ce1065e4d7077b9621c7f1221" title="Register a callback for lag frames.">nmiSetLag()</a> callback. </p><dl class="section return"><dt>Returns</dt><dd>orders still queued </dd></dl>
+
+</div>
+</div>
+<a id="ga1f25da7764913295211f5dfdfe151e7f" name="ga1f25da7764913295211f5dfdfe151e7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1f25da7764913295211f5dfdfe151e7f">&#9670;&#160;</a></span>audioQueueSetVoicePitch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioQueueSetVoicePitch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>voice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>pitch</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Queue a voice pitch (14-bit); see <a class="el" href="#ga9f53a120addc06612529ba94dfa6a3f3" title="Queue a key-off of the voices of mask (bit n = voice n).">audioQueueStopVoices()</a>. The mirrors (<a class="el" href="group__audio__volume.html#ga369cd526622e459d207ce9cf59a4b2cb" title="Get current master volume.">audioGetVolume()</a>, <a class="el" href="group__audio__volume.html#gab4c6d490fc3f1e7048c99b7fe357ec11" title="Get current state of a voice.">audioGetVoiceState()</a>) are not touched by the queued functions. </p>
+
+</div>
+</div>
+<a id="ga7834e5baca8109fb3094b001e435cf4a" name="ga7834e5baca8109fb3094b001e435cf4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7834e5baca8109fb3094b001e435cf4a">&#9670;&#160;</a></span>audioQueueSetVolume()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioQueueSetVolume </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>volume</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Queue a master volume (0..AUDIO_VOL_MAX); see <a class="el" href="#ga9f53a120addc06612529ba94dfa6a3f3" title="Queue a key-off of the voices of mask (bit n = voice n).">audioQueueStopVoices()</a>. </p>
+
+</div>
+</div>
+<a id="ga9f53a120addc06612529ba94dfa6a3f3" name="ga9f53a120addc06612529ba94dfa6a3f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9f53a120addc06612529ba94dfa6a3f3">&#9670;&#160;</a></span>audioQueueStopVoices()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioQueueStopVoices </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>mask</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Queue a key-off of the voices of <code class="param">mask</code> (bit n = voice n). </p>
+<p>The command queue lets a game loop slower than the music say what to do and have it sent at the driver's pace, without waiting: the queue holds 16 orders (AUDIO_ERR_NO_MEMORY when full, nothing queued), and <a class="el" href="#gac97dddc29b7b90fef4e6ebf9ca4db313" title="Send queued orders, at most maxCmds, without waiting.">audioQueueDrain()</a> sends them. Only the three below are queued; every other function sends at once.</p>
+<p><b>One sender, one lock.</b> The queue is filled from the main thread and drained from one place (an <a class="el" href="interrupt_8h.html#a97190a6ce1065e4d7077b9621c7f1221" title="Register a callback for lag frames.">nmiSetLag()</a> callback, or the loop). While the main thread writes the ports ($2140-$2143: any command, a VSET, the block of a sample load) an interrupt-time drain sends nothing and tries again at its next call, so a load in steps (<a class="el" href="group__audio__samples.html#ga46612deaa5841b76ba44398cd81a3352" title="Send the next piece of the sample audioLoadSampleBegin() started.">audioLoadSampleStep()</a>) and a drain from a callback can share the ports. The queued orders keep their order; they are not dated. </p>
 
 </div>
 </div>

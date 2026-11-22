@@ -11,6 +11,7 @@ var annotated_dup =
     [ "GameState", "structGameState.html", "structGameState" ],
     [ "GfxAsset", "structGfxAsset.html", "structGfxAsset" ],
     [ "Lamp", "structLamp.html", "structLamp" ],
+    [ "Leg", "structLeg.html", "structLeg" ],
     [ "LineClearResult", "structLineClearResult.html", "structLineClearResult" ],
     [ "Look", "structLook.html", "structLook" ],
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
@@ -26,5 +27,7 @@ var annotated_dup =
     [ "t_objs", "structt__objs.html", "structt__objs" ],
     [ "t_sprites", "structt__sprites.html", "structt__sprites" ],
     [ "TextConfig", "structTextConfig.html", "structTextConfig" ],
+    [ "TileRing", "structTileRing.html", "structTileRing" ],
+    [ "TileRingMap", "structTileRingMap.html", "structTileRingMap" ],
     [ "Walker", "structWalker.html", "structWalker" ]
 ];

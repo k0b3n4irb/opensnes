@@ -11,10 +11,10 @@ var learning_path =
         [ "More horsepower — the cartridge coprocessors", "learning_path.html#more-horsepower--the-cartridge-coprocessors", null ]
       ] ],
       [ "Further — the rest of the hardware", "learning_path.html#further--the-rest-of-the-hardware", [
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-25", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-38", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-26", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-39", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-18", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-57", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-58", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -35,6 +35,7 @@ var learning_path =
     [ "Map Scroll", "examples_maps_map_scroll.html", null ],
     [ "Continuous Scroll", "examples_scrolling_continuous_scroll.html", null ],
     [ "Collision Detection Demo", "examples_basics_collision_demo.html", null ],
+    [ "Tile Ring", "examples_scrolling_tile_ring.html", null ],
     [ "Fade and Mosaic — Screen Transitions", "examples_transitions_fading.html", null ],
     [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ],
     [ "Parallax Scrolling", "examples_scrolling_parallax_scroll.html", null ],

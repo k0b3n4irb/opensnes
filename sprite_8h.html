@@ -175,7 +175,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a7e322aa2d519ca5856491a92e0827405" id="r_a7e322aa2d519ca5856491a92e0827405"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7e322aa2d519ca5856491a92e0827405">OAM_Y_OFFSCREEN</a>&#160;&#160;&#160;0xE0</td></tr>
 <tr class="memdesc:a7e322aa2d519ca5856491a92e0827405"><td class="mdescLeft">&#160;</td><td class="mdescRight">Y coordinate that hides a sprite below the NTSC visible area.  <br /></td></tr>
 <tr class="memitem:ad6fdb30b5354a8869da17ca73a1e51f3" id="r_ad6fdb30b5354a8869da17ca73a1e51f3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3">oamSetFast</a>(_id,  _x,  _y,  _tile,  _pal,  _prio,  _fl)</td></tr>
-<tr class="memdesc:ad6fdb30b5354a8869da17ca73a1e51f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties with zero function-call overhead.  <br /></td></tr>
+<tr class="memdesc:ad6fdb30b5354a8869da17ca73a1e51f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties with inline writes.  <br /></td></tr>
 <tr class="memitem:ac83845cbc50f6c9f19844a317b59b66f" id="r_ac83845cbc50f6c9f19844a317b59b66f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f">oamSetXYFast</a>(_id,  _x,  _y)</td></tr>
 <tr class="memdesc:ac83845cbc50f6c9f19844a317b59b66f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update sprite position only (most common per-frame operation).  <br /></td></tr>
 <tr class="memitem:ab6fb97f65ce6a8dd50974c2c5405013d" id="r_ab6fb97f65ce6a8dd50974c2c5405013d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab6fb97f65ce6a8dd50974c2c5405013d">OBJ_BASE</a>(vram_addr)</td></tr>
@@ -258,6 +258,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:abd8864858828dc6c2646b15d59420b5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place a batch of world-space sprites: camera, culling, OAM, in one call.  <br /></td></tr>
 <tr class="memitem:a697c4b66632525f55f21fb6008582b3f" id="r_a697c4b66632525f55f21fb6008582b3f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="text_2pixel__text_2main_8c.html#aed41e53efdee92d24f64b3bae717c207">palette</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> priority, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> flags)</td></tr>
 <tr class="memdesc:a697c4b66632525f55f21fb6008582b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties.  <br /></td></tr>
+<tr class="memitem:aee3781df317208e36203b753f1e83c92" id="r_aee3781df317208e36203b753f1e83c92"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aee3781df317208e36203b753f1e83c92">oamSetAttr</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> attr)</td></tr>
+<tr class="memdesc:aee3781df317208e36203b753f1e83c92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a sprite whose attribute byte the game keeps composed.  <br /></td></tr>
 <tr class="memitem:a7519143e6fefdcbe97f2c6fcbaa73bbd" id="r_a7519143e6fefdcbe97f2c6fcbaa73bbd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">oamSetBatch</a> (const <a class="el" href="structOamBatch.html">OamBatch</a> *batch)</td></tr>
 <tr class="memdesc:a7519143e6fefdcbe97f2c6fcbaa73bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the OAM entries of N sprites from parallel arrays, in one call.  <br /></td></tr>
 <tr class="memitem:a2ffba63a8844c983761138b1fbf81bd5" id="r_a2ffba63a8844c983761138b1fbf81bd5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5">oamSetSize</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> large)</td></tr>
@@ -673,13 +675,13 @@ Attribution</h2>
 <div class="line">        oamMemory[_ext] &amp;= ~_xhi; \</div>
 <div class="line">    <a class="code hl_variable" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a> = 1; \</div>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
-<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:861</div></div>
-<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:873</div></div>
+<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:929</div></div>
+<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:941</div></div>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
 </div><!-- fragment -->
-<p>Set sprite properties with zero function-call overhead. </p>
-<p>Drop-in replacement for <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> that writes directly to oamMemory[]. Same parameters, same behavior, but compiles to direct memory writes instead of a call to <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>.</p>
+<p>Set sprite properties with inline writes. </p>
+<p>Same parameters and behavior as <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>, written directly to oamMemory[] instead of a call. Measured slower than the call (see above).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">_id</td><td>Sprite ID (0-127) </td></tr>
@@ -733,7 +735,7 @@ Attribution</h2>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
 </div><!-- fragment -->
 <p>Update sprite position only (most common per-frame operation). </p>
-<p>Fastest possible sprite update — only writes X, Y, and X high bit. Use when tile/palette/priority/flags don't change between frames.</p>
+<p>Writes only X, Y and the X high bit, inline. Measured slower than <a class="el" href="#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY()</a> (see above).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">_id</td><td>Sprite ID (0-127) </td></tr>
@@ -1305,14 +1307,14 @@ Attribution</h2>
 <div class="line"><a class="code hl_function" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a>(0, 100, 80, hero_frame0, &amp;<a class="code hl_variable" href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a>, 0);          <span class="comment">// facing right</span></div>
 <div class="line"><a class="code hl_function" href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a>(0, 100, 80, hero_frame0, &amp;<a class="code hl_variable" href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a>, <a class="code hl_define" href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a>);  <span class="comment">// facing left</span></div>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:103</div></div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:594</div></div>
-<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:597</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:582</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:585</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:663</div></div>
+<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:666</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:651</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:654</div></div>
 <div class="ttc" id="asprite_8h_html_ad029b6c418d7e2b620009d54aec5cb0e"><div class="ttname"><a href="#ad029b6c418d7e2b620009d54aec5cb0e">oamDrawMetasprite</a></div><div class="ttdeci">u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame, const MetaspriteStyle *style, u8 flip)</div><div class="ttdoc">Draw one frame of a metasprite.</div></div>
 <div class="ttc" id="asprites_2aseprite__pipeline_2main_8c_html_ae5399d474914cf86e2e3470bca1cb5b9"><div class="ttname"><a href="sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9">hero_style</a></div><div class="ttdeci">static const MetaspriteStyle hero_style</div><div class="ttdoc">Metasprite pointer table generated by opensnes-sprite sheet (res/hero.png.toml).</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
-<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:570</div></div>
-<div class="ttc" id="astructMetaspriteStyle_html"><div class="ttname"><a href="structMetaspriteStyle.html">MetaspriteStyle</a></div><div class="ttdoc">What stays the same from one frame of a metasprite to the next.</div><div class="ttdef"><b>Definition</b> sprite.h:611</div></div>
+<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:639</div></div>
+<div class="ttc" id="astructMetaspriteStyle_html"><div class="ttname"><a href="structMetaspriteStyle.html">MetaspriteStyle</a></div><div class="ttdoc">What stays the same from one frame of a metasprite to the next.</div><div class="ttdef"><b>Definition</b> sprite.h:680</div></div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
 </div>
@@ -1406,7 +1408,7 @@ Attribution</h2>
 <div class="line">    .sizeMode       = <a class="code hl_define" href="#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>,</div>
 <div class="line">};</div>
 <div class="line"><a class="code hl_function" href="#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a>(&amp;dyn);</div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:679</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:748</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1561,7 +1563,7 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Park a run of sprites off screen in one call. </p>
-<p>Does to sprites <code class="param">first</code> to <code class="param">first</code> + <code class="param">count</code> - 1 what <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> does to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A scene that clears or parks many sprites a frame (a pool of effects, the sprites a screen no longer shows) pays about a quarter of what the same loop of <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> calls costs.</p>
+<p>Does to sprites <code class="param">first</code> to <code class="param">first</code> + <code class="param">count</code> - 1 what <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> does to one: Y = OBJ_HIDE_Y, X = 257, tile, attributes and size untouched. A scene that clears or parks many sprites a frame (a pool of effects, the sprites a screen no longer shows) pays, the call included: 1,710 master cycles for one sprite, 2,750 for 4, 4,610 for 32, 10,160 for all 128, about 58 a sprite past the first few; a loop of <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> costs about 800 a sprite (SlowROM, devtools/libbench, rows hide1, hiderange, hide128, hideeach).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">first</td><td>First sprite ID (0-127); at 128 or more nothing is done </td></tr>
@@ -1776,10 +1778,13 @@ Attribution</h2>
 <ul>
 <li><b>Culling is by <span class="tt">size</span>, on both axes.</b> A 32x32 sprite at x = -31 is still drawn, with its ninth x bit set; at x = -32 it is hidden.</li>
 <li><b><span class="tt">visible[]</span></b> tells the game which sprites were placed, so that it can skip its own work (animation, streaming) for the others without testing again. Pass 0 if it is not wanted.</li>
-<li><b>The size bit is not touched</b>: set it once with <a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a>. A batch has one size; a game with two sizes makes two calls.</li>
+<li><b>Without <span class="tt">big</span>, the size bit is not touched</b>: set it once with <a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5" title="Set sprite size (large/small).">oamSetSize()</a>. The batch has one size, <span class="tt">size</span>.</li>
+<li><b><span class="tt">big</span>, for sprites of two sizes in one drawing order.</b> One byte per sprite (indexed by the sprite, as <span class="tt">tile</span>): 0 is small, <span class="tt">size</span> pixels, any other value large, <span class="tt">size_big</span> pixels (the two sizes the game chose with <a class="el" href="#a0ab1cfd8e05842654a0e146b83d62664" title="Initialize the sprite (OAM) system.">oamInit()</a>, e.g. OBJ_SIZE16_L32: 16 and 32). The screen test uses each sprite's own size, and the call writes the size bit of every slot of the batch: set for a placed large sprite, clear for a placed small one AND for every hidden slot (a hidden entry is small). Two calls of one size each would put the sprites in OAM order by size, which is not the game's drawing order. Only the byte is read, but as a word: the byte after the last sprite's is read too, as for any array (harmless in RAM and ROM). Cost, measured (devtools/placebench, rows <span class="tt">mix</span>, SlowROM): about 1 090 master cycles a placed small sprite, 1 200 a large one and 770 a hidden one in a large batch (with <span class="tt">order</span>, about 100 more each); a call of one sprite about 6 800, since a batch with <span class="tt">big</span> always takes the path of the large batches.</li>
 <li><b><span class="tt"><a class="el" href="sprites_2world__sprites_2main_8c.html#a12d35ad58f591e8935ab963c345d36b1">cam_y</a></span> is the y you give <a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></b>: a sprite and the background it stands on take the same camera value.</li>
 <li>A batch that runs past sprite 127 stops there.</li>
-<li><b><span class="tt">order</span>, for a game that sorts its sprites by depth.</b> OAM order is drawing order: of two sprites, the lower id is in front, whatever their priority bits (those place a sprite against the backgrounds only). Without <span class="tt">order</span>, slot <span class="tt">first_id + <a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span> shows element i of the arrays, so a game that sorts every frame has to move x, y, tile and attr with the sort. With <span class="tt">order</span>, slot <span class="tt">first_id + <a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span> shows sprite <span class="tt">order[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>: the arrays stay indexed by the sprite and the sort permutes <span class="tt">count</span> bytes. <span class="tt">visible[]</span> stays indexed by the sprite. An <span class="tt">order</span> byte that is not under <span class="tt">count</span> hides its slot. A batch declared without the field (the eight initialisers of the example below) has <span class="tt">order</span> 0. Cost, measured (devtools/libbench, rows <span class="tt">world</span> and <span class="tt">worldo</span>): with <span class="tt">order</span>, about 240 master cycles more a sprite (+14 %); without it, one test a call, about 180 master cycles whatever the count.</li>
+<li><b><span class="tt">order</span>, for a game that sorts its sprites by depth.</b> OAM order is drawing order: of two sprites, the lower id is in front, whatever their priority bits (those place a sprite against the backgrounds only). Without <span class="tt">order</span>, slot <span class="tt">first_id + <a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span> shows element i of the arrays, so a game that sorts every frame has to move x, y, tile and attr with the sort. With <span class="tt">order</span>, slot <span class="tt">first_id + <a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span> shows sprite <span class="tt">order[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>: the arrays stay indexed by the sprite and the sort permutes <span class="tt">count</span> bytes. <span class="tt">visible[]</span> stays indexed by the sprite. An <span class="tt">order</span> byte that is not under <span class="tt">count</span> hides its slot. A batch declared without the field (the eight initialisers of the example below) has <span class="tt">order</span> 0, and <span class="tt">big</span> 0 likewise. Cost, measured (devtools/placebench, SlowROM): with <span class="tt">order</span>, about 230 master cycles more a placed sprite, 260 a hidden one.</li>
+<li><b>Cost</b> (devtools/placebench, master cycles, SlowROM): a call of one sprite about 3 300; in a large batch, about 940 a placed sprite and 590 a hidden one (FastROM: 2 800, 810, 510). The code is about 13 KB, placed by the linker in any bank.</li>
+<li><b>What the call touches besides the OAM shadow and <span class="tt">visible[]</span></b>: the two camera arguments it was given are left as they were; the tile and attribute bytes of a sprite it hides are left as they were (only x, y and the ninth x bit say hidden, as <a class="el" href="#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a> does); it uses up to 30 bytes of the <span class="tt">tcc__lf</span> block as scratch (all 40 with <span class="tt">big</span>), which the ABI gives any callee (compiler/ABI.md). Within the call, the ninth x bits of a group of eight OAM entries are written together after the group's entries.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1802,8 +1807,14 @@ Attribution</h2>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structOamWorldBatch.html">OamWorldBatch</a> sorted = {</div>
 <div class="line">    ax, ay, atile, aattr, aseen, 0, 12, 32, by_depth</div>
 <div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// two sizes in one order, oamInit(OBJ_SIZE16_L32, ...): abig[i] != 0 is 32x32</span></div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> abig[12];</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structOamWorldBatch.html">OamWorldBatch</a> mixed = {</div>
+<div class="line">    ax, ay, atile, aattr, aseen, 0, 12, 16, by_depth, abig, 32</div>
+<div class="line">};</div>
 <div class="ttc" id="asprite_8h_html_abd8864858828dc6c2646b15d59420b5a"><div class="ttname"><a href="#abd8864858828dc6c2646b15d59420b5a">oamPlaceWorld</a></div><div class="ttdeci">void oamPlaceWorld(const OamWorldBatch *batch, u16 cam_x, u16 cam_y)</div><div class="ttdoc">Place a batch of world-space sprites: camera, culling, OAM, in one call.</div></div>
-<div class="ttc" id="astructOamWorldBatch_html"><div class="ttname"><a href="structOamWorldBatch.html">OamWorldBatch</a></div><div class="ttdoc">A batch of sprites in world coordinates, for oamPlaceWorld().</div><div class="ttdef"><b>Definition</b> sprite.h:379</div></div>
+<div class="ttc" id="astructOamWorldBatch_html"><div class="ttname"><a href="structOamWorldBatch.html">OamWorldBatch</a></div><div class="ttdoc">A batch of sprites in world coordinates, for oamPlaceWorld().</div><div class="ttdef"><b>Definition</b> sprite.h:408</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1864,11 +1875,63 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is written in assembly and is cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) save the call itself.</dd>
+<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is written in assembly; about 2,030 master cycles a sprite, the call and its seven arguments included (SlowROM, devtools/libbench, row <span class="tt">oamset</span>). A game that keeps the attribute byte composed pays about 1,580 with <a class="el" href="#aee3781df317208e36203b753f1e83c92" title="Set a sprite whose attribute byte the game keeps composed.">oamSetAttr()</a>; one with arrays of x, y, tile and attribute about 1,150 a sprite with <a class="el" href="#a7519143e6fefdcbe97f2c6fcbaa73bbd" title="Write the OAM entries of N sprites from parallel arrays, in one call.">oamSetBatch()</a>. The <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with inline writes.">oamSetFast()</a></span> macro costs more than the call (about 2,590: the compiled C writes each byte through a computed index), and so does <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> against <a class="el" href="#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY()</a> (about 1,920 against 1,330).</dd>
 <dd>
 Any integer type works for the coordinates you keep on your side (<span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, struct members or plain variables). Until 2026-09-21 this block warned that separate <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables gave jerky movement and that an <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> struct was mandatory; that was a compiler defect of early 2026, long fixed — <span class="tt">examples/input/move_sprite</span> uses plain <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> and its manifest pins the motion to the pixel. Prefer <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> when a sprite can leave the screen by the left or the top, so the off-screen test is a signed compare. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="audio_2sample__swap_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> in five real scenes. </dd></dl>
 
+</div>
+</div>
+<a id="aee3781df317208e36203b753f1e83c92" name="aee3781df317208e36203b753f1e83c92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee3781df317208e36203b753f1e83c92">&#9670;&#160;</a></span>oamSetAttr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void oamSetAttr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>tile</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>attr</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set a sprite whose attribute byte the game keeps composed. </p>
+<p><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> with the attribute byte given whole: <code class="param">attr</code> is stored as the fourth OAM byte (vhoopppc, as <a class="el" href="#a5fa5799545b94ba8e1ca643a9425ba71" title="Pre-compute OAM attribute byte (vhoopppc).">OAM_ATTR()</a> builds it; its bit 0 is bit 8 of the tile), the low byte of <code class="param">tile</code> as the third. Nothing is shifted or masked, so a game that keeps the byte in its data (one per object or per animation frame) pays neither the composition nor the two extra arguments of <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>. Same x, y, ninth x bit, size bit untouched, same invalid-id rule.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Sprite ID (0-127) </td></tr>
+    <tr><td class="paramname">x</td><td>X position (0-511, negative wraps) </td></tr>
+    <tr><td class="paramname">y</td><td>Y position (0-255), as <a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> takes it </td></tr>
+    <tr><td class="paramname">tile</td><td>Tile number: its low byte is stored, bit 8 comes from <code class="param">attr</code> </td></tr>
+    <tr><td class="paramname">attr</td><td>Attribute byte (vhoopppc)</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> attr = <a class="code hl_define" href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a>(tile, <a class="code hl_variable" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a>, prio, <a class="code hl_define" href="#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a>);   <span class="comment">// once, when it changes</span></div>
+<div class="line"><a class="code hl_function" href="#aee3781df317208e36203b753f1e83c92">oamSetAttr</a>(<span class="keywordtype">id</span>, x, y, tile, attr);                 <span class="comment">// every frame</span></div>
+<div class="ttc" id="asprite_8h_html_aee3781df317208e36203b753f1e83c92"><div class="ttname"><a href="#aee3781df317208e36203b753f1e83c92">oamSetAttr</a></div><div class="ttdeci">void oamSetAttr(u16 id, u16 x, u16 y, u16 tile, u16 attr)</div><div class="ttdoc">Set a sprite whose attribute byte the game keeps composed.</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a7519143e6fefdcbe97f2c6fcbaa73bbd" name="a7519143e6fefdcbe97f2c6fcbaa73bbd"></a>
@@ -1909,7 +1972,7 @@ Any integer type works for the coordinates you keep on your side (<span class="t
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_acaa2531ea968a59c1e1ca003c5e8773a"><div class="ttname"><a href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a></div><div class="ttdeci">static u16 by</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 <div class="ttc" id="asprite_8h_html_a7519143e6fefdcbe97f2c6fcbaa73bbd"><div class="ttname"><a href="#a7519143e6fefdcbe97f2c6fcbaa73bbd">oamSetBatch</a></div><div class="ttdeci">void oamSetBatch(const OamBatch *batch)</div><div class="ttdoc">Write the OAM entries of N sprites from parallel arrays, in one call.</div></div>
-<div class="ttc" id="astructOamBatch_html"><div class="ttname"><a href="structOamBatch.html">OamBatch</a></div><div class="ttdoc">A batch of sprites in screen coordinates, for oamSetBatch().</div><div class="ttdef"><b>Definition</b> sprite.h:938</div></div>
+<div class="ttc" id="astructOamBatch_html"><div class="ttname"><a href="structOamBatch.html">OamBatch</a></div><div class="ttdoc">A batch of sprites in screen coordinates, for oamSetBatch().</div><div class="ttdef"><b>Definition</b> sprite.h:1005</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

@@ -23,10 +23,10 @@ var examples_by_category =
       ] ],
       [ "Demos", "examples_by_category.html#demos", null ],
       [ "Games", "examples_by_category.html#games", [
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-25", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-38", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-26", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-39", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-18", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-57", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-58", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -47,6 +47,7 @@ var examples_by_category =
     [ "Mixed Scroll", "examples_scrolling_mixed_scroll.html", null ],
     [ "Continuous Scroll", "examples_scrolling_continuous_scroll.html", null ],
     [ "Parallax Scrolling", "examples_scrolling_parallax_scroll.html", null ],
+    [ "Tile Ring", "examples_scrolling_tile_ring.html", null ],
     [ "Mode 7 -- Rotation and Scaling", "examples_mode7_rotate_scale.html", null ],
     [ "Mode 7 Perspective -- Pseudo-3D Ground Effect", "examples_mode7_perspective.html", null ],
     [ "Mode 7 rotating perspective — the full matrix, per scanline", "examples_mode7_perspective_rotate.html", null ],

@@ -13,6 +13,7 @@ var searchData=
   ['opensnes_2dsave_2emd_10',['opensnes-save.md',['../opensnes-save_8md.html',1,'']]],
   ['opensnes_2dsprite_2emd_11',['opensnes-sprite.md',['../opensnes-sprite_8md.html',1,'']]],
   ['opensnes_2dtext_2emd_12',['opensnes-text.md',['../opensnes-text_8md.html',1,'']]],
-  ['opensnes_2dtileset_2emd_13',['opensnes-tileset.md',['../opensnes-tileset_8md.html',1,'']]],
-  ['opensnes_2emd_14',['opensnes.md',['../opensnes_8md.html',1,'']]]
+  ['opensnes_2dtilering_2emd_13',['opensnes-tilering.md',['../opensnes-tilering_8md.html',1,'']]],
+  ['opensnes_2dtileset_2emd_14',['opensnes-tileset.md',['../opensnes-tileset_8md.html',1,'']]],
+  ['opensnes_2emd_15',['opensnes.md',['../opensnes_8md.html',1,'']]]
 ];

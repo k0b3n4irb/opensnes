@@ -199,9 +199,10 @@ var NAVTREEINDEX0 =
 "craft.html#the-hardware-references-we-cite":[3],
 "craft.html#the-philosophy":[0],
 "craft_backgrounds.html":[0,6,1],
-"craft_camera.html":[0,6,4],
+"craft_camera.html":[0,6,5],
 "craft_frame_budget.html":[0,6,2],
-"craft_game_feel.html":[0,6,5],
+"craft_game_feel.html":[0,6,6],
+"craft_hot_loops.html":[0,6,3],
 "craft_planning.html":[0,6,0],
 "craft_planning.html#autotoc_md1-vram--64-kb-shared-by-everything-on-screen":[3,0,0],
 "craft_planning.html#autotoc_md2-cgram--256-colours-split-bg-vs-sprites":[3,0,1],
@@ -211,7 +212,7 @@ var NAVTREEINDEX0 =
 "craft_planning.html#scope-a-first-game-you-can-finish":[3,2],
 "craft_planning.html#the-cost-side-tiles-by-mode":[3,1,0],
 "craft_planning.html#the-three-budgets":[3,0],
-"craft_tiles_to_levels.html":[0,6,3],
+"craft_tiles_to_levels.html":[0,6,4],
 "debug_8h.html":[3,0,2,0,0,8],
 "debug_8h.html#a0d70da9a3ad98f46019e0066b9805837":[3,0,2,0,0,8,2],
 "debug_8h.html#a2bfec3c05a1c52d8a6b31762500af6e4":[3,0,2,0,0,8,1],
@@ -227,6 +228,7 @@ var NAVTREEINDEX0 =
 "dir_132bfc441c0d7963bb09bf3e9c51c6a0.html":[3,0,1,7,0],
 "dir_18df014f56ce8f777f87575dd62191c9.html":[3,0,1,6,0],
 "dir_18fad6f51288fbbac8c86743937ab4d6.html":[3,0,1,5],
+"dir_1cec7c6e415cb2699dd32afda5e75686.html":[3,0,1,13,3],
 "dir_1d360af94f7b303e66707d7aab72f249.html":[3,0,1,9,1],
 "dir_2024a52f136dfba97c130ad441279d55.html":[3,0,1,0,6],
 "dir_216eb654b68fb2a563a7238597afeb12.html":[3,0,1,13],
@@ -247,7 +249,5 @@ var NAVTREEINDEX0 =
 "dir_499e1b33f49991c7bf9314bb42ef47a2.html":[3,0,1,3,1],
 "dir_49e56c817e5e54854c35e136979f97ca.html":[3,0,0],
 "dir_4a33f256780b3d83d2a399a144270042.html":[3,0,1,1,4],
-"dir_4be4d94cfc675acd796722117a23ff4e.html":[3,0,1,15,0],
-"dir_4c43594cb340b9b81082e85d495f7dea.html":[3,0,1,14,0],
-"dir_4d4fe9d7f3e2d3c3526968b9ca288d36.html":[3,0,1,4,2]
+"dir_4be4d94cfc675acd796722117a23ff4e.html":[3,0,1,15,0]
 };

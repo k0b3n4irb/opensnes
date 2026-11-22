@@ -11,8 +11,8 @@ var tools =
       [ "The emulator: luna", "tools.html#the-emulator-luna", null ],
       [ "Free assets to start from", "tools.html#free-assets-to-start-from", null ],
       [ "Where they fit with the rest of the docs", "tools.html#where-they-fit-with-the-rest-of-the-docs", [
-        [ "Convert", "tools_opensnes_tileset.html#convert-1", null ],
-        [ "Inspect", "tools_opensnes_tileset.html#inspect-8", null ],
+        [ "Convert", "tools_opensnes_tileset.html#convert-2", null ],
+        [ "Inspect", "tools_opensnes_tileset.html#inspect-9", null ],
         [ "Settings beside the asset", "tools_opensnes_tileset.html#settings-beside-the-asset-4", null ],
         [ "From gfx4snes", "tools_opensnes_tileset.html#from-gfx4snes", null ]
       ] ]
@@ -25,11 +25,12 @@ var tools =
     [ "opensnes-sample — WAV to BRR samples", "tools_opensnes_sample.html", null ],
     [ "opensnes-music — Impulse Tracker to soundbank", "tools_opensnes_music.html", null ],
     [ "opensnes-rom — is the ROM good?", "tools_opensnes_rom.html", null ],
+    [ "opensnes-tilering — maps with more characters than VRAM holds", "tools_opensnes_tilering.html", null ],
     [ "opensnes-save — battery save files", "tools_opensnes_save.html", null ],
     [ "opensnes — the project tool", "tools_opensnes.html", null ],
     [ "The opensnes-* tools: conventions", "tools_conventions.html", null ],
     [ "Your project's Makefile", "tools_build.html", null ],
-    [ "luna — command reference (pinned v1.40.0)", "tools_luna.html", null ],
+    [ "luna — command reference (pinned v1.44.0)", "tools_luna.html", null ],
     [ "Legacy tools", "tools_legacy.html", [
       [ "gfx4snes", "tools_legacy.html#tools_gfx4snes", null ],
       [ "tmx2snes", "tools_legacy.html#tools_tmx2snes", null ],

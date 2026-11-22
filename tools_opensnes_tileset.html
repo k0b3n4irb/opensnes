@@ -123,7 +123,7 @@ $(function(){initNavTree('tools_opensnes_tileset.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The background tool of the <span class="tt">opensnes-*</span> family (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>). A picture drawn at the screen's size becomes the three things a BG layer loads: the tileset (<span class="tt">.pic</span>), the tilemap (<span class="tt">.map</span>) and the palette (<span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>). The converter is <span class="tt">gfx4snes -m</span>'s, linked as a library: the bytes are its own.</p>
-<h2 class="doxsection"><a class="anchor" id="convert-1"></a>
+<h2 class="doxsection"><a class="anchor" id="convert-2"></a>
 Convert</h2>
 <div class="fragment"><div class="line">opensnes-tileset convert res/town.png --colors 16            # 4 bpp, Mode 1: tiles, map, 16-colour palette</div>
 <div class="line">opensnes-tileset convert res/title.png --bpp 8 --mode 7      # Mode 7: packed .pc7 / .mp7</div>
@@ -161,7 +161,7 @@ Convert</h2>
 <p><b>Colour 0 of a bank is never drawn.</b> On a background a tile pixel of 0 is transparent, whatever the palette holds at that index (<a href="https://snes.nesdev.org/wiki/Palettes">SNESdev wiki, Palettes</a>: "a tile
 pixel of 0 is always transparent"): what shows there is the layer behind, or the backdrop. A picture drawn without that rule that uses index 0 as its black will have holes; a cell that must be opaque black needs another index set to black.</p>
 <p>The hardware limits are refused, not masked: a tilemap addresses 1024 tiles (the 10-bit field), a Mode 7 map 256 (one byte per tile).</p>
-<h2 class="doxsection"><a class="anchor" id="inspect-8"></a>
+<h2 class="doxsection"><a class="anchor" id="inspect-9"></a>
 Inspect</h2>
 <div class="fragment"><div class="line">opensnes-tileset inspect res/*.png</div>
 <div class="line"># town.png: 256x256 px, 1024 blocks of 8 (up to 1024 tiles before deduplication, 32768 bytes of VRAM at 4 bpp, map 2048 bytes), 14 colours used, highest index 13 (bank 0)</div>

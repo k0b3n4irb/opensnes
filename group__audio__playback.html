@@ -135,6 +135,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga08d3a1cc8f2e0e4bd9da475bc6e2afc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop all audio playback.  <br /></td></tr>
 <tr class="memitem:gaab4342a06378dea04a8d7a9e032e222f" id="r_gaab4342a06378dea04a8d7a9e032e222f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gaab4342a06378dea04a8d7a9e032e222f">audioStopVoice</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice)</td></tr>
 <tr class="memdesc:gaab4342a06378dea04a8d7a9e032e222f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop a specific voice.  <br /></td></tr>
+<tr class="memitem:gaba04a78f510ff846dd0ece801fc58589" id="r_gaba04a78f510ff846dd0ece801fc58589"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gaba04a78f510ff846dd0ece801fc58589">audioStopVoices</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mask)</td></tr>
+<tr class="memdesc:gaba04a78f510ff846dd0ece801fc58589"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop several voices with one command.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"></div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
@@ -206,7 +208,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Voice number (0-7) or 0xFF on failure</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#gaabc5f4c3e8d426c4f321cad86a5838d1">audioPlaySampleEx</a>(0, 64, <a class="code hl_define" href="group__audio__const.html#ga16bd84a1500f98bd8c91af7bf144e00e">AUDIO_PAN_RIGHT</a>, 0x1800);</div>
-<div class="ttc" id="agroup__audio__const_html_ga16bd84a1500f98bd8c91af7bf144e00e"><div class="ttname"><a href="group__audio__const.html#ga16bd84a1500f98bd8c91af7bf144e00e">AUDIO_PAN_RIGHT</a></div><div class="ttdeci">#define AUDIO_PAN_RIGHT</div><div class="ttdef"><b>Definition</b> audio.h:97</div></div>
+<div class="ttc" id="agroup__audio__const_html_ga16bd84a1500f98bd8c91af7bf144e00e"><div class="ttname"><a href="group__audio__const.html#ga16bd84a1500f98bd8c91af7bf144e00e">AUDIO_PAN_RIGHT</a></div><div class="ttdeci">#define AUDIO_PAN_RIGHT</div><div class="ttdef"><b>Definition</b> audio.h:122</div></div>
 <div class="ttc" id="agroup__audio__playback_html_gaabc5f4c3e8d426c4f321cad86a5838d1"><div class="ttname"><a href="#gaabc5f4c3e8d426c4f321cad86a5838d1">audioPlaySampleEx</a></div><div class="ttdeci">u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sample with custom settings.</div></div>
 </div><!-- fragment --> 
 </div>
@@ -248,6 +250,7 @@ Functions</h2></td></tr>
 <p>Play a sample on a voice YOU choose. </p>
 <p><a class="el" href="#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> and <a class="el" href="#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> pick the voice round-robin and only tell you afterwards. That is too late for anything that must be set BEFORE key-on — <a class="el" href="group__audio__adsr.html#gafafd587e502924fbcd3736f9e6d7dc56" title="Set ADSR envelope for a voice.">audioSetADSR()</a> / <a class="el" href="group__audio__adsr.html#ga3b6f625d4135211e3736bf075f9ad7d1" title="Set GAIN mode for a voice (alternative to ADSR).">audioSetGain()</a> shape the attack — and it lets a long sound be stolen by the eighth effect after it. Choosing the voice fixes both: reserve, say, voice 7 for the engine hum, aim its envelope once, and keep effects on the automatic voices. (Added 2026-09-21; AUDIO_VOICE_AUTO had been defined since v2 with nothing to pass it to.)</p>
 <p>An explicit voice does not advance the round-robin counter.</p>
+<p>A note is two commands, VSET then KON, when its volume and its pitch both differ from what the voice holds (three when its pan changed too); only the one that changed, or none, is sent otherwise (<span class="tt">testing/fixtures/stress/audio_note</span>).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">voice</td><td>Voice 0-7, or AUDIO_VOICE_AUTO for the round-robin choice </td></tr>
@@ -262,7 +265,7 @@ Functions</h2></td></tr>
 <div class="fragment"><div class="line"><a class="code hl_function" href="group__audio__adsr.html#gafafd587e502924fbcd3736f9e6d7dc56">audioSetADSR</a>(7, 4, 7, 7, 0);                 <span class="comment">// slow attack, on voice 7</span></div>
 <div class="line"><a class="code hl_function" href="#gabd9ad2a4f0279d90e4a8e9d33acc5020">audioPlaySampleOn</a>(7, SFX_ENGINE, 90, <a class="code hl_define" href="group__audio__const.html#ga76644b2a53510614279351615658a331">AUDIO_PAN_CENTER</a>, 0x1000);</div>
 <div class="ttc" id="agroup__audio__adsr_html_gafafd587e502924fbcd3736f9e6d7dc56"><div class="ttname"><a href="group__audio__adsr.html#gafafd587e502924fbcd3736f9e6d7dc56">audioSetADSR</a></div><div class="ttdeci">u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release)</div><div class="ttdoc">Set ADSR envelope for a voice.</div></div>
-<div class="ttc" id="agroup__audio__const_html_ga76644b2a53510614279351615658a331"><div class="ttname"><a href="group__audio__const.html#ga76644b2a53510614279351615658a331">AUDIO_PAN_CENTER</a></div><div class="ttdeci">#define AUDIO_PAN_CENTER</div><div class="ttdef"><b>Definition</b> audio.h:96</div></div>
+<div class="ttc" id="agroup__audio__const_html_ga76644b2a53510614279351615658a331"><div class="ttname"><a href="group__audio__const.html#ga76644b2a53510614279351615658a331">AUDIO_PAN_CENTER</a></div><div class="ttdeci">#define AUDIO_PAN_CENTER</div><div class="ttdef"><b>Definition</b> audio.h:121</div></div>
 <div class="ttc" id="agroup__audio__playback_html_gabd9ad2a4f0279d90e4a8e9d33acc5020"><div class="ttname"><a href="#gabd9ad2a4f0279d90e4a8e9d33acc5020">audioPlaySampleOn</a></div><div class="ttdeci">u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sample on a voice YOU choose.</div></div>
 </div><!-- fragment --> 
 </div>
@@ -283,6 +286,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Stop all audio playback. </p>
+<p>audioStopVoices(0xFF): every voice in one command.</p>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK, or AUDIO_ERR_TIMEOUT as for <a class="el" href="#gaba04a78f510ff846dd0ece801fc58589" title="Stop several voices with one command.">audioStopVoices()</a> </dd></dl>
 
 </div>
 </div>
@@ -302,13 +307,46 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Stop a specific voice. </p>
+<p><a class="el" href="#gaba04a78f510ff846dd0ece801fc58589" title="Stop several voices with one command.">audioStopVoices()</a> with the one bit of <code class="param">voice</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">voice</td><td>Voice number (0-7) </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK, AUDIO_ERR_INVALID_ID for a voice of 8 or more (nothing is sent), or AUDIO_ERR_TIMEOUT as for <a class="el" href="#gaba04a78f510ff846dd0ece801fc58589" title="Stop several voices with one command.">audioStopVoices()</a> </dd></dl>
 
+</div>
+</div>
+<a id="gaba04a78f510ff846dd0ece801fc58589" name="gaba04a78f510ff846dd0ece801fc58589"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaba04a78f510ff846dd0ece801fc58589">&#9670;&#160;</a></span>audioStopVoices()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioStopVoices </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>mask</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop several voices with one command. </p>
+<p>Keys off every voice whose bit is set in <code class="param">mask:</code> bit 0 is voice 0, bit 7 voice 7 (<span class="tt">0x05</span> stops voices 0 and 2). One command to the sound CPU, whatever the number of voices, where a loop of <a class="el" href="#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a> sends one per voice and waits for each to be taken before sending the next: stopping four voices this way is one handshake instead of four.</p>
+<p>Like every key-off it starts the voices' release, it does not cut them: the S-DSP takes 8 off the envelope every sample, so a voice at full envelope is silent about 8 ms later (see <a class="el" href="group__audio__samples.html#ga289fd684cb4de6ac8a183a8a26ceaa28" title="Start loading a sample in steps at an address the game chooses.">audioLoadSampleBeginAt()</a>).</p>
+<p>Cost: the call itself is the port writes (the acknowledgement is awaited by the next command). The sound CPU holds the key-off 132 of its cycles, about 2 scanlines, the same for one voice or eight, so a command sent right after waits for it. Measured on luna (<span class="tt">testing/fixtures/stress/koff_hold</span>), up to the end of a state read that follows: the read alone 7 scanlines; four voices stopped by one <a class="el" href="#gaba04a78f510ff846dd0ece801fc58589" title="Stop several voices with one command.">audioStopVoices()</a> then the read, 11; by four <a class="el" href="#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a> then the read, 25.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mask</td><td>Voices to stop, one bit per voice number (0-7) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK (also for a <code class="param">mask</code> of 0, which sends nothing), or AUDIO_ERR_TIMEOUT when the previous command was never acknowledged (nothing is sent then), as for <a class="el" href="#gaab4342a06378dea04a8d7a9e032e222f" title="Stop a specific voice.">audioStopVoice()</a></dd></dl>
+<div class="fragment"><div class="line"><a class="code hl_function" href="#gaba04a78f510ff846dd0ece801fc58589">audioStopVoices</a>((1 &lt;&lt; 0) | (1 &lt;&lt; 2) | (1 &lt;&lt; 5));   <span class="comment">// voices 0, 2 and 5</span></div>
+<div class="ttc" id="agroup__audio__playback_html_gaba04a78f510ff846dd0ece801fc58589"><div class="ttname"><a href="#gaba04a78f510ff846dd0ece801fc58589">audioStopVoices</a></div><div class="ttdeci">u8 audioStopVoices(u8 mask)</div><div class="ttdoc">Stop several voices with one command.</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 </div><!-- contents -->

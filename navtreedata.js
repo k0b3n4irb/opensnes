@@ -31,8 +31,8 @@ var NAVTREE =
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Variables", "functions_vars.html", "functions_vars" ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -53,15 +53,16 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "anim_8h.html",
-"dir_4ed9d43a0930c08ae60871a519803040.html",
-"examples_demos_platform_objects.html#autotoc_md4-main-loop-update-draw-sync",
-"examples_sprites_sprite_swarm.html",
-"group__audio__const.html#ga35f7d781e9c70ec004fe775caaa3367a",
-"group__ppu__regs.html#gafcc7237046120cbda0d0e02bbe8be265",
-"kit_8h.html#a59ad24e9ccd096f298f064d4e358b8bc",
-"render_8c.html#ae0457afb754642b0f70288f9aa9fefae",
-"structEntity.html",
-"text_8h.html#afcf97ad814e172c8648c70fb9f696ad4"
+"dir_4c43594cb340b9b81082e85d495f7dea.html",
+"examples_demos_platform_objects.html#autotoc_md2-register-the-object-types",
+"examples_sprites_simple_sprite.html",
+"globals_type.html",
+"group__ppu__regs.html#ga165959d614d718e17d008060049491bc",
+"input_8h.html#aed650db72d53439d6b554063a88de5cb",
+"registers.html",
+"sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8",
+"structt__sprites.html#a725c47bc8c0a00ad85b3f73b8c6f2a22",
+"window_8h.html#a34339b4322e501b9f95cf07ebae08381"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

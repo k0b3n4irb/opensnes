@@ -81,9 +81,10 @@ var searchData=
   ['rgb_78',['RGB',['../video_8h.html#a4a118ad3ee36468a3fa616977a64864e',1,'video.h']]],
   ['rgb24_79',['RGB24',['../video_8h.html#ad8da1514f9cd03e3cda94953525627f2',1,'video.h']]],
   ['rim_5fy_80',['RIM_Y',['../chips_2superfx__game__skeleton_2main_8c.html#a4fdcffe367c4f2a15cb51219704f73d9',1,'main.c']]],
-  ['rival_5fframe_81',['RIVAL_FRAME',['../mode7_2mode7__racing_2main_8c.html#ace1b29465a09caec17f81546e34433ec',1,'main.c']]],
-  ['roof_5fmap_82',['ROOF_MAP',['../basics_2aim__target_2main_8c.html#a3bfde2d6bdb39781832cf10bf0e704c6',1,'main.c']]],
-  ['roof_5ftiles_83',['ROOF_TILES',['../basics_2aim__target_2main_8c.html#a11723159f1463f1975722dc7e8fea8c9',1,'main.c']]],
-  ['roof_5fy_84',['ROOF_Y',['../maps_2map__scroll_2main_8c.html#ae149f3c623db4510b5901377062d11cc',1,'main.c']]],
-  ['rows_85',['ROWS',['../text_2pixel__text_2main_8c.html#a3cfd3aa62338d12609f6d65bce97e9cd',1,'main.c']]]
+  ['ring_5fslots_81',['RING_SLOTS',['../scrolling_2tile__ring_2main_8c.html#a565dc0bc843e587384ceecd073faea4b',1,'main.c']]],
+  ['rival_5fframe_82',['RIVAL_FRAME',['../mode7_2mode7__racing_2main_8c.html#ace1b29465a09caec17f81546e34433ec',1,'main.c']]],
+  ['roof_5fmap_83',['ROOF_MAP',['../basics_2aim__target_2main_8c.html#a3bfde2d6bdb39781832cf10bf0e704c6',1,'main.c']]],
+  ['roof_5ftiles_84',['ROOF_TILES',['../basics_2aim__target_2main_8c.html#a11723159f1463f1975722dc7e8fea8c9',1,'main.c']]],
+  ['roof_5fy_85',['ROOF_Y',['../maps_2map__scroll_2main_8c.html#ae149f3c623db4510b5901377062d11cc',1,'main.c']]],
+  ['rows_86',['ROWS',['../text_2pixel__text_2main_8c.html#a3cfd3aa62338d12609f6d65bce97e9cd',1,'main.c']]]
 ];

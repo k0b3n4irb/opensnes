@@ -23,5 +23,6 @@ var examples_scrolling =
       ] ]
     ] ],
     [ "Mixed Scroll", "examples_scrolling_mixed_scroll.html", null ],
-    [ "Parallax Scrolling", "examples_scrolling_parallax_scroll.html", null ]
+    [ "Parallax Scrolling", "examples_scrolling_parallax_scroll.html", null ],
+    [ "Tile Ring", "examples_scrolling_tile_ring.html", null ]
 ];

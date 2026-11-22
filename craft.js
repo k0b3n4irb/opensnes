@@ -19,6 +19,7 @@ var craft =
     ] ],
     [ "Composing with backgrounds &amp; layers", "craft_backgrounds.html", null ],
     [ "The frame budget", "craft_frame_budget.html", null ],
+    [ "Hot loops: writing the inner loop the compiler likes", "craft_hot_loops.html", null ],
     [ "From tiles to levels", "craft_tiles_to_levels.html", null ],
     [ "Following the player: the camera", "craft_camera.html", null ],
     [ "Game feel: juice on real hardware", "craft_game_feel.html", null ]

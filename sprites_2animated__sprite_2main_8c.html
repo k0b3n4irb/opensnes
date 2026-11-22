@@ -172,7 +172,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Direction-based sprite animation with horizontal flip. </p>
 <p>Demonstrates a classic sprite animation pattern: Kit, the fox-kit courier seen from above, with a walk cycle per direction (down, up, left, right). Each direction uses a different row of frames in the sprite sheet, and the left-facing animation reuses the right-facing frames with the OAM horizontal flip bit (bit 6 of attribute byte).</p>
-<p>Animation is frame-paced with a configurable delay between tile changes. The sprite's OAM tile number is updated each frame via <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> to point at the correct frame in the pre-loaded sprite sheet. Movement is controlled with the D-PAD and clamped to screen boundaries.</p>
+<p>Animation is frame-paced with a configurable delay between tile changes. The sprite's OAM tile number is updated each frame via <a class="el" href="sprite_8h.html#aee3781df317208e36203b753f1e83c92" title="Set a sprite whose attribute byte the game keeps composed.">oamSetAttr()</a> to point at the correct frame in the pre-loaded sprite sheet. Movement is controlled with the D-PAD and clamped to screen boundaries.</p>
 <p>This began as the PVSnesLib AnimatedSprite example.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Sprite animation via OAM tile number updates</li>

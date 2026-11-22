@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.40.0)</title>
+<title>luna — command reference (pinned v1.44.0)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.40.0) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.44.0) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">testing/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -140,8 +140,13 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">  record       Record a run as a small video, a text timeline and contact sheets: `&lt;OUT&gt;.mp4` (H.264 + AAC, the picture at twice its size with a strip under it naming the frame, the time and the buttons held), `&lt;OUT&gt;.md` (when the picture moves, holds or goes off, when the pad changes, the sound second by second) and `&lt;OUT&gt;-1.png` … (one labelled picture per second). The video is for eyes and for the models that take one; the text and the sheets are for the ones that do not. The video needs `ffmpeg` on the machine; `--no-video` writes the rest without it. Exit 0 = written, 1 = the run or the encoder failed, 2 = usage error</div>
 <div class="line">  diff         Compare two ROMs frame by frame: run both in one process, hash the displayed frame at every PPU frame, and print MATCH / DIFF for each requested frame — MATCH when A&#39;s frame `F` equals B&#39;s frame at some `F ± tolerance` (the boot-length offset a codegen change can introduce). The &quot;compare at equal frame&quot; protocol that validates a compiler / library change. Exit 0 = all match, 1 = any DIFF, 2 = usage error</div>
 <div class="line">  profile      Real master cycles per symbol: every step credits its cycles — bus + internal cycles plus the DMA / HDMA / refresh stalls charged during it — to the instruction&#39;s address; the report folds those onto the nearest `.sym` label (or a 256-byte page without one), heaviest first. Replaces static instruction weights with what the machine paid</div>
+<div class="line">  ticks        Record named memory zones at every tick of a game, as JSONL in the `tick-record` format (version 1): a header line, one line per tick, and an end line a complete record always has. A tick is an arrival on a routine the spec names, read just before its first instruction, so two runs line up tick by tick whatever their speed — two builds of a game, or a port and the program it reproduces, recorded by another emulator in the same format. The zones are raw bytes in memory order; the header gives the byte order. Exit 0 = the record is complete, 1 = the run fell short of it (the end line says why), 2 = the spec was refused and nothing ran</div>
 <div class="line">  wram-trace   Emit per-frame (vblank-aligned) WRAM page hashes for a confound-free cross-emulator differential. Each line is `&lt;ppu_frame&gt; &lt;h0&gt; &lt;h1&gt; ... &lt;hN&gt;` where each `h` is the FNV-1a hash of one WRAM page (`--page-size` bytes, default 4 KiB → 32 pages). Because WRAM-at-vblank-N is the SAME game-frame in both luna and a reference emulator (no input ⟹ game logic advances once per NMI), the first frame whose page hash differs from the reference pins the first REAL state divergence — unlike scene- level windows the boot-frame offset confounds</div>
 <div class="line">  bench        Run every ROM in a directory headless, detect anomalies (crashes, freezes, dead APU, missing firmware), and write a compatibility report + one markdown bug file per finding. Stresses the CLI/API across the whole corpus. Reports stay local (under `--out`)</div>
+<div class="line">  race-sweep   Search the interrupt races of a routine: force an NMI (or an IRQ) before EACH instruction of `--from`..`--to`, from one snapshot, and compare the outcome with the run that was not interrupted. Warm up (`--warm-until-pc` / `--warm-frames`), snapshot, run the baseline to the end condition (`--until-pc` / `--until-frame`), read the `--compare` bytes, then for every instruction address of the range the baseline executed: restore, interrupt there, run to the same end, compare. A trial is identical, DIFFERS (the bytes are listed), NOT TAKEN (injection refused: NMITIMEN.7 clear, I flag set; never a pass) or END NOT REACHED (a hang, a lost wake-up). The injected edge is synthetic, as for `--inject-nmi-at`. Deterministic: the report is the same for any `--jobs`. The window must hold no interrupt of its own (a natural NMI): the baseline counts them and the sweep is refused unless `--allow-baseline-interrupt` (then NESTED trials)</div>
+<div class="line">  audio-check  Audio fault analyzer: find a gap (a hole in a sound that was playing), a click (a jump out of the slope of the signal), saturation (clipped runs) and, with --voices-dir, a voice cut (a voice that falls to silence with no release decay) in a WAV written by `luna state --audio-out` (and `--voice-wav-dir`). One line per fault (kind, frame, time, measured numbers, threshold name), or --json (schema 1). Frames are nominal: a WAV has no frame marks. It reads the core&#39;s stream, not the host&#39;s resampling or pacing</div>
+<div class="line">  cart-check   Audit a ROM&#39;s header for a physical cartridge (repro board / flash): copier header, checksum, sizes, map byte, vectors, SRAM and chipset, country, title. One line per finding, `SEVERITY CODE: message`</div>
+<div class="line">  strict       Hardware strict mode: run a ROM and list what a real console would have refused or corrupted — a VRAM/OAM/CGRAM write or a PPU memory read while the picture is drawn (R1-R4), a DMA through the blocked A-bus zone (R5) or between WRAM and $2180 (R6), a manual joypad read during the auto-read (R8), or of `$4218-$421F` (R9), a write to `$2100` with bit 7 on the data bus (R10) or to `$2133` over a different bus byte (R11) while the picture is drawn, brightness 0 with the display on over a lit picture for a whole frame (R12, an advisory: a console shows it faintly, luna draws black). It also checks, once a frame, the sprite tiles the picture draws: a tile with pixels that no write ever filled (S1, its content is the power-on VRAM) or that was uploaded under another OBSEL layout (S4). The journal only observes: the run is identical to a plain one. One line per distinct (rule, pc, address), one per distinct (S1/S4, tile)</div>
 <div class="line">  spc-dump     Run a ROM until its music driver is playing, then export the APU state as a `.spc` sound file (SNES-SPC700 Sound File Data v0.30): SPC700 registers + 64 KB ARAM + DSP registers + IPL ROM, playable in any SPC player. Step far enough in (and pulse Start via `--input`) that the music has started before the snapshot</div>
 <div class="line">  assets-dump  Run a ROM to a scene, then dump every graphics asset currently loaded as PNGs: the VRAM tile sheet, the four BG tilemaps, the CGRAM palette, the OAM sprite sheet, and the composited screen — plus raw `vram.bin` / `cgram.bin` and `oam.json`. This captures the assets *loaded at this instant* (already decompressed by the game); snapshot several scenes (via `--input` / different `-n`) to cover a whole game. A static whole-ROM rip is NOT possible — SNES graphics are game-specific-compressed with no standard layout</div>
 <div class="line">  help         Print this message or the help of the given subcommand(s)</div>
@@ -203,6 +208,9 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --power-on &lt;POWER_ON&gt;</div>
 <div class="line">          What RAM holds before the ROM boots: `zero` (default), `ones`, `random` (a seed is derived and printed) or `random=&lt;seed&gt;` (decimal or 0x hex — replays an exact machine). Fills WRAM, VRAM, CGRAM, OAM, APU RAM and the cartridge RAM no battery keeps (Game Pak RAM, BW-RAM, I-RAM); a boot bug that only shows on real hardware&#39;s garbage RAM shows here too</div>
 <div class="line"> </div>
+<div class="line">      --strict-hw</div>
+<div class="line">          Hardware strict mode: also journal what a real console would refuse or corrupt (see `luna strict`) and print it after the state. Exit 1 if there is any fault. Observation only: the run itself is unchanged</div>
+<div class="line"> </div>
 <div class="line">  -h, --help</div>
 <div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-test"></a>
@@ -215,7 +223,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">  [PATHS]...  Manifest files, or directories scanned recursively for `*.toml`. Defaults to `./tests`</div>
 <div class="line"> </div>
 <div class="line">Options:</div>
-<div class="line">      --update           Rewrite each manifest&#39;s `asserts.fbhash` with the measured value (regenerate goldens after an intended render change). Formatting and comments are preserved</div>
+<div class="line">      --update           Rewrite each manifest&#39;s `asserts.fbhash`, the checkpoints&#39; `fbhash` and the memory blocks that did not match with the measured values (regenerate goldens after an intended change). Formatting and comments are preserved</div>
 <div class="line">      --only &lt;ONLY&gt;      Only run manifests whose path contains this substring</div>
 <div class="line">      --report &lt;REPORT&gt;  Also print a machine-readable JSON report to stdout [possible values: json]</div>
 <div class="line">      --jobs &lt;JOBS&gt;      Run up to N manifests at once (0 = one per CPU). Each manifest gets its own emulator; the report is the same lines in the same order, and the same exit code, as a serial run. Manifests chained through a battery file (one&#39;s `srm_out` is another&#39;s `srm_in`) still run one after another, in path order; there is no other ordering between manifests [default: 1]</div>
@@ -303,6 +311,18 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --layers &lt;LAYERS&gt;</div>
 <div class="line">          With `--layer-shots`: only these layers, comma-separated (`bg1,bg2,bg3,bg4,obj`; default all five)</div>
 <div class="line"> </div>
+<div class="line">      --trace-log &lt;TRACE_LOG&gt;</div>
+<div class="line">          Mesen2&#39;s trace logger for the 65C816: one text row per instruction, written to PATH as Mesen2 writes its trace file — the 24-bit PC, two spaces, then the row as the format lays it out. The default format is Mesen2&#39;s (disassembly, effective address, value, registers, flags, scanline and dot)</div>
+<div class="line"> </div>
+<div class="line">      --trace-format &lt;TRACE_FORMAT&gt;</div>
+<div class="line">          With `--trace-log`: the row format, in Mesen2&#39;s tags (`[Disassembly]`, `[A,4h]`, `[Scanline,3]`, `[Align,38]`…; see the guide)</div>
+<div class="line"> </div>
+<div class="line">      --trace-condition &lt;TRACE_CONDITION&gt;</div>
+<div class="line">          With `--trace-log`: only the instructions for which this expression (the debugger&#39;s language) holds, at the opcode fetch or at one of the instruction&#39;s memory accesses</div>
+<div class="line"> </div>
+<div class="line">      --trace-no-labels</div>
+<div class="line">          With `--trace-log`: addresses as numbers, without the names of the labels and the loaded symbols (Mesen2&#39;s &quot;Use labels&quot; unticked)</div>
+<div class="line"> </div>
 <div class="line">      --dump-vram &lt;DUMP_VRAM&gt;</div>
 <div class="line">          Dump all 64 KB of PPU VRAM (raw bytes) to this file after the run. For diagnosing the framebuffer DMA → VRAM → display path</div>
 <div class="line"> </div>
@@ -336,6 +356,12 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --audio-out &lt;AUDIO_OUT&gt;</div>
 <div class="line">          Optional audio dump path (32 kHz stereo WAV)</div>
+<div class="line"> </div>
+<div class="line">      --voice-wav-dir &lt;VOICE_WAV_DIR&gt;</div>
+<div class="line">          Also write each S-DSP voice on its own, `voice0.wav` to `voice7.wav` in this folder (created if absent): 32 kHz stereo, the voice&#39;s output after its envelope and its left / right volume, before the main volume, the echo and the `FLG` mute. Sample `n` of a file is sample `n` of `--audio-out`, so a note can be followed voice by voice. Sixty seconds unless `--voice-wav-seconds` says otherwise. Example: `--until-frame 1800 --voice-wav-dir voices/`</div>
+<div class="line"> </div>
+<div class="line">      --voice-wav-seconds &lt;VOICE_WAV_SECONDS&gt;</div>
+<div class="line">          With `--voice-wav-dir`: how many seconds of each voice to keep (default 60; each second costs about a megabyte of memory for the eight voices). A longer run says how many samples the files lack</div>
 <div class="line"> </div>
 <div class="line">      --input &lt;INPUT&gt;</div>
 <div class="line">          Scripted joypad-1 input. Format: comma-separated `frame:hex` checkpoints (frame number in decimal, hex mask with optional `0x` prefix). The mask is latched at the start of the named PPU frame and held until the next checkpoint overrides it.</div>
@@ -373,7 +399,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Scripted Super Scope aim, applied to whichever port is set to `superscope`. `frame:x,y,buttons` entries separated by `;` (absolute screen pixels; buttons bit0=trigger, bit1=cursor, bit2=turbo, bit3=pause). Example: `--superscope &quot;120:128,112,1&quot;`</div>
 <div class="line"> </div>
 <div class="line">      --peek &lt;PEEK&gt;</div>
-<div class="line">          Optional memory peek(s) after snapshot.  Format: `BANK:OFFSET:COUNT` (ALL hex — `:20` is 32 bytes; a count can say its base, `:0x20` hex or `:#32` decimal), or a WLA-DX label `NAME[:COUNT]` resolved through the loaded `.sym` table (auto-detected `&lt;rom&gt;.sym` or `--sym`; count defaults to 1).  Can be specified multiple times.  The whole 24-bit space is readable (WRAM, ROM incl. `$C0-$FF` `HiROM`, SRAM, coproc RAM); the `$2000-$5FFF` register band reads `0` (no side effects), except the DMA registers `$4300-$437F` which read their real values, and an unmapped range reads `$FF` with a stderr note and `unmapped` in the JSON entry.  Output goes to stderr as a labelled hex dump.  Examples: `--peek 7E:0200:220`, `--peek monster_x:2`. `APU:OFFSET:COUNT` reads the SPC700&#39;s RAM, and `VRAM:WORD:COUNT` reads `COUNT` bytes of PPU VRAM from a **word** address (as `VMADD` takes it): `--peek VRAM:7340:6` is three tilemap entries. `CGRAM:COLOR:COUNT` reads `COUNT` bytes of the palette from a colour index (as `CGADD` takes it): `--peek CGRAM:10:#32` is the sixteen colours of palette 1</div>
+<div class="line">          Optional memory peek(s) after snapshot.  Format: `BANK:OFFSET:COUNT` (ALL hex — `:20` is 32 bytes; a count can say its base, `:0x20` hex or `:#32` decimal), or a WLA-DX label `NAME[:COUNT]` resolved through the loaded `.sym` table (auto-detected `&lt;rom&gt;.sym` or `--sym`; count defaults to 1).  Can be specified multiple times.  The whole 24-bit space is readable (WRAM, ROM incl. `$C0-$FF` `HiROM`, SRAM, coproc RAM); the `$2000-$5FFF` register band reads `0` (no side effects), except the DMA registers `$4300-$437F` which read their real values, and an unmapped range reads `$FF` with a stderr note and `unmapped` in the JSON entry.  Output goes to stderr as a labelled hex dump.  Examples: `--peek 7E:0200:220`, `--peek monster_x:2`. `APU:OFFSET:COUNT` reads the SPC700&#39;s RAM, and `VRAM:WORD:COUNT` reads `COUNT` bytes of PPU VRAM from a **word** address (as `VMADD` takes it): `--peek VRAM:7340:6` is three tilemap entries. `CGRAM:COLOR:COUNT` reads `COUNT` bytes of the palette from a colour index (as `CGADD` takes it): `--peek CGRAM:10:#32` is the sixteen colours of palette 1. `OAM:OFFSET:COUNT` reads the PPU&#39;s own OAM (544 bytes, offset in hex; not the WRAM mirror): `--peek OAM:0:#16` is the first four sprites. `PPU:REGISTER:COUNT` reads `COUNT` write-only PPU registers as the PPU holds them: `--peek PPU:2101:1` is OBSEL (INIDISP, OBSEL, BGMODE, MOSAIC, M7SEL, `$2123-$212F`, CGWSEL, CGADSUB, SETINI; any other is refused)</div>
 <div class="line"> </div>
 <div class="line">      --assert &lt;ASSERT&gt;</div>
 <div class="line">          Assert memory equals expected bytes after warm-up. Format: `BANK:OFFSET=HEX` (all hex), or a WLA-DX label `NAME=HEX` resolved through the loaded `.sym` table. Prints `PASS`/`FAIL` per spec and exits non-zero if any fails. Repeatable. Examples: `--assert 7E:0010=AB12`, `--assert r_done=EFBE`</div>
@@ -388,7 +414,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Assert CGRAM (palette) equals expected bytes (`OFFSET=HEX`, byte offset into the 512-byte CGRAM, low byte of each colour first). Like `--assert` but over CGRAM. Repeatable</div>
 <div class="line"> </div>
 <div class="line">      --until-frame &lt;UNTIL_FRAME&gt;</div>
-<div class="line">          Run until PPU frame N (then snapshot), instead of stopping at the `-n` instruction count. Makes input→assert probes land on an exact frame rather than a generous `-n`</div>
+<div class="line">          Run until PPU frame N (then snapshot), instead of stopping at the `-n` instruction count. Makes input→assert probes land on an exact frame rather than a generous `-n`. The stop is at the wrap back to line 0: `--screenshot` shows the picture drawn in the previous lines 1-224, while `--peek` of OAM / PPU / VRAM reads what the V-blank NMI has since written for the NEXT picture, one frame ahead. To read the state that drew the picture, stop with `--until-pc` on the NMI handler instead (see the guide)</div>
 <div class="line"> </div>
 <div class="line">      --until-pc &lt;UNTIL_PC&gt;</div>
 <div class="line">          Run until execution reaches this routine (then snapshot): a `.sym` label, `label+N`, or `BANK:OFFSET` in hex. The stop is just before its first instruction runs, so `--peek` reads the state the routine receives — consistent where a frame boundary falls in the middle of a game tick. `--input` scripts stay indexed by frame. Bounded by `--until-frame` when given (else 36000 frames); not reaching it is an error, exit 1. The frame and scanline of the stop are printed and land in the JSON as `until_pc`. Example: `--until-pc tickEnd --hit 120`</div>
@@ -400,6 +426,9 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --until-if &lt;UNTIL_IF&gt;</div>
 <div class="line">          With `--until-pc`: stop only at an arrival where this expression, in Mesen2&#39;s debugger language, is non-zero (`--hit N`: the N-th such arrival). Labels stand for their address, `[label]` reads a byte and `{label}` a word. The JSON&#39;s `until_pc.hits_seen` is the arrival it stopped on. Example: `--until-pc tick --until-if &quot;[score] != 0&quot;`</div>
+<div class="line"> </div>
+<div class="line">      --then-frames &lt;THEN_FRAMES&gt;</div>
+<div class="line">          With `--until-pc`: run N more frames after the stop, then take the screenshot, the `--layer-shots`, the `--peek`s and the `--out` as usual — one run per screen instead of one to find the arrival and one to capture. The scripted input and the `--poke-at`s keep going on those frames; the JSON&#39;s `until_pc` still gives the frame and the line of the arrival. Example: `--until-pc matchDecide --hit 6382 --then-frames 40 --screenshot end.png`</div>
 <div class="line"> </div>
 <div class="line">      --peek-at &lt;PEEK_AT&gt;</div>
 <div class="line">          Read every `--peek` EACH time execution reaches this routine (same forms as `--until-pc`), one line per arrival with its frame and scanline: a whole run&#39;s worth of consistent samples in one emulator run, with no trace code in the ROM. The run length stays `-n` / `--until-frame` / `--until-pc`. Rows go to stderr, to `--peek-at-out` as CSV, and into the JSON as `peek_hits`. Example: `--peek-at tickEnd --peek pl_x:#36 --until-frame 600`</div>
@@ -415,6 +444,12 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --poke &lt;POKE&gt;</div>
 <div class="line">          Bytes to write at the `--poke-at` before it: `NAME=HEX` or `BANK:OFFSET=HEX`, the `--assert` grammar — hex bytes in memory order, so a 16-bit `$0140` is `4001`. Repeatable</div>
+<div class="line"> </div>
+<div class="line">      --inject-nmi-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an NMI just BEFORE the instruction at this routine (`SPEC` or `SPEC:N`: a `.sym` label, `label+N`, or `BANK:OFFSET`; `N` = the arrival, default 1; with a bare `BANK:OFFSET` write `BANK:OFFSET:N`). A synthetic extra edge, not hardware: the real `VBlank` NMI still comes, so a frame can see two. Not injected, with the reason, when `NMITIMEN.7` is clear. Never reached: an error. Repeatable; sweep a race by running once per `N`</div>
+<div class="line"> </div>
+<div class="line">      --inject-irq-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an IRQ just BEFORE the instruction at this routine (same `SPEC[:N]` as `--inject-nmi-at`). A single edge, `$4211` untouched. Not injected, with the reason, while the I flag is set</div>
 <div class="line"> </div>
 <div class="line">      --input-at &lt;INPUT_AT&gt;</div>
 <div class="line">          Index every input script (`--input` … `--input5`, `--mouse`, `--superscope`) by **arrivals on this routine** instead of by frame: entry `N:` applies the N-th time execution reaches it (a `.sym` label, `label+N`, or `BANK:OFFSET`). A frame number lands in a different game tick when the code gets faster or slower; an arrival does not, so the run depends on the game&#39;s logic alone. The press changes the controller, and the game sees it at its next read: with the auto-read, from arrival N+1. A joypad entry `N+K:` sets the mask K frames after the N-th arrival, for a screen that ignores a button held as it opens. Example: `--input-at tickStart --input &quot;81:0x0800,96:0&quot;`, or `--input-at screen_open --input &quot;3+30:0x8000,3+36:0&quot;`</div>
@@ -433,6 +468,14 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --dsp-trace-max &lt;DSP_TRACE_MAX&gt;</div>
 <div class="line">          Cap on captured DSP register writes (see `--dsp-trace`)</div>
+<div class="line">          </div>
+<div class="line">          [default: 100000]</div>
+<div class="line"> </div>
+<div class="line">      --dsp-events &lt;DSP_EVENTS&gt;</div>
+<div class="line">          Optional DSP note events, JSON lines: one per voice keyed on by a `KON` (`$4C`) write, with the PPU frame number, the SPC cycle of the write and that voice&#39;s `srcn`, `pitch` (14 bits), `vol_l`, `vol_r` (signed), `adsr1`, `adsr2` and `gain`, read when the voice really starts (the end of the 5-sample KON delay, `start_spc_cycles`), so a `PITCH` written just after the `KON` is seen. A `PITCH` written later than that delay is not: use `--dsp-trace` for the full register story. A whole piece of music lines up with the picture from one command</div>
+<div class="line"> </div>
+<div class="line">      --dsp-events-max &lt;DSP_EVENTS_MAX&gt;</div>
+<div class="line">          Cap on captured notes (see `--dsp-events`)</div>
 <div class="line">          </div>
 <div class="line">          [default: 100000]</div>
 <div class="line"> </div>
@@ -564,13 +607,15 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <span class="tt">luna record</span></h2>
 <div class="fragment"><div class="line">Record a run as a small video, a text timeline and contact sheets: `&lt;OUT&gt;.mp4` (H.264 + AAC, the picture at twice its size with a strip under it naming the frame, the time and the buttons held), `&lt;OUT&gt;.md` (when the picture moves, holds or goes off, when the pad changes, the sound second by second) and `&lt;OUT&gt;-1.png` … (one labelled picture per second). The video is for eyes and for the models that take one; the text and the sheets are for the ones that do not. The video needs `ffmpeg` on the machine; `--no-video` writes the rest without it. Exit 0 = written, 1 = the run or the encoder failed, 2 = usage error</div>
 <div class="line"> </div>
-<div class="line">Usage: luna record [OPTIONS] --out &lt;OUT&gt; &lt;ROM&gt;</div>
+<div class="line">Usage: luna record [OPTIONS] &lt;ROM&gt;</div>
 <div class="line"> </div>
 <div class="line">Arguments:</div>
 <div class="line">  &lt;ROM&gt;  Path to the .sfc / .smc ROM file</div>
 <div class="line"> </div>
 <div class="line">Options:</div>
 <div class="line">  -o, --out &lt;OUT&gt;                    Base path of the files written: `--out /tmp/demo` gives `/tmp/demo.mp4`, `/tmp/demo.md`, `/tmp/demo-1.png` … (a trailing `.mp4` is dropped)</div>
+<div class="line">      --raw &lt;FILE|-&gt;                 Write the bare picture instead of the video: every frame as raw RGB (3 bytes a dot), 512 dots wide, rows as the screen draws them, to this file or to stdout (`-`). No strip, no timeline, no sheets, no `ffmpeg`. The size and the rate are said on stderr as one JSON line before the first frame, the sound rate in a second one at the end</div>
+<div class="line">      --raw-audio &lt;RAW_AUDIO&gt;        With `--raw`: where the sound goes, 16-bit stereo little-endian PCM (default: `&lt;OUT&gt;.pcm` when `--out` is given, else none)</div>
 <div class="line">      --from-frame &lt;FROM_FRAME&gt;      First PPU frame recorded, frame-indexed like `state --until-frame` [default: 1]</div>
 <div class="line">  -c, --count &lt;COUNT&gt;                Number of consecutive frames recorded (600 is ten seconds of NTSC) [default: 600]</div>
 <div class="line">      --sheet-every &lt;SHEET_EVERY&gt;    Frames between two pictures of the contact sheets. Default: one per second (60 on NTSC, 50 on PAL)</div>
@@ -586,6 +631,8 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --poke-at &lt;POKE_AT&gt;            Write every `--poke` into memory when execution reaches this routine, at its `--poke-hit`-th arrival counted from power-on (`state --poke-at`): record a scene the game only reaches through a menu. Repeatable: each `--poke-at` takes the `--poke-hit` and the `--poke`s that follow it</div>
 <div class="line">      --poke-hit &lt;POKE_HIT&gt;          With `--poke-at`: the arrival the bytes are written at (default 1, the first). One per `--poke-at`</div>
 <div class="line">      --poke &lt;POKE&gt;                  Bytes to write at the `--poke-at` before it: `NAME=HEX` or `BANK:OFFSET=HEX`, hex bytes in memory order. Repeatable</div>
+<div class="line">      --inject-nmi-at &lt;SPEC[:N]&gt;     Force an NMI just BEFORE the instruction at this routine (`SPEC` or `SPEC:N`: a `.sym` label, `label+N`, or `BANK:OFFSET`; `N` = the arrival, default 1; with a bare `BANK:OFFSET` write `BANK:OFFSET:N`). A synthetic extra edge, not hardware: the real `VBlank` NMI still comes, so a frame can see two. Not injected, with the reason, when `NMITIMEN.7` is clear. Never reached: an error. Repeatable; sweep a race by running once per `N`</div>
+<div class="line">      --inject-irq-at &lt;SPEC[:N]&gt;     Force an IRQ just BEFORE the instruction at this routine (same `SPEC[:N]` as `--inject-nmi-at`). A single edge, `$4211` untouched. Not injected, with the reason, while the I flag is set</div>
 <div class="line">      --sym &lt;SYM&gt;                    Symbol file naming the routines and variables of `--poke-at`, `--poke` and `--input-at`. Default: the `.sym` beside the ROM</div>
 <div class="line">  -h, --help                         Print help</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-diff"></a>
@@ -732,20 +779,24 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          With `--poke-at`: the arrival the bytes are written at (default 1, the first). One per `--poke-at`</div>
 <div class="line">      --poke &lt;POKE&gt;</div>
 <div class="line">          Bytes to write at the `--poke-at` before it: `NAME=HEX` or `BANK:OFFSET=HEX`, hex bytes in memory order. Repeatable</div>
+<div class="line">      --inject-nmi-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an NMI just BEFORE the instruction at this routine (`SPEC` or `SPEC:N`: a `.sym` label, `label+N`, or `BANK:OFFSET`; `N` = the arrival, default 1; with a bare `BANK:OFFSET` write `BANK:OFFSET:N`). A synthetic extra edge, not hardware: the real `VBlank` NMI still comes, so a frame can see two. Not injected, with the reason, when `NMITIMEN.7` is clear. Never reached: an error. Repeatable; sweep a race by running once per `N`</div>
+<div class="line">      --inject-irq-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an IRQ just BEFORE the instruction at this routine (same `SPEC[:N]` as `--inject-nmi-at`). A single edge, `$4211` untouched. Not injected, with the reason, while the I flag is set</div>
 <div class="line">      --until-pc &lt;UNTIL_PC&gt;</div>
 <div class="line">          End the profile when execution reaches this routine (a `.sym` label, `label+N`, or `BANK:OFFSET` in hex), just before its first instruction: a window of N game ticks rather than N frames, which stays the same work when the code gets faster. Bounded by `--until-frame` when given (else 36000 frames; `-n` does not apply); not reaching it is an error, exit 1. Example: `--from-frame 60 --until-pc tickEnd --hit 340`</div>
 <div class="line">      --hit &lt;HIT&gt;</div>
 <div class="line">          With `--until-pc`: which arrival, counted from power-on [default: 1]</div>
 <div class="line">      --frames-out &lt;FRAMES_OUT&gt;</div>
-<div class="line">          Write the window frame by frame as CSV (`frame,active_mclk,idle_mclk,cpu_mclk,dma_mclk,hdma_mclk,refresh_mclk,total_mclk,nmi,lag`): `active` is what the program used (CPU + the DMA it started), `idle` the time parked in `WAI`, `lag` a frame whose NMI found the CPU still executing. The same rows are `frame_series` in `--out`. Finds WHICH frame overran, in one run</div>
+<div class="line">          Write the window frame by frame as CSV (`frame,active_mclk,idle_mclk,cpu_mclk,dma_mclk,hdma_mclk,refresh_mclk,total_mclk,nmi,lag,refresh_in_wai_mclk`): `active` is what the program used (CPU + the DMA it started), `idle` the time parked in `WAI`, `refresh_in_wai` the DRAM refresh that fell while parked (idle + it = the time parked), `lag` = full frame: the NMI found the CPU still executing (it is NOT the duration of a game tick: a two-frame tick lags every other frame by design; see `luna ticks --intervals`). The same rows are `frame_series` in `--out`. Finds WHICH frame overran, in one run</div>
 <div class="line">      --worst &lt;WORST&gt;</div>
 <div class="line">          Print the per-symbol table of the N heaviest frames (by `active_mclk`), and put them in `--out` as `worst_frames` — what was running in the frame that overran [default: 0]</div>
 <div class="line">      --max-frame-mclk &lt;MAX_FRAME_MCLK&gt;</div>
 <div class="line">          Gate: no completed frame may use more than N active master cycles, else exit 1</div>
 <div class="line">      --max-lag-frames &lt;MAX_LAG_FRAMES&gt;</div>
-<div class="line">          Gate: at most N lag frames in the window, else exit 1. A lag frame is one whose NMI came while the CPU was executing rather than parked in `WAI`</div>
+<div class="line">          Gate: at most N lag frames in the window, else exit 1. A lag frame is a FULL frame: its NMI came while the CPU was executing rather than parked in `WAI`. It does not measure how long a game tick lasts (`luna ticks --intervals` does)</div>
 <div class="line">      --max-lag-run &lt;MAX_LAG_RUN&gt;</div>
-<div class="line">          Gate: at most N lag frames IN A ROW, else exit 1. A game whose tick takes two frames lags every other frame by design: `--max-lag-run 1` passes it and fails the tick that spills into a third</div>
+<div class="line">          Gate: at most N lag frames (full frames, not tick durations) IN A ROW, else exit 1. A game whose tick takes two frames lags every other frame by design: `--max-lag-run 1` passes it and fails the tick that spills into a third</div>
 <div class="line">      --no-render</div>
 <div class="line">          Leave the picture uncomputed: the same cycles and the same report, in about half the time. A profile never reads the screen</div>
 <div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;</div>
@@ -756,6 +807,71 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Power-on RAM state (`zero`, `ones`, `random[=&lt;seed&gt;]`)</div>
 <div class="line">  -h, --help</div>
 <div class="line">          Print help</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-ticks"></a>
+<span class="tt">luna ticks</span></h2>
+<div class="fragment"><div class="line">Record named memory zones at every tick of a game, as JSONL in the `tick-record` format (version 1): a header line, one line per tick, and an end line a complete record always has. A tick is an arrival on a routine the spec names, read just before its first instruction, so two runs line up tick by tick whatever their speed — two builds of a game, or a port and the program it reproduces, recorded by another emulator in the same format. The zones are raw bytes in memory order; the header gives the byte order. Exit 0 = the record is complete, 1 = the run fell short of it (the end line says why), 2 = the spec was refused and nothing ran.</div>
+<div class="line"> </div>
+<div class="line">`--compare A B` compares two records instead (no ROM, no spec) and reports the first tick where a zone differs: exit 0 = identical, 1 = they diverge, 2 = they cannot be compared.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna ticks [OPTIONS] [ROM]</div>
+<div class="line"> </div>
+<div class="line">Arguments:</div>
+<div class="line">  [ROM]</div>
+<div class="line">          Path to the .sfc / .smc ROM file</div>
+<div class="line"> </div>
+<div class="line">Options:</div>
+<div class="line">      --spec &lt;SPEC&gt;</div>
+<div class="line">          The spec (TOML): the tick routine, the zones, and optionally a start point, a limit, an input script, pokes and pictures. See the guide for every key</div>
+<div class="line"> </div>
+<div class="line">      --compare &lt;A&gt; &lt;B&gt;</div>
+<div class="line">          Compare two records (JSONL files, `-` for one of them on stdin) and report the first tick where a zone differs. Pairs ticks by `t`; the clock fields are never compared. Exit 0 = identical, 1 = they diverge, 2 = they cannot be compared</div>
+<div class="line"> </div>
+<div class="line">      --intervals &lt;RECORD&gt;</div>
+<div class="line">          The duration of each tick of a record already written (by luna or by any program that writes the format; `-` for stdin): from one arrival on the tick routine to the next, in frames and milliseconds, with the longest tick. This is NOT `luna profile`&#39;s lag (a frame whose NMI found the CPU executing, which a two-frame tick has every other frame by design). A luna record converts by its header; any other `clock.cycles` unit needs `--frame-cycles`. Exit 0 = measured, 2 = cannot be measured</div>
+<div class="line"> </div>
+<div class="line">      --frame-cycles &lt;FRAME_CYCLES&gt;</div>
+<div class="line">          With `--intervals`: cycles of one frame in the record&#39;s `clock.cycles` unit. Required unless the record is luna&#39;s (`snes_master` at the NTSC or PAL rate, from which it is known)</div>
+<div class="line"> </div>
+<div class="line">      --cycle-hz &lt;CYCLE_HZ&gt;</div>
+<div class="line">          With `--intervals`: cycles per second of that unit, for the milliseconds (default: the header&#39;s rate for a luna record; otherwise no milliseconds)</div>
+<div class="line"> </div>
+<div class="line">      --over &lt;OVER&gt;</div>
+<div class="line">          With `--intervals`: list the ticks lasting more than N frames (fractional: `2.5` lists the ticks that spilled into a third)</div>
+<div class="line"> </div>
+<div class="line">      --csv &lt;CSV&gt;</div>
+<div class="line">          With `--compare`: write every differing zone of every tick as CSV (`t,zone,first_offset,a,b,differing_bytes`) to this file, `-` for stdout. With `--intervals`: one row per tick, `t,frame_delta,cycles,frames,ms,over`</div>
+<div class="line"> </div>
+<div class="line">      --zone &lt;ZONE&gt;</div>
+<div class="line">          With `--compare`: compare only this zone (repeatable). Without it, both records must name the same zones</div>
+<div class="line"> </div>
+<div class="line">      --out &lt;OUT&gt;</div>
+<div class="line">          Where the record goes; `-` is stdout</div>
+<div class="line">          </div>
+<div class="line">          [default: -]</div>
+<div class="line"> </div>
+<div class="line">      --shots-dir &lt;SHOTS_DIR&gt;</div>
+<div class="line">          Folder of the `[shots]` pictures (default: `&lt;OUT&gt;.shots`)</div>
+<div class="line"> </div>
+<div class="line">      --audio-out &lt;AUDIO_OUT&gt;</div>
+<div class="line">          A 16-bit stereo WAV of the sound of the `every_frame` pictures: the same frames, counted from the same anchor tick, not from power-on. Needs `[shots] every_frame = true`</div>
+<div class="line"> </div>
+<div class="line">      --schema</div>
+<div class="line">          Print the JSON Schema of the three kinds of line and exit — no ROM needed</div>
+<div class="line"> </div>
+<div class="line">      --sym &lt;SYM&gt;</div>
+<div class="line">          WLA-DX `.sym` file (default: `&lt;ROM&gt;.sym` when it exists)</div>
+<div class="line"> </div>
+<div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;</div>
+<div class="line">          Force a cartridge mapper. One of: lorom, hirom, exhirom, sa1, superfx, dsp1, sdd1; spc7110 is recognised but not emulated, the load refuses it</div>
+<div class="line"> </div>
+<div class="line">      --force-region &lt;FORCE_REGION&gt;</div>
+<div class="line">          Force the video standard (ntsc, pal)</div>
+<div class="line"> </div>
+<div class="line">      --power-on &lt;POWER_ON&gt;</div>
+<div class="line">          Power-on RAM state (`zero`, `ones`, `random[=&lt;seed&gt;]`)</div>
+<div class="line"> </div>
+<div class="line">  -h, --help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-wram-trace"></a>
 <span class="tt">luna wram-trace</span></h2>
 <div class="fragment"><div class="line">Emit per-frame (vblank-aligned) WRAM page hashes for a confound-free cross-emulator differential. Each line is `&lt;ppu_frame&gt; &lt;h0&gt; &lt;h1&gt; ... &lt;hN&gt;` where each `h` is the FNV-1a hash of one WRAM page (`--page-size` bytes, default 4 KiB → 32 pages). Because WRAM-at-vblank-N is the SAME game-frame in both luna and a reference emulator (no input ⟹ game logic advances once per NMI), the first frame whose page hash differs from the reference pins the first REAL state divergence — unlike scene- level windows the boot-frame offset confounds</div>
@@ -791,6 +907,241 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --input &lt;INPUT&gt;    Override the default Start-pulse input (`frame:hex`, like `state --input`) applied to clear title screens</div>
 <div class="line">      --jobs &lt;JOBS&gt;      Bench up to N ROMs at once (0 = one per CPU). Each ROM gets its own emulator; the progress lines, the report and the bug files are the same, in the same order, as a serial run [default: 1]</div>
 <div class="line">  -h, --help             Print help</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-race-sweep"></a>
+<span class="tt">luna race-sweep</span></h2>
+<div class="fragment"><div class="line">Search the interrupt races of a routine: force an NMI (or an IRQ) before EACH instruction of `--from`..`--to`, from one snapshot, and compare the outcome with the run that was not interrupted. Warm up (`--warm-until-pc` / `--warm-frames`), snapshot, run the baseline to the end condition (`--until-pc` / `--until-frame`), read the `--compare` bytes, then for every instruction address of the range the baseline executed: restore, interrupt there, run to the same end, compare. A trial is identical, DIFFERS (the bytes are listed), NOT TAKEN (injection refused: NMITIMEN.7 clear, I flag set; never a pass) or END NOT REACHED (a hang, a lost wake-up). The injected edge is synthetic, as for `--inject-nmi-at`. Deterministic: the report is the same for any `--jobs`. The window must hold no interrupt of its own (a natural NMI): the baseline counts them and the sweep is refused unless `--allow-baseline-interrupt` (then NESTED trials).</div>
+<div class="line"> </div>
+<div class="line">Exit 0 = report printed, 1 = with `--fail-on-race`: a race was found (or every injection was refused), 2 = usage error.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna race-sweep [OPTIONS] --from &lt;SPEC&gt; --to &lt;SPEC&gt; &lt;ROM&gt;</div>
+<div class="line"> </div>
+<div class="line">Arguments:</div>
+<div class="line">  &lt;ROM&gt;</div>
+<div class="line">          Path to the .sfc / .smc ROM file</div>
+<div class="line"> </div>
+<div class="line">Options:</div>
+<div class="line">      --sym &lt;SYM&gt;</div>
+<div class="line">          Symbol file naming the routines and variables. Default: the `.sym` beside the ROM</div>
+<div class="line"> </div>
+<div class="line">      --from &lt;SPEC&gt;</div>
+<div class="line">          First instruction address swept (a `.sym` label, `label+N`, or `BANK:OFFSET` in hex)</div>
+<div class="line"> </div>
+<div class="line">      --to &lt;SPEC&gt;</div>
+<div class="line">          Last address swept, inclusive (same forms)</div>
+<div class="line"> </div>
+<div class="line">      --kind &lt;KIND&gt;</div>
+<div class="line">          Interrupt forced at each address: nmi, irq or both</div>
+<div class="line">          </div>
+<div class="line">          [default: nmi]</div>
+<div class="line"> </div>
+<div class="line">      --hit &lt;HIT&gt;</div>
+<div class="line">          Inject at this arrival of each address (default 1); an address the baseline reaches fewer times is not swept</div>
+<div class="line">          </div>
+<div class="line">          [default: 1]</div>
+<div class="line"> </div>
+<div class="line">      --warm-until-pc &lt;SPEC&gt;</div>
+<div class="line">          Start the sweep at the arrival on this routine (the machine is snapshotted there). Default: right after reset</div>
+<div class="line"> </div>
+<div class="line">      --warm-hit &lt;WARM_HIT&gt;</div>
+<div class="line">          With --warm-until-pc: the arrival (default 1)</div>
+<div class="line">          </div>
+<div class="line">          [default: 1]</div>
+<div class="line"> </div>
+<div class="line">      --warm-frames &lt;N&gt;</div>
+<div class="line">          Start the sweep at this absolute frame number</div>
+<div class="line"> </div>
+<div class="line">      --until-pc &lt;SPEC&gt;</div>
+<div class="line">          End of every run: the arrival on this routine</div>
+<div class="line"> </div>
+<div class="line">      --until-hit &lt;UNTIL_HIT&gt;</div>
+<div class="line">          With --until-pc: the arrival (default 1, counted from the snapshot; standing on it counts)</div>
+<div class="line">          </div>
+<div class="line">          [default: 1]</div>
+<div class="line"> </div>
+<div class="line">      --until-frame &lt;N&gt;</div>
+<div class="line">          End of every run: this absolute frame number</div>
+<div class="line"> </div>
+<div class="line">      --compare &lt;SPEC[:COUNT]&gt;</div>
+<div class="line">          Bytes that must be equal at the end: `SPEC` or `SPEC:COUNT` (`BANK:OFFSET` in hex, or a symbol; a symbol&#39;s count defaults to its size in the `.sym`; with a bare `BANK:OFFSET` write `BANK:OFFSET:COUNT`). Repeatable</div>
+<div class="line"> </div>
+<div class="line">      --max-steps &lt;MAX_STEPS&gt;</div>
+<div class="line">          Instruction budget of the baseline, and the cap of a trial (a trial gets 4x the baseline + 100000, within this)</div>
+<div class="line">          </div>
+<div class="line">          [default: 20000000]</div>
+<div class="line"> </div>
+<div class="line">      --allow-baseline-interrupt</div>
+<div class="line">          Run although the window takes a real interrupt by itself (a natural NMI): without it the sweep is refused (exit 2), since every trial would add a second interrupt the hardware cannot give. With it, the addresses the baseline runs inside the handler are NESTED (not run, never a race) and the report warns that the other trials stack a second interrupt</div>
+<div class="line"> </div>
+<div class="line">      --jobs &lt;JOBS&gt;</div>
+<div class="line">          Trials in parallel (0 = one per CPU). Same report for any value</div>
+<div class="line">          </div>
+<div class="line">          [default: 1]</div>
+<div class="line"> </div>
+<div class="line">      --json</div>
+<div class="line">          Print the report as JSON (schema 1) instead of text</div>
+<div class="line"> </div>
+<div class="line">      --out &lt;OUT&gt;</div>
+<div class="line">          Write the report to this file instead of stdout</div>
+<div class="line"> </div>
+<div class="line">      --fail-on-race</div>
+<div class="line">          Exit 1 when a race was found (a trial differs or loses its end) or when every injection was refused</div>
+<div class="line"> </div>
+<div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;</div>
+<div class="line">          Force a cartridge mapper, bypassing header auto-detection. One of: lorom, hirom, exhirom, sa1, superfx, dsp1, sdd1; spc7110 is recognised but not emulated, the load refuses it</div>
+<div class="line"> </div>
+<div class="line">      --force-region &lt;FORCE_REGION&gt;</div>
+<div class="line">          Force the video standard (ntsc, pal)</div>
+<div class="line"> </div>
+<div class="line">      --power-on &lt;POWER_ON&gt;</div>
+<div class="line">          What RAM holds before the ROM boots (zero, ones, random, random=&lt;seed&gt;)</div>
+<div class="line"> </div>
+<div class="line">  -h, --help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-audio-check"></a>
+<span class="tt">luna audio-check</span></h2>
+<div class="fragment"><div class="line">Audio fault analyzer: find a gap (a hole in a sound that was playing), a click (a jump out of the slope of the signal), saturation (clipped runs) and, with --voices-dir, a voice cut (a voice that falls to silence with no release decay) in a WAV written by `luna state --audio-out` (and `--voice-wav-dir`). One line per fault (kind, frame, time, measured numbers, threshold name), or --json (schema 1). Frames are nominal: a WAV has no frame marks. It reads the core&#39;s stream, not the host&#39;s resampling or pacing.</div>
+<div class="line"> </div>
+<div class="line">Exit 0 = clean, 1 = at least one fault of a --fail-on kind, 2 = usage or I/O error.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna audio-check [OPTIONS] &lt;WAV&gt;</div>
+<div class="line"> </div>
+<div class="line">Arguments:</div>
+<div class="line">  &lt;WAV&gt;</div>
+<div class="line">          The WAV to analyse (16-bit PCM, mono or stereo)</div>
+<div class="line"> </div>
+<div class="line">Options:</div>
+<div class="line">      --voices-dir &lt;VOICES_DIR&gt;</div>
+<div class="line">          Directory holding voice0.wav .. voice7.wav (`state --voice-wav-dir`): enables the voice-cut check</div>
+<div class="line"> </div>
+<div class="line">      --region &lt;REGION&gt;</div>
+<div class="line">          Video region, which sets the nominal frame length: ntsc (default, ~533.1 samples at 32040 Hz) or pal (~640.7)</div>
+<div class="line">          </div>
+<div class="line">          [default: ntsc]</div>
+<div class="line"> </div>
+<div class="line">      --json</div>
+<div class="line">          Print the report as JSON (schema 1)</div>
+<div class="line"> </div>
+<div class="line">      --fail-on &lt;FAIL_ON&gt;</div>
+<div class="line">          Comma-separated kinds that fail the exit code (gap, click, saturation, voice-cut). Default: gap,click,saturation (a voice cut is listed, but the hardware does the same at the end of an unlooped BRR sample, so it fails only when asked for)</div>
+<div class="line"> </div>
+<div class="line">      --gap-floor &lt;GAP_FLOOR&gt;</div>
+<div class="line">          A stretch is silent below this RMS (default 16)</div>
+<div class="line"> </div>
+<div class="line">      --gap-level &lt;GAP_LEVEL&gt;</div>
+<div class="line">          The sound before a gap must average at least this RMS (default 256)</div>
+<div class="line"> </div>
+<div class="line">      --gap-before &lt;GAP_BEFORE&gt;</div>
+<div class="line">          Frames of sound required before a gap (default 3)</div>
+<div class="line"> </div>
+<div class="line">      --gap-min-frames &lt;GAP_MIN_FRAMES&gt;</div>
+<div class="line">          Shortest gap, in frames (default 0.75)</div>
+<div class="line"> </div>
+<div class="line">      --gap-max-frames &lt;GAP_MAX_FRAMES&gt;</div>
+<div class="line">          Longest gap, in frames; longer is a pause (default 60)</div>
+<div class="line"> </div>
+<div class="line">      --gap-edge-ratio &lt;GAP_EDGE_RATIO&gt;</div>
+<div class="line">          Gap start: the RMS of the 32 samples before the hole must be this fraction of the sound&#39;s level; a musical rest fades out and fails it (default 0.35)</div>
+<div class="line"> </div>
+<div class="line">      --click-ratio &lt;CLICK_RATIO&gt;</div>
+<div class="line">          Click: second difference over the local mean (default 40)</div>
+<div class="line"> </div>
+<div class="line">      --click-floor &lt;CLICK_FLOOR&gt;</div>
+<div class="line">          Click: smallest second difference, absolute (default 4000)</div>
+<div class="line"> </div>
+<div class="line">      --sat-run &lt;SAT_RUN&gt;</div>
+<div class="line">          Saturation: consecutive samples at the rails (default 4)</div>
+<div class="line"> </div>
+<div class="line">      --voice-level &lt;VOICE_LEVEL&gt;</div>
+<div class="line">          Voice cut: the voice peaked above this (default 2000)</div>
+<div class="line"> </div>
+<div class="line">      --voice-cut-samples &lt;VOICE_CUT_SAMPLES&gt;</div>
+<div class="line">          Voice cut: falls to silence in fewer samples than this (default 32)</div>
+<div class="line"> </div>
+<div class="line">      --voice-decay-ratio &lt;VOICE_DECAY_RATIO&gt;</div>
+<div class="line">          Voice cut: a release decay leaves less than this fraction of the earlier peak in the last samples (default 0.25)</div>
+<div class="line"> </div>
+<div class="line">  -h, --help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-cart-check"></a>
+<span class="tt">luna cart-check</span></h2>
+<div class="fragment"><div class="line">Audit a ROM&#39;s header for a physical cartridge (repro board / flash): copier header, checksum, sizes, map byte, vectors, SRAM and chipset, country, title. One line per finding, `SEVERITY CODE: message`.</div>
+<div class="line"> </div>
+<div class="line">Exit 0 = no Error/Warn (Info allowed), 1 = at least one Error/Warn, 2 = the file cannot be read.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna cart-check [OPTIONS] &lt;ROM&gt;</div>
+<div class="line"> </div>
+<div class="line">Arguments:</div>
+<div class="line">  &lt;ROM&gt;</div>
+<div class="line">          Path to the .sfc / .smc ROM file</div>
+<div class="line"> </div>
+<div class="line">Options:</div>
+<div class="line">      --json</div>
+<div class="line">          Print the findings as JSON instead of text</div>
+<div class="line"> </div>
+<div class="line">      --no-sram</div>
+<div class="line">          Refuse any declared save RAM (SRAM size byte or a RAM/battery chipset): `ERROR SRAM_DECLARED`. For cartridges that save nothing</div>
+<div class="line"> </div>
+<div class="line">  -h, --help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-strict"></a>
+<span class="tt">luna strict</span></h2>
+<div class="fragment"><div class="line">Hardware strict mode: run a ROM and list what a real console would have refused or corrupted — a VRAM/OAM/CGRAM write or a PPU memory read while the picture is drawn (R1-R4), a DMA through the blocked A-bus zone (R5) or between WRAM and $2180 (R6), a manual joypad read during the auto-read (R8), or of `$4218-$421F` (R9), a write to `$2100` with bit 7 on the data bus (R10) or to `$2133` over a different bus byte (R11) while the picture is drawn, brightness 0 with the display on over a lit picture for a whole frame (R12, an advisory: a console shows it faintly, luna draws black). It also checks, once a frame, the sprite tiles the picture draws: a tile with pixels that no write ever filled (S1, its content is the power-on VRAM) or that was uploaded under another OBSEL layout (S4). The journal only observes: the run is identical to a plain one. One line per distinct (rule, pc, address), one per distinct (S1/S4, tile).</div>
+<div class="line"> </div>
+<div class="line">Exit 0 = no fault, 1 = at least one fault, 2 = the ROM cannot be loaded.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna strict [OPTIONS] &lt;ROM&gt;</div>
+<div class="line"> </div>
+<div class="line">Arguments:</div>
+<div class="line">  &lt;ROM&gt;</div>
+<div class="line">          Path to the .sfc / .smc ROM file</div>
+<div class="line"> </div>
+<div class="line">Options:</div>
+<div class="line">      --frames &lt;FRAMES&gt;</div>
+<div class="line">          Number of PPU frames to run</div>
+<div class="line">          </div>
+<div class="line">          [default: 600]</div>
+<div class="line"> </div>
+<div class="line">      --json</div>
+<div class="line">          Print the report as JSON instead of text</div>
+<div class="line"> </div>
+<div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;</div>
+<div class="line">          Force a cartridge mapper, bypassing header auto-detection. One of: lorom, hirom, exhirom, sa1, superfx, dsp1, sdd1; spc7110 is recognised but not emulated, the load refuses it</div>
+<div class="line"> </div>
+<div class="line">      --force-region &lt;FORCE_REGION&gt;</div>
+<div class="line">          Force the video standard (ntsc, pal)</div>
+<div class="line"> </div>
+<div class="line">      --power-on &lt;POWER_ON&gt;</div>
+<div class="line">          What RAM holds before the ROM boots (zero, ones, random, random=&lt;seed&gt;)</div>
+<div class="line"> </div>
+<div class="line">      --input &lt;INPUT&gt;</div>
+<div class="line">          Scripted joypad-1 input, `frame:hex` as in `state --input`: play the menus, the match, the GAME OVER under the journal</div>
+<div class="line"> </div>
+<div class="line">      --input2 &lt;INPUT2&gt;</div>
+<div class="line">          Scripted joypad-2 input (`state --input2` grammar)</div>
+<div class="line"> </div>
+<div class="line">      --input-at &lt;INPUT_AT&gt;</div>
+<div class="line">          Number the input scripts by arrivals on this routine instead of by frame (`state --input-at`; `N+K:` = K frames after arrival N)</div>
+<div class="line"> </div>
+<div class="line">      --poke-at &lt;POKE_AT&gt;</div>
+<div class="line">          Write every `--poke` when execution reaches this routine, at its `--poke-hit`-th arrival (`state --poke-at`). Repeatable. A poke never reached is an error (exit 2): the scenario was not played</div>
+<div class="line"> </div>
+<div class="line">      --poke-hit &lt;POKE_HIT&gt;</div>
+<div class="line">          With `--poke-at`: the arrival the bytes are written at (default 1)</div>
+<div class="line"> </div>
+<div class="line">      --poke &lt;POKE&gt;</div>
+<div class="line">          Bytes to write at the `--poke-at`: `NAME=HEX` or `BANK:OFFSET=HEX`</div>
+<div class="line"> </div>
+<div class="line">      --inject-nmi-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an NMI just BEFORE the instruction at this routine (`SPEC` or `SPEC:N`: a `.sym` label, `label+N`, or `BANK:OFFSET`; `N` = the arrival, default 1; with a bare `BANK:OFFSET` write `BANK:OFFSET:N`). A synthetic extra edge, not hardware: the real `VBlank` NMI still comes, so a frame can see two. Not injected, with the reason, when `NMITIMEN.7` is clear. Never reached: an error. Repeatable; sweep a race by running once per `N`</div>
+<div class="line"> </div>
+<div class="line">      --inject-irq-at &lt;SPEC[:N]&gt;</div>
+<div class="line">          Force an IRQ just BEFORE the instruction at this routine (same `SPEC[:N]` as `--inject-nmi-at`). A single edge, `$4211` untouched. Not injected, with the reason, while the I flag is set</div>
+<div class="line"> </div>
+<div class="line">      --sym &lt;SYM&gt;</div>
+<div class="line">          Symbol file naming `--poke-at`, `--poke` and `--input-at`. Default: the `.sym` beside the ROM</div>
+<div class="line"> </div>
+<div class="line">  -h, --help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-spc-dump"></a>
 <span class="tt">luna spc-dump</span></h2>
 <div class="fragment"><div class="line">Run a ROM until its music driver is playing, then export the APU state as a `.spc` sound file (SNES-SPC700 Sound File Data v0.30): SPC700 registers + 64 KB ARAM + DSP registers + IPL ROM, playable in any SPC player. Step far enough in (and pulse Start via `--input`) that the music has started before the snapshot</div>

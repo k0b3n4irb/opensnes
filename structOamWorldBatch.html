@@ -131,10 +131,12 @@ $(function(){initNavTree('structOamWorldBatch.html','','structOamWorldBatch-memb
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aa3d4c4f57bd32c02a1d634368956bce9" id="r_aa3d4c4f57bd32c02a1d634368956bce9"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#aa3d4c4f57bd32c02a1d634368956bce9">attr</a></td></tr>
+<tr class="memitem:a152b51abd91969564e1ced95059cf30a" id="r_a152b51abd91969564e1ced95059cf30a"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a152b51abd91969564e1ced95059cf30a">big</a></td></tr>
 <tr class="memitem:a685480f61d420fb657a87023bfc006d3" id="r_a685480f61d420fb657a87023bfc006d3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a685480f61d420fb657a87023bfc006d3">count</a></td></tr>
 <tr class="memitem:ac1cd8a6382effedb66b6c46ca8486d82" id="r_ac1cd8a6382effedb66b6c46ca8486d82"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac1cd8a6382effedb66b6c46ca8486d82">first_id</a></td></tr>
 <tr class="memitem:aa2f66bf32e69170541da3acea0fc5833" id="r_aa2f66bf32e69170541da3acea0fc5833"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#aa2f66bf32e69170541da3acea0fc5833">order</a></td></tr>
 <tr class="memitem:aa4166d766f1a846e5cd29afd6c06c3a8" id="r_aa4166d766f1a846e5cd29afd6c06c3a8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa4166d766f1a846e5cd29afd6c06c3a8">size</a></td></tr>
+<tr class="memitem:a04c261c6e05d2549214ef374b5c228d0" id="r_a04c261c6e05d2549214ef374b5c228d0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a04c261c6e05d2549214ef374b5c228d0">size_big</a></td></tr>
 <tr class="memitem:acef2e8696479f1f995631c26b8323897" id="r_acef2e8696479f1f995631c26b8323897"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#acef2e8696479f1f995631c26b8323897">tile</a></td></tr>
 <tr class="memitem:a977d181c90d9d43b1a6987e2a6cd3e60" id="r_a977d181c90d9d43b1a6987e2a6cd3e60"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a977d181c90d9d43b1a6987e2a6cd3e60">visible</a></td></tr>
 <tr class="memitem:a3809be06a1ccc59d745e1e0c683e7eec" id="r_a3809be06a1ccc59d745e1e0c683e7eec"><td class="memItemLeft">const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a3809be06a1ccc59d745e1e0c683e7eec">x</a></td></tr>
@@ -156,6 +158,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>12: attribute byte (vhoopppc), as <a class="el" href="sprite_8h.html#a5fa5799545b94ba8e1ca643a9425ba71" title="Pre-compute OAM attribute byte (vhoopppc).">OAM_ATTR()</a> builds it </p>
+
+</div>
+</div>
+<a id="a152b51abd91969564e1ced95059cf30a" name="a152b51abd91969564e1ced95059cf30a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a152b51abd91969564e1ced95059cf30a">&#9670;&#160;</a></span>big</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* OamWorldBatch::big</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>28: optional, one byte per sprite: not 0 = large (<span class="tt"><a class="el" href="#a04c261c6e05d2549214ef374b5c228d0">size_big</a></span>), 0 = small (<span class="tt"><a class="el" href="#aa4166d766f1a846e5cd29afd6c06c3a8">size</a></span>). 0: one size, size bits untouched </p>
 
 </div>
 </div>
@@ -216,6 +233,21 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>22: width and height in pixels: 8, 16, 32 or 64 </p>
+
+</div>
+</div>
+<a id="a04c261c6e05d2549214ef374b5c228d0" name="a04c261c6e05d2549214ef374b5c228d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04c261c6e05d2549214ef374b5c228d0">&#9670;&#160;</a></span>size_big</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> OamWorldBatch::size_big</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>32: width and height in pixels of a large sprite; read only with <span class="tt"><a class="el" href="#a152b51abd91969564e1ced95059cf30a">big</a></span> </p>
 
 </div>
 </div>
