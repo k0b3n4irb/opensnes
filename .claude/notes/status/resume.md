@@ -6,7 +6,8 @@ and the CHANGELOG.
 
 ## State
 
-- **v0.55.0 is released** (2026-11-08): `main` at `f21b3fc7` (merge of `develop` `6ee38284`), tag `v0.55.0` pushed, `release.yml` run 42472392201. It is published (5 assets). GitHub had an incident that morning (timeouts on release assets and archives): the Windows leg (MSYS2 download), Doxygen and cppcheck downloads answered 504/503 several times; failed jobs were re-run. v0.54.0 was 2026-11-01.
+- **v0.56.0 is released** (2026-11-22): `main` at `079994ea` (merge of `develop` `a6848fcb`), tag `v0.56.0` pushed, `release.yml` run 45005526201 green with 5 assets; `main` runs 45005503905 (build) and 45005503898 (lint) green. The first push was refused by the pre-push `--coherent` pin check, which judged three commits written before it existed (`a00aa1ff`, `71e02510`, `362db7fc`, on `develop` already): the check now exempts `b42286eb` and its ancestors (`a6848fcb`, with a test that sees a later fault). Cause: a history check laid down without a bound was never played on the release range `origin/main..main`; prevented by the bound and its test.
+- The previous release, v0.55.0 (2026-11-08): `main` at `f21b3fc7`, tag `v0.55.0`.
 - The 0.53.0 worktree `../opensnes-requests` / `wip/requests` is merged and
   can go.
 
