@@ -65,6 +65,17 @@ saves ~18 an iteration): under that the default (inlined) is faster, above it
 `noinline` on that one loop pays. Count the iterations of your own loop before
 choosing.
 
+A short function called from several places stays a `jsl` unless it is
+`static inline`: the compiler copies on its own only a `static` function with
+one call site. Sort the profile by block, look for functions of 5 to 40
+instructions called tens of thousands of times, and mark those `static
+inline`. Measured on a ported game (2026-11-23, one level, 546 steps): fifteen
+such marks took the pace from x1.100 to x1.054 of the original for +2.7 KB of
+code. An automatic rule (every `static` leaf up to N IR instructions with two
+sites or more) was tried and does not match it: x1.074 at N=32 (+1.8 KB),
+x1.055 only at N=96 (+6.4 KB), and it copies functions nobody needs. So the
+mark stays by hand.
+
 ## 4. Do not multiply inside the loop
 
 A multiply by a constant is inlined as shifts and adds; a variable multiply
