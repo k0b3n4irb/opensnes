@@ -1,0 +1,8 @@
+# rngNext() before consoleInit() (2026-11-25): the seed starts at 0xACE1.
+# Negative control: with rand_seed at 0 the four values are 0 (r_nonzero = 0).
+rom = "../fixtures/libtests_rng_preinit/libtest_rng_preinit.sfc"
+frames = 10
+
+[asserts.values]                 # u16, little-endian
+r_done = 0xC0DE
+r_nonzero = 4

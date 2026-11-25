@@ -263,7 +263,12 @@ u8 isPAL(void) {
 u16 rngNext(void) {
     /* 16-bit LFSR (Linear Feedback Shift Register) */
     /* Polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
-    u16 bit = ((rand_seed >> 0) ^ (rand_seed >> 2) ^
+    /* 0 is the LFSR's fixed point and the state before consoleInit()/rngSeed():
+     * left alone it returned 0 forever (until 2026-11-25). No other path
+     * reaches 0, so the test costs no startup copy. */
+    u16 bit;
+    if (rand_seed == 0) rand_seed = 0xACE1;
+    bit = ((rand_seed >> 0) ^ (rand_seed >> 2) ^
                (rand_seed >> 3) ^ (rand_seed >> 5)) & 1;
     rand_seed = (rand_seed >> 1) | (bit << 15);
     return rand_seed;
