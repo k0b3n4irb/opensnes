@@ -123,6 +123,7 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-31 | The dynamic engine drains up to 7 frames of 32x32 in its NMI hook, with no budget and before the OAM DMA: in a 7-frame VBlank the OAM DMA runs past the blank and is lost (127 of 140 VBlanks), and the VRAM queue flushed after it loses its row and column from 6 frames on (`dyn16` of `devtools/slotbench`) | luna memory trace, writes outside the blank | open |
 | 2026-10-31 | `oamDynamic32Draw` has no bound on `oamnumberspr0`: a 17th and 18th sprite read past `lkup32idT` and `lkup32idB` and end on the wrong tiles, with no diagnostic (`dyn18`, 8 strips of 8) | `devtools/slotbench`, VRAM read back | open |
 | 2026-11-25 | `rngNext()` returned 0 forever when called before `consoleInit()` or `rngSeed()`: `rand_seed` starts at 0, the LFSR's fixed point. Found by the audit of functions that depend on an Init (after `isPAL`, `294fbb3c`); the others read (`console_brightness`, `mosaic`, `colormath`, `window`, `mode7` scales, `text` cursor) have a usable zero state or set it in their own call | fixture `libtests_rng_preinit`, negative control `r_nonzero` 0 | fixed |
+| 2026-11-25 | `isPAL()` before `consoleInit()` gave 0 on a PAL console; the fix `294fbb3c` had no pre-Init fixture | fixture `libtests_ispal_preinit` (PAL region), negative control `r_ispal` 0 with the old code | fixed |
 
 ## Campaign closed — 2026-10-05
 

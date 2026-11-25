@@ -1,0 +1,9 @@
+# isPAL() before consoleInit() (2026-11-25): it reads the region from $213F
+# on its first call. Negative control: the old code returned 0 here on PAL.
+rom = "../fixtures/libtests_ispal_preinit/libtest_ispal_preinit.sfc"
+frames = 10
+region = "pal"
+
+[asserts.values]                 # u16, little-endian
+r_done = 0xC0DE
+r_ispal = 1
