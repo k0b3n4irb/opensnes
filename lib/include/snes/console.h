@@ -391,6 +391,10 @@ void resetFrameCount(void);
  * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) (it returned 0xFF for PAL
  *         before 2026-09-22)
  *
+ * Safe to call at any time, including before consoleInit(): the first call
+ * reads the region from $213F itself (it used to return 0 until
+ * consoleInit() had run).
+ *
  * @code
  * if (isPAL()) {
  *     // Adjust game speed for 50Hz

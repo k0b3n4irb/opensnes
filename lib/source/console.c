@@ -48,7 +48,9 @@ u8 console_brightness = 15;
 /* Prefixed and out of console.h since 2026-10-03 (was `force_blanked`). */
 u8 console_force_blanked = 1;
 
-/** PAL/NTSC flag */
+/** Region: 0 = not read yet, 1 = NTSC, 2 = PAL. isPAL() reads $213F on its
+ *  first call, so it is right even before consoleInit(). Zero-initialised on
+ *  purpose: a non-zero initial value adds a startup copy. */
 static u8 is_pal_system;
 
 /** Random seed */
@@ -67,7 +69,7 @@ void consoleInit(void) {
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
     /* Detect PAL/NTSC */
-    is_pal_system = (REG_STAT78 & 0x10) ? 1 : 0;
+    is_pal_system = 1 + ((REG_STAT78 >> 4) & 1);
 
     /* Set default brightness (screen still blanked) */
     console_brightness = 15;
@@ -246,7 +248,12 @@ void resetFrameCount(void) {
  *============================================================================*/
 
 u8 isPAL(void) {
-    return is_pal_system;
+    /* Lazy read: the region does not change, so one $213F read is enough
+     * (the read resets the OPHCT/OPVCT pointers, hence only once). */
+    if (is_pal_system == 0) {
+        is_pal_system = 1 + ((REG_STAT78 >> 4) & 1);
+    }
+    return is_pal_system - 1;
 }
 
 /*============================================================================
