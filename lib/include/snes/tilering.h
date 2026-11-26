@@ -74,6 +74,11 @@
  *   characters consecutive both in ROM and in the ring. No copy and no RAM,
  *   but in VBlank each entry costs VRAM_QUEUE_ENTRY_COST more.
  *
+ * @note The staging copy is a DMA made during the picture: the CPU stops for
+ *       its length (about 256 master cycles a character, one transfer per run
+ *       of consecutive characters), and an H or V IRQ due meanwhile is served
+ *       late. A game with raster IRQ gives no staging buffer, or allows for
+ *       the delay.
  * @note No HDMA on DMA channel 0 with this module, in either mode: the
  *       staging copy, tileRingFill() and vramQueueFlush() all rewrite that
  *       channel's registers. HDMA goes on channels 1-6 (snes/hdma.h).
