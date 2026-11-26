@@ -74,8 +74,9 @@
  *   characters consecutive both in ROM and in the ring. No copy and no RAM,
  *   but in VBlank each entry costs VRAM_QUEUE_ENTRY_COST more.
  *
- * @note Uses DMA channel 0 to fill the staging buffer, outside VBlank:
- *       a game that runs HDMA on channel 0 gives no staging buffer.
+ * @note No HDMA on DMA channel 0 with this module, in either mode: the
+ *       staging copy, tileRingFill() and vramQueueFlush() all rewrite that
+ *       channel's registers. HDMA goes on channels 1-6 (snes/hdma.h).
  * @note The camera moves at most one character (8 px) a frame on each
  *       axis: tileRingUpdate() moves the window one row and one column at
  *       most and returns how far it still is. A jump is a new
