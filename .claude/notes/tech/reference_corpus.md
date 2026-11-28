@@ -73,7 +73,7 @@ so every id changed once; old ids still resolve through an alias table in
 `corpus get` — 17 of 17 of ours checked, same text. Cite the new id when you
 touch a comment. fullsnes's prose (~400 KB) is indexed again. Golden
 queries 9/9. Serving it on the replica takes `git pull` + `make import
-SRC=/media/psf/Home/workspaces/SNES/rag-partner` + `make rebuild`; the index
+SRC=<shared-folder>` + `make rebuild`; the index
 is down for the ~2.5 min of the rebuild (reported).
 
 ## Index state (2026-10-02, evening)

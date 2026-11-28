@@ -1,4 +1,4 @@
-Expert 02, puces d'extension (SA-1, Super FX, DSP-1). Audit du 2026-10-17. HEAD audité : `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`), luna `1.38.0`.
+Expert 02, puces d'extension (SA-1, Super FX, DSP-1). Audit du 2026-10-17. HEAD audité : `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`), luna `1.38.0`.
 
 # 02 — Puces d'extension : état réel avant 1.0
 

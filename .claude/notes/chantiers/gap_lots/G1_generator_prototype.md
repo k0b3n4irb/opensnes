@@ -37,7 +37,7 @@ so (an early verdict costs 4 to 6 days, not 11).
 
 ## Order and gates
 1. Contest this plan (Fable, written, before step 1): what is missing, which cost is underestimated, which yardstick is not
-   looked at (the other 65816 compiler's measure, private, is the first: `dumps/…/vbcc`).
+   looked at (the other 65816 compiler's measure, private, is the first: a private folder outside the repository).
 2. Step 1 harness; step 2 stop/go on the leaves; step 3; step 4 verdict to the conductor with the table.
 3. Each step: state identical, the prediction written before, the lesson in the kit.
 

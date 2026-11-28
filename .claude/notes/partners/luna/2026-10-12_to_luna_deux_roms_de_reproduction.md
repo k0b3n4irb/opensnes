@@ -2,7 +2,7 @@
 
 De : OpenSNES, sur luna 1.38.0 (pin `testing/luna.version`), arbre `develop`
 `f5143169`. Poids : léger. Non bloquant. Statut : envoyé tel quel, avec les
-pièces dans `~/workspace/partner-reports/opensnes/2026-10-12_roms/`.
+pièces dans `<exchange-folder>/opensnes/2026-10-12_roms/`.
 
 Les deux lignes « tenues en réserve » de `OPEN_luna.md` depuis le 5 octobre
 avaient été notées sans ROM ; les voici avec leur ROM, rejouées aujourd'hui.

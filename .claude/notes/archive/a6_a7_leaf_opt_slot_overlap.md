@@ -137,7 +137,7 @@ A as a separate perf optimisation chantier.
 
 ```sh
 $ grep -B2 -A4 "^rectInit:" \
-    /home/kobenairb/workspace/opensnes/lib/build/lorom/collision.c.asm
+    <workspace>/opensnes/lib/build/lorom/collision.c.asm
 rectInit:
     rep #$20
 @start.96:
@@ -159,8 +159,8 @@ signature.
 4. Rebuild the test fixture (CRITICAL — see [[a6_a7_unit_test_diagnostic]]
    for the stale-build trap I fell into earlier today):
    `cd tools/opensnes-emu/test/fixtures/unit/collision && \
-    OPENSNES=/home/kobenairb/workspace/opensnes make clean && \
-    OPENSNES=/home/kobenairb/workspace/opensnes SKIP_LINT=1 make`
+    OPENSNES=<workspace>/opensnes make clean && \
+    OPENSNES=<workspace>/opensnes SKIP_LINT=1 make`
 5. Run the diagnostic: `node /tmp/diag_collision_fail_list.mjs` — should
    show 0 FAIL lines.
 6. Quick suite: `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick`

@@ -1,6 +1,6 @@
 # Audit D — tests et intégration continue (2026-10-03)
 
-Dépôt `/home/kobenairb/workspace/opensnes`, `develop` @ `73fbdddb` au début de l'audit (`756da353` à la fin : `12a2dcc7` a réparé pendant l'audit le rouge CI décrit au point faible 2), luna épinglé v1.31.0, lecture seule. Mission ajoutée : la chasse aux défauts silencieux avant le gel 1.0 (`.claude/notes/status/silent_defects_log.md`).
+Dépôt `<workspace>/opensnes`, `develop` @ `73fbdddb` au début de l'audit (`756da353` à la fin : `12a2dcc7` a réparé pendant l'audit le rouge CI décrit au point faible 2), luna épinglé v1.31.0, lecture seule. Mission ajoutée : la chasse aux défauts silencieux avant le gel 1.0 (`.claude/notes/status/silent_defects_log.md`).
 
 ## Pourquoi les six défauts ont passé
 

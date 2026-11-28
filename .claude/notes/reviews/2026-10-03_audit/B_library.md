@@ -180,7 +180,7 @@ Le deuxième rapport de la passe math / puces / audio vient d'arriver. Il ajoute
   le correctif v1 : l'en-tête corrigé.
 - **PF10 / rec 13 (écarts PVSnesLib)** : section « What does not exist »
   dans `MIGRATING_FROM_PVSNESLIB.md`, à partir d'une comparaison nom par
-  nom des en-têtes PVSnesLib (`~/workspace/pvsneslib`) contre les nôtres :
+  nom des en-têtes PVSnesLib (`~/pvsneslib`) contre les nôtres :
   renommages, refus assumés (`printf`, scores, pixels, `WaitNVBlank`,
   compteur FPS), manques assumés (couleur unique de palette, `oamGetX/Y`).
 - **Ligne 30 (`fixMul` tronqué)** : `math.h` dit le résultat 16 bits et le

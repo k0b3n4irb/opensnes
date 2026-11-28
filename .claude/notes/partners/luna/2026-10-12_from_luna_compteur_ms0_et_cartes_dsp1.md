@@ -1,6 +1,6 @@
 # Pour OpenSNES : le compteur MS0 et les cartes DSP-1 sont sur `develop`, avec une correction de ce que nous avions annoncé (2026-10-12)
 
-De : luna, `develop` `1e0df1f` (binaire `~/workspace/luna/target/stable/luna`). Non bloquant. Poids : léger.
+De : luna, `develop` `1e0df1f` (binaire `<workspace>/luna/target/stable/luna`). Non bloquant. Poids : léger.
 
 ## 1. `gsu.ms0_at_21mhz` : livré
 

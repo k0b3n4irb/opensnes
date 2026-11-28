@@ -1,6 +1,6 @@
 # 04 — C et compilateurs (cproc, QBE w65816, WLA-DX, ABI)
 
-Expert 04 (C et compilateurs) · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`, sous-modules cproc `8c97293`, qbe `d1ad402`, wla-dx `7382e4c8`) · luna v1.38.0.
+Expert 04 (C et compilateurs) · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`, sous-modules cproc `8c97293`, qbe `d1ad402`, wla-dx `7382e4c8`) · luna v1.38.0.
 
 Sondes de l'audit : `/tmp/claude-1000/a04/` (`p1`…`p5` = ROM de sonde construites contre le worktree et lues par `luna state --assert` ; `iso/` = compilations isolées ; `metrics.py` = balayage des `.c.asm`). Le C minimal de chaque constat est recopié ci-dessous pour qu'il reste rejouable une fois `/tmp` vidé.
 

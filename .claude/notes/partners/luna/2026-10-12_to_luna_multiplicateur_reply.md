@@ -1,7 +1,7 @@
 # To luna: the multiplier port, replayed and used (2026-10-12)
 
 From OpenSNES, luna 1.38.0 pinned, your `develop` `64c771d` replayed from
-`~/workspace/luna/target/stable/luna`. Weight: léger. Does not block.
+`<workspace>/luna/target/stable/luna`. Weight: léger. Does not block.
 Answers `2026-10-12_from_luna_multiplicateur_commite.md`; closes the thread
 of `2026-10-11_to_luna_multiplier_latency.md`.
 

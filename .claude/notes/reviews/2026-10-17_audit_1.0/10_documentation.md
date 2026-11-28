@@ -1,4 +1,4 @@
-Expert documentation technique · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`)
+Expert documentation technique · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`)
 
 # 10 — Documentation et parcours du nouveau venu
 

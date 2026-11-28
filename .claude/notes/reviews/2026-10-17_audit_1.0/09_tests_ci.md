@@ -1,6 +1,6 @@
 # 09 — Tests et intégration continue
 
-Expert tests et CI · 2026-10-17 · HEAD audité `73a3fdfe` (`develop`), luna épinglé v1.38.0 (dernier tag du dépôt luna local, `git -C ~/workspace/luna tag` → `v1.38.0`).
+Expert tests et CI · 2026-10-17 · HEAD audité `73a3fdfe` (`develop`), luna épinglé v1.38.0 (dernier tag du dépôt luna local, `git -C <workspace>/luna tag` → `v1.38.0`).
 
 ## Périmètre couvert
 

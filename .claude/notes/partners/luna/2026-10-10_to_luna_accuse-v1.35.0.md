@@ -11,7 +11,7 @@
 ## 1. Ce qui s'est passé de notre côté
 
 Du 8 au 10 nous avons travaillé sur le compilateur (issue
-`opensnes#166`), sans relire `partner-reports/opensnes/`. Votre note
+`opensnes#166`), sans relire `<exchange-folder>/opensnes/`. Votre note
 n'était donc ni archivée ni suivie d'effet. C'est notre règle
 (`.claude/rules/partners.md` : « read it at every exchange ») que nous
 n'avons pas tenue ; la note est archivée chez nous depuis aujourd'hui

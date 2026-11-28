@@ -1,13 +1,13 @@
-Expert 12 : build et outils multi-plateformes · audit du 2026-10-17 · HEAD audité `73a3fdfe` (develop, worktree `/home/kobenairb/workspace/opensnes-audit`)
+Expert 12 : build et outils multi-plateformes · audit du 2026-10-17 · HEAD audité `73a3fdfe` (develop, worktree `<workspace>/opensnes-audit`)
 
-> **Incident pendant l'audit, à lire avant le reste.** Un `cd` vers un dossier de travail inexistant a échoué, et la commande suivante est partie dans le dossier par défaut de la session, **l'arbre principal** `/home/kobenairb/workspace/opensnes`. Elle y a lancé `make OPENSNES=<worktree> clean`, puis `make GSU_BANK=99`, puis de nouveau `make clean`, puis `make GSU_BANK=x`, entre 11:55 et 11:58 environ. Mon `OPENSNES=` n'agissait que sur `common.mk` : à la racine, c'est le `Makefile` de l'arbre principal qui a tourné.
+> **Incident pendant l'audit, à lire avant le reste.** Un `cd` vers un dossier de travail inexistant a échoué, et la commande suivante est partie dans le dossier par défaut de la session, **l'arbre principal** `<workspace>/opensnes`. Elle y a lancé `make OPENSNES=<worktree> clean`, puis `make GSU_BANK=99`, puis de nouveau `make clean`, puis `make GSU_BANK=x`, entre 11:55 et 11:58 environ. Mon `OPENSNES=` n'agissait que sur `common.mk` : à la racine, c'est le `Makefile` de l'arbre principal qui a tourné.
 > État constaté juste après, en lecture seule :
 > - `bin/` est reconstruit et complet (19 binaires, 11:58).
 > - `lib/build` est reconstruit : ses 233 objets sont identiques octet pour octet à ceux du worktree.
 > - En revanche, **les 85 ROM des exemples ont disparu**, et **10 fichiers suivis par git sont supprimés** : `examples/audio/{apu_switch/cello,apu_switch/drums,pitch_mod/player,play_noise/player,speech_synth/player}.spc700.bin`, `examples/audio/sfx_from_wav/res/{blip,coin}.h`, `examples/maps/map_scroll/res/tiledMario.{b16,o16,t16}`.
 > - Pendant environ trois minutes, `bin/` a été incomplet pour le jeu qui se construit sur cet arbre.
 >
-> Je n'ai rien restauré : toute écriture dans l'arbre principal m'est interdite. Pour remettre l'arbre en état, il faut soit `git -C /home/kobenairb/workspace/opensnes checkout -- <les 10 fichiers>`, soit `make examples` dans cet arbre, qui les régénère avec les mêmes octets (ici, le worktree reconstruit ne montre aucune différence avec les fichiers suivis). La décision revient au propriétaire. Il faut aussi prévenir the game.
+> Je n'ai rien restauré : toute écriture dans l'arbre principal m'est interdite. Pour remettre l'arbre en état, il faut soit `git -C <workspace>/opensnes checkout -- <les 10 fichiers>`, soit `make examples` dans cet arbre, qui les régénère avec les mêmes octets (ici, le worktree reconstruit ne montre aucune différence avec les fichiers suivis). La décision revient au propriétaire. Il faut aussi prévenir the game.
 >
 > **Mise à jour, 12:22 (reprise de l'audit).** Lu en lecture seule : l'arbre principal est revenu à un état propre, sans que j'y aie touché. `git status --untracked-files=no` ne liste aucun fichier, les 85 `.sfc` sont présents et `bin/` compte 19 binaires. Les 10 fichiers suivis existent de nouveau, datés de 12:20 (`cello.spc700.bin`, `tiledMario.b16`…). Il reste seulement à prévenir the game que `bin/` a été incomplet vers 11:55-11:58.
 

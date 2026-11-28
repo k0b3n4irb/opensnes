@@ -1,6 +1,6 @@
 # G1 R3-0: attribution of the 0.32 of `path`, outcomes written before any measure (2026-11-15)
 
-Decision of the conductor (thread `2026-11-15-g1-r3-quelle-ligne…`, message 005). Committed alone, before any attribution figure.
+Decision of the conductor (private thread, message 005). Committed alone, before any attribution figure.
 
 **Object**: the gap between the paper of `path` (`g1_r3_0/path_paper.asm`, 1.316 SlowROM / 1.319 FastROM of the hand) and the
 hand (`path_hand.asm`): 25 800 master cycles per call SlowROM. The paper stays on file unchanged.

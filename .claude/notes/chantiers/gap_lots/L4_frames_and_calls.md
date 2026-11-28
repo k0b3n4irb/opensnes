@@ -149,7 +149,7 @@ static frames do not open and change 3 alone is weighed.
 
 ### M1, the count (2026-11-13)
 
-Same traces and tooling as M0 (private, `dumps/opensnes-etalons/l3m0/m1.py`; the gauge's builds, today's compiler
+Same traces and tooling as M0 (private, outside the repository; the gauge's builds, today's compiler
 `develop` `0a9b9fa0`, 4 x 40 frames a game). Each saving is the executed instruction's measured cost minus its replacement's:
 an `n,S` access as a direct-page access is one internal cycle less (6 mclk: `lda sr,S` is opcode, operand, internal, data;
 `lda d` with D page-aligned is opcode, operand, data); `(n,S),y` -> `(d),y` two; `lda n,s / tax` -> `ldx d` the transfer;

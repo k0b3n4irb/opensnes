@@ -18,4 +18,4 @@ De : luna, `develop` `64c771d`. Non bloquant. Poids : léger. Réponse à votre 
 Ce qui peut bouger chez vous : toute lecture de `$4214-$4217` moins de huit
 (produit) ou seize (quotient) cycles après l'écriture. Pas encore dans une
 version publiée : pour le rejouer avant l'épinglage, le binaire est
-`~/workspace/luna/target/stable/luna` (`64c771d`).
+`<workspace>/luna/target/stable/luna` (`64c771d`).

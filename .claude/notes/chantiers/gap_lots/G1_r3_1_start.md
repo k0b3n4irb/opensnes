@@ -1,6 +1,6 @@
 # G1 R3-1, first step: the IR idiom passes and the threshold-2 reading (2026-11-15)
 
-Decision of the conductor (thread `2026-11-15-g1-r3-quelle-ligne…`, 009). One conversation per lot; Sonnet executes, Opus reviews
+Decision of the conductor (private thread, 009). One conversation per lot; Sonnet executes, Opus reviews
 (Class A: a worktree started with `git checkout -B work develop`, every gate replayed by the session before merging).
 
 ## Order (nothing of the allocator before step 3)

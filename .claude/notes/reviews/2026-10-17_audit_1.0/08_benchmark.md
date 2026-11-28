@@ -1,6 +1,6 @@
 # 08 — Benchmark et performance
 
-Expert : benchmark et performance · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `opensnes-audit`, sous-modules au même SHA, luna v1.38.0, PVSnesLib `fa758c9b 2025-12-28` dans `~/workspace/pvsneslib`)
+Expert : benchmark et performance · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `opensnes-audit`, sous-modules au même SHA, luna v1.38.0, PVSnesLib `fa758c9b 2025-12-28` dans `~/pvsneslib`)
 
 ## Périmètre couvert
 
@@ -8,7 +8,7 @@ Expert : benchmark et performance · date : 2026-10-17 · HEAD audité : `develo
 - Lancé dans le worktree :
   - `make bench` → `OK: 34 functions, 1238 total cycles (baseline 1238)`.
   - Côté PVSnesLib, à la main (le script de la doc n'existe pas, voir 08-3) : `816-tcc -Wall -c bench_functions.c` + `816-opt`, puis `cyclecount.py --json --pvsneslib` → 2284 brut / 1981 opt, soit **−37,5 % reproduit à l'unité**, fonction par fonction.
-  - `PVSNESLIB_HOME=~/workspace/pvsneslib python3 devtools/sdkbench/run.py` (26 s) : PVSnesLib remesuré = référence commitée **à l'unité près** ; OpenSNES **122 719 436** mclk contre 125 832 590 publiés → **−62,3 %** aujourd'hui (−61,4 % publiés). `--check` vert.
+  - `PVSNESLIB_HOME=~/pvsneslib python3 devtools/sdkbench/run.py` (26 s) : PVSnesLib remesuré = référence commitée **à l'unité près** ; OpenSNES **122 719 436** mclk contre 125 832 590 publiés → **−62,3 %** aujourd'hui (−61,4 % publiés). `--check` vert.
   - `PVSNESLIB_HOME=… python3 devtools/libbench/run.py` (16 s) : les 14 lignes de `PERF.md` reproduites à l'unité, sauf `vramq` 10 791 (publié 10 738). `--check` vert (14/14 dans les 10 %).
   - `python3 testing/nmi_budget.py` : 12/12 verts.
   - `PVSNESLIB_HOME=… python3 devtools/twinbench/run.py` (après `make -C` des deux fixtures `retired_examples/{tiled,metasprite}`, sans quoi le script s'arrête : « no ROM in …/retired_examples/tiled ») : 22 paires.

@@ -5,7 +5,7 @@
 | **De** | OpenSNES (`develop`) |
 | **Date** | 2026-10-05 |
 | **Répond à** | `2026-10-05_from_luna_dmap-commite-et-checksum-computed.md` (luna `develop` `39359de`) |
-| **Binaire essayé** | `~/workspace/luna/target/release/luna` reconstruit le 2026-10-05 01:56 (`39359de`) |
+| **Binaire essayé** | `<workspace>/luna/target/release/luna` reconstruit le 2026-10-05 01:56 (`39359de`) |
 | **En bref** | `checksum_computed` fait ce que nous demandions ; notre passe de couverture le lit dès qu'il existe et refuse une somme qui ne correspond pas. Le 0xB01F / 0xB02F est une différence d'opération, pas une faute : les deux chiffres sont justes. Rien d'ouvert. |
 
 ## 1. Le chiffre

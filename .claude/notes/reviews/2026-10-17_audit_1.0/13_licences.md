@@ -1,4 +1,4 @@
-Expert 13 — Licences, provenance et conformité · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`)
+Expert 13 — Licences, provenance et conformité · 2026-10-17 · HEAD audité `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`)
 
 > Je ne suis pas avocat. Ce rapport décrit des risques et des écarts entre ce que le dépôt livre et ce que les licences demandent. Ce n'est pas un avis juridique. Avant une 1.0 « commercial-grade », la question des assets et des marques mérite une relecture par un juriste.
 
@@ -7,7 +7,7 @@ Expert 13 — Licences, provenance et conformité · 2026-10-17 · HEAD audité 
 - **Licences des composants livrés.** Lu : `LICENSE`, `ATTRIBUTION.md` (247 l.), `docs/THIRD_PARTY.md` (103 l.), `tools/third_party/README.md` et les `LICENSE` des trois sous-modules (`compiler/cproc` ISC, `compiler/qbe` MIT, `compiler/wla-dx` **GPL-2.0-or-later**). Lu aussi les en-têtes de `tools/lib/{gfx4snes,smconv,tmx2snes}/src`, de `tools/third_party/*` et de 60 sources de `lib/source`, puis `templates/crt0.asm`, `templates/hdr.asm`, `lib/source/runtime.asm` et `lib/source/sm_spc.asm`.
 - **Le zip.** J'ai lu la recette `release` (`Makefile:628-686`), `release-examples` (`Makefile:690-699`) et la matrice de `.github/workflows/release.yml:41-54`. `file bin/*` donne 19 binaires dans `bin/`, **tous liés statiquement**.
 - **Ce qui finit dans la ROM d'un jeu fermé.** La lib, crt0, le runtime, le pilote SNESMOD et l'en-tête de ROM.
-- **Provenance des assets.** J'ai comparé les md5 de tous les fichiers non-source suivis de `examples/` et `starter/` à un clone local de PVSnesLib (`~/workspace/pvsneslib`, `fa758c9b`, 2025-12-28, 3649 fichiers). J'ai lu les chaînes des sept modules `.it` suivis et les README d'exemples qui citent un auteur tiers (krom, Kenney, PVSnesLib).
+- **Provenance des assets.** J'ai comparé les md5 de tous les fichiers non-source suivis de `examples/` et `starter/` à un clone local de PVSnesLib (`~/pvsneslib`, `fa758c9b`, 2025-12-28, 3649 fichiers). J'ai lu les chaînes des sept modules `.it` suivis et les README d'exemples qui citent un auteur tiers (krom, Kenney, PVSnesLib).
 - **Marques.** J'ai cherché « Nintendo », « SNES », « Mario », « Tetris » et « 1942 » dans les noms, les `ROM_NAME`, le README, la page d'accueil et `docs/`.
 - **Le suivi.** `2026-10-04_reste_a_traiter.md` (F PF1, H « risque GPL », la décision du propriétaire du 10-05) et `H_governance.md` §16-17 et §101.
 - **Non couvert.**

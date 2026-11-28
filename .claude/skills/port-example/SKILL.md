@@ -19,7 +19,7 @@ Port a PVSnesLib example to OpenSNES SDK, preserving identical visual output.
 ```
 $PVSNESLIB_HOME/snes-examples/
 ```
-Set `PVSNESLIB_HOME` to your local PVSnesLib clone (e.g. `export PVSNESLIB_HOME=~/workspace/pvsneslib`).
+Set `PVSNESLIB_HOME` to your local PVSnesLib clone (e.g. `export PVSNESLIB_HOME=~/pvsneslib`).
 
 ## Step-by-Step Porting Protocol
 

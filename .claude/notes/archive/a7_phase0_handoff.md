@@ -86,7 +86,7 @@ int main(void) {
 Companion `/tmp/a7_repro/Makefile`:
 
 ```make
-OPENSNES := /home/kobenairb/workspace/opensnes
+OPENSNES := <workspace>/opensnes
 TARGET   := a7_repro.sfc
 ROM_NAME := A7 REPRO
 CSRC     := main.c

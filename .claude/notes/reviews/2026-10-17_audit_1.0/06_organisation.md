@@ -6,7 +6,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 
 1. Lus : `CLAUDE.md`, les 19 fichiers de `.claude/rules/`, `.claude/settings.json` et ses trois hooks, `.claude/agents/`, `.claude/skills/`, `.claude/notes/README.md`, les six notes de `status/`, l'en-tête et l'entrée A5 de `STRUCTURAL_DEFECTS.md`, `ROADMAP.md`, `docs/STABILITY.md`, `CONTRIBUTING.md`, `MAINTAINING.md`, `.github/` (CODEOWNERS, 9 workflows, `lint.yml`, `release.yml`), `devtools/lint_commits.py`, `compiler/PINS.md`.
 2. Audits précédents : `H_governance.md` et `2026-10-04_reste_a_traiter.md` (lignes H), la fiche D1-D5 et `silent_defects_log.md` (critère 7).
-3. Mesuré dans l'arbre principal, en lecture seule : `git log` / `shortlog` / `numstat` sur 30 jours (614 commits sur `develop`), tailles des sections du CHANGELOG, octets chargés à chaque session, l'état des dossiers d'échange partenaires (`~/workspace/partner-reports/opensnes/`, dossier rag-partner).
+3. Mesuré dans l'arbre principal, en lecture seule : `git log` / `shortlog` / `numstat` sur 30 jours (614 commits sur `develop`), tailles des sections du CHANGELOG, octets chargés à chaque session, l'état des dossiers d'échange partenaires (`<exchange-folder>/opensnes/`, dossier rag-partner).
 4. Lancé dans le worktree `opensnes-audit` : `make lint-docs` (vert, 85 exemples), `devtools/lint_commits.py --message-file` sous une identité de contributeur fictive (refus, exit 1).
 5. Pas de mesure réseau (`gh issue list` interdit par le mandat) : l'état des issues et PR GitHub n'est pas mesuré dans ce rapport.
 
@@ -46,7 +46,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 
 **06-3 🔴 La porte « jeu vitrine » n'a aucun candidat publiable, et aucune des trois portes du propriétaire n'a de date (H PF14 toujours ouvert).**
 - **Jeu vitrine.** `ROADMAP.md:52` dit « Showcase game (not a port) — In progress outside this repository ». Les deux jeux en cours ne remplissent pas cette ligne :
-  - Le RPG, sorti de l'arbre le 09-26 (`06930df8`), a son dernier commit le 2026-09-26 (`~/workspace/opensnes-rpg`, `ea3a0a8`) et aucun `remote` configuré. Il ne progresse pas.
+  - Le RPG, sorti de l'arbre le 09-26 (`06930df8`), a son dernier commit le 2026-09-26 (`<workspace>/opensnes-rpg`, `ea3a0a8`) et aucun `remote` configuré. Il ne progresse pas.
   - Le seul autre jeu actif est un projet tiers sous licence, privé. Il ne peut donc pas servir de preuve publique.
 - **Session console.** `docs/HARDWARE_VERIFICATION.md:170` dit toujours « No session recorded yet ».
 - **Assets.** Ils sont à refaire « before a 1.0 release candidate », sans date ni personne désignée (`ROADMAP.md:53`).
@@ -142,7 +142,7 @@ Expert : organisation et structure de projet · date : 2026-10-17 · HEAD audit�
 ## Risques
 
 - **Le jeu pilote l'API dans les derniers jours avant le gel.** `[Unreleased]` ajoute quatre fonctions publiques demandées par un jeu bâti sur le SDK (`vramQueueCost`, `audioReleaseEcho`, `audioLoadSampleBegin/Step`) cinq jours après « the SDK carries the public API meant for 1.0 » (`ROADMAP.md:14`). Une API gelée avant d'avoir servi à un second projet risque de garder la forme d'un seul jeu, que le dépôt ne peut même pas montrer (06-9).
-- **Les règles dépendent d'une seule machine.** `partners.md` et `exchanges.md` (auto-chargés) imposent des chemins locaux (`/media/psf/Home/...`, `~/workspace/partner-reports/`) et des sessions jointes par `SendMessage`. rag-partner n'est pas public (H PF18). Un second mainteneur ne pourrait suivre ni le circuit partenaires ni la règle `hardware_claims.md` sans recréer cet environnement.
+- **Les règles dépendent d'une seule machine.** `partners.md` et `exchanges.md` (auto-chargés) imposent des chemins locaux (`<shared-folder>`, `<exchange-folder>/`) et des sessions jointes par `SendMessage`. rag-partner n'est pas public (H PF18). Un second mainteneur ne pourrait suivre ni le circuit partenaires ni la règle `hardware_claims.md` sans recréer cet environnement.
 - **Des sessions concurrentes travaillent sur l'arbre que le jeu consomme.** `exchanges.md` reconnaît que le jeu voit les modifications non commitées de cet arbre, et il y avait déjà eu une casse `-Werror` le 10-10. Plusieurs sessions (le jeu, les auditeurs, la session principale) partagent `bin/`, et le marqueur de tests (06-15) est commun à toutes.
 - **Le rythme dépend de l'outillage IA.** Avec 108 commits un jour donné et 45 % des commits le week-end, une interruption de l'outil ou de la disponibilité du mainteneur arrête le projet. Rien n'est prévu pour ce cas.
 - **Une 1.0 avec 185 patchs de compilateur maintenus seul.** cproc 46, QBE 134, wla-dx 5 (`compiler/PINS.md`), pour une promesse de stabilité « until 2.0 ».

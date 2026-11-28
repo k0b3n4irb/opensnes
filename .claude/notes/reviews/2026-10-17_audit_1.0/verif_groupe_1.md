@@ -1,6 +1,6 @@
 # Vérification adversariale — groupe 1 (matériel, puces, audio, benchmark)
 
-2026-10-17, `develop` @ `73a3fdfe`, luna v1.38.0. Les ROM variantes ont été construites dans le scratchpad de la session, avec `OPENSNES` pointé sur le worktree `/home/kobenairb/workspace/opensnes-audit`. Les mesures luna et le twinbench ont tourné dans ce worktree. Les fichier:ligne ont été relus dans l'arbre principal, en lecture seule. Les affirmations matérielles ont été rejouées sur la corpus avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`, en lisant les phrases de l'arbitre.
+2026-10-17, `develop` @ `73a3fdfe`, luna v1.38.0. Les ROM variantes ont été construites dans le scratchpad de la session, avec `OPENSNES` pointé sur le worktree `<workspace>/opensnes-audit`. Les mesures luna et le twinbench ont tourné dans ce worktree. Les fichier:ligne ont été relus dans l'arbre principal, en lecture seule. Les affirmations matérielles ont été rejouées sur la corpus avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`, en lisant les phrases de l'arbitre.
 
 | id | verdict | ce que j'ai relancé | note |
 |---|---|---|---|

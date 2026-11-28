@@ -16,14 +16,14 @@ references say it is built over eight CPU cycles:
 
 ## The piece
 
-`~/workspace/partner-reports/opensnes/pieces/2026-10-11_mulprobe.sfc`
+`<exchange-folder>/opensnes/pieces/2026-10-11_mulprobe.sfc`
 (with its `.sym`, and the routine in `2026-10-11_mulprobe.asm`). It does
 0xFF x 0xFF five times and reads `$4216` then `$4217` with `lda.l`, after
 0, 1, 2, 3 and 4 `nop`, into `probe[0..9]`; `probe[10]` = 0x5A says the
 routine ran.
 
 ```sh
-luna state ~/workspace/partner-reports/opensnes/pieces/2026-10-11_mulprobe.sfc \
+luna state <exchange-folder>/opensnes/pieces/2026-10-11_mulprobe.sfc \
     --until-frame 30 --peek probe:c
 ```
 

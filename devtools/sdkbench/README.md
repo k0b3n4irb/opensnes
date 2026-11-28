@@ -7,7 +7,7 @@ went. The measured table of `docs/BENCHMARK.md` comes from it.
 
 ```bash
 make bench-sdk                                   # OpenSNES against the committed PVSnesLib figures
-PVSNESLIB_HOME=~/workspace/pvsneslib make bench-sdk   # measure PVSnesLib again
+PVSNESLIB_HOME=~/pvsneslib make bench-sdk   # measure PVSnesLib again
 make bench-sdk CHECK=1                           # the CI gate: OpenSNES against baseline.json
 PVSNESLIB_HOME=… make bench-sdk UPDATE=1         # rewrite both committed files and the table of docs/BENCHMARK.md
 ```

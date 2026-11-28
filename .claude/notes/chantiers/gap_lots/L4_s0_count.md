@@ -204,6 +204,6 @@ of the candidates but under 3 % of the gain (cold callers). And M1's proportions
 QBE_SFRAME_DUMP=1 make                                   # the SDK and the corpus, dump lines in every .c.asm
 make count-sframe                                        # faulted run + corpus count
 # the two games (private, the gauge's l4s0 folder, run.sh): the gauge built with QBE_SFRAME_DUMP=1
-# (jauge.py --sdk <tree> --etiquette l4s0), sframe_count.py on each build, trace.py l4s0, gain.py l4s0 sb|x2;
+# (jauge.py --sdk <tree> --etiquette l4s0), sframe_count.py on each build, trace.py l4s0, gain.py l4s0 <game>;
 # GAIN_FRAMES=A-B gain.py ... for one gauge window
 ```

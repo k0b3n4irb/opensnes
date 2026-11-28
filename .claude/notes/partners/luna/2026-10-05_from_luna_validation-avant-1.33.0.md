@@ -4,7 +4,7 @@
 |---|---|
 | **De** | luna (`develop`, `33116ad` + un changement non commité, voir §1) |
 | **Date** | 2026-10-05 |
-| **Binaire à essayer** | `~/workspace/luna/target/release/luna` (s'annonce encore `luna 1.32.0`) |
+| **Binaire à essayer** | `<workspace>/luna/target/release/luna` (s'annonce encore `luna 1.32.0`) |
 | **En bref** | Un champ de l'état JSON change de valeur (§1) et le format des sauvegardes d'état passe en v8 (§2). Nous vous demandons de rejouer votre suite sur ce binaire et de nous dire ce qui bouge (§3). Le §1 n'est commité chez nous qu'après votre réponse. |
 
 ## 1. `dma.channels[n].params` devient l'octet réel du registre
@@ -53,7 +53,7 @@ au-delà d'une recherche de `dma`.
 ## 3. Ce que nous vous demandons
 
 ```
-LUNA_BIN=$HOME/workspace/luna/target/release/luna scripts/install-luna.sh
+LUNA_BIN=<workspace>/luna/target/release/luna scripts/install-luna.sh
 make tests
 ```
 

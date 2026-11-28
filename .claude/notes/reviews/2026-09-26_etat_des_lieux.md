@@ -290,7 +290,7 @@ La chaîne est sérieuse pour un SDK 0.x : pins vérifiés, refus explicites plu
 # Annexe B — Audit — bibliothèque et runtime (2026-09-26)
 
 
-Dépôt `/home/kobenairb/workspace/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2` + phases A/B Super FX, v0.44.0 publiée le 22). Lecture seule.
+Dépôt `<workspace>/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2` + phases A/B Super FX, v0.44.0 publiée le 22). Lecture seule.
 
 ### Périmètre couvert
 
@@ -362,7 +362,7 @@ La bibliothèque est aujourd'hui saine là où elle était dangereuse il y a une
 # Annexe C — Audit — système de build et outils d'assets (2026-09-26)
 
 
-Dépôt : `/home/kobenairb/workspace/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2`, v0.44.0 publiée le 22/09). Lecture seule ; un seul exemple reconstruit (`examples/text/print_string`, `make -B`) et une simulation du zip de release dans le scratchpad.
+Dépôt : `<workspace>/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2`, v0.44.0 publiée le 22/09). Lecture seule ; un seul exemple reconstruit (`examples/text/print_string`, `make -B`) et une simulation du zip de release dans le scratchpad.
 
 ### Périmètre couvert
 
@@ -456,7 +456,7 @@ Le build est rapide (~11 s pour tout, 0,2 s par exemple), bien instrumenté apr�
 # Annexe D — Audit — tests et intégration continue (OpenSNES, 2026-09-26)
 
 
-Dépôt `/home/kobenairb/workspace/opensnes`, `develop` @ `d9f896a2`, branche courante `wip/superfx-runtime` (`6f621f2e`), luna épinglé v1.24.0, lecture seule.
+Dépôt `<workspace>/opensnes`, `develop` @ `d9f896a2`, branche courante `wip/superfx-runtime` (`6f621f2e`), luna épinglé v1.24.0, lecture seule.
 
 ### Périmètre couvert
 
@@ -538,7 +538,7 @@ Pour un SDK 0.x, l'appareil de test est exceptionnel : sept oracles indépendant
 # Annexe E — Audit — documentation et accueil du nouveau venu (2026-09-26)
 
 
-Dépôt : `/home/kobenairb/workspace/opensnes`, branche `wip/superfx-runtime` @ `6f621f2e` (develop @ `d9f896a2`, v0.44.0 du 22/09). Lecture seule ; aucune modification de fichier suivi.
+Dépôt : `<workspace>/opensnes`, branche `wip/superfx-runtime` @ `6f621f2e` (develop @ `d9f896a2`, v0.44.0 du 22/09). Lecture seule ; aucune modification de fichier suivi.
 
 ### Périmètre couvert
 
@@ -605,13 +605,13 @@ L'accueil est au niveau d'un SDK 1.0 sur le geste principal : un nouveau venu sc
 # Annexe F — Audit — exemples et jeux (2026-09-26)
 
 
-Auditeur : agent `audit-examples`. Dépôt `/home/kobenairb/workspace/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2`, v0.44.0). Lecture seule.
+Auditeur : agent `audit-examples`. Dépôt `<workspace>/opensnes`, branche `wip/superfx-runtime` (develop @ `d9f896a2`, v0.44.0). Lecture seule.
 
 ### Périmètre couvert
 
 - Inventaire : 85 `main.c` (`find examples -name main.c | wc -l` = 85 ; `luna_runner.py --list` = 85 ; 85 `.sfc` déjà construits), 17 681 lignes de C suivies sous `examples/` (`git ls-files | grep '\.[ch]$' | xargs cat | wc -l`), 1 743 557 octets d'assets suivis.
 - Lecture intégrale de 6 `main.c` : `text/print_string` (57 l.), `sprites/simple_sprite` (96), `hdma/hdma_wave` (257), `sprites/animated_sprite` (228), `games/breakout` (894), `games/tetris` (727) ; lecture des 8 README de jeux, de `examples/README.md`, `examples/games/README.md`, `docs/examples_group.md`, `ATTRIBUTION.md`, `.claude/rules/new_example.md`, `.claude/skills/port-example/SKILL.md`, `.claude/notes/chantiers/examples_reorg_by_usecase.md`, `.claude/notes/conventions/example_pedagogy.md`, `projects/rpg/docs/tech/STATUS.md`, `projects/rpg/Makefile`.
-- Mesures : grep de motifs périmés sur les sources suivies uniquement (les `combined.asm` générés exclus), détection de fonctions dupliquées (script Python sur les 95 `.c`), matrice de couverture par grep sur sources + Makefiles, `md5sum` croisé entre les assets des exemples et le clone PVSnesLib (`~/workspace/pvsneslib`, 483 fichiers d'assets), conformité Doxygen des en-têtes, présence README/PNG, date du dernier commit par exemple.
+- Mesures : grep de motifs périmés sur les sources suivies uniquement (les `combined.asm` générés exclus), détection de fonctions dupliquées (script Python sur les 95 `.c`), matrice de couverture par grep sur sources + Makefiles, `md5sum` croisé entre les assets des exemples et le clone PVSnesLib (`~/pvsneslib`, 483 fichiers d'assets), conformité Doxygen des en-têtes, présence README/PNG, date du dernier commit par exemple.
 - Exécution : `make lint-docs` (vert), `luna test` sur 4 manifestes de jeux (`movement_breakout`, `state_tetris`, `movement_likemario`, `movement_rpg` — 4 PASS, luna 1.24.0).
 - Hors périmètre (→ aspects docs / tests / build) : contenu de `docs/`, harnais luna lui-même, budget bank $00 par exemple.
 
@@ -629,7 +629,7 @@ Auditeur : agent `audit-examples`. Dépôt `/home/kobenairb/workspace/opensnes`,
 
 ### Points faibles
 
-1. 🔴 **Assets Nintendo (Mario, Goomba, Koopa) livrés byte-identiques depuis PVSnesLib, sans attribution.** Preuve : le croisement `md5sum` donne **66 fichiers dans 23 exemples** identiques à un fichier de `~/workspace/pvsneslib/snes-examples/`, dont `games/likemario/res/tiles.png`, `games/mapandobjects/res/{mario,goomba,koopatroopa,tilesMario}.png`, `maps/map_scroll/res/mario.png`, `maps/slope_collision/res/tiles.png`, `maps/tiled/res/tileslevel1.png`, `sprites/{metasprite,dynamic_metasprite}/res/spritehero*.png`, `windows/window/res/bg{1,2}.png`, les 3 `.it` de `audio/snesmod_*`, `likemario/res/overworld.it` + `mariojump.brr`. `ATTRIBUTION.md` ne cite que Kenney sous « Game Assets » et impose pourtant (« Code Attribution in Files ») un en-tête par fichier dérivé. La licence MIT de PVSnesLib (`~/workspace/pvsneslib/LICENSE`) couvre le code d'alekmaul, pas des sprites de Nintendo. Conséquence : les zips de release (`release.yml`) redistribuent de la propriété intellectuelle tierce sous bannière MIT ; un 1.0 ne peut pas partir avec. Effort : M (remplacer 4 jeux d'assets Mario par de l'original, attribuer le reste).
+1. 🔴 **Assets Nintendo (Mario, Goomba, Koopa) livrés byte-identiques depuis PVSnesLib, sans attribution.** Preuve : le croisement `md5sum` donne **66 fichiers dans 23 exemples** identiques à un fichier de `~/pvsneslib/snes-examples/`, dont `games/likemario/res/tiles.png`, `games/mapandobjects/res/{mario,goomba,koopatroopa,tilesMario}.png`, `maps/map_scroll/res/mario.png`, `maps/slope_collision/res/tiles.png`, `maps/tiled/res/tileslevel1.png`, `sprites/{metasprite,dynamic_metasprite}/res/spritehero*.png`, `windows/window/res/bg{1,2}.png`, les 3 `.it` de `audio/snesmod_*`, `likemario/res/overworld.it` + `mariojump.brr`. `ATTRIBUTION.md` ne cite que Kenney sous « Game Assets » et impose pourtant (« Code Attribution in Files ») un en-tête par fichier dérivé. La licence MIT de PVSnesLib (`~/pvsneslib/LICENSE`) couvre le code d'alekmaul, pas des sprites de Nintendo. Conséquence : les zips de release (`release.yml`) redistribuent de la propriété intellectuelle tierce sous bannière MIT ; un 1.0 ne peut pas partir avec. Effort : M (remplacer 4 jeux d'assets Mario par de l'original, attribuer le reste).
 2. 🟠 **Aucun jeu n'est « complet » au sens du README, sauf tetris.** `examples/README.md` l. 26 annonce « Complete game projects » et `games/README.md` « Game state machines (title, playing, game over) ». Mesuré :
    | Jeu | lignes main.c (dossier) | états | game over | redémarrage | audio | sauvegarde | preuve |
    |---|---|---|---|---|---|---|---|
@@ -725,7 +725,7 @@ Le corpus est large (85 exemples, tous construits, tous sous luna), la mécaniqu
 # Annexe G — Audit — puces d'extension (SA-1, Super FX, DSP-1) — 2026-09-26
 
 
-Auditeur : agent `audit-chips`. Dépôt `/home/kobenairb/workspace/opensnes`,
+Auditeur : agent `audit-chips`. Dépôt `<workspace>/opensnes`,
 branche `wip/superfx-runtime` @ `6f621f2e` (develop @ `d9f896a2`, v0.44.0).
 luna épinglé v1.24.0 (`tools/luna-test/luna.version`). Reference corpus :
 207 sources, index du 2026-09-25 (empreinte `e2a738a553ec`).

@@ -588,7 +588,7 @@ longer recurses (`QBE_SINK_DEEP=1` restores it).
   unchanged (1270);
 - corpus: 86/86 MATCH at offset 0; nine WRAM streams re-captured (direct
   page temps renumbered);
-- the work was done in a separate worktree (`~/workspace/opensnes-s8`,
+- the work was done in a separate worktree (`<workspace>/opensnes-s8`,
   submodules as worktrees of the main tree's), the compiler binary given
   meanwhile in a separate directory: the first chantier run under
   `exchanges.md`.
@@ -875,7 +875,7 @@ with the libtests as the judge.
 ## 2026-10-12 — the waits shortened, judged by luna `64c771d`
 
 luna committed the port the same day (`64c771d`, not yet released; binary
-`~/workspace/luna/target/stable/luna`). Our probe gives
+`<workspace>/luna/target/stable/luna`). Our probe gives
 `f1fec1fe01fe01fe01fe5a00` there, and a finer one (nop and xba fillers,
 8-bit and 16-bit reads: `partners/luna/2026-10-12_to_luna_multiplicateur_reply.md`)
 says the product is complete 8 CPU cycles after the write of `$4203`

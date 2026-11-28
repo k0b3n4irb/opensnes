@@ -31,7 +31,7 @@ its row in `luna_tooling.md` are deleted, `diff_corpus.py` gains a
 
 **2026-10-10, `diff --audio --align-onset` with more than one sound.**
 `audio/echo` before and after a compiler step (ROMs in
-`~/workspace/partner-reports/opensnes/2026-10-10_roms_audio-onsets/`):
+`<exchange-folder>/opensnes/2026-10-10_roms_audio-onsets/`):
 `luna diff --audio --align-onset echo_before.sfc echo_after.sfc
 --until-frame 300` says DIFF, max delta 21.83 % in the 1500 ms window,
 onset shift +2 samples. Sample against sample the two captures are the

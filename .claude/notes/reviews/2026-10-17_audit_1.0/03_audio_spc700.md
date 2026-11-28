@@ -1,4 +1,4 @@
-Expert 03 — audio SNES (SPC700, S-DSP, SNESMOD, moteur audio v2) · 2026-10-17 · HEAD audité `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`, luna v1.38.0)
+Expert 03 — audio SNES (SPC700, S-DSP, SNESMOD, moteur audio v2) · 2026-10-17 · HEAD audité `73a3fdfe` (worktree `<workspace>/opensnes-audit`, luna v1.38.0)
 
 # Audit 1.0 — audio
 

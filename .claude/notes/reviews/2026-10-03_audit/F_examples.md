@@ -34,7 +34,7 @@ Méthode : ROM existantes lancées sur `tools/luna-test/bin/luna` au-delà des t
 - Inventaire : 89 `main.c` (audio 10, backgrounds 10, basics 8, chips 6, color 8, fundamentals 1, games 8, hdma 4, input 5, maps 4, memory 2, mode7 5, scrolling 3, sprites 8, text 2, transitions 2, windows 3). 18 360 lignes de C suivies (`git ls-files examples | grep -E '\.(c|h)$' | xargs cat | wc -l`). Assets suivis : 3,8 Mo. Nouveaux depuis le 2026-09-26 : `mode4`, `mode6`, `superfx_game_skeleton`, `pseudo_hires`, `extbg`.
 - Lecture intégrale de 6 `main.c` (`print_string`, `simple_sprite`, `hdma_wave`, `windows/window`, `breakout`, `shmup_1942`), plus `tetris/render.c`, `scene_stack/main.c`, `dynamic_map/main.c` l. 379-470, et les README des 8 jeux.
 - Exécution luna (v1.31.0) : ~60 `state`/`frames`, 4 bots MCP, 33 manifestes générés (`luna test --jobs 0`), 445 runs `--power-on`, 2 traces DSP, 3 traces CPU/DMA.
-- Statique : greps de motifs périmés, des écritures de registres directes, des duplications et de la matrice de couverture. `md5sum` croisé avec `~/workspace/pvsneslib/snes-examples`. `make lint-docs` (vert, 89).
+- Statique : greps de motifs périmés, des écritures de registres directes, des duplications et de la matrice de couverture. `md5sum` croisé avec `~/pvsneslib/snes-examples`. `make lint-docs` (vert, 89).
 - Comparaison point par point avec l'annexe F du 2026-09-26 (`reviews/2026-09-26_etat_des_lieux.md` l. 605-720).
 
 ## Points forts

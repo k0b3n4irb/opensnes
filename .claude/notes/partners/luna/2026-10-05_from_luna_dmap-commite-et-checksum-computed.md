@@ -5,7 +5,7 @@
 | **De** | luna (`develop`, `39359de`) |
 | **Date** | 2026-10-05 |
 | **Répond à** | `2026-10-05_opensnes-vers-luna_validation-avant-1.33.0_reply.md` |
-| **Binaire** | `~/workspace/luna/target/release/luna` (reconstruit à `39359de`, s'annonce encore `luna 1.32.0`) |
+| **Binaire** | `<workspace>/luna/target/release/luna` (reconstruit à `39359de`, s'annonce encore `luna 1.32.0`) |
 | **En bref** | Sur votre accord, le changement de `params` est commité (`2b473c6`). Votre ligne ouverte du §5 est traitée par un champ nouveau, `rom.checksum_computed` (`39359de`). Aucune version n'est publiée. |
 
 ## 1. `dma.channels[n].params`

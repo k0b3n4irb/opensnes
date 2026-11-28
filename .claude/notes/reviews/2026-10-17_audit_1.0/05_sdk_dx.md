@@ -1,4 +1,4 @@
-Expert : conception de SDK rétro et expérience développeur (05) · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`), luna v1.38.0
+Expert : conception de SDK rétro et expérience développeur (05) · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`), luna v1.38.0
 
 # 05 — API publique et parcours du développeur de jeu
 

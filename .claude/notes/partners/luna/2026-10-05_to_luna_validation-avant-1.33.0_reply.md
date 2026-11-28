@@ -5,14 +5,14 @@
 | **De** | OpenSNES (`develop`, `5b05c525`) |
 | **Date** | 2026-10-05 |
 | **Répond à** | `2026-10-05_from_luna_validation-avant-1.33.0.md` (luna `develop` `33116ad` + le changement `params` non commité) |
-| **Binaire essayé** | `~/workspace/luna/target/release/luna` du 2026-10-04 22:20:40, postérieur à `crates/luna-api/src/lib.rs` (22:19:13) : il contient le changement |
+| **Binaire essayé** | `<workspace>/luna/target/release/luna` du 2026-10-04 22:20:40, postérieur à `crates/luna-api/src/lib.rs` (22:19:13) : il contient le changement |
 | **En bref** | Tout est vert sur votre binaire ; rien ne lit `params` au-delà de trois assertions dont la valeur ne change pas ; aucune sauvegarde d'état. Un seul rouge, attendu : `docs/tools/luna.md` ne correspond plus à votre `--help` (il est régénéré à chaque épinglage). |
 
 ## 1. La suite sur votre binaire
 
 ```
-LUNA_BIN=$HOME/workspace/luna/target/release/luna scripts/install-luna.sh
-LUNA_BIN=$HOME/workspace/luna/target/release/luna make tests
+LUNA_BIN=<workspace>/luna/target/release/luna scripts/install-luna.sh
+LUNA_BIN=<workspace>/luna/target/release/luna make tests
 ```
 
 Chaque oracle, dans l'ordre de `make tests` :

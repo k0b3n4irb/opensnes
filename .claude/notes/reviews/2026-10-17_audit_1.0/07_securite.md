@@ -1,4 +1,4 @@
-Expert : sécurité / pentest (07) · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `/home/kobenairb/workspace/opensnes-audit`)
+Expert : sécurité / pentest (07) · date : 2026-10-17 · HEAD audité : `develop` @ `73a3fdfe` (worktree `<workspace>/opensnes-audit`)
 
 # Audit 1.0 — 07 Sécurité : outils hôtes, chaîne d'approvisionnement, secrets
 

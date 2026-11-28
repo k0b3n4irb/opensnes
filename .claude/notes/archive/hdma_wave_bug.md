@@ -27,7 +27,7 @@
 
 ## TODO
 1. Fix `hdmaWaveH()` / `hdmaWaveUpdate()` / `fillWaveTable()` in `lib/source/hdma.c`
-2. Port the REAL PVSnesLib Waves example from `/home/kobenairb/workspace/pvsneslib/snes-examples/graphics/Effects/Waves`
+2. Port the REAL PVSnesLib Waves example from `~/pvsneslib/snes-examples/graphics/Effects/Waves`
 3. Replace `examples/graphics/effects/hdma_wave/` with the working PVS port
 
 ## Root Cause Investigation

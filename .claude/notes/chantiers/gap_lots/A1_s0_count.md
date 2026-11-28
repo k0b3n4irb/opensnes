@@ -170,6 +170,6 @@ would pick (0.90 against 0.94, 0.97 against 1.03).
 make clean && CC65816_KEEP_IR=$PWD/build/a1_ir make      # the SDK, the library and the corpus with their IR kept
 make count-a1 A1_IR=build/a1_ir                          # census of the corpus and of the library
 # the two games (private, the gauge's a1s0 folder, run.sh): the frozen sources built again with CC65816_KEEP_IR
-# (ROMs cmp-identical to ref1114), trace.py ref1114 sb x2, then a1_count.py --casm-dir <game> --casm-dir lib/build/lorom
+# (ROMs cmp-identical to ref1114), trace.py ref1114 <games>, then a1_count.py --casm-dir <game> --casm-dir lib/build/lorom
 # --ir-dir <game IR> --ir-dir <SDK IR> --rom --sym --trace [--frames A-B for one window] --json
 ```
