@@ -599,11 +599,17 @@ endef
 # project that had written `{ x, y, tile, attr, seen, 0, 12, 32 }` — the
 # form of the SDK's own documentation — stopped compiling the day the field
 # arrived.
+# -Wno-error=unused-but-set-global: clang 23 added the warning (a static
+# variable written and never read) to -Wall -Wextra, and a game that built
+# the day before stopped on a system update. It stays a warning: such a
+# variable may be read from assembly or by a test through its symbol.
+# -Wno-unknown-warning-option: an older clang does not know that name.
 CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
 	-Wno-unused-parameter -Wno-missing-field-initializers \
 	-Wno-error=deprecated-declarations \
-	-Wno-error=deprecated-pragma
+	-Wno-error=deprecated-pragma \
+	-Wno-unknown-warning-option -Wno-error=unused-but-set-global
 
 # C sources → objects
 # Step 1: clang syntax check (cproc has no built-in -W flags so a sibling

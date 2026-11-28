@@ -5,6 +5,7 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- fix(build): the C lint no longer stops a build under clang 23 on `-Wunused-but-set-global`, a warning that release added (a `static` variable written and never read). It is printed as a warning; the other warnings still fail the build, and older clang releases are unaffected.
 - fix(compiler): a 32-bit mask of a 32-bit 0 / 1 chosen by a one-bit test, `((a & 1) ? 1UL : 0UL) & 63`, compiles (qbe `9c97bbc`); qbe stopped on an assertion of its value numbering (`assoccon`). The optimizer replaces the 32-bit choice by the 16-bit test that makes it, an operand this target reads zero-extended, and the step that merges the constants of two `&` in a row asserted that both were 32-bit. It now leaves such a pair as it is: merging across the widening would be wrong for `+`, `-` and `*`. The corpus and the library are byte-identical; the fixture `testing/fixtures/compiler/assoc_widen` checks the values (high half included) and `difftest_stmt` pins the shape as `p17` (found by `--batch idiom`, seed 62339485).
 
 ## [0.56.0] — 2026-11-21
@@ -6321,7 +6322,7 @@ sites across the SDK, 4 of the 5 documented known compiler bugs cleared.
 - **`.gitignore` cleanup** — `.claude/` entry was a blanket gitignore that
   hid project-wide policies. Replaced with the precise
   `.claude/settings.local.json` exclusion.
-- **3 hardcoded `/home/kobenairb/...` paths** in `.claude/rules/` and
+- **3 hardcoded `<home>/...` paths** in `.claude/rules/` and
   skills replaced with `$PVSNESLIB_HOME`.
 - **Two dead unit fixtures** (`unit/animation`, `unit/entity`) referenced
   modules removed from `lib/`. Build phase passed from 76/78 to 76/76.
